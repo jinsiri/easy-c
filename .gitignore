@@ -10,10 +10,11 @@
 /frontend/node_modules/
 /frontend/build/
 /frontend/generated/
+/frontend/.next
 /src/META-INF/
 #/src/test/
 /src/main/resources/static
-#/src/main/resources/application.properties
+/src/main/resources/.env
 
 HELP.md
 .gradle
@@ -52,3 +53,4 @@ out/
 
 ### VS Code ###
 .vscode/
+
