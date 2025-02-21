@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
-import "./globals.css";
+
+//MUI
+import {AppRouterCacheProvider} from "@mui/material-nextjs/v15-appRouter";
+import {ThemeProvider} from "@mui/material/styles";
+import theme from '../theme/Theme';
+
+//CSS
+import "./_css/globals.css";
+
 
 export const metadata: Metadata = {
   title: "EASY-C",
@@ -14,7 +22,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        {children}
+      <AppRouterCacheProvider>
+          <ThemeProvider theme={theme}>
+              <main>{children}</main>
+          </ThemeProvider>
+      </AppRouterCacheProvider>
       </body>
     </html>
   );
