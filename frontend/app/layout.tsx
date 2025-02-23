@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
-//MUI
+/** MUI */
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v15-appRouter";
 import {ThemeProvider} from "@mui/material/styles";
 import theme from '../theme/Theme';
 
-//CSS
+/** CSS */
 import "./_css/globals.css";
 
 

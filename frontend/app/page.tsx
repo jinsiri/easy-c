@@ -1,4 +1,4 @@
-// import Image from "next/image";
+/** MUI */
 import Button from "@mui/material/Button";
 
 import styles from "./page.module.css";
