@@ -1,0 +1,14 @@
+@charset "utf-8";
+
+@import "font.css";
+
+* {
+    box-sizing: border-box;
+    font-size: 16px;
+    color: var(--mui-palette-gray-1000);
+}
+
+a {
+    text-decoration: none;
+
+}
