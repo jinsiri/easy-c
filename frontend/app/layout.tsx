@@ -7,6 +7,7 @@ import theme from '../theme/Theme';
 
 /** CSS */
 import "./_css/globals.css";
+import {Box, Typography} from "@mui/material";
 
 
 export const metadata: Metadata = {
@@ -25,6 +26,9 @@ export default function RootLayout({
       <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
               <main>{children}</main>
+              <Box component={'footer'} display="flex" flexDirection="column" alignItems="center" justifyContent={'center'} sx={{position:'fixed', bottom:0, width:'100%', height:'48px'}}>
+                  <Typography textAlign={'center'} sx={{fontSize:'.813rem', color:'gray.700'}}>Copyright. EasyC All right reserved.</Typography>
+              </Box>
           </ThemeProvider>
       </AppRouterCacheProvider>
       </body>
