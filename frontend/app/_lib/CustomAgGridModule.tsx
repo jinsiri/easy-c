@@ -35,9 +35,7 @@ const theme = themeQuartz
 	});
 
 
-export default function CustomAgGridModule({ children }: Readonly<{
-	children: React.ReactNode;
-}>) {
+export default function CustomAgGridModule() {
 	return (
 		<Box style={{ width: '100%', height: '100%' }}>
 			<AgGridReact
