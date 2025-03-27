@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 
 /** MUI */
-import { Box, IconButton, Stack } from '@mui/material';
+import { Box, IconButton, Paper, Stack } from '@mui/material';
 import FormatIndentIncreaseIcon from '@mui/icons-material/FormatIndentIncrease';
 
 interface propsType {
@@ -18,14 +18,17 @@ export default function Header(props: propsType) {
 	};
 
 	return (
-		<Box sx={{
-			display: 'flex',
-			justifyContent: 'space-between',
-			width: '100%',
-			height: headerHeight,
-			padding: '0.5rem 1rem',
-			backgroundColor: 'aqua',
-		}}>
+		<Paper
+			elevation={3}
+			sx={{
+				display: 'flex',
+				justifyContent: 'space-between',
+				width: '100%',
+				height: headerHeight,
+				padding: '0.5rem 1rem',
+				borderRadius: 0,
+			}}
+		>
 			<Box sx={{ display: 'flex', alignItems: 'center' }}>
 				<IconButton onClick={onClickDrawerButton}>
 					<FormatIndentIncreaseIcon />
@@ -48,6 +51,6 @@ export default function Header(props: propsType) {
 				</Stack>
 
 			</Box>
-		</Box>
+		</Paper>
 	);
 }

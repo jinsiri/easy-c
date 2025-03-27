@@ -15,20 +15,20 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 	const [drawerOpen, setDrawerOpen] = useState(true);
 
 	return (
-		<Box sx={{ display: 'flex', width: '100vw', height: '100vh' }}>
+		<Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100vw', height: '100vh' }}>
 			<Sidebar drawerOpen={drawerOpen} headerHeight={headerHeight}></Sidebar>
-			<Box component={'main'} sx={{
-				width: drawerOpen ? 'calc(100vw - 19rem)' : 'calc(100vw - 4.5rem)',
-				height: '100%',
-				backgroundColor: 'blue',
-				transition: 'all ease 0.3s',
-			}}>
+			<Box
+				component={'main'}
+				sx={{
+					width: drawerOpen ? 'calc(100vw - 19rem)' : 'calc(100vw - 4.5rem)',
+					height: '100%',
+					transition: 'all ease 0.3s',
+				}}
+			>
 				<Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} headerHeight={headerHeight}></Header>
 				<Box sx={{ width: '100%', height: `calc(100% - ${headerHeight})` }}>
 					{children}
 				</Box>
-
-
 			</Box>
 		</Box>
 	);
