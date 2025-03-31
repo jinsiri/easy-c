@@ -1,8 +1,11 @@
+
 const colorScheme = {
     light: {
         palette: {
             primary: {
                 main: '#615FD6',
+				dark: '#5553C9',
+				contrastText: '#FAFAFA',
 
                 50: '#F5F4FF',
                 100: '#D4D2F4',
@@ -18,6 +21,8 @@ const colorScheme = {
 
             secondary: {
                 main: '#FFC45B',
+				contrastText: '#FAFAFA',
+
 
                 50: '#FFF9EE',
                 100: '#FFEDCD',
@@ -33,6 +38,8 @@ const colorScheme = {
 
             success: {
                 main: '#009673',
+				contrastText: '#FAFAFA',
+
 
                 50: '#E5F4F1',
                 100: '#B2DFD5',
@@ -47,6 +54,8 @@ const colorScheme = {
             },
             info: {
                 main: '#0077E4',
+				contrastText: '#FAFAFA',
+
 
                 50: '#E5F1FC',
                 100: '#CCE3F9',
@@ -62,6 +71,8 @@ const colorScheme = {
             },
             warn: {
                 main: '#FF9839',
+				contrastText: '#FAFAFA',
+
 
                 50: '#FFF4EB',
                 100: '#FFE0C3',
@@ -76,6 +87,8 @@ const colorScheme = {
             },
             error: {
                 main: '#DA5645',
+				contrastText: '#FAFAFA',
+
 
                 50: '#FBEEEC',
                 100: '#FDCAC3',
@@ -91,6 +104,8 @@ const colorScheme = {
 
             gray: {
                 main: '#C8C8C8',
+				contrastText: '#FAFAFA',
+
 
                 50: '#FAFAFA',
                 100: '#F5F5F5',

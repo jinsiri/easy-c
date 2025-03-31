@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 /** MUI */
 import { Box, IconButton, Paper, Stack } from '@mui/material';
-import FormatIndentIncreaseIcon from '@mui/icons-material/FormatIndentIncrease';
+import { FormatIndentIncrease, PersonOutlineRounded } from '@mui/icons-material';
 
 interface propsType {
 	drawerOpen: boolean;
@@ -19,37 +19,37 @@ export default function Header(props: propsType) {
 
 	return (
 		<Paper
-			elevation={3}
+			elevation={2}
 			sx={{
 				display: 'flex',
 				justifyContent: 'space-between',
+				alignItems: 'center',
 				width: '100%',
 				height: headerHeight,
-				padding: '0.5rem 1rem',
+				padding: '0 1rem',
 				borderRadius: 0,
 			}}
 		>
 			<Box sx={{ display: 'flex', alignItems: 'center' }}>
-				<IconButton onClick={onClickDrawerButton}>
-					<FormatIndentIncreaseIcon />
+				<IconButton className="contained-primary " onClick={onClickDrawerButton}>
+					<FormatIndentIncrease className="svg-small" />
 				</IconButton>
 			</Box>
 			<Box>
-				<Stack direction={'row'} spacing={'0.5rem'} sx={{ height: '100%', alignItems: 'center' }}>
-					<IconButton>
-						<FormatIndentIncreaseIcon />
+				<Stack direction={'row'} spacing={'0.75rem'} sx={{ height: '100%', alignItems: 'center' }}>
+					<IconButton className="contained-primary">
+						<FormatIndentIncrease className="svg-small" />
 					</IconButton>
-					<IconButton>
-						<FormatIndentIncreaseIcon />
+					<IconButton className="contained-primary">
+						<FormatIndentIncrease className="svg-small" />
 					</IconButton>
-					<IconButton>
-						<FormatIndentIncreaseIcon />
+					<IconButton className="contained-primary">
+						<FormatIndentIncrease className="svg-small" />
 					</IconButton>
-					<IconButton>
-						<FormatIndentIncreaseIcon />
+					<IconButton className="circle-primary">
+						<PersonOutlineRounded />
 					</IconButton>
 				</Stack>
-
 			</Box>
 		</Paper>
 	);
