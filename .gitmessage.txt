@@ -1,21 +1,6 @@
 # git commit message template
-# 추가하고자 하는 type은 아래 문서에 작성해주세요
-
 # 본문과 푸터는 선택 사항입니다.
 # 주석은 커밋에 포함되지 않습니다.
-
-
-# git 메세지 템플릿 설정 적용
-
-# git config --global commit.template .gitmessage.txt
-# 템플릿 설정 적용 후
-# "git commit" 명령어 실행 시 아래 템플릿이 출력됩니다.
-
-# 참고
-# https://velog.io/@bky373/Git-%EC%BB%A4%EB%B0%8B-%EB%A9%94%EC%8B%9C%EC%A7%80-%ED%85%9C%ED%94%8C%EB%A6%BF
-
-
-
 ##################
 # type: Subject (아래에 작성)
 
@@ -25,6 +10,7 @@
 ##################
 # <Type>
 # 타입의 첫 문자는 대문자로 하며, : 뒤에만 space가 있음에 유의
+# 추가하고자 하는 type은 아래에 작성해주세요
 
 # Feat: 새로운 기능 추가
 # Fix: 버그 수정
@@ -58,3 +44,15 @@
 # Resolves: #111
 # Ref: #122
 # related to: #30, #50
+
+======================================================================================================
+
+# git 메세지 템플릿 설정 적용
+
+# git config --global commit.template .gitmessage.txt
+# 템플릿 설정 적용 후
+# "git commit" 명령어 실행 시 아래 템플릿이 출력됩니다.
+
+# 참고
+# https://velog.io/@bky373/Git-%EC%BB%A4%EB%B0%8B-%EB%A9%94%EC%8B%9C%EC%A7%80-%ED%85%9C%ED%94%8C%EB%A6%BF
+
