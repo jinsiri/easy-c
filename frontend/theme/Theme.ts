@@ -5,6 +5,8 @@ import {createTheme} from "@mui/material/styles";
 import colorSchemes from "@/theme/colorSchemes";
 import typography from "@/theme/typography";
 
+import component from './component';
+
 const theme = createTheme({
     cssVariables: true,
     colorSchemes: colorSchemes,
@@ -18,12 +20,8 @@ const theme = createTheme({
             xl: 1536,
         },
     },
-    components: {
-        MuiCheckbox: {
-            styleOverrides: {
-            },
-        }
-    },
-})
+});
+
+theme.components = component(theme);
 
 export default theme;
