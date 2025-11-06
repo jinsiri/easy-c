@@ -68,46 +68,40 @@ export default function Sidebar(props: propsType) {
 	return (
 		<Paper
 			elevation={3}
-			component="nav"
+			component='nav'
 			sx={{
 				width: drawerOpen ? '19rem' : '4.5rem',
 				height: '100%',
-				transition: 'all ease 0.3s',
+				transition: 'all easeInOut 0.4s',
 				zIndex: 500,
 			}}
 		>
 			<Box sx={{ width: '100%', height: headerHeight }}></Box>
-			<Box className="w-100"
-				 sx={{ overflowX: 'hidden', overscrollBehaviorY: 'auto', height: `calc(100% - ${headerHeight})` }}>
-				<List className="w-100" component="div" disablePadding>
-					{
-						navList.map((value, idx) => (
-							<Fragment key={`${idx}_${value.name}`}>
-								<ListItemButton className="nav-depth-1" sx={{ height: drawerOpen ? 'auto' : '3rem' }}>
-									<Box sx={{ padding: '0.5rem' }}>{value.icon} </Box>
-									<Fade in={drawerOpen} easing={'ease'} timeout={200}>
-										<ListItemText primary={value.name} className={'transition-3'}
-													  sx={{ marginLeft: '0.25rem' }} />
-									</Fade>
-									<Fade in={drawerOpen} easing={'ease'} timeout={200}>
-										<ExpandMoreRounded />
-									</Fade>
-								</ListItemButton>
+			<Box className='w-100' sx={{ overflowX: 'hidden', overscrollBehaviorY: 'auto', height: `calc(100% - ${headerHeight})` }}>
+				<List className='w-100' component='div' disablePadding>
+					{navList.map((value, idx) => (
+						<Fragment key={`${idx}_${value.name}`}>
+							<ListItemButton className='nav-depth-1' sx={{ height: drawerOpen ? 'auto' : '3rem' }}>
+								<Box sx={{ padding: '0.5rem' }}>{value.icon} </Box>
+								<Fade in={drawerOpen} easing={'easeInOut'} timeout={200}>
+									<ListItemText primary={value.name} className={'transition-3'} sx={{ marginLeft: '0.25rem' }} />
+								</Fade>
+								<Fade in={drawerOpen} easing={'easeInOut'} timeout={200}>
+									<ExpandMoreRounded />
+								</Fade>
+							</ListItemButton>
 
-								<Collapse in={false} timeout="auto" unmountOnExit>
-									<List component="div" disablePadding>
-										<ListItemButton className="nav-depth-2">
-											<ListItemText primary="Starred" />
-										</ListItemButton>
-									</List>
-								</Collapse>
-
-							</Fragment>
-						))
-					}
+							<Collapse in={false} timeout='auto' unmountOnExit>
+								<List component='div' disablePadding>
+									<ListItemButton className='nav-depth-2'>
+										<ListItemText primary='Starred' />
+									</ListItemButton>
+								</List>
+							</Collapse>
+						</Fragment>
+					))}
 				</List>
 			</Box>
 		</Paper>
-
 	);
 }
