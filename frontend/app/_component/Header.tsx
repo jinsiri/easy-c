@@ -1,8 +1,9 @@
 import { Dispatch, SetStateAction } from 'react';
 
 /** MUI */
-import { Box, IconButton, Paper, Stack } from '@mui/material';
-import { FormatIndentIncrease, PersonOutlineRounded } from '@mui/icons-material';
+import { Box, IconButton, Paper, Stack, Popper, Fade, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
+import { FormatIndentIncrease, PersonOutlineRounded, LogoutRounded, ManageAccountsRounded } from '@mui/icons-material';
+import PopupState, { bindToggle, bindPopper } from 'material-ui-popup-state';
 
 interface propsType {
 	drawerOpen: boolean;
@@ -31,24 +32,59 @@ export default function Header(props: propsType) {
 			}}
 		>
 			<Box sx={{ display: 'flex', alignItems: 'center' }}>
-				<IconButton className="contained-primary " onClick={onClickDrawerButton}>
-					<FormatIndentIncrease className="svg-small" />
+				<IconButton className='contained-primary ' onClick={onClickDrawerButton}>
+					<FormatIndentIncrease className='svg-small' />
 				</IconButton>
 			</Box>
 			<Box>
 				<Stack direction={'row'} spacing={'0.75rem'} sx={{ height: '100%', alignItems: 'center' }}>
-					<IconButton className="contained-primary">
-						<FormatIndentIncrease className="svg-small" />
+					<IconButton className='contained-primary'>
+						<FormatIndentIncrease className='svg-small' />
 					</IconButton>
-					<IconButton className="contained-primary">
-						<FormatIndentIncrease className="svg-small" />
+					<IconButton className='contained-primary'>
+						<FormatIndentIncrease className='svg-small' />
 					</IconButton>
-					<IconButton className="contained-primary">
-						<FormatIndentIncrease className="svg-small" />
+					<IconButton className='contained-primary'>
+						<FormatIndentIncrease className='svg-small' />
 					</IconButton>
-					<IconButton className="circle-primary">
+					{/*<IconButton className='circle-primary'>
 						<PersonOutlineRounded />
-					</IconButton>
+					</IconButton>*/}
+					<PopupState variant='popper' popupId='demo-popup-popper'>
+						{(popupState) => (
+							<div>
+								<IconButton className='circle-primary' {...bindToggle(popupState)}>
+									<PersonOutlineRounded />
+								</IconButton>
+								<Popper {...bindPopper(popupState)} placement='bottom-end' transition>
+									{({ TransitionProps }) => (
+										<Fade {...TransitionProps} timeout={350}>
+											<Paper>
+												<List>
+													<ListItem disablePadding>
+														<ListItemButton>
+															<ListItemIcon>
+																<ManageAccountsRounded />
+															</ListItemIcon>
+															<ListItemText primary='관리자 모드' />
+														</ListItemButton>
+													</ListItem>
+													<ListItem disablePadding>
+														<ListItemButton>
+															<ListItemIcon>
+																<LogoutRounded />
+															</ListItemIcon>
+															<ListItemText primary='로그아웃' />
+														</ListItemButton>
+													</ListItem>
+												</List>
+											</Paper>
+										</Fade>
+									)}
+								</Popper>
+							</div>
+						)}
+					</PopupState>
 				</Stack>
 			</Box>
 		</Paper>
