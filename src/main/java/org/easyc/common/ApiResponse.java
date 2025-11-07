@@ -1,7 +1,6 @@
 package org.easyc.common;
 
 import jakarta.annotation.Nullable;
-import lombok.Data;
 import org.easyc.exception.CustomExceptionCode;
 
 import java.time.Instant;
@@ -9,7 +8,6 @@ import java.time.Instant;
 /**
  * @param result S, F
  */
-@Data
 public record ApiResponse<D>(
         String status,
         String result,
