@@ -2,6 +2,7 @@
 import { Box, List, Paper } from '@mui/material';
 
 /** Custom */
+import { menuType } from '../_constant/Types';
 import AdminMenuItem from './menuItem/AdminMenuItem';
 import Menu1Depth from './menu/Menu1Depth';
 
@@ -12,6 +13,7 @@ interface propsType {
 
 export default function AdminSidebar(props: propsType) {
 	const { drawerOpen, headerHeight } = props;
+	const menuList: menuType[] = AdminMenuItem[0].children ?? [];
 
 	return (
 		<Paper
@@ -27,7 +29,7 @@ export default function AdminSidebar(props: propsType) {
 			<Box sx={{ width: '100%', height: headerHeight }}></Box>
 			<Box className='w-100' sx={{ overflowX: 'hidden', overscrollBehaviorY: 'auto', height: `calc(100% - ${headerHeight})` }}>
 				<List className='w-100' component='div' disablePadding>
-					{AdminMenuItem.map((value) => {
+					{menuList.map((value) => {
 						return value.type === '1depth' && <Menu1Depth key={value.id} item={value} drawerOpen={drawerOpen} />;
 					})}
 				</List>
