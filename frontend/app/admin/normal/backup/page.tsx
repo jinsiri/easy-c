@@ -1,27 +1,27 @@
 'use client';
 
 /** MUI */
-import { Box, Typography, Button, Grid, List, ListItem } from '@mui/material';
+import { Box, Typography, Button, TextField } from '@mui/material';
+
+/** Ag Grid */
+import { ColDef } from 'ag-grid-community';
 
 /** Custom */
 import PathBreadcrumbs from '../../../_component/PathBreadcrumbs';
-import SettingLayoutElement from '../../../_component/layoutElement/SettingLayoutElement';
+import AggridComponent from '@/app/_component/AggridComponent';
 
-const normalList = [
-	{ name: '사이트 명' },
-	{ name: '사이트 URL' },
-	{ name: '도메인 명' },
-	{ name: '담당자' },
-	{ name: '사이트 아이디' },
-	{ name: '도입 일자' },
-	{ name: '총 계정 수' },
-	{ name: '설정 계정' },
-	{ name: '총 할당용량' },
-	{ name: '공용 용량' },
-	{ name: '사용기간' },
+const rowData: Record<string, any>[] = [
+	{ make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
+	{ make: 'Ford', model: 'F-Series', price: 33850, electric: false },
+	{ make: 'Toyota', model: 'Corolla', price: 29600, electric: false },
 ];
 
-const logoList = [{ name: '로고 설정' }, { name: '파비콘 설정' }];
+const colDefs: ColDef<Record<string, any>>[] = [
+	{ field: 'make', headerName: '제조사' },
+	{ field: 'model', headerName: '모델명' },
+	{ field: 'price', headerName: '가격', type: 'numericColumn' },
+	{ field: 'electric', headerName: '전기차 여부' },
+];
 
 export default function AdminNormalBackupPage() {
 	return (
@@ -31,38 +31,14 @@ export default function AdminNormalBackupPage() {
 				<Typography variant='h5' sx={{ fontWeight: '800' }}>
 					데이터 백업 관리
 				</Typography>
-				<Button variant='contained'>설정 저장</Button>
+				<TextField id='outlined-basic' variant='outlined' placeholder='제목을 입력해주세요' />
 			</Box>
-			<Grid container spacing={4} sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
-				<Grid size={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-					<SettingLayoutElement subtitle='서비스 정보'>
-						<List>
-							{normalList.map((item: Record<string, any>, idx: number) => {
-								return (
-									<ListItem key={idx} sx={{ display: 'flex', alignItems: 'center' }}>
-										<Box sx={{ fontSize: '15px', fontWeight: '600' }}>{item.name}</Box>
-										<Box></Box>
-									</ListItem>
-								);
-							})}
-						</List>
-					</SettingLayoutElement>
-				</Grid>
-				<Grid size={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-					<SettingLayoutElement subtitle='로고 및 테마'>
-						<List>
-							{logoList.map((item: Record<string, any>, idx: number) => {
-								return (
-									<ListItem key={idx} sx={{ display: 'flex', alignItems: 'center' }}>
-										<Box sx={{ fontSize: '15px', fontWeight: '600' }}>{item.name}</Box>
-										<Box></Box>
-									</ListItem>
-								);
-							})}
-						</List>
-					</SettingLayoutElement>
-				</Grid>
-			</Grid>
+			<Box sx={{ mb: '1rem' }}>
+				<Button variant='contained'>백업 신청</Button>
+			</Box>
+			<Box sx={{ flexGrow: 1, width: '100%', minHeight: '20rem' }}>
+				<AggridComponent rowData={rowData} colDefs={colDefs} />
+			</Box>
 		</Box>
 	);
 }

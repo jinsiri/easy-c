@@ -172,3 +172,14 @@ a {
 .lh-1 {
 	line-height: 1;
 }
+
+/** Ag Grid */
+.ag-header-cell-label,
+.ag-header-group-cell-label {
+	justify-content: center;
+}
+
+.ag-header-cell-text,
+.ag-header-group-text {
+	color: var(--mui-palette-gray-700);
+}
