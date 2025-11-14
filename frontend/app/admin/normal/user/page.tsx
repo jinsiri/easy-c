@@ -17,13 +17,13 @@ export default function AdminNormalUserPage() {
 			<PathBreadcrumbs />
 			<Box component={'section'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '1.5rem' }}>
 				<Typography variant='h5' sx={{ fontWeight: '800' }}>
-					기본 정보 설정
+					사용자 관리
 				</Typography>
 				<Button variant='contained'>설정 저장</Button>
 			</Box>
 			<Grid container spacing={4} sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
 				<Grid size={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-					<SettingLayoutElement subtitle='서비스 정보'>
+					<SettingLayoutElement subtitle='사용자 프로필 관리'>
 						<List>
 							{profilList.map((item: Record<string, any>, idx: number) => {
 								return (
@@ -37,7 +37,7 @@ export default function AdminNormalUserPage() {
 					</SettingLayoutElement>
 				</Grid>
 				<Grid size={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-					<SettingLayoutElement subtitle='로고 및 테마'>
+					<SettingLayoutElement subtitle='첨부파일 용량 제한'>
 						<List>
 							{fileList.map((item: Record<string, any>, idx: number) => {
 								return (

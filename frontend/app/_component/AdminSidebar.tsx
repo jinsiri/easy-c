@@ -30,7 +30,7 @@ export default function AdminSidebar(props: propsType) {
 			<Box className='w-100' sx={{ overflowX: 'hidden', overscrollBehaviorY: 'auto', height: `calc(100% - ${headerHeight})` }}>
 				<List className='w-100' component='div' disablePadding>
 					{menuList.map((value) => {
-						return value.type === '1depth' && <Menu1Depth key={value.id} item={value} drawerOpen={drawerOpen} />;
+						return value.type === '1depth' && <Menu1Depth key={value.id} item={value} drawerOpen={drawerOpen} prevUrl={'/admin'} />;
 					})}
 				</List>
 			</Box>

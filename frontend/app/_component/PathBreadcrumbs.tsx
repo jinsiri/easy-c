@@ -31,12 +31,18 @@ export default function PathBreadcrumbs() {
 	const breadcrumbs: menuType[] = pathSegments.map((path) => findMenuByUrl(targetMenuItem, path)).filter(Boolean);
 
 	return (
-		<Box sx={{ width: '100%', padding: '1rem 0 0.125rem 0 ' }}>
+		<Box sx={{ width: '100%', padding: '1rem 0 0.25rem 0 ' }}>
 			<Breadcrumbs aria-label='breadcrumb'>
 				{breadcrumbs.length > 0 &&
-					breadcrumbs.map((item: menuType) => {
+					breadcrumbs.map((item: menuType, idx: number) => {
 						return (
-							<Link key={item.id} href={item.url} color='text.primary' underline='hover' sx={{ fontSize: '0.875rem' }}>
+							<Link
+								key={item.id}
+								href={item.url}
+								color={breadcrumbs.length - 1 === idx ? 'primary.main' : 'text.secondary'}
+								underline='hover'
+								sx={{ fontSize: '0.875rem' }}
+							>
 								{item.title}
 							</Link>
 						);
