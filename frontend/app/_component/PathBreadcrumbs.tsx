@@ -31,7 +31,7 @@ export default function PathBreadcrumbs() {
 	const breadcrumbs: menuType[] = pathSegments.map((path) => findMenuByUrl(targetMenuItem, path)).filter(Boolean);
 
 	return (
-		<Box sx={{ width: '100%', padding: '0.5rem 1rem' }}>
+		<Box sx={{ width: '100%', padding: '1rem 0 0.125rem 0 ' }}>
 			<Breadcrumbs aria-label='breadcrumb'>
 				{breadcrumbs.length > 0 &&
 					breadcrumbs.map((item: menuType) => {
