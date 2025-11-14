@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
+import Link from 'next/link';
 
 /** MUI */
 import { Box, IconButton, Paper, Stack, Popper, Fade, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
@@ -10,6 +11,11 @@ interface propsType {
 	setDrawerOpen: Dispatch<SetStateAction<boolean>>;
 	headerHeight: string;
 }
+
+const list = [
+	{ title: '관리자 모드', icon: <ManageAccountsRounded />, component: Link, url: '/admin/normal/setting' },
+	{ title: '로그아웃', icon: <LogoutRounded />, component: 'span', url: undefined },
+];
 
 export default function Header(props: propsType) {
 	const { drawerOpen, setDrawerOpen, headerHeight } = props;
@@ -61,22 +67,18 @@ export default function Header(props: propsType) {
 										<Fade {...TransitionProps} timeout={350}>
 											<Paper>
 												<List>
-													<ListItem disablePadding>
-														<ListItemButton>
-															<ListItemIcon>
-																<ManageAccountsRounded />
-															</ListItemIcon>
-															<ListItemText primary='관리자 모드' />
-														</ListItemButton>
-													</ListItem>
-													<ListItem disablePadding>
-														<ListItemButton>
-															<ListItemIcon>
-																<LogoutRounded />
-															</ListItemIcon>
-															<ListItemText primary='로그아웃' />
-														</ListItemButton>
-													</ListItem>
+													{list.map((item) => {
+														return (
+															<ListItemButton
+																key={item.title}
+																component={item.component}
+																{...(item.component === Link ? { to: item.url } : item.url ? { href: item.url } : {})}
+															>
+																<ListItemIcon>{item.icon}</ListItemIcon>
+																<ListItemText primary={item.title} />
+															</ListItemButton>
+														);
+													})}
 												</List>
 											</Paper>
 										</Fade>
