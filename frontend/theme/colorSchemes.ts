@@ -112,6 +112,11 @@ const colorScheme = {
 				1000: '#383838',
 				1500: '#2A2A2A',
 			},
+
+			text: {
+				primary: '#555555',
+				secondary: '#777777',
+			},
 		},
 	},
 	dark: {
