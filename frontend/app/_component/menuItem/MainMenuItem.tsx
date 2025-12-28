@@ -9,6 +9,7 @@ import {
 	WorkRounded,
 	PsychologyAltRounded,
 	WorkHistoryRounded,
+	BeachAccessRounded,
 } from '@mui/icons-material';
 
 /** Custom */
@@ -22,6 +23,21 @@ const MainMenuItem: menuType[] = [
 		url: '/',
 		children: [
 			{
+				id: 'main-attendance',
+				title: '근태관리',
+				type: '1depth',
+				url: '/attendance',
+				icon: WorkHistoryRounded,
+			},
+			{
+				id: 'main-vacation',
+				title: '휴가관리',
+				type: '1depth',
+				url: '/vacation',
+				icon: BeachAccessRounded,
+			},
+
+			/*{
 				id: 'main-mail',
 				title: '메일',
 				type: '1depth',
@@ -90,7 +106,7 @@ const MainMenuItem: menuType[] = [
 				type: '1depth',
 				url: '/report',
 				icon: AssignmentRounded,
-			},
+			},*/
 		],
 	},
 ];
