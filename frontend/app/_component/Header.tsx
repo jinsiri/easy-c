@@ -2,8 +2,8 @@ import { Dispatch, SetStateAction } from 'react';
 import Link from 'next/link';
 
 /** MUI */
-import { Box, IconButton, Paper, Stack, Popper, Fade, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
-import { FormatIndentIncrease, PersonOutlineRounded, LogoutRounded, ManageAccountsRounded } from '@mui/icons-material';
+import { Box, IconButton, Paper, Stack, Popper, Fade, List, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
+import { FormatIndentIncrease, PersonOutlineRounded, LogoutRounded, ManageAccountsRounded, AssignmentIndRounded } from '@mui/icons-material';
 import PopupState, { bindToggle, bindPopper } from 'material-ui-popup-state';
 
 interface propsType {
@@ -14,6 +14,7 @@ interface propsType {
 
 const list = [
 	{ title: '관리자 모드', icon: <ManageAccountsRounded />, component: Link, url: '/admin/normal/setting' },
+	{ title: '내 인사정보', icon: <AssignmentIndRounded />, component: Link, url: '/management/user' },
 	{ title: '로그아웃', icon: <LogoutRounded />, component: 'span', url: undefined },
 ];
 
