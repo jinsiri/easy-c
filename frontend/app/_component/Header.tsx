@@ -76,7 +76,7 @@ export default function Header(props: propsType) {
 																{...(item.component === Link ? { to: item.url } : item.url ? { href: item.url } : {})}
 															>
 																<ListItemIcon>{item.icon}</ListItemIcon>
-																<ListItemText primary={item.title} />
+																<ListItemText primary={item.title} sx={{ marginRight: '1rem' }} />
 															</ListItemButton>
 														);
 													})}
