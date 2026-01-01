@@ -1,15 +1,5 @@
 /** MUI */
-import {
-	EmailRounded,
-	AddToQueueRounded,
-	ApprovalRounded,
-	AssignmentRounded,
-	CalendarMonthRounded,
-	ForumRounded,
-	WorkRounded,
-	PsychologyAltRounded,
-	WorkHistoryRounded,
-} from '@mui/icons-material';
+import { AssignmentIndRounded, WorkHistoryRounded, BeachAccessRounded } from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '../../_constant/Types';
@@ -22,6 +12,64 @@ const MainMenuItem: menuType[] = [
 		url: '/',
 		children: [
 			{
+				id: 'main-humanResources',
+				title: '인사',
+				type: '1depth',
+				url: '/humanResources',
+				icon: AssignmentIndRounded,
+				children: [
+					{
+						id: 'main-humanResources-user',
+						title: '내 인사 정보',
+						type: '2depth',
+						url: '/user',
+					},
+					{
+						id: 'main-humanResources-salary',
+						title: '내 급여 조회',
+						type: '2depth',
+						url: '/salary',
+					},
+					{
+						id: 'main-humanResources-company',
+						title: '전사 인사 정보',
+						type: '2depth',
+						url: '/company',
+					},
+				],
+			},
+			{
+				id: 'main-attendance',
+				title: '근태',
+				type: '1depth',
+				url: '/attendance',
+				icon: WorkHistoryRounded,
+				children: [
+					{
+						id: 'main-attendance-user',
+						title: '내 근태 정보',
+						type: '2depth',
+						url: '/user',
+					},
+				],
+			},
+			{
+				id: 'main-vacation',
+				title: '휴가',
+				type: '1depth',
+				url: '/vacation',
+				icon: BeachAccessRounded,
+				children: [
+					{
+						id: 'main-vacation-user',
+						title: '내 휴가 정보',
+						type: '2depth',
+						url: '/user',
+					},
+				],
+			},
+
+			/*{
 				id: 'main-mail',
 				title: '메일',
 				type: '1depth',
@@ -90,7 +138,7 @@ const MainMenuItem: menuType[] = [
 				type: '1depth',
 				url: '/report',
 				icon: AssignmentRounded,
-			},
+			},*/
 		],
 	},
 ];

@@ -1,6 +1,7 @@
 'use client';
 
 import { Fragment, useState } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 /** MUI */
@@ -27,12 +28,15 @@ export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 
 	const onClickListItemButton = (event: React.MouseEvent<HTMLElement>) => {
 		setCollapseOpen(!collapseOpen);
+		console.log(event);
 	};
 
 	return (
 		<Fragment>
 			<ListItemButton
 				className='nav-depth-1'
+				component={item.children ? 'span' : Link}
+				href={item.children ? undefined : item.url}
 				sx={{
 					height: drawerOpen ? 'auto' : '3rem',
 					backgroundColor: isActive ? theme.palette.primary[100] : 'transparent',

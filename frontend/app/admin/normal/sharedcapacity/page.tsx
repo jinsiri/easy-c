@@ -26,13 +26,9 @@ const logoList = [{ name: '로고 설정' }, { name: '파비콘 설정' }];
 export default function AdminNormalSharedcapacityPage() {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
-			<PathBreadcrumbs />
-			<Box component={'section'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '1.5rem' }}>
-				<Typography variant='h5' sx={{ fontWeight: '800' }}>
-					공용 용량 관리
-				</Typography>
+			<PathBreadcrumbs>
 				<Button variant='contained'>설정 저장</Button>
-			</Box>
+			</PathBreadcrumbs>
 			<Grid container spacing={4} sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
 				<Grid size={6} sx={{ display: 'flex', flexDirection: 'column' }}>
 					<SettingLayoutElement subtitle='서비스 정보'>

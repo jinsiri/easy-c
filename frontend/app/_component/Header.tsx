@@ -2,8 +2,8 @@ import { Dispatch, SetStateAction } from 'react';
 import Link from 'next/link';
 
 /** MUI */
-import { Box, IconButton, Paper, Stack, Popper, Fade, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
-import { FormatIndentIncrease, PersonOutlineRounded, LogoutRounded, ManageAccountsRounded } from '@mui/icons-material';
+import { Box, IconButton, Paper, Stack, Popper, Fade, List, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
+import { FormatIndentIncrease, PersonOutlineRounded, LogoutRounded, ManageAccountsRounded, ContactsRounded } from '@mui/icons-material';
 import PopupState, { bindToggle, bindPopper } from 'material-ui-popup-state';
 
 interface propsType {
@@ -14,6 +14,7 @@ interface propsType {
 
 const list = [
 	{ title: '관리자 모드', icon: <ManageAccountsRounded />, component: Link, url: '/admin/normal/setting' },
+	{ title: '내 정보', icon: <ContactsRounded />, component: Link, url: '/management/user' },
 	{ title: '로그아웃', icon: <LogoutRounded />, component: 'span', url: undefined },
 ];
 
@@ -28,6 +29,7 @@ export default function Header(props: propsType) {
 		<Paper
 			elevation={2}
 			sx={{
+				flexShrink: 0,
 				display: 'flex',
 				justifyContent: 'space-between',
 				alignItems: 'center',
@@ -75,7 +77,7 @@ export default function Header(props: propsType) {
 																{...(item.component === Link ? { to: item.url } : item.url ? { href: item.url } : {})}
 															>
 																<ListItemIcon>{item.icon}</ListItemIcon>
-																<ListItemText primary={item.title} />
+																<ListItemText primary={item.title} sx={{ marginRight: '1rem' }} />
 															</ListItemButton>
 														);
 													})}

@@ -2,11 +2,12 @@
 import { useState } from 'react';
 
 /** MUI */
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 
 /** Custom */
 import Sidebar from '@/app/_component/Sidebar';
 import Header from '@/app/_component/Header';
+import Footer from '@/app/_component/Footer';
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
 	const headerHeight = '4rem';
@@ -18,26 +19,17 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 			<Box
 				component={'main'}
 				sx={{
+					overflowY: 'auto',
+					display: 'flex',
+					flexDirection: 'column',
 					position: 'relative',
 					width: drawerOpen ? 'calc(100vw - 19rem)' : 'calc(100vw - 4.5rem)',
-					height: '100%',
 					transition: 'all ease 0.3s',
 				}}
 			>
 				<Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} headerHeight={headerHeight}></Header>
-				<Box sx={{ width: '100%', minHeight: `calc(100% - ${headerHeight} - 48px)` }}>{children}</Box>
-				<Box
-					component={'footer'}
-					display='flex'
-					flexDirection='column'
-					alignItems='center'
-					justifyContent={'center'}
-					sx={{ position: 'fixed', bottom: 0, width: 'inherit', height: '48px' }}
-				>
-					<Typography textAlign={'center'} sx={{ fontSize: '.813rem', color: 'gray.700' }}>
-						Copyright. EasyC All right reserved.
-					</Typography>
-				</Box>
+				<Box sx={{ width: '100%', flexGrow: 1 /*height: `calc(100% - ${headerHeight} - 48px)`*/ }}>{children}</Box>
+				<Footer />
 			</Box>
 		</Box>
 	);
