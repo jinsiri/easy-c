@@ -1,5 +1,6 @@
 package org.easyc.exception;
 
+import org.easyc.common.exception.CustomException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
