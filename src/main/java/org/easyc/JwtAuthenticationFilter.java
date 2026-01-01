@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        // 1. 쿠키에서 JWT 가져오기
+        // 쿠키에서 JWT 가져오기
         String token = resolveToken(request);
 
         try {
@@ -46,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         } catch (Exception e) {
+            logger.debug(e.getMessage());
             // JWT 이상 시 인증 무시 -> 401/403은 컨트롤러 접근 시 처리
             SecurityContextHolder.clearContext();
         }

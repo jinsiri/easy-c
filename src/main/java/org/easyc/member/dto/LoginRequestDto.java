@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+//@NoArgsConstructor
 public class LoginRequestDto {
     private String loginId;
-    private String password;
+    private String encryptedPassword;
 }

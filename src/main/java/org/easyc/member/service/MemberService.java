@@ -1,14 +1,15 @@
 package org.easyc.member.service;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.member.dto.LoginRequestDto;
 import org.easyc.member.dto.MemberJoinRequestDto;
 import org.easyc.member.entity.Member;
 import org.easyc.member.repository.MemberRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +17,8 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    private final BCryptPasswordEncoder encoder;
+//    private final BCryptPasswordEncoder encoder;
+    private final PasswordEncoder encoder;
 
     // 로그인 아이디 중복 체크
     public boolean isLoginIdDuplicate(String loginId) {
@@ -33,25 +35,6 @@ public class MemberService {
         memberRepository.save(requestDto.toEntity(encoder.encode(requestDto.getPassword())));
     }
 
-    // 로그인
-    public Member login(LoginRequestDto requestDto) {
-        Optional<Member> optionalUser = memberRepository.findByLoginId(requestDto.getLoginId());
-
-        // loginId와 일치하는 User가 없으면 null return
-        if(optionalUser.isEmpty()) {
-            return null;
-        }
-
-        Member member = optionalUser.get();
-
-        // 찾아온 User의 password와 입력된 password가 다르면 null return
-        if(!member.getPassword().equals(requestDto.getPassword())) {
-            return null;
-        }
-
-        return member;
-    }
-
     // 사용자 정보 조회
     public Member getLoginUserByUserId(Long userId) {
         if(userId == null) return null;
@@ -61,12 +44,10 @@ public class MemberService {
     }
 
     public Member getLoginUserByLoginId(String loginId) {
-        if(loginId == null) return null;
+        if (loginId == null) return null;
 
         Optional<Member> optionalUser = memberRepository.findByLoginId(loginId);
-        return optionalUser.orElse(null);
+        return optionalUser
+                .orElseThrow(() -> new UsernameNotFoundException("Member not found"));
     }
-
-
-
 }
