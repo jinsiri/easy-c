@@ -1,5 +1,5 @@
 /** MUI */
-import { ApprovalRounded, CalendarMonthRounded } from '@mui/icons-material';
+import { AccountTree, ApprovalRounded, CalendarMonthRounded } from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '../../_constant/Types';
@@ -53,6 +53,21 @@ const AdminMenuItem: menuType[] = [
 						title: '팝업 공지 설정',
 						type: '2depth',
 						url: '/popup',
+					},
+				],
+			},
+			{
+				id: 'admin-org',
+				title: '조직 관리',
+				type: '1depth',
+				url: '/org',
+				icon: AccountTree,
+				children: [
+					{
+						id: 'admin-org-list',
+						title: '조직설계',
+						type: '2depth',
+						url: '/list',
 					},
 				],
 			},
