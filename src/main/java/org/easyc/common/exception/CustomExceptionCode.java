@@ -1,4 +1,4 @@
-package org.easyc.exception;
+package org.easyc.common.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,7 @@
-package org.easyc.common;
+package org.easyc.common.response;
 
 import jakarta.annotation.Nullable;
-import org.easyc.exception.CustomExceptionCode;
+import org.easyc.common.exception.CustomExceptionCode;
 
 import java.time.Instant;
 
