@@ -7,6 +7,16 @@ const OutlinedInput = (theme: Theme) => ({
 				padding: '0.5rem 1rem',
 			},
 		},
+		variants: [
+			{
+				props: { size: 'small' },
+				style: {
+					'& .MuiOutlinedInput-input': {
+						padding: '0.375rem 0.75rem',
+					},
+				},
+			},
+		],
 	},
 });
 

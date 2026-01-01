@@ -19,15 +19,16 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 			<Box
 				component={'main'}
 				sx={{
-					overflow: 'auto',
+					overflowY: 'auto',
+					display: 'flex',
+					flexDirection: 'column',
 					position: 'relative',
 					width: drawerOpen ? 'calc(100vw - 19rem)' : 'calc(100vw - 4.5rem)',
-					height: '100%',
 					transition: 'all ease 0.3s',
 				}}
 			>
 				<Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} headerHeight={headerHeight}></Header>
-				<Box sx={{ width: '100%', minHeight: `calc(100% - ${headerHeight} - 48px)` }}>{children}</Box>
+				<Box sx={{ width: '100%', flexGrow: 1 /*height: `calc(100% - ${headerHeight} - 48px)`*/ }}>{children}</Box>
 				<Footer />
 			</Box>
 		</Box>

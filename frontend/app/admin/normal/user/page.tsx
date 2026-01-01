@@ -14,13 +14,9 @@ const fileList = [{ name: '첨부파일 용량 제한' }, { name: '첨부파일 
 export default function AdminNormalUserPage() {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
-			<PathBreadcrumbs />
-			<Box component={'section'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '1.5rem' }}>
-				<Typography variant='h5' sx={{ fontWeight: '800' }}>
-					사용자 관리
-				</Typography>
+			<PathBreadcrumbs>
 				<Button variant='contained'>설정 저장</Button>
-			</Box>
+			</PathBreadcrumbs>
 			<Grid container spacing={4} sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
 				<Grid size={6} sx={{ display: 'flex', flexDirection: 'column' }}>
 					<SettingLayoutElement subtitle='사용자 프로필 관리'>

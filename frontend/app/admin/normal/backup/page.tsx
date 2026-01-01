@@ -1,14 +1,14 @@
 'use client';
 
 /** MUI */
-import { Box, Typography, Button, TextField } from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
+import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
 import PathBreadcrumbs from '../../../_component/PathBreadcrumbs';
-import AggridComponent from '@/app/_component/AggridComponent';
 
 const rowData: Record<string, any>[] = [
 	{ make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
@@ -26,18 +26,14 @@ const colDefs: ColDef<Record<string, any>>[] = [
 export default function AdminNormalBackupPage() {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
-			<PathBreadcrumbs />
-			<Box component={'section'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '1.5rem' }}>
-				<Typography variant='h5' sx={{ fontWeight: '800' }}>
-					데이터 백업 관리
-				</Typography>
+			<PathBreadcrumbs>
 				<TextField id='outlined-basic' variant='outlined' placeholder='제목을 입력해주세요' />
-			</Box>
+			</PathBreadcrumbs>
 			<Box sx={{ mb: '1rem' }}>
 				<Button variant='contained'>백업 신청</Button>
 			</Box>
 			<Box sx={{ flexGrow: 1, width: '100%', minHeight: '20rem' }}>
-				<AggridComponent rowData={rowData} colDefs={colDefs} />
+				<CustomAgGridComp rowData={rowData} colDefs={colDefs} />
 			</Box>
 		</Box>
 	);

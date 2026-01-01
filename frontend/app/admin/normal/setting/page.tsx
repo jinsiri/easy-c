@@ -27,12 +27,6 @@ export default function AdminNormalSettingPage() {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
 			<PathBreadcrumbs />
-			<Box component={'section'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '1.5rem' }}>
-				<Typography variant='h5' sx={{ fontWeight: '800' }}>
-					기본 정보 설정
-				</Typography>
-				<Button variant='contained'>설정 저장</Button>
-			</Box>
 			<Grid container spacing={4} sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
 				<Grid size={6} sx={{ display: 'flex', flexDirection: 'column' }}>
 					<SettingLayoutElement subtitle='서비스 정보'>

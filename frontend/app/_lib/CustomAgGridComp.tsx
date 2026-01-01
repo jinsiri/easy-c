@@ -17,7 +17,7 @@ interface propsType {
 	onGridReady?: (params: GridReadyEvent) => void;
 }
 
-const AggridComponent = forwardRef(({ rowData, colDefs, onGridReady }: propsType, ref) => {
+const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady }: propsType, ref) => {
 	const gridRef = useRef<AgGridReact>(null);
 	const theme = useTheme();
 	const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
@@ -54,5 +54,5 @@ const AggridComponent = forwardRef(({ rowData, colDefs, onGridReady }: propsType
 	);
 });
 
-AggridComponent.displayName = 'AggridComponent';
-export default AggridComponent;
+CustomAgGridComp.displayName = 'CustomAgGridComp';
+export default CustomAgGridComp;
