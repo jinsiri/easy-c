@@ -45,7 +45,7 @@ export default function CommonTabs({ tabs, defaultTab = 0, containerSx }: Common
 				}}
 			>
 				{tabs[value].type === 'grid' && tabs[value].rowData && tabs[value].colDefs ? (
-					<Box sx={{ flexGrow: 1, width: '100%' }}>
+					<Box key={value} sx={{ flexGrow: 1, width: '100%' }}>
 						<CustomAgGridComp rowData={tabs[value].rowData} colDefs={tabs[value].colDefs} />
 					</Box>
 				) : (
