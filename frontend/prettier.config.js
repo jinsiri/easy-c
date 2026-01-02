@@ -8,7 +8,7 @@ const config = {
 	tabWidth: 4,
 	printWidth: 160,
 	arrowParens: 'always',
-	endOfLine: 'crlf',
+	endOfLine: 'lf',
 };
 
 module.exports = config;
