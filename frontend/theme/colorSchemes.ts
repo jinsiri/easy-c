@@ -3,6 +3,7 @@ const colorScheme = {
 		palette: {
 			primary: {
 				main: '#615FD6',
+				light: '#F5F4FF',
 				dark: '#5553C9',
 				contrastText: '#FAFAFA',
 

@@ -18,12 +18,24 @@ const IconButton = (theme: Theme) => ({
 					'& .MuiSvgIcon-root': {
 						fontSize: '1.5rem',
 						fill: theme.palette.primary.contrastText,
+
+						'&.svg': {
+							'&-small': {
+								fontSize: '1.25rem',
+							},
+							'&-x-small': {
+								fontSize: '1.125rem',
+							},
+						},
 					},
 
-					'& .MuiSvgIcon-root.svg-small': {
-						fontSize: '1.25rem',
-					},
+					'&.light': {
+						backgroundColor: theme.palette.primary.light,
 
+						'& .MuiSvgIcon-root': {
+							fill: theme.palette.primary.main,
+						},
+					},
 				},
 
 				'&.circle-primary': {
@@ -39,10 +51,8 @@ const IconButton = (theme: Theme) => ({
 						fontSize: '1.5rem',
 						fill: theme.palette.primary.contrastText,
 					},
-
 				},
 			},
-
 		},
 	},
 });
