@@ -8,6 +8,7 @@ import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import SettingLayoutElement from '@/app/_component/layoutElement/SettingLayoutElement';
 import { AddCircleOutline, Edit, RemoveCircleOutline, Search } from '@mui/icons-material';
 import { useCallback, useMemo, useState } from 'react';
+import CommonTabs from '@/app/_component/CommonTabs';
 
 const tabList = ['부서 정보', '부서원 목록'];
 
@@ -54,11 +55,23 @@ function InfoList({ items }: { items: InfoItem[] }) {
 
 export default function AdminOrgListPage() {
 	const theme = useTheme();
-	const [targetTab, setTargetTab] = useState<number>(0);
 
-	const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
-		setTargetTab(newValue);
-	}, []);
+	const orgTabs = [
+		{
+			label: '부서 정보',
+			content: (
+				<InfoList
+					items={[
+						{ label: '부서명(한글)', value: dummyDept.deptNm },
+						{ label: '부서메일아이디', value: dummyDept.email },
+						{ label: '부서코드', value: dummyDept.deptMngCode },
+						{ label: '부서 약어', value: dummyDept.deptShortNm },
+					]}
+				/>
+			),
+		},
+		{ label: '부서원 목록', content: <>부서원 목록</> },
+	];
 
 	return (
 		<>
@@ -103,41 +116,7 @@ export default function AdminOrgListPage() {
 									<Button variant='outlined'>일괄 등록</Button>
 								</Stack>
 							</Stack>
-							<Box
-								sx={{
-									'&>div': { padding: 0 },
-								}}
-							>
-								<Tabs value={targetTab} onChange={handleTabChange} aria-label='basic tabs example' sx={{ flexShrink: 0, padding: '0 1.5rem' }}>
-									{tabList.map((item: string, idx: number) => {
-										return <Tab id={`simple-tab-${idx}`} aria-controls={`simple-tabpanel-${idx}`} key={idx} label={item} />;
-									})}
-								</Tabs>
-							</Box>
-							<Box
-								sx={{
-									overflow: targetTab === 2 ? 'auto' : 'inherit',
-									display: 'flex',
-									flexDirection: 'column',
-									flexGrow: 1,
-									marginTop: '-1px',
-									padding: targetTab <= 1 ? '1rem 1.125rem' : '',
-									borderTop: `1px solid ${theme.palette.divider}`,
-								}}
-							>
-								{targetTab === 0 && (
-									<>
-										<InfoList
-											items={[
-												{ label: '부서명(한글)', value: dummyDept.deptNm },
-												{ label: '부서메일아이디', value: dummyDept.email },
-												{ label: '부서코드', value: dummyDept.deptMngCode },
-												{ label: '부서 약어', value: dummyDept.deptShortNm },
-											]}
-										/>
-									</>
-								)}
-							</Box>
+							<CommonTabs tabs={orgTabs} />
 						</SettingLayoutElement>
 					</Grid>
 				</Grid>

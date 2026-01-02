@@ -1,15 +1,15 @@
 'use client';
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 /** MUI */
-import { Box, Typography, Tabs, Tab, Grid, List, ListItem, useTheme, OutlinedInput } from '@mui/material';
+import { Box, Typography, Grid, List, ListItem, useTheme, OutlinedInput } from '@mui/material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
-import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
 import PathBreadcrumbs from '../../../_component/PathBreadcrumbs';
+import CommonTabs from '@/app/_component/CommonTabs';
 
 const careerColDefs: ColDef<Record<string, any>>[] = [
 	{ field: '시작일', headerName: '시작일', editable: false },
@@ -49,7 +49,6 @@ const languageColDefs: ColDef<Record<string, any>>[] = [
 	{ field: '기타', headerName: '기타', editable: false },
 ];
 
-const tabList = ['기본 정보', '신상 정보', '경력', '포상/징계', '자격', '어학'];
 const dummyInfo = {
 	'직원 이름': '김호두',
 	사원번호: '250514-1',
@@ -146,11 +145,6 @@ const dummyUserLanguageInfo: ColDef<Record<string, any>>[] = [
 
 export default function HumanResourceUserPage() {
 	const theme = useTheme();
-	const [targetTab, setTargetTab] = useState<number>(0);
-
-	const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
-		setTargetTab(newValue);
-	}, []);
 
 	const tabInfoContents = useMemo(() => {
 		const targetList: Record<string, any> = dummyUserInfo;
@@ -247,25 +241,14 @@ export default function HumanResourceUserPage() {
 		);
 	}, []);
 
-	const tabTableContents = useMemo(() => {
-		if (targetTab >= 2) {
-			const _colDefs = targetTab === 2 ? careerColDefs : targetTab === 3 ? rewardColDefs : targetTab === 4 ? certificateColDefs : languageColDefs;
-			const _rowData =
-				targetTab === 2
-					? dummyUserCareerInfo
-					: targetTab === 3
-						? dummyUserRewardInfo
-						: targetTab === 4
-							? dummyUserCertificateInfo
-							: dummyUserLanguageInfo;
-
-			return (
-				<Box sx={{ flexGrow: 1, width: '100%' }}>
-					<CustomAgGridComp rowData={_rowData} colDefs={_colDefs} />
-				</Box>
-			);
-		}
-	}, [targetTab]);
+	const userTabs = [
+		{ label: '기본 정보', content: tabInfoContents },
+		{ label: '신상 정보', content: tabPersonalContents },
+		{ label: '경력', type: 'grid', colDefs: careerColDefs, rowData: dummyUserCareerInfo },
+		{ label: '포상/징계', type: 'grid', colDefs: rewardColDefs, rowData: dummyUserRewardInfo },
+		{ label: '자격', type: 'grid', colDefs: certificateColDefs, rowData: dummyUserCertificateInfo },
+		{ label: '어학', type: 'grid', colDefs: languageColDefs, rowData: dummyUserLanguageInfo },
+	];
 
 	return (
 		<Box
@@ -314,26 +297,14 @@ export default function HumanResourceUserPage() {
 					</Box>
 				</Box>
 			</Box>
-			<Tabs value={targetTab} onChange={handleTabChange} aria-label='basic tabs example' sx={{ flexShrink: 0, padding: '0 1.5rem' }}>
-				{tabList.map((item: string, idx: number) => {
-					return <Tab id={`simple-tab-${idx}`} aria-controls={`simple-tabpanel-${idx}`} key={idx} label={item} />;
-				})}
-			</Tabs>
-			<Box
-				sx={{
-					overflow: targetTab === 2 ? 'auto' : 'inherit',
+			<CommonTabs
+				tabs={userTabs}
+				containerSx={{
 					display: 'flex',
 					flexDirection: 'column',
-					flexGrow: 1,
 					marginTop: '-1px',
-					padding: targetTab <= 1 ? '1rem 1.5rem' : '',
-					borderTop: `1px solid ${theme.palette.divider}`,
 				}}
-			>
-				{targetTab === 0 && tabInfoContents}
-				{targetTab === 1 && tabPersonalContents}
-				{targetTab >= 2 && tabTableContents}
-			</Box>
+			/>
 		</Box>
 	);
 }
