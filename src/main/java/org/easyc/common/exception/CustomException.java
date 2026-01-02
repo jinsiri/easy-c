@@ -1,4 +1,4 @@
-package org.easyc.exception;
+package org.easyc.common.exception;
 
 public class CustomException extends RuntimeException {
     private final CustomExceptionCode customExceptionCode;
