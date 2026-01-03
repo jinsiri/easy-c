@@ -3,8 +3,9 @@
 import React, { useMemo, useState } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { TextField, Box } from '@mui/material';
+import { TextField, Box, InputAdornment } from '@mui/material';
 import theme from '@/theme/Theme';
+import { Search } from '@mui/icons-material';
 
 export interface FlatData {
 	id: number;
@@ -73,8 +74,24 @@ export default function MyTreeView({ dbData }: { dbData: FlatData[] }) {
 	const treeStructure = useMemo(() => buildTree(dbData), [dbData]);
 
 	return (
-		<Box sx={{ p: 2, minWidth: 300 }}>
-			<TextField fullWidth size='small' label='검색어 하이라이트' variant='outlined' onChange={(e) => setSearchTerm(e.target.value)} sx={{ mb: 2 }} />
+		<Box sx={{ '& input': { fontSize: '.875rem' }, '& .MuiTreeItem-label ': { fontSize: '.875rem' } }}>
+			<TextField
+				fullWidth
+				variant='outlined'
+				hiddenLabel
+				placeholder='부서/부서원을 검색하세요.'
+				slotProps={{
+					input: {
+						startAdornment: (
+							<InputAdornment position='start'>
+								<Search className='svg-small' />
+							</InputAdornment>
+						),
+					},
+				}}
+				onChange={(e) => setSearchTerm(e.target.value)}
+				sx={{ mb: 2 }}
+			/>
 
 			<SimpleTreeView>
 				<RecursiveTreeItem nodes={treeStructure} searchTerm={searchTerm} />
