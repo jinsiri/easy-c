@@ -69,6 +69,12 @@ const AdminMenuItem: menuType[] = [
 						type: '2depth',
 						url: '/list',
 					},
+					{
+						id: 'admin-org-role',
+						title: '직위체계',
+						type: '2depth',
+						url: '/role',
+					},
 				],
 			},
 			{
