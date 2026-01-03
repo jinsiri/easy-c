@@ -44,10 +44,10 @@ const positionTemplate: Record<string, any>[] = [
 export default function AdminOrgRolePage() {
 	const theme = useTheme();
 
-	const [age, setAge] = useState(10);
+	const [jobField, setJobField] = useState('office');
 
 	const handleChange = (event: SelectChangeEvent) => {
-		setAge(event.target.value);
+		setJobField(event.target.value);
 	};
 
 	const roleTabs = [
@@ -111,7 +111,7 @@ export default function AdminOrgRolePage() {
 												<Select
 													labelId='demo-select-small-label'
 													id='demo-select-small'
-													value={age}
+													value={jobField}
 													label='Age'
 													notched={false}
 													sx={{ fontSize: '.875rem' }}
@@ -126,9 +126,9 @@ export default function AdminOrgRolePage() {
 														},
 													}}
 												>
-													<MenuItem value={10}>사무직</MenuItem>
-													<MenuItem value={20}>연구직</MenuItem>
-													<MenuItem value={30}>생산직</MenuItem>
+													<MenuItem value={'office'}>사무직</MenuItem>
+													<MenuItem value={'research'}>연구직</MenuItem>
+													<MenuItem value={'blueCollor'}>생산직</MenuItem>
 												</Select>
 											</FormControl>
 										</Stack>
