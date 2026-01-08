@@ -4,6 +4,8 @@
 import { Box, Grid, Typography, useTheme } from '@mui/material';
 
 /** Custom */
+import ColTitleAndText from '../_component/layoutElement/ColTitleAndText';
+
 export default function Home() {
 	const theme = useTheme();
 
@@ -46,20 +48,17 @@ export default function Home() {
 								<Typography sx={{ marginLeft: '0.25rem', fontWeight: '600' }}>{dummyInfo['직위']}</Typography>
 							</Box>
 							<Box sx={{ fontSize: '0.875rem', color: theme.palette.grey[500] }}>{dummyInfo['부서/직책']}</Box>
-							<Grid container spacing={3} sx={{ display: 'flex', flexDirection: 'row', mt: '1rem' }}>
-								<Grid sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-									<Box sx={{ fontSize: '0.875rem' }}>결재할 문서</Box>
-									<Box sx={{ padding: '0.5rem', fontSize: '1.625rem', fontWeight: '600' }}> 15 </Box>
-								</Grid>
-								<Grid sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-									<Box sx={{ fontSize: '0.875rem' }}>오늘의 할 일</Box>
-									<Box sx={{ padding: '0.5rem', fontSize: '1.625rem', fontWeight: '600' }}> 15 </Box>
-								</Grid>
-								<Grid sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-									<Box sx={{ fontSize: '0.875rem' }}>잔여 휴가</Box>
-									<Box sx={{ padding: '0.5rem', fontSize: '1.625rem', fontWeight: '600' }}> 15 </Box>
-								</Grid>
-							</Grid>
+							<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: '1rem' }}>
+								<ColTitleAndText subtitle='결재할 문서' sx={{ mr: '1.5rem' }}>
+									<Box sx={{ fontSize: '1.625rem', fontWeight: '600' }}> 15 </Box>
+								</ColTitleAndText>
+								<ColTitleAndText subtitle='오늘의 할 일' sx={{ mr: '1.5rem' }}>
+									<Box sx={{ fontSize: '1.625rem', fontWeight: '600' }}> 15 </Box>
+								</ColTitleAndText>
+								<ColTitleAndText subtitle='잔여 휴가'>
+									<Box sx={{ fontSize: '1.625rem', fontWeight: '600' }}> 15 </Box>
+								</ColTitleAndText>
+							</Box>
 						</Box>
 					</Box>
 					<Box
