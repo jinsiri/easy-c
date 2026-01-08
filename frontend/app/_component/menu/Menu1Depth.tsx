@@ -28,7 +28,6 @@ export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 
 	const onClickListItemButton = (event: React.MouseEvent<HTMLElement>) => {
 		setCollapseOpen(!collapseOpen);
-		console.log(event);
 	};
 
 	return (
