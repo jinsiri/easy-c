@@ -1,4 +1,4 @@
-import axiosConfig from '../hooks/axiosConfig';
+import axiosConfig from '../_lib/axiosConfig';
 
 // 로그인, 인증, 토큰 관련 API
 interface LoginRequestDto {
