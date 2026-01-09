@@ -1,4 +1,4 @@
-package org.easyc;
+package org.easyc.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -40,8 +40,11 @@ public class JwtProvider {
 
     public String createToken(Authentication auth) {
 
+        String role = auth.getAuthorities().iterator().next().getAuthority();
+
         return Jwts.builder()
                     .setSubject(auth.getName()) // loginId
+                    .claim("role", role)
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + EXP))
 //                    .signWith(SignatureAlgorithm.HS256, SECRET) // 구식 - 문자열 서명, 보안적으로 권장하지 않음.
@@ -69,6 +72,17 @@ public class JwtProvider {
                 .parseClaimsJws(token);
 
         return claimsJws.getBody().getSubject();
+    }
+
+
+    public String getRole(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("role", String.class);
     }
 
 }

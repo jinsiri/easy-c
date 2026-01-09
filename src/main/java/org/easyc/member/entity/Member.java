@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.easyc.common.constant.MemberRole;
+import org.easyc.member.constant.MemberRole;
 
 @Entity
 @Builder

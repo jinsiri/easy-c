@@ -1,6 +1,7 @@
-package org.easyc;
+package org.easyc.config;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.auth.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,8 +48,8 @@ public class SecurityConfig {
 
                 // URL별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/error").permitAll()  // 이거 추가!
+                        .requestMatchers("/api/auth/**", "/error").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // 그 외 인증 필요
 //                        .anyRequest().permitAll() // 테스트용
                 )

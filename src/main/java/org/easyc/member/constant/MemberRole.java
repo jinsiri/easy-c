@@ -1,4 +1,4 @@
-package org.easyc.common.constant;
+package org.easyc.member.constant;
 
 public enum MemberRole {
     ROLE_USER, ROLE_ADMIN

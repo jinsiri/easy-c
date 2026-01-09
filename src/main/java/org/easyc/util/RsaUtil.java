@@ -1,4 +1,4 @@
-package org.easyc;
+package org.easyc.util;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;

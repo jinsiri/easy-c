@@ -1,7 +1,9 @@
-package org.easyc;
+package org.easyc.auth.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.member.dto.LoginRequestDto;
+import org.easyc.auth.jwt.JwtProvider;
+import org.easyc.auth.dto.LoginRequestDto;
+import org.easyc.util.RsaUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -91,5 +93,6 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
     }
+
 
 }

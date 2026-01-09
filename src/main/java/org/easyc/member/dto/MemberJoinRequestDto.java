@@ -2,7 +2,7 @@ package org.easyc.member.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import org.easyc.common.constant.MemberRole;
+import org.easyc.member.constant.MemberRole;
 import org.easyc.member.entity.Member;
 
 @Getter

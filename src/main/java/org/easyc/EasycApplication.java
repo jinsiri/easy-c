@@ -1,6 +1,6 @@
 package org.easyc;
 
-import org.easyc.common.constant.MemberRole;
+import org.easyc.member.constant.MemberRole;
 import org.easyc.member.entity.Member;
 import org.easyc.member.repository.MemberRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -26,6 +26,15 @@ public class EasycApplication {
 								.loginId("admin")
 								.password(encoder.encode("1234"))
 								.nickname("관리자")
+								.memberRole(MemberRole.ROLE_ADMIN)
+								.build()
+				);
+
+				repo.save(
+						Member.builder()
+								.loginId("user1")
+								.password(encoder.encode("1234"))
+								.nickname("사용자1")
 								.memberRole(MemberRole.ROLE_USER)
 								.build()
 				);
