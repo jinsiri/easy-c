@@ -15,13 +15,13 @@ const dummyDept = {
 	deptId: 1,
 	deptNm: '데모',
 	deptShortNm: '부서 약어',
-	email: 'test@gmail.com',
-	deptLevel: 1,
-	deptOrder: 1,
-	upperDeptNo: 1,
-	lowerDeptCount: 1,
-	deptMngCode: 'c014',
-	deptSortCode: '001',
+	deptCode: 'c014',
+	deptEmail: 'test@gmail.com',
+	treeLevel: 1,
+	treeSiblingOrder: 1,
+	treeParentId: 1,
+	treeChildCount: 1,
+	treeSortCode: '001',
 };
 
 type InfoItem = {
@@ -88,8 +88,8 @@ export default function AdminDeptListPage() {
 				<InfoList
 					items={[
 						{ label: '부서명(한글)', value: dummyDept.deptNm },
-						{ label: '부서메일아이디', value: dummyDept.email },
-						{ label: '부서코드', value: dummyDept.deptMngCode },
+						{ label: '부서메일아이디', value: dummyDept.deptEmail },
+						{ label: '부서코드', value: dummyDept.deptCode },
 						{ label: '부서 약어', value: dummyDept.deptShortNm },
 					]}
 				/>
