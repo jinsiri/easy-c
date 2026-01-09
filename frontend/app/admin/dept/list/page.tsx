@@ -78,10 +78,10 @@ function InfoList({ items }: { items: InfoItem[] }) {
 	);
 }
 
-export default function AdminOrgListPage() {
+export default function AdminDeptListPage() {
 	const theme = useTheme();
 
-	const orgTabs = [
+	const deptTabs = [
 		{
 			label: '부서 정보',
 			content: (
@@ -143,7 +143,7 @@ export default function AdminOrgListPage() {
 									<Button variant='outlined'>일괄 등록</Button>
 								</Stack>
 							</Stack>
-							<CommonTabs tabs={orgTabs} />
+							<CommonTabs tabs={deptTabs} />
 						</SettingLayoutElement>
 					</Grid>
 				</Grid>

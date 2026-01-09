@@ -41,7 +41,7 @@ const positionTemplate: Record<string, any>[] = [
 	},
 ];
 
-export default function AdminOrgRolePage() {
+export default function AdminDeptRolePage() {
 	const theme = useTheme();
 
 	const [jobField, setJobField] = useState('office');
