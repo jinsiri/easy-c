@@ -31,8 +31,15 @@ axiosConfig.interceptors.request.use(
 axiosConfig.interceptors.response.use(
 	(response) => response,
 	(error) => {
-		console.error('Axios 에러:', error);
-		return Promise.reject(error);
+		const message =
+			error.response?.data?.message ??
+			error.message ??
+			'서버 오류가 발생했습니다.';
+
+		return Promise.reject({
+			message,
+			status: error.response?.status,
+		});
 	},
 );
 
