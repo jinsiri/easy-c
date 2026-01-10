@@ -1,5 +1,7 @@
 @charset "utf-8";
 
+@import 'react-calendar-timeline/style.css';
+
 @import 'font.css';
 
 * {
@@ -173,6 +175,12 @@ a {
 	line-height: 1;
 }
 
+.text-ellipsis {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
 /** Ag Grid */
 .ag-header-cell-label,
 .ag-header-group-cell-label {
@@ -183,3 +191,5 @@ a {
 .ag-header-group-text {
 	color: var(--mui-palette-gray-700);
 }
+
+/** React Timelime */
