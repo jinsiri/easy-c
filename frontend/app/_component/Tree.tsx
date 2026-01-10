@@ -9,9 +9,9 @@ import { Search } from '@mui/icons-material';
 
 export interface FlatData {
 	id: number;
-	upperNo: number | null;
 	label: string;
-	sortOrder: number;
+	treeParentId: number | null;
+	treeSiblingOrder: number;
 }
 
 export interface TreeNode extends FlatData {
@@ -28,8 +28,8 @@ export const buildTree = (data: FlatData[]): TreeNode[] => {
 
 	data.forEach((item) => {
 		const node = map[item.id];
-		if (item.upperNo !== null && map[item.upperNo]) {
-			map[item.upperNo].children.push(node);
+		if (item.treeParentId !== null && map[item.treeParentId]) {
+			map[item.treeParentId].children.push(node);
 		} else {
 			roots.push(node);
 		}
@@ -68,7 +68,7 @@ const RecursiveTreeItem = ({ nodes, searchTerm }: { nodes: TreeNode[]; searchTer
 	);
 };
 
-export default function MyTreeView({ dbData }: { dbData: FlatData[] }) {
+export default function CommonTreeview({ dbData }: { dbData: FlatData[] }) {
 	const [searchTerm, setSearchTerm] = useState('');
 
 	const treeStructure = useMemo(() => buildTree(dbData), [dbData]);

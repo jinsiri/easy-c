@@ -1,7 +1,7 @@
 'use client';
 
 /** MUI */
-import { Box, Button, Grid, IconButton, List, ListItem, Stack, Tab, Tabs, Typography, useTheme } from '@mui/material';
+import { Box, Button, Grid, IconButton, List, ListItem, Stack, Typography, useTheme } from '@mui/material';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -9,7 +9,7 @@ import SettingLayoutElement from '@/app/_component/layoutElement/SettingLayoutEl
 import { AddCircleOutline, Edit, RemoveCircleOutline, Search } from '@mui/icons-material';
 import { useCallback, useMemo, useState } from 'react';
 import CommonTabs from '@/app/_component/CommonTabs';
-import MyTreeView from '@/app/_component/Tree';
+import CommonTreeview from '@/app/_component/Tree';
 
 const dummyDept = {
 	deptId: 1,
@@ -31,28 +31,28 @@ type InfoItem = {
 
 const departmentDummyData = [
 	// 1단계: 본부
-	{ id: 100, upperNo: null, label: '경영지원본부', sortOrder: 1 },
-	{ id: 200, upperNo: null, label: '기술연구소', sortOrder: 2 },
+	{ id: 100, treeParentId: null, label: '경영지원본부', treeSiblingOrder: 1 },
+	{ id: 200, treeParentId: null, label: '기술연구소', treeSiblingOrder: 2 },
 
 	// 2단계: 경영지원본부 산하 부서
-	{ id: 110, upperNo: 100, label: '인사팀', sortOrder: 1 },
-	{ id: 120, upperNo: 100, label: '재무팀', sortOrder: 2 },
+	{ id: 110, treeParentId: 100, label: '인사팀', treeSiblingOrder: 1 },
+	{ id: 120, treeParentId: 100, label: '재무팀', treeSiblingOrder: 2 },
 
 	// 3단계: 인사팀 소속 직원 (직원을 부서의 자식으로 처리)
-	{ id: 111, upperNo: 110, label: '김철수 팀장', sortOrder: 1 },
-	{ id: 112, upperNo: 110, label: '이영희 대리', sortOrder: 2 },
+	{ id: 111, treeParentId: 110, label: '김철수 팀장', treeSiblingOrder: 1 },
+	{ id: 112, treeParentId: 110, label: '이영희 대리', treeSiblingOrder: 2 },
 
 	// 2단계: 기술연구소 산하 부서
-	{ id: 210, upperNo: 200, label: '백엔드개발팀', sortOrder: 1 },
-	{ id: 220, upperNo: 200, label: '프론트엔드개발팀', sortOrder: 2 },
+	{ id: 210, treeParentId: 200, label: '백엔드개발팀', treeSiblingOrder: 1 },
+	{ id: 220, treeParentId: 200, label: '프론트엔드개발팀', treeSiblingOrder: 2 },
 
 	// 3단계: 백엔드개발팀 소속 직원
-	{ id: 211, upperNo: 210, label: '박디비 과장', sortOrder: 1 },
-	{ id: 212, upperNo: 210, label: '최서버 사원', sortOrder: 2 },
+	{ id: 211, treeParentId: 210, label: '박디비 과장', treeSiblingOrder: 1 },
+	{ id: 212, treeParentId: 210, label: '최서버 사원', treeSiblingOrder: 2 },
 
 	// 3단계: 프론트엔드개발팀 소속 직원
-	{ id: 221, upperNo: 220, label: '정리액트 팀장', sortOrder: 1 },
-	{ id: 222, upperNo: 220, label: '조넥스트 사원', sortOrder: 2 },
+	{ id: 221, treeParentId: 220, label: '정리액트 팀장', treeSiblingOrder: 1 },
+	{ id: 222, treeParentId: 220, label: '조넥스트 사원', treeSiblingOrder: 2 },
 ];
 
 function InfoList({ items }: { items: InfoItem[] }) {
@@ -131,7 +131,7 @@ export default function AdminDeptListPage() {
 							}
 						>
 							<Box>
-								<MyTreeView dbData={departmentDummyData} />
+								<CommonTreeview dbData={departmentDummyData} />
 							</Box>
 						</SettingLayoutElement>
 					</Grid>
