@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @MappedSuperclass
-public abstract class CommonTreeModel {
+public abstract class BaseTreeEntity extends BaseEntity {
     @Column(name="tree_level")
     private int treeLevel;
 
