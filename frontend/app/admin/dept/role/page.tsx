@@ -57,7 +57,13 @@ export default function AdminDeptRolePage() {
 			content: (
 				<>
 					<Grid container direction={'row'} spacing={2} sx={{ flexGrow: 1, width: '100%', p: 2 }}>
-						<Grid size={8} sx={{ display: 'flex', flexDirection: 'column' }}>
+						<Grid
+							size={{
+								xs: 12,
+								lg: 8,
+							}}
+							sx={{ display: 'flex', flexDirection: 'column' }}
+						>
 							<Grid container justifyContent={'space-between'} alignItems={'center'}>
 								<Grid>
 									<Typography variant='h6'>직위 목록</Typography>
@@ -94,12 +100,23 @@ export default function AdminDeptRolePage() {
 							</Grid>
 							<CustomAgGridComp rowData={dummyPosition} colDefs={positionColDefs} />
 						</Grid>
-						<Grid size={1} sx={{ display: 'flex', flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
+						<Grid
+							size={{
+								xs: 12,
+								lg: 1,
+							}}
+							sx={{ display: 'flex', flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+						>
 							<IconButton className={'contained-primary light'} sx={{ ml: 1 }}>
 								<ArrowBack fontSize={'small'} />
 							</IconButton>
 						</Grid>
-						<Grid size={3}>
+						<Grid
+							size={{
+								xs: 12,
+								lg: 3,
+							}}
+						>
 							<Grid container justifyContent={'space-between'} alignItems={'center'} sx={{ mb: 1 }}>
 								<Grid>
 									<Typography variant='h6'>템플릿</Typography>

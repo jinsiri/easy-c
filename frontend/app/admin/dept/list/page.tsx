@@ -106,7 +106,14 @@ export default function AdminDeptListPage() {
 					</Typography>
 				</Box>
 				<Grid container spacing={3} sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
-					<Grid size={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+					<Grid
+						size={{
+							xs: 12,
+							md: 4,
+							lg: 3,
+						}}
+						sx={{ display: 'flex', flexDirection: 'column' }}
+					>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: '1rem' }}>
 							<Typography sx={{ mr: '1.5rem', fontSize: '1.125rem', fontWeight: 'bold' }}>조직도</Typography>
 							<Box sx={{ flexGrow: 1, height: '1px', bgcolor: theme.palette.grey[300] }} />
@@ -127,7 +134,14 @@ export default function AdminDeptListPage() {
 							</Box>
 						</Box>
 					</Grid>
-					<Grid size={9} sx={{ display: 'flex', flexDirection: 'column' }}>
+					<Grid
+						size={{
+							xs: 12,
+							md: 8,
+							lg: 9,
+						}}
+						sx={{ display: 'flex', flexDirection: 'column' }}
+					>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: '1rem' }}>
 							<Typography sx={{ mr: '1.5rem', fontSize: '1.125rem', fontWeight: 'bold' }}>{dummyDept.deptNm}</Typography>
 							<Box sx={{ flexGrow: 1, height: '1px', bgcolor: theme.palette.grey[300] }} />
