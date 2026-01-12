@@ -30,12 +30,6 @@ const MainMenuItem: menuType[] = [
 						type: '2depth',
 						url: '/salary',
 					},
-					{
-						id: 'main-humanResources-company',
-						title: '전사 인사 정보',
-						type: '2depth',
-						url: '/company',
-					},
 				],
 			},
 			{

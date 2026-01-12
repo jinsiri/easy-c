@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 /** MUI */
 import { Box } from '@mui/material';
@@ -12,6 +12,18 @@ import Footer from '@/app/_component/Footer';
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
 	const headerHeight = '4rem';
 	const [drawerOpen, setDrawerOpen] = useState(true);
+
+	useEffect(() => {
+		const mql = window.matchMedia('(min-width: 1200px)');
+
+		// 초기값 설정
+		setDrawerOpen(mql.matches);
+
+		const handler = (e) => setDrawerOpen(mql.matches);
+		mql.addEventListener('change', handler);
+
+		return () => mql.removeEventListener('change', handler);
+	}, []);
 
 	return (
 		<Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100vw', height: '100vh' }}>
