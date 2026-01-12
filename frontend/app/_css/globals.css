@@ -193,3 +193,37 @@ a {
 }
 
 /** React Timelime */
+.react-calendar-timeline .rct-header-root {
+	background: var(--mui-palette-gray-50);
+	border-bottom: var(--mui-palette-gray-300);
+}
+
+.react-calendar-timeline .rct-calendar-header {
+	border: 1px solid var(--mui-palette-gray-300);
+}
+
+.react-calendar-timeline .rct-dateHeader {
+	border-bottom: 1px solid var(--mui-palette-gray-300);
+	cursor: pointer;
+	font-size: 14px;
+	background-color: var(--mui-palette-gray-100);
+	border-left: 1px solid var(--mui-palette-gray-300);
+}
+
+.react-calendar-timeline .rct-dateHeader-primary {
+	border-left: 1px solid var(--mui-palette-gray-300);
+	border-right: 1px solid var(--mui-palette-gray-300);
+}
+
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-even,
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
+	border-bottom: 1px solid var(--mui-palette-gray-300);
+}
+
+.react-calendar-timeline .rct-vertical-lines .rct-vl {
+	border-left: 1px solid var(--mui-palette-gray-300);
+}
+
+.react-calendar-timeline .rct-items .rct-item {
+	border-radius: 0.25rem;
+}

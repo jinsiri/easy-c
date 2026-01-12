@@ -3,274 +3,35 @@
 import React, { useState } from 'react';
 
 /** MUI */
-import { Box, Grid, Typography, useTheme } from '@mui/material';
+import { Box, Grid, Typography, useTheme, useMediaQuery } from '@mui/material';
+
+/** lib */
+import CustomReactCalendarTimeline from '../_lib/CustomReactCalendarTimeline';
+
+type dayName = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+
+interface CalendarColData {
+	key: dayName;
+	header: string;
+}
 
 interface CalendarData {
 	day: number;
-	attendance: string;
-	leave: string;
-	overtime: string;
-	vacation: string;
+	attendance?: string;
+	leave?: string;
+	fulltime?: string;
+	overtime?: string;
+	vacation?: string;
+	detail?: string;
+	confirm?: string;
 }
 
-const calendarRow: Record<string, CalendarData>[] = [
-	{
-		mon: {
-			day: 1,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		tue: {
-			day: 2,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		wed: {
-			day: 3,
-			attendance: '08:00',
-			leave: '20:00',
-			overtime: '8h 00m 초과',
-			vacation: '',
-		},
-		thu: {
-			day: 4,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '2h 00m 휴가',
-		},
-		fri: {
-			day: 5,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		sat: {
-			day: 6,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		sun: {
-			day: 7,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-	},
-	{
-		mon: {
-			day: 1,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		tue: {
-			day: 2,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		wed: {
-			day: 3,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		thu: {
-			day: 4,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		fri: {
-			day: 5,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		sat: {
-			day: 6,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		sun: {
-			day: 7,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-	},
-	{
-		mon: {
-			day: 1,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		tue: {
-			day: 2,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		wed: {
-			day: 3,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		thu: {
-			day: 4,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		fri: {
-			day: 5,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		sat: {
-			day: 6,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		sun: {
-			day: 7,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-	},
-	{
-		mon: {
-			day: 1,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		tue: {
-			day: 2,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		wed: {
-			day: 3,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		thu: {
-			day: 4,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		fri: {
-			day: 5,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		sat: {
-			day: 6,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		sun: {
-			day: 7,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-	},
-	{
-		mon: {
-			day: 1,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		tue: {
-			day: 2,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		wed: {
-			day: 3,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		thu: {
-			day: 4,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		fri: {
-			day: 5,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		sat: {
-			day: 6,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-		sun: {
-			day: 7,
-			attendance: '',
-			leave: '',
-			overtime: '',
-			vacation: '',
-		},
-	},
-];
-const calendarCol = [
+interface ColData {
+	key: keyof CalendarData;
+	header: string;
+}
+
+const calendarCol: CalendarColData[] = [
 	{ key: 'mon', header: '월요일' },
 	{ key: 'tue', header: '화요일' },
 	{ key: 'wed', header: '수요일' },
@@ -280,11 +41,336 @@ const calendarCol = [
 	{ key: 'sun', header: '일요일' },
 ];
 
+const calendarRow: Record<dayName, CalendarData>[] = [
+	{
+		mon: {
+			day: 1,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+			confirm: '',
+		},
+		tue: {
+			day: 2,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+			confirm: '',
+		},
+		wed: {
+			day: 3,
+			attendance: '08:00',
+			leave: '20:00',
+			fulltime: '12h 00m',
+			overtime: '04h 00m',
+			vacation: '',
+			confirm: '',
+		},
+		thu: {
+			day: 4,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+			confirm: '',
+		},
+		fri: {
+			day: 5,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+			confirm: '',
+		},
+		sat: {
+			day: 6,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+			confirm: '',
+		},
+		sun: {
+			day: 7,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+			confirm: '',
+		},
+	},
+	{
+		mon: {
+			day: 1,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		tue: {
+			day: 2,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		wed: {
+			day: 3,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		thu: {
+			day: 4,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		fri: {
+			day: 5,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		sat: {
+			day: 6,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		sun: {
+			day: 7,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+	},
+	{
+		mon: {
+			day: 1,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		tue: {
+			day: 2,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		wed: {
+			day: 3,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		thu: {
+			day: 4,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		fri: {
+			day: 5,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		sat: {
+			day: 6,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		sun: {
+			day: 7,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+	},
+	{
+		mon: {
+			day: 1,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		tue: {
+			day: 2,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		wed: {
+			day: 3,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		thu: {
+			day: 4,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		fri: {
+			day: 5,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		sat: {
+			day: 6,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		sun: {
+			day: 7,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+	},
+	{
+		mon: {
+			day: 1,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		tue: {
+			day: 2,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		wed: {
+			day: 3,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		thu: {
+			day: 4,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		fri: {
+			day: 5,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		sat: {
+			day: 6,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+		sun: {
+			day: 7,
+			attendance: '',
+			leave: '',
+			fulltime: '',
+			overtime: '',
+			vacation: '',
+		},
+	},
+];
+
+const detailCol: ColData[] = [
+	{
+		header: '근무시작',
+		key: 'attendance',
+	},
+	{
+		header: '근무종료',
+		key: 'leave',
+	},
+	{
+		header: '총 근로시간',
+		key: 'fulltime',
+	},
+	{
+		header: '근무시간 상세',
+		key: 'detail',
+	},
+	{
+		header: '승인요청내용',
+		key: 'confirm',
+	},
+];
+
 export default function Calendar() {
 	const theme = useTheme();
 	const [activeCell, setActiveCell] = useState<string | null>(null);
 
-	const onClickCell = (event: React.MouseEvent<HTMLAnchorElement>, target: string) => {
+	const matchesUpMedium = useMediaQuery(theme.breakpoints.up('md'));
+
+	const onClickCell = (event: React.MouseEvent<HTMLElement>, target: string) => {
 		event.preventDefault();
 
 		if (target === activeCell) {
@@ -312,7 +398,6 @@ export default function Calendar() {
 							{calendarCol.map((subItem: Record<string, any>, subIdx: number) => {
 								return (
 									<Box
-										component={'a'}
 										key={`${idx}_${subIdx}`}
 										sx={{
 											display: 'flex',
@@ -324,9 +409,8 @@ export default function Calendar() {
 												borderLeft: `1px solid ${theme.palette.grey[300]}`,
 											}),
 											...(activeCell === idx + '_' + subIdx && {
-												border: `2px solid ${theme.palette.primary.main}`,
-												borderLeftColor: 'primary.main',
-												zIndex: 1,
+												outline: `2px solid ${theme.palette.primary.main}`,
+												zIndex: 2,
 											}),
 											cursor: 'pointer',
 										}}
@@ -342,7 +426,7 @@ export default function Calendar() {
 												}}
 											>
 												<Typography sx={{ marginRight: '0.5rem', fontWeight: 'bold' }}>{item[subItem.key].day}</Typography>
-												<Typography>{subItem.header}</Typography>
+												<Typography sx={{ display: { xs: 'none', md: 'block' } }}>{subItem.header}</Typography>
 											</Box>
 											<Box sx={{ height: '5rem', padding: '0.5rem' }}>
 												{item[subItem.key].attendance && (
@@ -423,7 +507,43 @@ export default function Calendar() {
 						</Box>
 						{activeCell && Number(activeCell.split('_')[0]) === idx && (
 							<Box sx={{ padding: '0.5rem', borderTop: `1px solid ${theme.palette.grey[300]}` }}>
-								<Box sx={{ height: '10rem', padding: '0.5rem', border: `1px solid ${theme.palette.grey[300]}`, borderRadius: '1rem' }}></Box>
+								<Box sx={{ height: '12rem' }}>
+									<Box sx={{ display: 'flex', width: '100%', height: '5rem' }}>
+										{detailCol.map((detailItem, detailIdx) => {
+											return (
+												<Box key={`${activeCell}_${detailIdx}`} sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+													<Box
+														className={'text-ellipsis'}
+														sx={{
+															width: '100%',
+															height: '2.5rem',
+															padding: '0.5rem',
+															textAlign: 'center',
+															borderBottom: `1px solid ${theme.palette.grey[300]}`,
+															color: theme.palette.grey[500],
+														}}
+													>
+														{detailItem.header}
+													</Box>
+													<Box
+														className={'text-ellipsis'}
+														sx={{
+															width: '100%',
+															height: '2.5rem',
+															padding: '0.5rem',
+															textAlign: 'center',
+														}}
+													>
+														{calendarRow[idx][calendarCol[Number(activeCell.split('_')[1])].key][detailItem.key]}
+													</Box>
+												</Box>
+											);
+										})}
+									</Box>
+									<Box sx={{ width: '100%', height: '7rem', mt: '0.5rem' }}>
+										<CustomReactCalendarTimeline groups={[]} items={[]} sidebarWidth={0} />
+									</Box>
+								</Box>
 							</Box>
 						)}
 					</Grid>
