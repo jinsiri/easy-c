@@ -5,11 +5,9 @@ import { Box, Button, Grid, IconButton, List, ListItem, Stack, Typography, useTh
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
-import SettingLayoutElement from '@/app/_component/layoutElement/SettingLayoutElement';
-import { AddCircleOutline, Edit, RemoveCircleOutline, Search } from '@mui/icons-material';
-import { useCallback, useMemo, useState } from 'react';
 import CommonTabs from '@/app/_component/CommonTabs';
 import CommonTreeview from '@/app/_component/Tree';
+import { AddCircleOutline, Edit, RemoveCircleOutline, Search } from '@mui/icons-material';
 
 const dummyDept = {
 	deptId: 1,
@@ -109,34 +107,32 @@ export default function AdminDeptListPage() {
 				</Box>
 				<Grid container spacing={3} sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
 					<Grid size={3} sx={{ display: 'flex', flexDirection: 'column' }}>
-						<SettingLayoutElement
-							subtitle='조직도'
-							boxColor={'#fff'}
-							btnGroup={
-								<Stack direction={'row'} spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-									<Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-										<IconButton className='contained-primary light'>
-											<AddCircleOutline className='svg-small' />
-										</IconButton>
-										<IconButton className='contained-primary light'>
-											<RemoveCircleOutline className='svg-small' />
-										</IconButton>
-									</Stack>
-									<Stack>
-										<IconButton className='contained-primary'>
-											<Search className='svg-small' />
-										</IconButton>
-									</Stack>
-								</Stack>
-							}
-						>
+						<Box sx={{ display: 'flex', alignItems: 'center', mb: '1rem' }}>
+							<Typography sx={{ mr: '1.5rem', fontSize: '1.125rem', fontWeight: 'bold' }}>조직도</Typography>
+							<Box sx={{ flexGrow: 1, height: '1px', bgcolor: theme.palette.grey[300] }} />
+						</Box>
+						<Box sx={{ mb: 1 }}>
+							<Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
+								<IconButton className='contained-primary light'>
+									<AddCircleOutline className='svg-small' />
+								</IconButton>
+								<IconButton className='contained-primary light'>
+									<RemoveCircleOutline className='svg-small' />
+								</IconButton>
+							</Stack>
+						</Box>
+						<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
 							<Box>
 								<CommonTreeview dbData={departmentDummyData} />
 							</Box>
-						</SettingLayoutElement>
+						</Box>
 					</Grid>
 					<Grid size={9} sx={{ display: 'flex', flexDirection: 'column' }}>
-						<SettingLayoutElement subtitle={dummyDept.deptNm} boxColor={'#fff'}>
+						<Box sx={{ display: 'flex', alignItems: 'center', mb: '1rem' }}>
+							<Typography sx={{ mr: '1.5rem', fontSize: '1.125rem', fontWeight: 'bold' }}>{dummyDept.deptNm}</Typography>
+							<Box sx={{ flexGrow: 1, height: '1px', bgcolor: theme.palette.grey[300] }} />
+						</Box>
+						<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
 							<Stack alignItems={'flex-end'}>
 								<Stack direction={'row'} spacing={1}>
 									<Button variant='outlined'>부서원 추가</Button>
@@ -144,7 +140,7 @@ export default function AdminDeptListPage() {
 								</Stack>
 							</Stack>
 							<CommonTabs tabs={deptTabs} />
-						</SettingLayoutElement>
+						</Box>
 					</Grid>
 				</Grid>
 			</Box>
