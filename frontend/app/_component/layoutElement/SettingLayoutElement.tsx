@@ -12,13 +12,9 @@ export default function SettingLayoutElement({ subtitle, boxColor, btnGroup, chi
 	const theme = useTheme();
 
 	return (
-		<>
-			<Box sx={{ display: 'flex', alignItems: 'center', mb: '1rem' }}>
-				<Typography sx={{ mr: '1.5rem', fontSize: '1.125rem', fontWeight: 'bold' }}>{subtitle}</Typography>
-				<Box sx={{ flexGrow: 1, height: '1px', bgcolor: theme.palette.grey[300] }} />
-			</Box>
-			{btnGroup && <Box sx={{ mb: 1 }}>{btnGroup}</Box>}
-			<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: boxColor ?? theme.palette.grey[100] }}>{children}</Box>
-		</>
+		<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+			<Box sx={{ fontSize: '0.875rem' }}>{subtitle}</Box>
+			<Box sx={{ padding: '0.5rem' }}>{children}</Box>
+		</Box>
 	);
 }

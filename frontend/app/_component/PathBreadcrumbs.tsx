@@ -66,7 +66,7 @@ export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
 					{breadcrumbs.length > 0 &&
 						breadcrumbs.map((item: menuType, idx: number) => {
 							return item.children ? (
-								<Typography key={item.id} color={'text.secondary'} sx={{ fontSize: '0.875rem' }}>
+								<Typography key={item.id} color={'text.secondary'}>
 									{item.title}
 								</Typography>
 							) : (
@@ -75,7 +75,6 @@ export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
 									href={item.url}
 									color={breadcrumbs.length - 1 === idx ? 'primary.main' : 'text.secondary'}
 									underline='hover'
-									sx={{ fontSize: '0.875rem' }}
 								>
 									{item.title}
 								</Link>
@@ -84,7 +83,7 @@ export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
 				</Breadcrumbs>
 			</Box>
 			<Box component={'article'} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-				<Typography variant='h5' sx={{ fontWeight: '800' }}>
+				<Typography variant='h4' sx={{ fontWeight: '800' }}>
 					{breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].title : ''}
 				</Typography>
 				{children}
