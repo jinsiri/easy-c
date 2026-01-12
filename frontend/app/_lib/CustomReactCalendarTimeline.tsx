@@ -99,7 +99,7 @@ const CustomReactCalendarTimeline = ({
 	};
 
 	return (
-		<Box sx={{ width: '100%', height: '100%', minWidth: '20rem', minHeight: '5rem' }}>
+		<div style={{ width: '100%', height: '100%', minWidth: '20rem', minHeight: '5rem' }}>
 			<Timeline
 				keys={keys}
 				className={className}
@@ -118,7 +118,7 @@ const CustomReactCalendarTimeline = ({
 				stackItems={true}
 				traditionalZoom={false}
 			/>
-		</Box>
+		</div>
 	);
 };
 
