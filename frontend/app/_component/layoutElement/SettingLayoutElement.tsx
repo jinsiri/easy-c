@@ -1,14 +1,12 @@
 /** MUI */
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 
 interface SettingLayoutElementProps {
 	subtitle: string;
-	boxColor?: string;
-	btnGroup?: React.ReactNode;
 	children: React.ReactNode;
 }
 
-export default function SettingLayoutElement({ subtitle, boxColor, btnGroup, children }: SettingLayoutElementProps) {
+export default function SettingLayoutElement({ subtitle, children }: SettingLayoutElementProps) {
 	const theme = useTheme();
 
 	return (
