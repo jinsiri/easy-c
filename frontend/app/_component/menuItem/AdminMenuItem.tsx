@@ -57,20 +57,20 @@ const AdminMenuItem: menuType[] = [
 				],
 			},
 			{
-				id: 'admin-org',
+				id: 'admin-dept',
 				title: '조직 관리',
 				type: '1depth',
-				url: '/org',
+				url: '/dept',
 				icon: AccountTree,
 				children: [
 					{
-						id: 'admin-org-list',
+						id: 'admin-dept-list',
 						title: '조직설계',
 						type: '2depth',
 						url: '/list',
 					},
 					{
-						id: 'admin-org-role',
+						id: 'admin-dept-role',
 						title: '직위체계',
 						type: '2depth',
 						url: '/role',
