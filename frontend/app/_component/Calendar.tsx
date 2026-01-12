@@ -368,8 +368,6 @@ export default function Calendar() {
 	const theme = useTheme();
 	const [activeCell, setActiveCell] = useState<string | null>(null);
 
-	const matchesUpMedium = useMediaQuery(theme.breakpoints.up('md'));
-
 	const onClickCell = (event: React.MouseEvent<HTMLElement>, target: string) => {
 		event.preventDefault();
 
@@ -540,9 +538,7 @@ export default function Calendar() {
 											);
 										})}
 									</Box>
-									<Box sx={{ width: '100%', height: '7rem', mt: '0.5rem' }}>
-										<CustomReactCalendarTimeline groups={[]} items={[]} sidebarWidth={0} />
-									</Box>
+									<Box sx={{ overflow: 'hidden', width: '100%', height: '7rem', mt: '0.5rem' }}></Box>
 								</Box>
 							</Box>
 						)}

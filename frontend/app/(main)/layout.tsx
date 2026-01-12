@@ -11,9 +11,11 @@ import Footer from '@/app/_component/Footer';
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
 	const headerHeight = '4rem';
+	const [mounted, setMounted] = useState(false);
 	const [drawerOpen, setDrawerOpen] = useState(true);
 
 	useEffect(() => {
+		setMounted(true);
 		const mql = window.matchMedia('(min-width: 1200px)');
 
 		// 초기값 설정
@@ -25,7 +27,9 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 		return () => mql.removeEventListener('change', handler);
 	}, []);
 
-	return (
+	return !mounted ? (
+		<div style={{ width: '100vw', height: '100vh' }} />
+	) : (
 		<Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100vw', height: '100vh' }}>
 			<Sidebar drawerOpen={drawerOpen} headerHeight={headerHeight}></Sidebar>
 			<Box
