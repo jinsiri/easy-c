@@ -20,8 +20,6 @@ export default function Menu2Depth({ item, drawerOpen, prevUrl }: propsType) {
 	const pathName = usePathname();
 	const isActive = pathName.includes(prevUrl + item.url);
 
-	const [collapseOpen, setCollapseOpen] = useState(false);
-
 	return (
 		<Fragment>
 			<ListItemButton
@@ -30,47 +28,32 @@ export default function Menu2Depth({ item, drawerOpen, prevUrl }: propsType) {
 				href={item.children ? undefined : prevUrl + item.url}
 				sx={{
 					height: drawerOpen ? 'auto' : '3rem',
-					borderRadius: '1rem',
+					borderRadius: drawerOpen ? '1rem' : 0,
 					backgroundColor: isActive ? theme.palette.primary[50] : 'transparent',
 				}}
 			>
-				<Box
-					sx={{
-						position: 'absolute',
-						top: 0,
-						left: '2rem',
-						width: '1px',
-						height: '48px',
-						backgroundColor: theme.palette.grey[200],
-						zIndex: 10,
-					}}
-				></Box>
-				<Box sx={{ display: 'flex', justifyContent: 'center', width: '2.25rem', height: '100%' }} />
-				<Fade in={drawerOpen} easing={'easeInOut'} timeout={200}>
-					<ListItemText primary={item.title} className={'transition-3'} sx={{ marginLeft: '0.25rem' }} />
-				</Fade>
-				{item.children && (
-					<Fade in={drawerOpen} easing={'easeInOut'} timeout={200}>
-						<ExpandMoreRounded sx={{ color: theme.palette.grey[700] }} />
-					</Fade>
+				{drawerOpen ? (
+					<>
+						<Box
+							sx={{
+								position: 'absolute',
+								top: 0,
+								left: '2rem',
+								width: '1px',
+								height: '100%',
+								backgroundColor: theme.palette.grey[200],
+								zIndex: 10,
+							}}
+						/>
+						<Box sx={{ display: 'flex', justifyContent: 'center', width: '2.25rem', height: '100%' }} />
+						<Fade in={drawerOpen} easing={'easeInOut'} timeout={200}>
+							<ListItemText primary={item.title} className={'transition-3'} sx={{ marginLeft: '0.25rem' }} />
+						</Fade>
+					</>
+				) : (
+					<ListItemText primary={item.title} sx={{ marginLeft: '0.25rem' }} />
 				)}
 			</ListItemButton>
-
-			{item.children && (
-				<Collapse in={drawerOpen && collapseOpen} timeout='auto' unmountOnExit>
-					<List component='div' disablePadding>
-						{item.children.map((value) => {
-							return (
-								value.type === '3depth' && (
-									<ListItemButton className='nav-depth-3'>
-										<ListItemText primary='Starred' />
-									</ListItemButton>
-								)
-							);
-						})}
-					</List>
-				</Collapse>
-			)}
 		</Fragment>
 	);
 }

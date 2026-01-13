@@ -3,7 +3,7 @@ const colorScheme = {
 		palette: {
 			primary: {
 				main: '#615FD6',
-				light: '#F5F4FF',
+				light: '#7279E2',
 				dark: '#5553C9',
 				contrastText: '#FAFAFA',
 
@@ -21,6 +21,8 @@ const colorScheme = {
 
 			secondary: {
 				main: '#FFC45B',
+				light: '#FFCD75',
+				dark: '#E5B051',
 				contrastText: '#FAFAFA',
 
 				50: '#FFF9EE',
