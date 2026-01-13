@@ -17,8 +17,8 @@ interface CalendarColData {
 
 interface CalendarData {
 	day: number;
-	attendance?: string;
-	leave?: string;
+	startTime?: string;
+	endTime?: string;
 	fulltime?: string;
 	overtime?: string;
 	vacation?: string;
@@ -45,8 +45,8 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 	{
 		mon: {
 			day: 1,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
@@ -54,8 +54,8 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 		},
 		tue: {
 			day: 2,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
@@ -63,8 +63,8 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 		},
 		wed: {
 			day: 3,
-			attendance: '08:00',
-			leave: '20:00',
+			startTime: '08:00',
+			endTime: '20:00',
 			fulltime: '12h 00m',
 			overtime: '04h 00m',
 			vacation: '',
@@ -72,8 +72,8 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 		},
 		thu: {
 			day: 4,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
@@ -81,8 +81,8 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 		},
 		fri: {
 			day: 5,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
@@ -90,8 +90,8 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 		},
 		sat: {
 			day: 6,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
@@ -99,8 +99,8 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 		},
 		sun: {
 			day: 7,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
@@ -110,56 +110,56 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 	{
 		mon: {
 			day: 1,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		tue: {
 			day: 2,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		wed: {
 			day: 3,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		thu: {
 			day: 4,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		fri: {
 			day: 5,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		sat: {
 			day: 6,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		sun: {
 			day: 7,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
@@ -168,56 +168,56 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 	{
 		mon: {
 			day: 1,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		tue: {
 			day: 2,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		wed: {
 			day: 3,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		thu: {
 			day: 4,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		fri: {
 			day: 5,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		sat: {
 			day: 6,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		sun: {
 			day: 7,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
@@ -226,56 +226,56 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 	{
 		mon: {
 			day: 1,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		tue: {
 			day: 2,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		wed: {
 			day: 3,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		thu: {
 			day: 4,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		fri: {
 			day: 5,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		sat: {
 			day: 6,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		sun: {
 			day: 7,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
@@ -284,56 +284,56 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 	{
 		mon: {
 			day: 1,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		tue: {
 			day: 2,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		wed: {
 			day: 3,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		thu: {
 			day: 4,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		fri: {
 			day: 5,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		sat: {
 			day: 6,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
 		},
 		sun: {
 			day: 7,
-			attendance: '',
-			leave: '',
+			startTime: '',
+			endTime: '',
 			fulltime: '',
 			overtime: '',
 			vacation: '',
@@ -344,11 +344,11 @@ const calendarRow: Record<dayName, CalendarData>[] = [
 const detailCol: ColData[] = [
 	{
 		header: '근무시작',
-		key: 'attendance',
+		key: 'startTime',
 	},
 	{
 		header: '근무종료',
-		key: 'leave',
+		key: 'endTime',
 	},
 	{
 		header: '총 근로시간',
@@ -427,7 +427,7 @@ export default function Calendar() {
 												<Typography sx={{ display: { xs: 'none', md: 'block' } }}>{subItem.header}</Typography>
 											</Box>
 											<Box sx={{ height: '5rem', padding: '0.5rem' }}>
-												{item[subItem.key].attendance && (
+												{item[subItem.key].startTime && (
 													<Box sx={{ display: 'flex', flexDirection: 'row' }}>
 														<Typography
 															variant={'caption'}
@@ -446,10 +446,10 @@ export default function Calendar() {
 														>
 															출
 														</Typography>
-														<Typography>{item[subItem.key].attendance}</Typography>
+														<Typography>{item[subItem.key].startTime}</Typography>
 													</Box>
 												)}
-												{item[subItem.key].leave && (
+												{item[subItem.key].endTime && (
 													<Box sx={{ display: 'flex', flexDirection: 'row' }}>
 														<Typography
 															sx={{
@@ -467,7 +467,7 @@ export default function Calendar() {
 														>
 															퇴
 														</Typography>
-														<Typography>{item[subItem.key].leave}</Typography>
+														<Typography>{item[subItem.key].endTime}</Typography>
 													</Box>
 												)}
 												{item[subItem.key].overtime && (

@@ -16,17 +16,20 @@ export default function AttendanceUserPage() {
 					size={12}
 					sx={{
 						display: 'flex',
-						flexDirection: 'row',
+						flexDirection: { xs: 'column', sm: 'column', md: 'row' },
 						borderRadius: '1rem',
 						borderWidth: '1px',
 						borderStyle: 'solid',
 						borderColor: 'gray.300',
+						gap: '1rem',
 					}}
 				>
-					<Box sx={{ width: '50%' }}>
+					<Box sx={{ width: { sm: '100%', md: '50%' } }}>
 						<AttendanceComp />
 					</Box>
-					<Box sx={{ width: '50%', padding: '1rem 1.5rem', borderLeftWidth: '1px', borderStyle: 'solid', borderColor: 'gray.300' }}>
+					<Box
+						sx={{ width: { sm: '100%', md: '50%' }, padding: '1rem 1.5rem', borderLeftWidth: '1px', borderStyle: 'solid', borderColor: 'gray.300' }}
+					>
 						<Box sx={{ display: 'flex', flexDirection: 'row' }}>
 							<Typography variant='h6'>주간 누적</Typography>
 							<Typography variant='h6' sx={{ marginLeft: '0.5rem', color: 'primary.main' }}>
@@ -44,6 +47,7 @@ export default function AttendanceUserPage() {
 						padding: '1rem',
 						borderRadius: '1rem',
 						backgroundColor: 'gray.100',
+						gap: '2rem',
 					}}
 				>
 					<ColTitleAndText subtitle={'잔여 근무일'}>

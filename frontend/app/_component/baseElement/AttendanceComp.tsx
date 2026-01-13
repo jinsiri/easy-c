@@ -29,9 +29,9 @@ export default function AttendanceComp() {
 			<Box
 				sx={{
 					display: 'flex',
-					flexDirection: { sm: 'column', md: 'row' },
+					flexDirection: { xs: 'column', sm: 'column', md: 'row' },
 					flexWrap: 'wrap',
-					justifyContent: { sm: 'center', md: 'space-between' },
+					justifyContent: { xs: 'center', sm: 'center', md: 'space-between' },
 					alignItems: 'center',
 					marginTop: '1rem',
 				}}
@@ -39,7 +39,7 @@ export default function AttendanceComp() {
 				<Box
 					sx={{
 						display: 'flex',
-						flexDirection: { sm: 'column', md: 'row' },
+						flexDirection: 'row',
 						flexWrap: 'wrap',
 						justifyContent: 'center',
 						alignItems: 'center',
@@ -55,7 +55,7 @@ export default function AttendanceComp() {
 							<Typography variant='h5'>08:00:01</Typography>
 						</Box>
 					</ColTitleAndText>
-					<ArrowForwardRounded sx={{ display: { sm: 'none', md: 'block' } }} />
+					<ArrowForwardRounded />
 					<ColTitleAndText subtitle={'퇴근 시간'}>
 						<Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
 							<Typography variant='h5'>22:00:00</Typography>
