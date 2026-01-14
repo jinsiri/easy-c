@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.easyc.common.constant.MemberRole;
+import org.easyc.member.constant.MemberRole;
 
 @Entity
 @Builder
@@ -21,7 +21,7 @@ public class Member {
 
     private String loginId;
     private String password;
-    private String nickname;
+    private String nickname; // 사용 안함
 
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;

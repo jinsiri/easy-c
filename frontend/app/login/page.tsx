@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { TextField, Button, Typography, Box, FormControlLabel, Checkbox } from '@mui/material';
 
 import {authService} from "@/app/services/authService";
-import {encryptRSA} from "@/app/utils/crypto";
+import {encryptRSA} from "@/app/_utils/crypto";
 
 const LoginPage = () => {
 
@@ -18,29 +18,21 @@ const LoginPage = () => {
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		// TODO: 로그인 api 호출 로직
 		try {
-			await login();
+			const { data: publicKey } = await authService.getPublicKey();
+
+			const encryptedPw = encryptRSA(password, publicKey);
+
+			const res = await authService.login({
+				loginId: userId,
+				encryptedPassword: encryptedPw
+			});
+
 			alert('로그인 성공!');
 			router.push('/');  // 메인 페이지 이동
-		} catch (error) {
-			alert('로그인 실패! ' + error.response.data.message);
+		} catch (error: any) {
+			alert('로그인 실패! ' + error.message);
 		}
-	};
-
-
-	const login = async () => {
-
-		const { data: publicKey } = await authService.getPublicKey();
-
-		const encryptedPw = encryptRSA(password, publicKey);
-
-		const res = await authService.login({
-			loginId: userId,
-			encryptedPassword: encryptedPw
-		});
-
-		return res;
 	};
 
 	return (
