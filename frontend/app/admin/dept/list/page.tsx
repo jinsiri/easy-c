@@ -7,7 +7,7 @@ import { Box, Button, Grid, IconButton, List, ListItem, Stack, Typography, useTh
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import CommonTabs from '@/app/_component/CommonTabs';
 import CommonTreeview from '@/app/_component/Tree';
-import { AddCircleOutline, Edit, RemoveCircleOutline, Search } from '@mui/icons-material';
+import { AddCircleOutline, Edit, RemoveCircleOutline } from '@mui/icons-material';
 
 const dummyDept = {
 	deptId: 1,
