@@ -18,5 +18,5 @@ interface LoginResponseDto {
 export const authService = {
 	getPublicKey: () => axiosConfig.get<string>('/api/auth/public-key'),
 	login: (data: LoginRequestDto) => axiosConfig.post<LoginResponseDto>('/api/auth/login', data),
-	logout: () => axiosConfig.get('/api/auth/logout'),
+	logout: () => axiosConfig.post('/api/auth/logout'),
 };

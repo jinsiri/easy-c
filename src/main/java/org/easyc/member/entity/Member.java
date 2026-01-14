@@ -21,7 +21,7 @@ public class Member {
 
     private String loginId;
     private String password;
-    private String nickname;
+    private String nickname; // 사용 안함
 
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
