@@ -21,11 +21,11 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
     // --- 공통 상태 (Common) ---
-    @Column(name = "is_deleted")
-    private boolean isDeleted = false;
+    @Column(name = "deleted")
+    private boolean deleted = false;
 
-    @Column(name = "is_active")
-    private boolean isActive = true;
+    @Column(name = "active")
+    private boolean active = true;
 
     // --- 등록 정보 (Register) ---
     @CreatedDate
