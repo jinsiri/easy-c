@@ -2,7 +2,10 @@ package org.easyc.auth.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.easyc.auth.dto.LoginRequestDto;
+import org.easyc.auth.dto.LoginResponseDto;
 import org.easyc.auth.jwt.JwtProvider;
+import org.easyc.member.entity.Member;
+import org.easyc.member.repository.MemberRepository;
 import org.easyc.util.RsaUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final RsaUtil rsaUtil;
+    private final MemberRepository memberRepository;
 
     @GetMapping("/test")
     public String test() {
@@ -42,7 +46,7 @@ public class AuthController {
      * @return
      */
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody LoginRequestDto requestDto) throws Exception {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto requestDto) throws Exception {
 
         String decryptedPassword = rsaUtil.decrypt(requestDto.getEncryptedPassword());
 
@@ -88,10 +92,14 @@ public class AuthController {
                 .sameSite("Lax")
                 .build();
 
+
+        Member member = memberRepository.findAllByLoginId(requestDto.getLoginId());
+        LoginResponseDto loginResponseDto = new LoginResponseDto(member);
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .build();
+                .body(loginResponseDto);
     }
 
     /**
