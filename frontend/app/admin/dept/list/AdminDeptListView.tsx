@@ -16,45 +16,6 @@ type InfoItem = {
 	value: React.ReactNode;
 };
 
-const dummyDept = {
-	deptId: 1,
-	deptNm: '데모',
-	deptShortNm: '부서 약어',
-	deptCode: 'c014',
-	deptEmail: 'test@gmail.com',
-	treeLevel: 1,
-	treeSiblingOrder: 1,
-	treeParentId: 1,
-	treeChildCount: 1,
-	treeSortCode: '001',
-};
-
-const departmentDummyData = [
-	// 1단계: 본부
-	{ id: 100, treeParentId: null, label: '경영지원본부', treeSiblingOrder: 1 },
-	{ id: 200, treeParentId: null, label: '기술연구소', treeSiblingOrder: 2 },
-
-	// 2단계: 경영지원본부 산하 부서
-	{ id: 110, treeParentId: 100, label: '인사팀', treeSiblingOrder: 1 },
-	{ id: 120, treeParentId: 100, label: '재무팀', treeSiblingOrder: 2 },
-
-	// 3단계: 인사팀 소속 직원 (직원을 부서의 자식으로 처리)
-	{ id: 111, treeParentId: 110, label: '김철수 팀장', treeSiblingOrder: 1 },
-	{ id: 112, treeParentId: 110, label: '이영희 대리', treeSiblingOrder: 2 },
-
-	// 2단계: 기술연구소 산하 부서
-	{ id: 210, treeParentId: 200, label: '백엔드개발팀', treeSiblingOrder: 1 },
-	{ id: 220, treeParentId: 200, label: '프론트엔드개발팀', treeSiblingOrder: 2 },
-
-	// 3단계: 백엔드개발팀 소속 직원
-	{ id: 211, treeParentId: 210, label: '박디비 과장', treeSiblingOrder: 1 },
-	{ id: 212, treeParentId: 210, label: '최서버 사원', treeSiblingOrder: 2 },
-
-	// 3단계: 프론트엔드개발팀 소속 직원
-	{ id: 221, treeParentId: 220, label: '정리액트 팀장', treeSiblingOrder: 1 },
-	{ id: 222, treeParentId: 220, label: '조넥스트 사원', treeSiblingOrder: 2 },
-];
-
 function InfoList({ items }: { items: InfoItem[] }) {
 	return (
 		<List disablePadding>
@@ -78,10 +39,15 @@ function InfoList({ items }: { items: InfoItem[] }) {
 	);
 }
 
+const mapDeptToTree = (dept: DeptResponseDto) => ({
+	...dept,
+	id: dept.deptId,
+	label: dept.deptNm,
+});
+
 export default function AdminDeptListView({ dbData }: Props) {
 	const theme = useTheme();
 
-	// 임시 데이터 (실제 데이터가 없을 경우 대비)
 	const dummyDept = {
 		deptNm: dbData?.[0]?.deptNm || '부서 선택 안됨',
 		deptEmail: dbData?.[0]?.deptEmail || '-',
@@ -151,7 +117,14 @@ export default function AdminDeptListView({ dbData }: Props) {
 					</Box>
 
 					<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
-						<CommonTreeview dbData={departmentDummyData} />
+						<CommonTreeview
+							rawData={dbData || []}
+							mapEntityToTree={mapDeptToTree}
+							placeholder='부서명을 검색하세요.'
+							onNodeClick={(node) => {
+								console.log('선택된 부서의 코드:', node.label); // 원본 필드 접근 가능
+							}}
+						/>
 					</Box>
 				</Grid>
 
