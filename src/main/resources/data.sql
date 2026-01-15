@@ -1,4 +1,4 @@
-INSERT INTO dept (dept_id, dept_nm, tree_level, tree_sibling_order, tree_parent_id, tree_child_count, tree_sort_code, delete, active)
+INSERT INTO dept (dept_id, dept_nm, tree_level, tree_sibling_order, tree_parent_id, tree_child_count, tree_sort_code, deleted, active)
 VALUES (1, '부서', 1, 1, NULL, 0, '001', false, true)
     ON CONFLICT (dept_id) DO NOTHING;
 

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BaseDto {
-    private boolean delete = false;
+    private boolean deleted = false;
     private boolean active = true;
     private LocalDateTime registerDate;
     private String registerIp;

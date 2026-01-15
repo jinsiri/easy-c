@@ -21,8 +21,8 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
     // --- 공통 상태 (Common) ---
-    @Column(name = "delete")
-    private boolean delete = false;
+    @Column(name = "deleted")
+    private boolean deleted = false;
 
     @Column(name = "active")
     private boolean active = true;
