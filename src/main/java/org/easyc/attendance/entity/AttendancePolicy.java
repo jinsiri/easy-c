@@ -38,4 +38,7 @@ public class AttendancePolicy {
 
     @Column(name = "allow_margin_minute")
     private Long allowMarginMinute;
+
+    @Column(name = "working_day")
+    private String workingDay;
 }

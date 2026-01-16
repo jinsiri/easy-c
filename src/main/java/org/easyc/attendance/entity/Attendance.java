@@ -53,6 +53,9 @@ public class Attendance {
     @Column(name = "overtime_minute")
     private Long overtimeMinute;
 
+    @Column(name = "work_type")
+    private String workType;
+
     @Column(name = "work_status")
     private String workStatus;
 
@@ -69,10 +72,12 @@ public class Attendance {
     /** 휴가 관련 */
 
     @Column(name = "remoted", columnDefinition = "boolean default false")
-    private Boolean remoted = false;;
+    @Builder.Default
+    private boolean remoted = false;
 
     @Column(name = "vacationed", columnDefinition = "boolean default false")
-    private Boolean vacationed = false;
+    @Builder.Default
+    private boolean vacationed = false;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "vacation_type")
