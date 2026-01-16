@@ -200,7 +200,16 @@ public class AttendanceService {
     private Attendance updateAttendanceByStartTime(AttendanceSaveReqDto req, Attendance targetAttendance, LocalDateTime startTime) {
         if(targetAttendance != null){
             //!! 추후에 멤버와 연결된 정보로 다시 수정
-            AttendancePolicy targetPolicy = attendancePolicyRepository.findByAttendancePolicyId(Long.valueOf(1));
+
+            AttendancePolicy targetPolicy = attendancePolicyRepository.findByAttendancePolicyId(Long.valueOf(1))
+                    .orElseGet(() -> AttendancePolicy.builder()
+                            .startTime(LocalTime.of(9,0))
+                            .endTime(LocalTime.of(18,0))
+                            .halfLeaveStartTime(LocalTime.of(13,0))
+                            .halfLeaveEndTime(LocalTime.of(13,0))
+                            .allowMarginMinute(Long.valueOf(5))
+                            .workingDay("1,2,3,4,5")
+                            .build());
 
             int dayOfWeek = startTime.getDayOfWeek().getValue();
             LocalTime currentTime = startTime.toLocalTime();
@@ -233,7 +242,15 @@ public class AttendanceService {
     private Attendance updateAttendanceByEndTime(AttendanceSaveReqDto req, Attendance targetAttendance, LocalDateTime endTime) {
         if(targetAttendance != null){
             //!! 추후에 멤버와 연결된 정보로 다시 수정
-            AttendancePolicy targetPolicy = attendancePolicyRepository.findByAttendancePolicyId(Long.valueOf(1));
+            AttendancePolicy targetPolicy = attendancePolicyRepository.findByAttendancePolicyId(Long.valueOf(1))
+                    .orElseGet(() -> AttendancePolicy.builder()
+                            .startTime(LocalTime.of(9,0))
+                            .endTime(LocalTime.of(18,0))
+                            .halfLeaveStartTime(LocalTime.of(13,0))
+                            .halfLeaveEndTime(LocalTime.of(13,0))
+                            .allowMarginMinute(Long.valueOf(5))
+                            .workingDay("1,2,3,4,5")
+                            .build());
 
             // 조퇴 여부 판별
             // 날짜가 바뀌지 않았고(당일 퇴근), 정책의 퇴근 시간보다 일찍 나갔을 때
