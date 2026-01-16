@@ -6,6 +6,4 @@ public enum WORK_STATUS {
     EARLY_LEAVE	,   //조퇴
     ABSENT,	        //결근
     VACATION,	    //휴가
-    WEEKEND_WORK,   //주말 출근
-    HOLIDAY_WORK    //휴일 근로
 }
