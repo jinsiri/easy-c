@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
 /** MUI */
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography, useTheme } from '@mui/material';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -19,12 +19,16 @@ import { formatMinutes } from '@/app/_utils/commonFunc';
 
 /** Type / Interface */
 import { attendanceReqInterface, AttendanceResInterface } from '@/type/AttendanceInterface';
+import CustomEchartComp from '@/app/_lib/CustomEchartComp';
 
 dayjs.extend(duration);
 
 export default function AttendanceUserPage() {
+	const theme = useTheme();
+
 	const [attendanceData, setAttenceData] = useState<AttendanceResInterface>({});
 	const [calendarData, setCalendarData] = useState([]);
+	const [chartOption, setChartOption] = useState<Record<string, any>>({});
 
 	useEffect(() => {
 		//금일 및 금주 데이터
@@ -46,6 +50,7 @@ export default function AttendanceUserPage() {
 			.then((res) => {
 				if (res.data) {
 					setAttenceData(res.data);
+					makeChartOption(res.data);
 				}
 			})
 			.catch((err) => {});
@@ -66,6 +71,51 @@ export default function AttendanceUserPage() {
 				}
 			})
 			.catch((err) => {});
+	};
+
+	const makeChartOption = (data: AttendanceResInterface) => {
+		const _option = {
+			grid: {
+				left: 0,
+				right: 0,
+			},
+			xAxis: {
+				max: 100,
+			},
+			yAxis: {
+				data: [''],
+				nameGap: 0,
+			},
+			series: [
+				{
+					type: 'bar',
+					showBackground: true,
+					itemStyle: {
+						color: {
+							type: 'linear',
+							x: 0,
+							x2: 1,
+							colorStops: [
+								{
+									offset: 0,
+									color: theme.palette.primary.main,
+								},
+								{
+									offset: 1,
+									color: theme.palette.primary.light,
+								},
+							],
+						},
+					},
+					data: [Math.floor((data.workTime / data.totalWorkTime) * 100)],
+					backgroundStyle: {
+						color: 'rgba(180, 180, 180, 0.2)',
+					},
+				},
+			],
+		};
+
+		setChartOption(_option);
 	};
 
 	const onSuccessEvent = () => {
@@ -119,7 +169,9 @@ export default function AttendanceUserPage() {
 							<Typography sx={{ color: 'gray.700' }}>이번 주 14시간 46분이 더 필요해요.</Typography>
 						</Box>
 
-						<Box sx={{ width: '100%', height: '4rem' }}></Box>
+						<Box sx={{ width: '100%', height: '4rem' }}>
+							<CustomEchartComp chartType={'rank_bar'} option={chartOption} />
+						</Box>
 						<Box
 							sx={{
 								display: 'flex',
