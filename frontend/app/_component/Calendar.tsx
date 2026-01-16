@@ -8,12 +8,14 @@ import { Box, Grid, Typography } from '@mui/material';
 /** lib */
 import dayjs from 'dayjs';
 import CustomReactCalendarTimeline from '../_lib/CustomReactCalendarTimeline';
+import { TimelineItemBase } from 'react-calendar-timeline';
 
 /** Custom */
 import { formatMinutes } from '@/app/_utils/commonFunc';
 
 /** type / interface */
 import { AttendanceDayResInterface } from '@/type/AttendanceInterface';
+import { WORKSTATUS } from '../_constant/const_attendance';
 
 type dayName = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
 
@@ -151,6 +153,9 @@ const detailCol: ColData[] = [
 	{
 		header: '근로 상태',
 		key: 'workStatus',
+		formatter: (value, row) => {
+			return <Typography>{WORKSTATUS[value]}</Typography>;
+		},
 	},
 	{
 		header: '총 근로시간',
@@ -175,6 +180,7 @@ const detailCol: ColData[] = [
 export default function Calendar({ calendarRow }: { calendarRow: Record<dayName, CalendarData>[] }) {
 	const [targetCalendarRow, setTargetCalendarRow] = useState<Record<dayName, CalendarData>[]>(defaultCalendarRow);
 	const [activeCell, setActiveCell] = useState<string | null>(null);
+	const [activeTimelineData, setActiveTimelineData] = useState<TimelineItemBase<Date>[]>([]);
 
 	useEffect(() => {
 		if (calendarRow) {
@@ -187,8 +193,47 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 
 		if (target === activeCell) {
 			setActiveCell(null);
+			setActiveTimelineData([]);
 		} else {
 			setActiveCell(target);
+			setActiveTimelineData(makeTimelineData(target));
+		}
+	};
+
+	const makeTimelineData = (target: string) => {
+		const [rowIdx, colIdx] = target.split('_').map(Number);
+
+		const item = targetCalendarRow[rowIdx];
+		const subItem = calendarCol[colIdx];
+		const detail = item?.[subItem.key]?.detailData;
+
+		if (!detail?.startTime || !detail?.endTime) {
+			return [];
+		}
+
+		return [
+			{
+				id: 'item1',
+				group: 'group1',
+				start_time: dayjs(detail.startTime).toDate(),
+				end_time: dayjs(detail.endTime).toDate(),
+				canMove: false,
+				canResize: false,
+				canChangeGroup: false,
+			},
+		];
+	};
+
+	const getDayColor = (currentMonth: boolean, dayKey: dayName) => {
+		if (!currentMonth) return 'gray.500';
+
+		switch (dayKey) {
+			case 'sat':
+				return 'info.500';
+			case 'sun':
+				return 'error.500';
+			default:
+				return 'inherit'; // 또는 기본 색상
 		}
 	};
 
@@ -236,7 +281,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 												sx={{
 													display: 'flex',
 													width: '100%',
-													padding: '0.375rem 1rem',
+													padding: '0.375rem 0.625rem',
 													borderBottom: `1px solid`,
 													borderColor: 'gray.300',
 												}}
@@ -245,7 +290,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 													sx={{
 														marginRight: '0.5rem',
 														fontWeight: 'bold',
-														...(item[subItem.key].isCurrentMonth ? {} : { color: 'gray.500' }),
+														color: getDayColor(item[subItem.key].isCurrentMonth, subItem.key),
 													}}
 												>
 													{item[subItem.key].day}
@@ -253,7 +298,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 												<Typography
 													sx={{
 														display: { xs: 'none', md: 'block' },
-														...(item[subItem.key].isCurrentMonth ? {} : { color: 'gray.500' }),
+														color: getDayColor(item[subItem.key].isCurrentMonth, subItem.key),
 													}}
 												>
 													{subItem.header}
@@ -281,7 +326,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 														</Typography>
 														<Typography>
 															{item[subItem.key]?.detailData.startTime
-																? dayjs(item[subItem.key].detailData.startTime).format('A HH:mm')
+																? dayjs(item[subItem.key].detailData.startTime).format('HH:mm')
 																: ''}
 														</Typography>
 													</Box>
@@ -306,38 +351,11 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 														</Typography>
 														<Typography>
 															{item[subItem.key]?.detailData.endTime
-																? dayjs(item[subItem.key].detailData.endTime).format('A HH:mm')
+																? dayjs(item[subItem.key].detailData.endTime).format('HH:mm')
 																: ''}
 														</Typography>
 													</Box>
 												)}
-												{/*item[subItem.key].detailData.overTime && (
-													<Box sx={{ display: 'flex', alignItems: 'center' }}>
-														<Box
-															sx={{
-																width: '2px',
-																height: '0.75rem',
-																marginRight: '0.25rem',
-																backgroundColor: 'primary.main',
-															}}
-														></Box>
-														<Typography variant='body2'>{item[subItem.key].detailData.overTime}</Typography>
-													</Box>
-												)*/}
-
-												{/*item[subItem.key].detailData.fullTime && (
-													<Box sx={{ display: 'flex', alignItems: 'center' }}>
-														<Box
-															sx={{
-																width: '2px',
-																height: '0.75rem',
-																marginRight: '0.25rem',
-																backgroundColor: 'primary.main',
-															}}
-														></Box>
-														<Typography variant='body2'>{item[subItem.key].detailData.fullTime}</Typography>
-													</Box>
-												)*/}
 											</Box>
 										</Box>
 									</Box>
@@ -387,7 +405,9 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 											);
 										})}
 									</Box>
-									<Box sx={{ overflow: 'hidden', width: '100%', height: '7rem', mt: '0.5rem' }}></Box>
+									<Box sx={{ overflow: 'hidden', width: '100%', height: '6rem', mt: '0.5rem' }}>
+										<CustomReactCalendarTimeline itemList={activeTimelineData} />
+									</Box>
 								</Box>
 							</Box>
 						)}

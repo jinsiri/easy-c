@@ -93,54 +93,71 @@ export default function AttendanceUserPage() {
 						<AttendanceComp attendanceData={attendanceData} onSuccess={onSuccessEvent} />
 					</Box>
 					<Box
-						sx={{ width: { sm: '100%', md: '50%' }, padding: '1rem 1.5rem', borderLeftWidth: '1px', borderStyle: 'solid', borderColor: 'gray.300' }}
+						sx={{
+							display: 'flex',
+							flexDirection: 'column',
+							width: { sm: '100%', md: '50%' },
+							padding: '1rem 1.5rem',
+							borderLeftWidth: '1px',
+							borderStyle: 'solid',
+							borderColor: 'gray.300',
+							gap: '1rem',
+						}}
 					>
-						<Box sx={{ display: 'flex', flexDirection: 'row' }}>
-							<Typography variant='h6'>주간 누적</Typography>
-							<Typography variant='h6' sx={{ marginLeft: '0.5rem', color: 'primary.main' }}>
-								{formatMinutes(attendanceData.workTime)}
-							</Typography>
+						<Box
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+							}}
+						>
+							<Box sx={{ display: 'flex', flexDirection: 'row' }}>
+								<Typography variant='h6'>주간 누적</Typography>
+								<Typography variant='h6' sx={{ marginLeft: '0.5rem', color: 'primary.main' }}>
+									{formatMinutes(attendanceData.workTime)}
+								</Typography>
+							</Box>
+							<Typography sx={{ color: 'gray.700' }}>이번 주 14시간 46분이 더 필요해요.</Typography>
 						</Box>
-						<Typography sx={{ color: 'gray.700' }}>이번 주 14시간 46분이 더 필요해요.</Typography>
+
+						<Box sx={{ width: '100%', height: '4rem' }}></Box>
+						<Box
+							sx={{
+								display: 'flex',
+								flexDirection: 'row',
+								gap: '0.5rem',
+							}}
+						>
+							<ColTitleAndText subtitle={'잔여 근무일'} sx={{ flex: '1' }}>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', textAlign: 'center' }}>
+									<Typography variant='h6' sx={{ color: 'primary.main' }}>
+										{attendanceData.totalWorkDay ? attendanceData.totalWorkDay - attendanceData.workDay : 0}d
+									</Typography>
+									<Typography sx={{ marginLeft: '0.25rem' }}>/ {attendanceData.totalWorkDay}d</Typography>
+								</Box>
+							</ColTitleAndText>
+							<ColTitleAndText subtitle={'잔여 근로시간'} sx={{ flex: '1' }}>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', textAlign: 'center' }}>
+									<Typography variant='h6' sx={{ color: 'primary.main' }}>
+										{formatMinutes(attendanceData.totalWorkTime ? attendanceData.totalWorkTime - attendanceData.workTime : 0)}
+									</Typography>
+									<Typography sx={{ marginLeft: '0.25rem' }}>/ {formatMinutes(attendanceData.totalWorkTime)}</Typography>
+								</Box>
+							</ColTitleAndText>
+							<ColTitleAndText subtitle={'총 근로시간'} sx={{ flex: '1' }}>
+								<Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+									<Typography variant='h6'>{formatMinutes(attendanceData.workTime)}</Typography>
+								</Box>
+							</ColTitleAndText>
+							<ColTitleAndText subtitle={'휴가'} sx={{ flex: '1' }}>
+								<Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+									<Typography variant='h6'>{formatMinutes(attendanceData.vacationTime)}</Typography>
+								</Box>
+							</ColTitleAndText>
+						</Box>
 					</Box>
 				</Grid>
-				<Grid
-					size={12}
-					sx={{
-						display: 'flex',
-						flexDirection: 'row',
-						padding: '1rem',
-						borderRadius: '1rem',
-						backgroundColor: 'gray.100',
-						gap: '2rem',
-					}}
-				>
-					<ColTitleAndText subtitle={'잔여 근무일'}>
-						<Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-							<Typography variant='h6' sx={{ color: 'primary.main' }}>
-								{attendanceData.totalWorkDay - attendanceData.workDay}d
-							</Typography>
-							<Typography sx={{ marginLeft: '0.25rem' }}>/ {attendanceData.totalWorkDay}d</Typography>
-						</Box>
-					</ColTitleAndText>
-					<ColTitleAndText subtitle={'잔여 근로시간'}>
-						<Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-							<Typography variant='h6' sx={{ color: 'primary.main' }}>
-								{formatMinutes(attendanceData.totalWorkTime - attendanceData.workTime)}
-							</Typography>
-							<Typography sx={{ marginLeft: '0.25rem' }}>/ {formatMinutes(attendanceData.totalWorkTime)}</Typography>
-						</Box>
-					</ColTitleAndText>
-					<ColTitleAndText subtitle={'총 근로시간'}>
-						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<Typography variant='h6'>{formatMinutes(attendanceData.workTime)}</Typography>
-						</Box>
-					</ColTitleAndText>
-					<ColTitleAndText subtitle={'휴가'}>
-						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<Typography variant='h6'>{formatMinutes(attendanceData.vacationTime)}</Typography>
-						</Box>
-					</ColTitleAndText>
+				<Grid size={12} sx={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+					<Typography variant='h5'>{dayjs().format('YYYY-MM-DD')}</Typography>
 				</Grid>
 				<Grid size={12}>
 					<Calendar calendarRow={calendarData} />

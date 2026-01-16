@@ -118,7 +118,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
 				<LiveClock />
 				<Typography variant={'subtitle2'} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-					<AccessTimeRounded sx={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} /> 선택적 근로 시간제 (08:00 ~ 17:00)
+					<AccessTimeRounded sx={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} /> 고정 근무제 (09:00 ~ 18:00)
 				</Typography>
 			</Box>
 
