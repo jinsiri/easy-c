@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class AttendanceCalendarResDto {
+    private Integer year;
+    private Integer month;
     private Integer day;
     private Boolean isCurrentMonth;
     private AttendanceDayResDto detailData = new AttendanceDayResDto();

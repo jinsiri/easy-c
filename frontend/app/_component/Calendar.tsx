@@ -25,6 +25,8 @@ interface CalendarColData {
 }
 
 interface CalendarData {
+	year: number;
+	month: number;
 	day: number;
 	isCurrentMonth: boolean;
 	detailData: AttendanceDayResInterface;
@@ -34,6 +36,12 @@ interface ColData {
 	key: keyof AttendanceDayResInterface;
 	header: string;
 	formatter?: (value: any, row?: AttendanceDayResInterface) => React.ReactNode;
+}
+
+interface TimelineDataInterface {
+	visibleTimeStart: number | undefined;
+	visibleTimeEnd: number | undefined;
+	data: TimelineItemBase<Date>[];
 }
 
 const calendarCol: CalendarColData[] = [
@@ -180,7 +188,11 @@ const detailCol: ColData[] = [
 export default function Calendar({ calendarRow }: { calendarRow: Record<dayName, CalendarData>[] }) {
 	const [targetCalendarRow, setTargetCalendarRow] = useState<Record<dayName, CalendarData>[]>(defaultCalendarRow);
 	const [activeCell, setActiveCell] = useState<string | null>(null);
-	const [activeTimelineData, setActiveTimelineData] = useState<TimelineItemBase<Date>[]>([]);
+	const [activeTimelineData, setActiveTimelineData] = useState<TimelineDataInterface>({
+		visibleTimeStart: undefined,
+		visibleTimeEnd: undefined,
+		data: [],
+	});
 
 	useEffect(() => {
 		if (calendarRow) {
@@ -200,28 +212,46 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 		}
 	};
 
-	const makeTimelineData = (target: string) => {
+	const makeTimelineData = (target: string): TimelineDataInterface => {
 		const [rowIdx, colIdx] = target.split('_').map(Number);
+		const rowData = targetCalendarRow[rowIdx]?.[calendarCol[colIdx].key];
+		const detail = targetCalendarRow[rowIdx]?.[calendarCol[colIdx].key]?.detailData;
 
-		const item = targetCalendarRow[rowIdx];
-		const subItem = calendarCol[colIdx];
-		const detail = item?.[subItem.key]?.detailData;
+		const baseDate = dayjs()
+			.year(rowData.year)
+			.month(rowData.month - 1)
+			.date(rowData.day);
+
+		const visibleTimeStart = baseDate.startOf('day').valueOf();
+		const visibleTimeEnd = baseDate.endOf('day').valueOf();
 
 		if (!detail?.startTime || !detail?.endTime) {
-			return [];
+			return {
+				visibleTimeStart,
+				visibleTimeEnd,
+				data: [],
+			};
 		}
 
-		return [
-			{
-				id: 'item1',
-				group: 'group1',
-				start_time: dayjs(detail.startTime).toDate(),
-				end_time: dayjs(detail.endTime).toDate(),
-				canMove: false,
-				canResize: false,
-				canChangeGroup: false,
-			},
-		];
+		const start = dayjs(detail.startTime);
+		const end = dayjs(detail.endTime);
+
+		return {
+			// 해당 날짜의 00:00:00와 23:59:59
+			visibleTimeStart: visibleTimeStart,
+			visibleTimeEnd: visibleTimeEnd,
+			data: [
+				{
+					id: `item-${target}`, // ID 중복 방지를 위해 target 활용 권장
+					group: 'group1',
+					start_time: start.toDate(),
+					end_time: end.toDate(),
+					canMove: false,
+					canResize: false,
+					canChangeGroup: false,
+				},
+			],
+		};
 	};
 
 	const getDayColor = (currentMonth: boolean, dayKey: dayName) => {
@@ -406,7 +436,11 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 										})}
 									</Box>
 									<Box sx={{ overflow: 'hidden', width: '100%', height: '6rem', mt: '0.5rem' }}>
-										<CustomReactCalendarTimeline itemList={activeTimelineData} />
+										<CustomReactCalendarTimeline
+											itemList={activeTimelineData.data}
+											visibleTimeStart={activeTimelineData.visibleTimeStart}
+											visibleTimeEnd={activeTimelineData.visibleTimeEnd}
+										/>
 									</Box>
 								</Box>
 							</Box>

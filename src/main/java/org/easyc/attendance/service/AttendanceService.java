@@ -192,6 +192,8 @@ public class AttendanceService {
             dto = new AttendanceCalendarResDto(attendance);
         }
 
+        dto.setYear(date.getYear());
+        dto.setMonth(date.getMonthValue());
         dto.setDay(date.getDayOfMonth());
         dto.setIsCurrentMonth(isCurrentMonth);
         return dto;
