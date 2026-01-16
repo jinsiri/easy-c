@@ -45,6 +45,12 @@ const MainMenuItem: menuType[] = [
 						type: '2depth',
 						url: '/user',
 					},
+					{
+						id: 'main-attendance-team',
+						title: '팀별 근태 정보',
+						type: '2depth',
+						url: '/team',
+					},
 				],
 			},
 			{

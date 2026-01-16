@@ -40,7 +40,7 @@ export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 				sx={{
 					position: 'relative',
 					height: drawerOpen ? 'auto' : '3rem',
-					backgroundColor: isActive ? theme.palette.primary[100] : 'transparent',
+					backgroundColor: isActive ? 'primary.100' : 'transparent',
 					borderRadius: '1rem 0 0 1rem',
 				}}
 				onClick={onClickListItemButton}
