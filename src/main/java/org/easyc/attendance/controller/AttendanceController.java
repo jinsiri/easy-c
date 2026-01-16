@@ -6,17 +6,15 @@ import org.easyc.attendance.dto.AttendanceCalendarResDto;
 import org.easyc.attendance.dto.AttendanceReqDto;
 import org.easyc.attendance.dto.AttendanceResDto;
 import org.easyc.attendance.dto.AttendanceSaveReqDto;
-import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.service.AttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.easyc.common.util.IpUtil.getClientIp;
+import static org.easyc.common.util.utilFunc.getClientIp;
 
 @RestController
 @RequiredArgsConstructor

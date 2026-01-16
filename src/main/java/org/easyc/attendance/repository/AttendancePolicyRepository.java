@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AttendancePolicyRepository extends JpaRepository<AttendancePolicy, Long> {
+    AttendancePolicy findByAttendancePolicyId(Long attendancePolicyId);
 }

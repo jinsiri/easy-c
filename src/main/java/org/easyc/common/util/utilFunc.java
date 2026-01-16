@@ -2,7 +2,11 @@ package org.easyc.common.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-public class IpUtil {
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class utilFunc {
     public static String getClientIp(HttpServletRequest request) {
         String[] headers = {
                 "X-Forwarded-For",
@@ -19,5 +23,12 @@ public class IpUtil {
             }
         }
         return request.getRemoteAddr();
+    }
+
+    public static LocalDate parseDate(String dateTimeStr) {
+        return LocalDate.parse(dateTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+    public static LocalDateTime parseDateTime(String dateTimeStr) {
+        return LocalDateTime.parse(dateTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 }
