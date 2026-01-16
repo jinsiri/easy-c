@@ -13,23 +13,24 @@ import { ArrowForwardRounded, AccessTimeRounded } from '@mui/icons-material';
 
 /** Custom */
 import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
+import { CURRENTSTATE } from '@/app/_constant/const_attendance';
 
 /** Type / Interface */
 import { attendanceSaveReqInterface, AttendanceResInterface } from '@/type/AttendanceInterface';
 
 export default function AttendanceComp({ attendanceData, onSuccess }: { attendanceData?: AttendanceResInterface; onSuccess?: () => void }) {
-	const [workingStatus, setWorkingStatus] = useState('before_work');
+	const [workingStatus, setWorkingStatus] = useState('BEFORE_WORK');
 	const [activated, setActived] = useState<boolean>(false);
 	const [workData, setWorkData] = useState<AttendanceResInterface>({});
 
 	useEffect(() => {
 		if (attendanceData && attendanceData.dayData) {
 			if (attendanceData.dayData.endTime) {
-				setWorkingStatus('after_work');
+				setWorkingStatus('AFTER_WORK');
 			} else if (attendanceData.dayData.startTime) {
-				setWorkingStatus('working');
+				setWorkingStatus('WORKING');
 			} else {
-				setWorkingStatus('before_work');
+				setWorkingStatus('BEFORE_WORK');
 			}
 
 			setActived(Boolean(attendanceData.dayData.startTime));
@@ -142,11 +143,20 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 							alignItems: 'center',
 							padding: '1rem',
 							borderRadius: '1rem',
-							backgroundColor: 'gray.100',
+							border: '2px solid',
+							borderColor: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'gray.300',
 							gap: { sm: '0.5rem', md: '1rem', lg: '1.5rem' },
 						}}
 					>
-						근무 전
+						<Typography
+							sx={{
+								fontSize: '1rem',
+								fontWeight: 600,
+								color: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'gray.300',
+							}}
+						>
+							{CURRENTSTATE[workingStatus]}
+						</Typography>
 					</Box>
 					<Box
 						sx={{
@@ -194,7 +204,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 						size='large'
 						sx={{ flexGrow: '1' }}
 						onClick={onClickWorkingStatusButton}
-						disabled={workingStatus === 'after_work'}
+						disabled={workingStatus === 'AFTER_WORK'}
 					>
 						{activated ? '퇴근하기' : '출근하기'}
 					</Button>

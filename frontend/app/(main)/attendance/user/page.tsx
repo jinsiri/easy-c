@@ -102,7 +102,7 @@ export default function AttendanceUserPage() {
 								},
 								{
 									offset: 1,
-									color: theme.palette.primary.light,
+									color: '#61fbd5',
 								},
 							],
 						},
@@ -166,7 +166,10 @@ export default function AttendanceUserPage() {
 									{formatMinutes(attendanceData.workTime)}
 								</Typography>
 							</Box>
-							<Typography sx={{ color: 'gray.700' }}>이번 주 14시간 46분이 더 필요해요.</Typography>
+							<Typography sx={{ color: 'gray.700' }}>
+								이번 주 {attendanceData.totalWorkTime ? Math.floor((attendanceData.workTime / attendanceData.totalWorkTime) * 100) : 0}% 근무
+								했어요.
+							</Typography>
 						</Box>
 
 						<Box sx={{ width: '100%', height: '4rem' }}>
