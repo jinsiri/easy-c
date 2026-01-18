@@ -6,6 +6,7 @@ import { DeptResponseDto } from '@/type/dept';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import CommonTabs from '@/app/_component/CommonTabs';
 import CommonTreeview from '@/app/_component/Tree';
+import { useRouter } from 'next/navigation';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -46,6 +47,7 @@ const mapDeptToTree = (dept: DeptResponseDto) => ({
 });
 
 export default function AdminDeptListView({ dbData }: Props) {
+	const router = useRouter();
 	const theme = useTheme();
 
 	const dummyDept = {
@@ -107,7 +109,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 
 					<Box sx={{ mb: 1 }}>
 						<Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-							<IconButton className='contained-primary light'>
+							<IconButton className='contained-primary light' onClick={() => router.push('/admin/dept/list/add')}>
 								<AddCircleOutline className='svg-small' />
 							</IconButton>
 							<IconButton className='contained-primary light'>

@@ -2,16 +2,17 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, DialogActions, DialogContent } from '@mui/material';
+import { Button, CircularProgress, DialogActions, DialogContent } from '@mui/material';
 
 export interface BaseDialogProps {
 	title: string;
 	children: React.ReactNode;
+	loading?: boolean;
 	onConfirm: () => void;
 }
 
 export default function BaseDialog(props: BaseDialogProps) {
-	const { title, children, onConfirm } = props;
+	const { title, children, loading, onConfirm } = props;
 	const router = useRouter();
 
 	const handleClose = () => {
@@ -26,8 +27,8 @@ export default function BaseDialog(props: BaseDialogProps) {
 				<Button variant='text' onClick={handleClose}>
 					닫기
 				</Button>
-				<Button variant='contained' color={'primary'} onClick={onConfirm}>
-					저장
+				<Button variant='contained' onClick={onConfirm} disabled={loading}>
+					{loading ? <CircularProgress size={24} /> : '저장'}
 				</Button>
 			</DialogActions>
 		</Dialog>
