@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { SyntheticEvent, useMemo, useState } from 'react';
 
 /** MUI */
 import { Box, Typography, Grid, List, ListItem, useTheme, OutlinedInput } from '@mui/material';
@@ -145,6 +145,11 @@ const dummyUserLanguageInfo: ColDef<Record<string, any>>[] = [
 
 export default function HumanResourceUserPage() {
 	const theme = useTheme();
+	const [targetTab, setTargetTab] = useState<number>(0);
+
+	const handleTabChange = (_: SyntheticEvent, newValue: number) => {
+		setTargetTab(newValue);
+	};
 
 	const tabInfoContents = useMemo(() => {
 		const targetList: Record<string, any> = dummyUserInfo;
@@ -288,7 +293,7 @@ export default function HumanResourceUserPage() {
 											padding: '0.5rem',
 										}}
 									>
-										<Box sx={{ width: '6rem', textWrap: 'nowrap', fontSize: '0.875rem', color: theme.palette.gray[700] }}>{key}</Box>
+										<Box sx={{ width: '6rem', textWrap: 'nowrap', fontSize: '0.875rem', color: theme.palette.grey[700] }}>{key}</Box>
 										<Box sx={{ width: 'calc(100% - 6rem)', textWrap: 'nowrap' }}>{value}</Box>
 									</ListItem>
 								);
@@ -299,10 +304,14 @@ export default function HumanResourceUserPage() {
 			</Box>
 			<CommonTabs
 				tabs={userTabs}
+				value={targetTab}
+				onChange={handleTabChange}
 				containerSx={{
 					display: 'flex',
 					flexDirection: 'column',
 					marginTop: '-1px',
+					overflow: targetTab === 2 ? 'auto' : 'inherit',
+					padding: targetTab <= 1 ? '1rem 1.5rem' : '',
 				}}
 			/>
 		</Box>
