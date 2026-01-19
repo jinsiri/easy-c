@@ -10,4 +10,8 @@ import org.easyc.common.dto.BaseDto;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 public class JobTitleRequestDto extends BaseDto {
+    private Long jobTitleId;
+    private String jobTitleNm;
+    private String jobTitleCode;
+    private int jobTitleLevel;
 }
