@@ -8,7 +8,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from '../theme/Theme';
 
 /** CSS */
-import './_css/globals.css';
+import '@/style/globals.css';
 
 export const metadata: Metadata = {
 	title: 'EASY-C',
