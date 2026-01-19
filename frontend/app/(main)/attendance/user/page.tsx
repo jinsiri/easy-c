@@ -8,7 +8,8 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
 /** MUI */
-import { Box, Grid, Typography, useTheme } from '@mui/material';
+import { Box, Grid, IconButton, Typography, useTheme } from '@mui/material';
+import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -27,16 +28,19 @@ export default function AttendanceUserPage() {
 	const theme = useTheme();
 
 	const [attendanceData, setAttenceData] = useState<AttendanceResInterface>({});
+	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
 	const [calendarData, setCalendarData] = useState([]);
 	const [chartOption, setChartOption] = useState<Record<string, any>>({});
 
 	useEffect(() => {
 		//금일 및 금주 데이터
 		getAttendanceTodayData();
+	}, []);
 
+	useEffect(() => {
 		//해당하는 달의 날짜 정보 및 달력에 표시할 데이터 불러오기
 		getAttendanceCalendarData();
-	}, []);
+	}, [calendarDate]);
 
 	const getAttendanceTodayData = () => {
 		const today = dayjs();
@@ -57,10 +61,9 @@ export default function AttendanceUserPage() {
 	};
 
 	const getAttendanceCalendarData = () => {
-		const today = dayjs();
 		const req: attendanceReqInterface = {
 			memberId: 1,
-			workDate: today.format('YYYY-MM-DD'),
+			workDate: calendarDate.format('YYYY-MM-DD'),
 		};
 
 		axiosConfig
@@ -90,6 +93,7 @@ export default function AttendanceUserPage() {
 				{
 					type: 'bar',
 					showBackground: true,
+					barWidth: 15,
 					itemStyle: {
 						color: {
 							type: 'linear',
@@ -211,8 +215,40 @@ export default function AttendanceUserPage() {
 						</Box>
 					</Box>
 				</Grid>
-				<Grid size={12} sx={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
-					<Typography variant='h5'>{dayjs().format('YYYY-MM-DD')}</Typography>
+				<Grid size={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem' }}>
+					<IconButton
+						sx={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							width: '1.25rem',
+							height: '1.25rem',
+							borderRadius: '100%',
+							border: '2px solid',
+							borderColor: 'gray.900',
+						}}
+						onClick={(e) => setCalendarDate((prev) => prev.subtract(1, 'month'))}
+					>
+						<ArrowLeftRounded sx={{ fontSize: '1.5rem', strokeWidth: 5 }} />
+					</IconButton>
+					<Typography variant='h5' sx={{ margin: '0 2rem' }}>
+						{calendarDate.format('YYYY-MM')}
+					</Typography>
+					<IconButton
+						sx={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							width: '1.25rem',
+							height: '1.25rem',
+							borderRadius: '100%',
+							border: '2px solid',
+							borderColor: 'gray.900',
+						}}
+						onClick={(e) => setCalendarDate((prev) => prev.add(1, 'month'))}
+					>
+						<ArrowRightRounded sx={{ fontSize: '1.5rem' }} />
+					</IconButton>
 				</Grid>
 				<Grid size={12}>
 					<Calendar calendarRow={calendarData} />
