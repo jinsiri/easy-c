@@ -2,7 +2,7 @@ package org.easyc.attendance.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.easyc.common.constant.VACATION_TYPE;
+import org.easyc.common.constant.VacationType;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
@@ -81,7 +81,7 @@ public class Attendance {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "vacation_type")
-    private VACATION_TYPE vacationType;
+    private VacationType vacationType;
 
 
     /** 수정 정보 */

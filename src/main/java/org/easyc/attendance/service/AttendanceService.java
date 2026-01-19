@@ -9,18 +9,13 @@ import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.entity.AttendancePolicy;
 import org.easyc.attendance.repository.AttendancePolicyRepository;
 import org.easyc.attendance.repository.AttendanceRepository;
-import org.easyc.common.constant.VACATION_TYPE;
-import org.easyc.common.constant.WORK_STATUS;
-import org.easyc.common.constant.WORK_TYPE;
-import org.easyc.member.repository.MemberRepository;
+import org.easyc.common.constant.VacationType;
+import org.easyc.common.constant.WorkStatus;
+import org.easyc.common.constant.WorkType;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.DateFormatter;
-import java.math.BigDecimal;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjuster;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -217,18 +212,18 @@ public class AttendanceService {
             LocalTime currentTime = startTime.toLocalTime();
 
             // 지각 여부 판별
-            LocalTime limitTime = (targetAttendance.isVacationed() && VACATION_TYPE.HALF_AM.name().equals(targetAttendance.getVacationType()))
+            LocalTime limitTime = (targetAttendance.isVacationed() && VacationType.HALF_AM.name().equals(targetAttendance.getVacationType()))
                     ? targetPolicy.getHalfLeaveStartTime().plus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES)
                     : targetPolicy.getStartTime().plus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES);
 
-            String status = currentTime.isAfter(limitTime) ? WORK_STATUS.LATE.name() : WORK_STATUS.PRESENT.name();
+            String status = currentTime.isAfter(limitTime) ? WorkStatus.LATE.name() : WorkStatus.PRESENT.name();
 
             // 근무 타입 판별
-            String workType = WORK_TYPE.NORMAL.name();
+            String workType = WorkType.NORMAL.name();
             if (dayOfWeek >= 6) {
-                workType = WORK_TYPE.WEEKEND.name();
+                workType = WorkType.WEEKEND.name();
             } else if (!targetPolicy.getWorkingDay().contains(String.valueOf(dayOfWeek))) {
-                workType = WORK_TYPE.HOLIDAY.name();
+                workType = WorkType.HOLIDAY.name();
             }
 
             targetAttendance.setStartTime(startTime);
@@ -256,16 +251,16 @@ public class AttendanceService {
 
             // 조퇴 여부 판별
             // 날짜가 바뀌지 않았고(당일 퇴근), 정책의 퇴근 시간보다 일찍 나갔을 때
-            LocalTime limitTime = (targetAttendance.isVacationed() && VACATION_TYPE.HALF_PM.name().equals(targetAttendance.getVacationType()))
+            LocalTime limitTime = (targetAttendance.isVacationed() && VacationType.HALF_PM.name().equals(targetAttendance.getVacationType()))
                     ? targetPolicy.getHalfLeaveEndTime().minus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES)
                     : targetPolicy.getEndTime().minus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES);
 
-            String status = WORK_STATUS.PRESENT.name();
+            String status = WorkStatus.PRESENT.name();
 
             // 출근일과 퇴근일이 같을 때만 조퇴
             if (targetAttendance.getWorkDate().equals(endTime.toLocalDate())) {
                 if (endTime.toLocalTime().isBefore(limitTime)) {
-                    status = WORK_STATUS.EARLY_LEAVE.name();
+                    status = WorkStatus.EARLY_LEAVE.name();
                 }
             }
 
@@ -302,7 +297,7 @@ public class AttendanceService {
         if(weekAttendanceData != null && weekAttendanceData.size() > 0) {
             for (Attendance attendance : weekAttendanceData) {
                 if(attendance.isVacationed()) {
-                    if(attendance.getVacationType().equals(VACATION_TYPE.FULL) ){
+                    if(attendance.getVacationType().equals(VacationType.FULL) ){
                         vacationTime += Long.valueOf( 8 * 60 );
                     }else {
                         vacationTime += Long.valueOf( 4 * 60 );
