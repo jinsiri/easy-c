@@ -11,11 +11,11 @@ import CustomReactCalendarTimeline from '../_lib/CustomReactCalendarTimeline';
 import { TimelineItemBase } from 'react-calendar-timeline';
 
 /** Custom */
-import { formatMinutes } from '@/app/_utils/commonFunc';
+import { formatMinutes } from '@/utils/commonFunc';
 
 /** type / interface */
-import { AttendanceDayResInterface } from '@/type/AttendanceInterface';
-import { WORKSTATUS } from '../_constant/const_attendance';
+import { AttendanceDayResInterface } from '@/type/attendanceInterface';
+import { WORKSTATUS } from '@/constant/attendanceConst';
 
 type dayName = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
 
@@ -57,6 +57,8 @@ const calendarCol: CalendarColData[] = [
 const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 	{
 		mon: {
+			year: 2026,
+			month: 1,
 			day: 1,
 			isCurrentMonth: true,
 			detailData: {
@@ -69,6 +71,8 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 			},
 		},
 		tue: {
+			year: 2026,
+			month: 1,
 			day: 1,
 			isCurrentMonth: true,
 			detailData: {
@@ -81,6 +85,8 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 			},
 		},
 		wed: {
+			year: 2026,
+			month: 1,
 			day: 1,
 			isCurrentMonth: true,
 			detailData: {
@@ -93,6 +99,8 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 			},
 		},
 		thu: {
+			year: 2026,
+			month: 1,
 			day: 1,
 			isCurrentMonth: true,
 			detailData: {
@@ -105,6 +113,8 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 			},
 		},
 		fri: {
+			year: 2026,
+			month: 1,
 			day: 1,
 			isCurrentMonth: true,
 			detailData: {
@@ -117,6 +127,8 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 			},
 		},
 		sat: {
+			year: 2026,
+			month: 1,
 			day: 1,
 			isCurrentMonth: true,
 			detailData: {
@@ -129,6 +141,8 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 			},
 		},
 		sun: {
+			year: 2026,
+			month: 1,
 			day: 1,
 			isCurrentMonth: true,
 			detailData: {

@@ -13,10 +13,10 @@ import { ArrowForwardRounded, AccessTimeRounded } from '@mui/icons-material';
 
 /** Custom */
 import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
-import { CURRENTSTATE } from '@/app/_constant/const_attendance';
+import { CURRENTSTATE } from '@/constant/attendanceConst';
 
 /** Type / Interface */
-import { attendanceSaveReqInterface, AttendanceResInterface } from '@/type/AttendanceInterface';
+import { attendanceSaveReqInterface, AttendanceResInterface } from '@/type/attendanceInterface';
 
 export default function AttendanceComp({ attendanceData, onSuccess }: { attendanceData?: AttendanceResInterface; onSuccess?: () => void }) {
 	const [workingStatus, setWorkingStatus] = useState('BEFORE_WORK');

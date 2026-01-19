@@ -2,7 +2,7 @@
 import { AssignmentIndRounded, WorkHistoryRounded, BeachAccessRounded } from '@mui/icons-material';
 
 /** Custom */
-import { menuType } from '../../_constant/Types';
+import { menuType } from '@/type/types';
 
 const MainMenuItem: menuType[] = [
 	{

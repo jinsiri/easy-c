@@ -16,10 +16,10 @@ import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
 import Calendar from '@/app/_component/Calendar';
 import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
-import { formatMinutes } from '@/app/_utils/commonFunc';
+import { formatMinutes } from '@/utils/commonFunc';
 
 /** Type / Interface */
-import { attendanceReqInterface, AttendanceResInterface } from '@/type/AttendanceInterface';
+import { attendanceReqInterface, AttendanceResInterface } from '@/type/attendanceInterface';
 import CustomEchartComp from '@/app/_lib/CustomEchartComp';
 
 dayjs.extend(duration);

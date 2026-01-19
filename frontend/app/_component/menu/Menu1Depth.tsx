@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 /** MUI */
-import { Box, Collapse, List, ListItemButton, ListItemText, Fade, Paper, useTheme } from '@mui/material';
+import { Box, Collapse, List, ListItemButton, ListItemText, Fade, Paper } from '@mui/material';
 import { ExpandMoreRounded } from '@mui/icons-material';
 
 /** Custom */
-import { menuType } from '../../_constant/Types';
+import { menuType } from '@/type/types';
 import Menu2Depth from './Menu2Depth';
 
 interface propsType {
@@ -20,7 +20,6 @@ interface propsType {
 
 export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 	const IconComponent = item.icon;
-	const theme = useTheme();
 	const pathName = usePathname();
 	const isActive = pathName.includes(prevUrl + item.url);
 
@@ -53,12 +52,10 @@ export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 				</Fade>
 				{item.children && (
 					<Fade in={drawerOpen} easing={'easeInOut'} timeout={200}>
-						<ExpandMoreRounded sx={{ color: theme.palette.grey[700] }} />
+						<ExpandMoreRounded sx={{ color: 'gray.700' }} />
 					</Fade>
 				)}
-				<Box
-					sx={{ position: 'absolute', bottom: 0, width: '100%', height: '1px', backgroundColor: isActive ? 'transparent' : theme.palette.grey[100] }}
-				/>
+				<Box sx={{ position: 'absolute', bottom: 0, width: '100%', height: '1px', backgroundColor: isActive ? 'transparent' : 'gray.100' }} />
 
 				{/* --- [추가] 사이드바가 닫혔을 때 호버 시 나타날 메뉴 --- */}
 				{!drawerOpen && item.children && isHovered && (

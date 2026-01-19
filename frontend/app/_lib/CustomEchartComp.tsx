@@ -71,16 +71,7 @@ import {
 import { CanvasRenderer } from 'echarts/renderers';
 
 /** custom */
-import {
-	BAR_OPTION,
-	PIE_OPTION,
-	LINE_OPTION,
-	LINE_AREA_OPTION,
-	RADAR_OPTION,
-	GAUGE_OPTION,
-	RANK_BAR_OPTION,
-	STACK_BAR_OPTION,
-} from '@/app/_utils/echartOption';
+import { BAR_OPTION, PIE_OPTION, LINE_OPTION, LINE_AREA_OPTION, RADAR_OPTION, GAUGE_OPTION, RANK_BAR_OPTION, STACK_BAR_OPTION } from '@/utils/echartOption';
 
 echarts.use([
 	TitleComponent,

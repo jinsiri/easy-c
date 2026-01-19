@@ -2,7 +2,7 @@
 import { Box, List, Paper } from '@mui/material';
 
 /** Custom */
-import { menuType } from '../_constant/Types';
+import { menuType } from '@/type/types';
 import AdminMenuItem from './menuItem/AdminMenuItem';
 import Menu1Depth from './menu/Menu1Depth';
 

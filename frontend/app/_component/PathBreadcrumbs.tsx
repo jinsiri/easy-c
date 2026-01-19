@@ -2,13 +2,12 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { usePageTitleStore } from '@/store/store';
 
 /** MUI */
 import { Box, Breadcrumbs, Link, Typography } from '@mui/material';
 
 /** Custom */
-import { menuType } from '../_constant/Types';
+import { menuType } from '@/type/types';
 import MainMenuItem from './menuItem/MainMenuItem';
 import AdminMenuItem from './menuItem/AdminMenuItem';
 
