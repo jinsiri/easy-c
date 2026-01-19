@@ -5,11 +5,10 @@ import { useRouter } from 'next/navigation';
 
 import { TextField, Button, Typography, Box, FormControlLabel, Checkbox } from '@mui/material';
 
-import {authService} from "@/app/services/authService";
-import {encryptRSA} from "@/app/utils/crypto";
+import { authService } from '@/app/services/authService';
+import { encryptRSA } from '@/app/_utils/crypto';
 
 const LoginPage = () => {
-
 	const router = useRouter();
 
 	const [userId, setUserId] = useState('');
@@ -22,23 +21,24 @@ const LoginPage = () => {
 		try {
 			await login();
 			alert('로그인 성공!');
-			router.push('/');  // 메인 페이지 이동
+			router.push('/'); // 메인 페이지 이동
 		} catch (error) {
 			alert('로그인 실패! ' + error.response.data.message);
 		}
 	};
 
-
 	const login = async () => {
-
 		const { data: publicKey } = await authService.getPublicKey();
-
 		const encryptedPw = encryptRSA(password, publicKey);
 
 		const res = await authService.login({
 			loginId: userId,
-			encryptedPassword: encryptedPw
+			encryptedPassword: encryptedPw,
 		});
+
+		if (res) {
+		}
+		console.log(res);
 
 		return res;
 	};

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Box, IconButton, Paper, Stack, Popper, Fade, List, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
 import { FormatIndentIncrease, PersonOutlineRounded, LogoutRounded, ManageAccountsRounded, ContactsRounded } from '@mui/icons-material';
 import PopupState, { bindToggle, bindPopper } from 'material-ui-popup-state';
+import {authService} from "@/app/services/authService";
+import {useRouter} from "next/navigation";
 
 interface propsType {
 	drawerOpen: boolean;
@@ -12,11 +14,6 @@ interface propsType {
 	headerHeight: string;
 }
 
-const list = [
-	{ title: '관리자 모드', icon: <ManageAccountsRounded />, component: Link, url: '/admin/normal/setting' },
-	{ title: '내 정보', icon: <ContactsRounded />, component: Link, url: '/management/user' },
-	{ title: '로그아웃', icon: <LogoutRounded />, component: 'span', url: undefined },
-];
 
 export default function Header(props: propsType) {
 	const { drawerOpen, setDrawerOpen, headerHeight } = props;
@@ -24,6 +21,30 @@ export default function Header(props: propsType) {
 	const onClickDrawerButton = () => {
 		setDrawerOpen(!drawerOpen);
 	};
+
+	const router = useRouter();
+
+	const handleLogout = async () => {
+		try {
+			await authService.logout();
+
+			// 토큰 저장 위치에 따라
+			localStorage.clear();
+			// or secureLocalStorage.clear();
+		} catch (e) {
+			console.error(e);
+		} finally {
+			router.replace('/login');
+		}
+	};
+
+
+	const list = [
+		{ title: '관리자 모드', icon: <ManageAccountsRounded />, component: Link, url: '/admin/normal/setting' },
+		{ title: '내 정보', icon: <ContactsRounded />, component: Link, url: '/management/user' },
+		{ title: '로그아웃', icon: <LogoutRounded />, component: 'button', onClick: handleLogout},
+	];
+
 
 	return (
 		<Paper
@@ -74,7 +95,8 @@ export default function Header(props: propsType) {
 															<ListItemButton
 																key={item.title}
 																component={item.component}
-																{...(item.component === Link ? { to: item.url } : item.url ? { href: item.url } : {})}
+																{...(item.component === Link && item.url ? { href: item.url } : {})}
+																onClick={item.onClick}
 															>
 																<ListItemIcon>{item.icon}</ListItemIcon>
 																<ListItemText primary={item.title} sx={{ marginRight: '1rem' }} />

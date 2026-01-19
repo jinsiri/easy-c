@@ -1,4 +1,4 @@
-package org.easyc.member.service;
+package org.easyc.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import org.easyc.member.entity.Member;

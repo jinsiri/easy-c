@@ -1,7 +1,6 @@
-package org.easyc.member.dto;
+package org.easyc.auth.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 //@NoArgsConstructor

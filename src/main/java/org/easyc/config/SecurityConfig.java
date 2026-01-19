@@ -1,6 +1,7 @@
 package org.easyc;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.auth.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,8 +50,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()  // 이거 추가!
-                        .anyRequest().authenticated() // 그 외 인증 필요
-//                        .anyRequest().permitAll() // 테스트용
+//                        .anyRequest().authenticated() // 그 외 인증 필요
+                       .anyRequest().permitAll() // 테스트용
                 )
 
                 // JWT 필터 추가 - UsernamePasswordAuthenticationFilter 전에 실행
