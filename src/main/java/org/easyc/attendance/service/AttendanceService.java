@@ -1,10 +1,10 @@
 package org.easyc.attendance.service;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.attendance.dto.AttendanceCalendarResDto;
-import org.easyc.attendance.dto.AttendanceReqDto;
-import org.easyc.attendance.dto.AttendanceResDto;
-import org.easyc.attendance.dto.AttendanceSaveReqDto;
+import org.easyc.attendance.dto.AttendanceCalendarResponseDto;
+import org.easyc.attendance.dto.AttendanceRequestDto;
+import org.easyc.attendance.dto.AttendanceResponseDto;
+import org.easyc.attendance.dto.AttendanceSaveRequestDto;
 import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.entity.AttendancePolicy;
 import org.easyc.attendance.repository.AttendancePolicyRepository;
@@ -28,7 +28,7 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final AttendancePolicyRepository attendancePolicyRepository;
 
-    public AttendanceResDto getAttendanceTodayData (AttendanceReqDto req){
+    public AttendanceResponseDto getAttendanceTodayData (AttendanceRequestDto req){
         LocalDate workDate = parseDate(req.getWorkDate());
 
         Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate).orElseGet(() -> Attendance.builder()
@@ -36,9 +36,9 @@ public class AttendanceService {
                 .workDate(workDate)
                 .build());
 
-        AttendanceResDto findWeekData = findWeekData(req.getMemberId(), workDate);
+        AttendanceResponseDto findWeekData = findWeekData(req.getMemberId(), workDate);
 
-        AttendanceResDto result = new AttendanceResDto(targetAttendance);
+        AttendanceResponseDto result = new AttendanceResponseDto(targetAttendance);
         result.setTotalWorkDay(findWeekData.getTotalWorkDay());
         result.setTotalWorkTime(findWeekData.getTotalWorkTime());
         result.setWorkDay(findWeekData.getWorkDay());
@@ -48,7 +48,7 @@ public class AttendanceService {
         return result;
     }
 
-    public List<Map<String, AttendanceCalendarResDto>> getAttendanceCalendarData(AttendanceReqDto req) {
+    public List<Map<String, AttendanceCalendarResponseDto>> getAttendanceCalendarData(AttendanceRequestDto req) {
         Long memberId = req.getMemberId();
         String workDateStr = req.getWorkDate();
         LocalDate workDate = parseDate(workDateStr);
@@ -65,8 +65,8 @@ public class AttendanceService {
                 .collect(Collectors.toMap(a -> a.getWorkDate().getDayOfMonth(), a -> a));
 
         String[] weekKeys = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
-        List<Map<String, AttendanceCalendarResDto>> calendarList = new ArrayList<>();
-        Map<String, AttendanceCalendarResDto> currentWeek = new LinkedHashMap<>();
+        List<Map<String, AttendanceCalendarResponseDto>> calendarList = new ArrayList<>();
+        Map<String, AttendanceCalendarResponseDto> currentWeek = new LinkedHashMap<>();
 
         // 1일 시작 전 이전 달 날짜 채우기 ---
         int firsrDayOfWeek = firstDay.getDayOfWeek().getValue();
@@ -86,7 +86,7 @@ public class AttendanceService {
             String key = weekKeys[dayOfWeek.getValue() - 1];
 
             Attendance targetAttendance = attendanceMap.get(cursor.getDayOfMonth());
-            AttendanceCalendarResDto dto = createResDto(cursor, targetAttendance, true );
+            AttendanceCalendarResponseDto dto = createResDto(cursor, targetAttendance, true );
             currentWeek.put(key, dto);
 
             // 일요일이거나 월의 마지막 날이면 리스트에 추가
@@ -110,7 +110,7 @@ public class AttendanceService {
         return calendarList;
     }
 
-    public Map<String, Object> startAttendanceData (AttendanceSaveReqDto req, String ipAddress) {
+    public Map<String, Object> startAttendanceData (AttendanceSaveRequestDto req, String ipAddress) {
         LocalDateTime startTime = parseDateTime(req.getStartTime());
         LocalDate workDate = startTime.toLocalDate();
 
@@ -127,9 +127,9 @@ public class AttendanceService {
         Attendance saveTargetAttendance = attendanceRepository.saveAndFlush(updateAttendanceByStartTime(req, targetAttendance, startTime));
 
        // 주단위 데이터 생성
-        AttendanceResDto findWeekData = findWeekData(req.getMemberId(), workDate);
+        AttendanceResponseDto findWeekData = findWeekData(req.getMemberId(), workDate);
 
-        AttendanceResDto result = new AttendanceResDto(saveTargetAttendance);
+        AttendanceResponseDto result = new AttendanceResponseDto(saveTargetAttendance);
         result.setTotalWorkDay(findWeekData.getTotalWorkDay());
         result.setTotalWorkTime(findWeekData.getTotalWorkTime());
         result.setWorkDay(findWeekData.getWorkDay());
@@ -144,7 +144,7 @@ public class AttendanceService {
         return res;
     }
 
-    public Map<String, Object> finishAttendanceCalendar (AttendanceSaveReqDto req, String ipAddress) {
+    public Map<String, Object> finishAttendanceCalendar (AttendanceSaveRequestDto req, String ipAddress) {
         LocalDateTime endTime = parseDateTime(req.getEndTime());
         LocalTime time = endTime.toLocalTime();
 
@@ -163,9 +163,9 @@ public class AttendanceService {
         Attendance saveTargetAttendance = attendanceRepository.saveAndFlush(updateAttendanceByEndTime(req, targetAttendance, endTime));
 
         // 주단위 데이터 생성
-        AttendanceResDto findWeekData = findWeekData(req.getMemberId(), workDate);
+        AttendanceResponseDto findWeekData = findWeekData(req.getMemberId(), workDate);
 
-        AttendanceResDto result = new AttendanceResDto(saveTargetAttendance);
+        AttendanceResponseDto result = new AttendanceResponseDto(saveTargetAttendance);
         result.setTotalWorkDay(findWeekData.getTotalWorkDay());
         result.setTotalWorkTime(findWeekData.getTotalWorkTime());
         result.setWorkDay(findWeekData.getWorkDay());
@@ -180,11 +180,11 @@ public class AttendanceService {
         return res;
     }
 
-    private AttendanceCalendarResDto createResDto(LocalDate date, Attendance attendance, boolean isCurrentMonth) {
-        AttendanceCalendarResDto dto = new AttendanceCalendarResDto();
+    private AttendanceCalendarResponseDto createResDto(LocalDate date, Attendance attendance, boolean isCurrentMonth) {
+        AttendanceCalendarResponseDto dto = new AttendanceCalendarResponseDto();
 
         if (attendance != null) {
-            dto = new AttendanceCalendarResDto(attendance);
+            dto = new AttendanceCalendarResponseDto(attendance);
         }
 
         dto.setYear(date.getYear());
@@ -194,7 +194,7 @@ public class AttendanceService {
         return dto;
     }
 
-    private Attendance updateAttendanceByStartTime(AttendanceSaveReqDto req, Attendance targetAttendance, LocalDateTime startTime) {
+    private Attendance updateAttendanceByStartTime(AttendanceSaveRequestDto req, Attendance targetAttendance, LocalDateTime startTime) {
         if(targetAttendance != null){
             //!! 추후에 멤버와 연결된 정보로 다시 수정
 
@@ -236,7 +236,7 @@ public class AttendanceService {
         return targetAttendance;
     }
 
-    private Attendance updateAttendanceByEndTime(AttendanceSaveReqDto req, Attendance targetAttendance, LocalDateTime endTime) {
+    private Attendance updateAttendanceByEndTime(AttendanceSaveRequestDto req, Attendance targetAttendance, LocalDateTime endTime) {
         if(targetAttendance != null){
             //!! 추후에 멤버와 연결된 정보로 다시 수정
             AttendancePolicy targetPolicy = attendancePolicyRepository.findByAttendancePolicyId(Long.valueOf(1))
@@ -281,7 +281,7 @@ public class AttendanceService {
         return targetAttendance;
     }
 
-    private AttendanceResDto findWeekData (Long memberId, LocalDate workDate) {
+    private AttendanceResponseDto findWeekData (Long memberId, LocalDate workDate) {
         LocalDate monday = workDate.with(DayOfWeek.MONDAY);
         LocalDate sunday = workDate.with(DayOfWeek.SUNDAY);
 
@@ -311,7 +311,7 @@ public class AttendanceService {
             }
         }
 
-        AttendanceResDto resDto = new AttendanceResDto();
+        AttendanceResponseDto resDto = new AttendanceResponseDto();
         resDto.setTotalWorkDay(defaultWorkDay);
         resDto.setTotalWorkTime(defaultWorkTime);
         resDto.setWorkDay(weekAttendanceData.size());

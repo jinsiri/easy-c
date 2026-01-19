@@ -1,25 +1,22 @@
 package org.easyc.attendance.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.easyc.attendance.entity.Attendance;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @NoArgsConstructor
-public class AttendanceCalendarResDto {
+public class AttendanceCalendarResponseDto {
     private Integer year;
     private Integer month;
     private Integer day;
     private Boolean isCurrentMonth;
-    private AttendanceDayResDto detailData = new AttendanceDayResDto();
+    private AttendanceDayResponseDto detailData = new AttendanceDayResponseDto();
 
-    public AttendanceCalendarResDto(Attendance entity) {
-        this.detailData = new AttendanceDayResDto(entity);
+    public AttendanceCalendarResponseDto(Attendance entity) {
+        this.detailData = new AttendanceDayResponseDto(entity);
     }
 }
 

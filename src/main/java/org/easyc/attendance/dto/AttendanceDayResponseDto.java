@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AttendanceDayResDto {
+public class AttendanceDayResponseDto {
     private Long attendanceId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -20,7 +20,7 @@ public class AttendanceDayResDto {
     private String vacation;
     private String confirm;
 
-    public AttendanceDayResDto(Attendance entity) {
+    public AttendanceDayResponseDto(Attendance entity) {
         this.attendanceId = entity.getAttendanceId();
         this.startTime = entity.getStartTime();
         this.endTime = entity.getEndTime();

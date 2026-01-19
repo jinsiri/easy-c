@@ -5,14 +5,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.easyc.attendance.entity.Attendance;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @NoArgsConstructor
-public class AttendanceResDto {
+public class AttendanceResponseDto {
     // 금일 데이터
-    private AttendanceDayResDto dayData = new AttendanceDayResDto();
+    private AttendanceDayResponseDto dayData = new AttendanceDayResponseDto();
 
     //일주일 데이터
     private Integer totalWorkDay;
@@ -22,8 +20,8 @@ public class AttendanceResDto {
     private Long vacationTime;
 
 
-    public AttendanceResDto(Attendance entity) {
-        this.dayData = new AttendanceDayResDto(entity);
+    public AttendanceResponseDto(Attendance entity) {
+        this.dayData = new AttendanceDayResponseDto(entity);
     }
 }
 

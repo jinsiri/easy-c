@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AttendanceSaveReqDto {
+public class AttendanceSaveRequestDto {
     private Long memberId;
     private String startTime;
     private String endTime;
