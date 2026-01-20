@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { TextField, Box, InputAdornment } from '@mui/material';
+import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
+import { TextField, Box, InputAdornment, alpha } from '@mui/material';
 import theme from '@/theme/Theme';
-import { Search } from '@mui/icons-material';
+import { AccountBox, Business, ChevronRight, ExpandMore, Person, Search } from '@mui/icons-material';
+import { styled } from '@mui/system';
 
 export type TreeData<T> = T & {
 	id: string | number;
@@ -17,6 +18,49 @@ export type TreeData<T> = T & {
 export type TreeNode<T> = TreeData<T> & {
 	children: TreeNode<T>[];
 };
+
+const getIconByDataType = (type: string) => {
+	switch (type) {
+		case 'dept':
+			return <Business />;
+		case 'deptMember':
+			return <AccountBox />;
+		default:
+			return null;
+	}
+};
+
+const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
+	color: theme.palette.grey[200],
+	[`& .${treeItemClasses.content}`]: {
+		borderRadius: theme.spacing(0.5),
+		padding: theme.spacing(0.5, 1),
+		margin: theme.spacing(0.2, 0),
+		[`& .${treeItemClasses.label}`]: {
+			fontSize: '0.8rem',
+			fontWeight: 500,
+		},
+	},
+	[`& .${treeItemClasses.iconContainer}`]: {
+		borderRadius: '50%',
+		backgroundColor: theme.palette.primary.dark,
+		padding: theme.spacing(0, 1.2),
+		...theme.applyStyles('light', {
+			backgroundColor: alpha(theme.palette.primary.main, 0.25),
+		}),
+		...theme.applyStyles('dark', {
+			color: theme.palette.primary.contrastText,
+		}),
+	},
+	[`& .${treeItemClasses.groupTransition}`]: {
+		marginLeft: 15,
+		paddingLeft: 18,
+		borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
+	},
+	...theme.applyStyles('light', {
+		color: theme.palette.grey[800],
+	}),
+}));
 
 export const buildTree = <T,>(data: TreeData<T>[]): TreeNode<T>[] => {
 	const map: { [key: string]: TreeNode<T> } = {};
@@ -68,9 +112,18 @@ const RecursiveTreeItem = <T,>({ nodes, searchTerm }: { nodes: TreeNode<T>[]; se
 	return (
 		<>
 			{nodes.map((node) => (
-				<TreeItem key={String(node.id)} itemId={String(node.id)} label={<HighlightText text={node.label} highlight={searchTerm} />}>
+				<CustomTreeItem
+					key={String(node.id)}
+					itemId={String(node.id)}
+					label={
+						<Box sx={{ display: 'flex', alignItems: 'center' }}>
+							<Box sx={{ display: 'flex', mr: 1, '& svg': { fontSize: '1.125rem' } }}>{getIconByDataType((node as any).dataType)}</Box>
+							<HighlightText text={node.label} highlight={searchTerm} />
+						</Box>
+					}
+				>
 					{node.children.length > 0 && <RecursiveTreeItem nodes={node.children} searchTerm={searchTerm} />}
-				</TreeItem>
+				</CustomTreeItem>
 			))}
 		</>
 	);
@@ -85,11 +138,19 @@ interface Props<T> {
 
 export default function CommonTreeview<T>({ rawData, mapEntityToTree, onNodeClick, placeholder = '검색어를 입력하세요.' }: Props<T>) {
 	const [searchTerm, setSearchTerm] = useState('');
+	const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
 	const treeStructure = useMemo(() => {
 		const formattedData = rawData.map(mapEntityToTree);
 		return buildTree(formattedData);
 	}, [rawData, mapEntityToTree]);
+
+	useEffect(() => {
+		if (treeStructure.length > 0) {
+			setSelectedItemId(String(treeStructure[0].id));
+			if (onNodeClick) onNodeClick(treeStructure[0]);
+		}
+	}, [treeStructure, onNodeClick]);
 
 	return (
 		<Box sx={{ '& input': { fontSize: '.875rem' }, '& .MuiTreeItem-label ': { fontSize: '.875rem' } }}>
@@ -112,7 +173,9 @@ export default function CommonTreeview<T>({ rawData, mapEntityToTree, onNodeClic
 			/>
 
 			<SimpleTreeView
+				selectedItems={selectedItemId}
 				onSelectedItemsChange={(_, itemId) => {
+					setSelectedItemId(itemId);
 					if (onNodeClick) {
 						const findNode = (nodes: TreeNode<T>[]): TreeNode<T> | undefined => {
 							for (const n of nodes) {
@@ -126,6 +189,10 @@ export default function CommonTreeview<T>({ rawData, mapEntityToTree, onNodeClic
 						const clickedNode = findNode(treeStructure);
 						if (clickedNode) onNodeClick(clickedNode);
 					}
+				}}
+				slots={{
+					collapseIcon: ExpandMore,
+					expandIcon: ChevronRight,
 				}}
 			>
 				<RecursiveTreeItem nodes={treeStructure} searchTerm={searchTerm} />

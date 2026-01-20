@@ -20,6 +20,9 @@ public class DeptResponseDto extends BaseTreeDto {
     private String deptCode;
     private String deptEmail;
 
+    // For tree icon
+    private String dataType;
+
     public static DeptResponseDto fromEntity(Dept dept) {
         return DeptResponseDto.builder()
                 .deptId(dept.getDeptId())
