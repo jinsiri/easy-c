@@ -1,7 +1,7 @@
 'use client';
 
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import DeptAddForm, { DeptFormValues } from '@/app/admin/dept/_component/DeptAddForm';
@@ -9,6 +9,9 @@ import axiosConfig from '@/app/_lib/axiosConfig';
 
 export default function AddDeptModal() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const parentIdStr = searchParams.get('parentId');
+	const parentId = parentIdStr ? parseInt(parentIdStr, 10) : null;
 	const [isSaving, setIsSaving] = useState(false);
 
 	const {
@@ -21,6 +24,7 @@ export default function AddDeptModal() {
 			deptEmail: '',
 			deptCode: '',
 			deptShortNm: '',
+			treeParentId: parentId,
 		},
 	});
 
@@ -29,8 +33,7 @@ export default function AddDeptModal() {
 	const handleSave = handleSubmit(async (data) => {
 		setIsSaving(true);
 		try {
-			// await axiosConfig.post('/admin/dept/add', data);
-			console.log(data);
+			await axiosConfig.post('/api/dept', data);
 			handleClose();
 		} catch (error) {
 			console.error('부서 저장 실패:', error);

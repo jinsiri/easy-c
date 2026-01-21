@@ -14,17 +14,17 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public abstract class BaseTreeEntity extends BaseEntity {
     @Column(name="tree_level")
-    private int treeLevel;
+    protected int treeLevel;
 
     @Column(name="tree_sibling_order")
-    private int treeSiblingOrder;
+    protected int treeSiblingOrder;
 
     @Column(name="tree_parent_id")
-    private Long treeParentId;
+    protected Long treeParentId;
 
     @Column(name="tree_child_count")
-    private int treeChildCount;
+    protected int treeChildCount;
 
     @Column(name="tree_sort_code")
-    private String treeSortCode;
+    protected String treeSortCode;
 }

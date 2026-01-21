@@ -41,5 +41,5 @@ const departmentDummyData = [
 export default async function AdminDeptListPage() {
 	const dbData = await getDeptList();
 
-	return <AdminDeptListView dbData={departmentDummyData as DeptResponseDto[]} />;
+	return <AdminDeptListView dbData={dbData || (departmentDummyData as DeptResponseDto[])} />;
 }

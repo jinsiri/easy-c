@@ -9,6 +9,7 @@ import org.easyc.common.dto.BaseTreeDto;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class DeptRequestDto extends BaseTreeDto {
     private Long deptId;
     private String deptNm;

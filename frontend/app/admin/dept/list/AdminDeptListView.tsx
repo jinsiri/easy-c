@@ -7,6 +7,8 @@ import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import CommonTabs from '@/app/_component/CommonTabs';
 import CommonTreeview from '@/app/_component/Tree';
 import { useRouter } from 'next/navigation';
+import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
+import { useState } from 'react';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -49,6 +51,7 @@ const mapDeptToTree = (dept: DeptResponseDto) => ({
 export default function AdminDeptListView({ dbData }: Props) {
 	const router = useRouter();
 	const theme = useTheme();
+	const [selectedDeptId, setSelectedDeptId] = useState(1);
 
 	const dummyDept = {
 		deptNm: dbData?.[0]?.deptNm || '부서 선택 안됨',
@@ -61,17 +64,19 @@ export default function AdminDeptListView({ dbData }: Props) {
 		{
 			label: '부서 정보',
 			content: (
-				<InfoList
-					items={[
-						{ label: '부서명(한글)', value: dummyDept.deptNm },
-						{ label: '부서메일아이디', value: dummyDept.deptEmail },
-						{ label: '부서코드', value: dummyDept.deptCode },
-						{ label: '부서 약어', value: dummyDept.deptShortNm },
-					]}
-				/>
+				<Box sx={{ p: '1rem 1.5rem' }}>
+					<InfoList
+						items={[
+							{ label: '부서명(한글)', value: dummyDept.deptNm },
+							{ label: '부서메일아이디', value: dummyDept.deptEmail },
+							{ label: '부서코드', value: dummyDept.deptCode },
+							{ label: '부서 약어', value: dummyDept.deptShortNm },
+						]}
+					/>
+				</Box>
 			),
 		},
-		{ label: '부서원 목록', content: <>부서원 목록</> },
+		{ label: '부서원 목록', content: <AdminDeptDetailView deptId={1} /> },
 	];
 
 	return (
@@ -109,7 +114,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 
 					<Box sx={{ mb: 1 }}>
 						<Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-							<IconButton className='contained-primary light' onClick={() => router.push('/admin/dept/list/add')}>
+							<IconButton className='contained-primary light' onClick={() => router.push(`/admin/dept/list/add?parentId=${selectedDeptId}`)}>
 								<AddCircleOutline className='svg-small' />
 							</IconButton>
 							<IconButton className='contained-primary light'>
@@ -125,6 +130,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 							placeholder='부서명을 검색하세요.'
 							onNodeClick={(node) => {
 								console.log('선택된 부서의 코드:', node.label); // 원본 필드 접근 가능
+								setSelectedDeptId(node.deptId);
 							}}
 						/>
 					</Box>
