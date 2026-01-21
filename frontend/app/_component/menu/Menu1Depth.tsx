@@ -52,10 +52,10 @@ export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 				</Fade>
 				{item.children && (
 					<Fade in={drawerOpen} easing={'easeInOut'} timeout={200}>
-						<ExpandMoreRounded sx={{ color: 'gray.700' }} />
+						<ExpandMoreRounded sx={{ color: 'grey.700' }} />
 					</Fade>
 				)}
-				<Box sx={{ position: 'absolute', bottom: 0, width: '100%', height: '1px', backgroundColor: isActive ? 'transparent' : 'gray.100' }} />
+				<Box sx={{ position: 'absolute', bottom: 0, width: '100%', height: '1px', backgroundColor: isActive ? 'transparent' : 'grey.100' }} />
 
 				{/* --- [추가] 사이드바가 닫혔을 때 호버 시 나타날 메뉴 --- */}
 				{!drawerOpen && item.children && isHovered && (

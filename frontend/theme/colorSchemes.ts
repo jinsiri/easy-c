@@ -98,7 +98,7 @@ const colorScheme = {
 				900: '#863328',
 			},
 
-			gray: {
+			grey: {
 				main: '#C8C8C8',
 				contrastText: '#FAFAFA',
 
@@ -212,7 +212,7 @@ const colorScheme = {
 				900: '#F2D3CE',
 			},
 
-			gray: {
+			grey: {
 				main: '#555555',
 
 				50: '#1F1F1F',
