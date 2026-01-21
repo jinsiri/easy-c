@@ -9,19 +9,7 @@ import { Timeline, TimelineGroupBase, TimelineItemBase } from 'react-calendar-ti
 const defaultGroup: TimelineGroupBase[] = [
 	{
 		id: 'group1',
-		title: 'adfs',
-	},
-];
-
-const defaultItem: TimelineItemBase<Date>[] = [
-	{
-		id: 'item1',
-		group: 'group1',
-		start_time: new Date('2026-01-16T08:00:00'),
-		end_time: new Date('2026-01-16T17:00:00'),
-		canMove: false,
-		canResize: false,
-		canChangeGroup: false,
+		title: 'default',
 	},
 ];
 

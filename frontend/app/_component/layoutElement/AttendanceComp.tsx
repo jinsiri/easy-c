@@ -144,7 +144,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 							padding: '1rem',
 							borderRadius: '1rem',
 							border: '2px solid',
-							borderColor: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'gray.300',
+							borderColor: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'grey.300',
 							gap: { sm: '0.5rem', md: '1rem', lg: '1.5rem' },
 						}}
 					>
@@ -152,7 +152,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 							sx={{
 								fontSize: '1rem',
 								fontWeight: 600,
-								color: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'gray.300',
+								color: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'grey.300',
 							}}
 						>
 							{CURRENTSTATE[workingStatus]}
@@ -168,7 +168,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 							alignItems: 'center',
 							padding: '1rem',
 							borderRadius: '1rem',
-							backgroundColor: 'gray.100',
+							backgroundColor: 'grey.100',
 							gap: { sm: '0.5rem', md: '1rem', lg: '1.5rem' },
 						}}
 					>
