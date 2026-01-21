@@ -35,8 +35,6 @@ export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
 	const [breadcrumbs, setBreadcrumbs] = useState<menuType[]>([]);
 
 	useEffect(() => {
-		console.log(pathname);
-		console.log(currentPathName);
 		if (pathname && pathname !== currentPathName) {
 			setCurrentPathName(pathname);
 		}
@@ -55,8 +53,22 @@ export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
 				})
 				.filter(Boolean);
 			setBreadcrumbs(_breadcrumbs);
+
+			console.log(_breadcrumbs);
 		}
 	}, [currentPathName]);
+
+	const targetUrl = (targetIdx: number) => {
+		let url = '';
+
+		breadcrumbs.forEach((item: menuType, idx: number) => {
+			if (targetIdx >= idx) {
+				url += item.url;
+			}
+		});
+
+		return url;
+	};
 
 	return (
 		<Box component={'section'} sx={{ width: '100%', mb: '1.5rem' }}>
@@ -71,7 +83,7 @@ export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
 							) : (
 								<Link
 									key={item.id}
-									href={item.url}
+									href={targetUrl(idx)}
 									color={breadcrumbs.length - 1 === idx ? 'primary.main' : 'text.secondary'}
 									underline='hover'
 								>
