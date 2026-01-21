@@ -36,6 +36,12 @@ public class AttendancePolicy {
     @Column(name = "half_leave_end_time")
     private LocalTime halfLeaveEndTime;
 
+    @Column(name = "core_start_time")
+    private LocalTime coreStartTime;
+
+    @Column(name = "core_end_time")
+    private LocalTime coreEndTime;
+
     @Column(name = "allow_margin_minute")
     private Long allowMarginMinute;
 
