@@ -9,6 +9,7 @@ import theme from '../theme/Theme';
 
 /** CSS */
 import '@/style/globals.css';
+import Loader from './_component/baseElement/Loader';
 
 export const metadata: Metadata = {
 	title: 'EASY-C',
@@ -30,6 +31,7 @@ export default function RootLayout({
 						<CssBaseline />
 						{children}
 						{modal}
+						<Loader />
 					</ThemeProvider>
 				</AppRouterCacheProvider>
 			</body>

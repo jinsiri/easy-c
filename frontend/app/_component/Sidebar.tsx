@@ -23,7 +23,7 @@ export default function Sidebar(props: propsType) {
 				width: drawerOpen ? '19rem' : '4.5rem',
 				height: '100%',
 				transition: 'all easeInOut 0.4s',
-				zIndex: 500,
+				zIndex: 100,
 			}}
 		>
 			<Box sx={{ width: '100%', height: headerHeight }}></Box>
