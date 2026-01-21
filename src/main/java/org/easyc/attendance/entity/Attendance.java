@@ -2,6 +2,8 @@ package org.easyc.attendance.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.easyc.common.constant.WorkType;
+import org.easyc.common.constant.WorkStatus;
 import org.easyc.common.constant.VacationType;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -22,6 +24,12 @@ public class Attendance {
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="attendance_seq")
     @Column(name = "attendance_id")
     private Long attendanceId;
+
+    /** 정상근로 처리 */
+    @Column(name = "normalized", columnDefinition = "boolean default false")
+    @Builder.Default
+    private boolean normalized = false;
+
 
     /** 등록자 정보 */
     @Column(name = "member_id")
@@ -53,11 +61,13 @@ public class Attendance {
     @Column(name = "overtime_minute")
     private Long overtimeMinute;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "work_type")
-    private String workType;
+    private WorkType workType;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "work_status")
-    private String workStatus;
+    private WorkStatus workStatus;
 
     @Column(name = "violation_reason")
     private String violationReason;
