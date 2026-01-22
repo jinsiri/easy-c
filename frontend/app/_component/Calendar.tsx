@@ -474,7 +474,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 						</Box>
 						{activeCell && Number(activeCell.split('_')[0]) === idx && (
 							<Box sx={{ padding: '0.5rem', borderTop: `1px solid`, borderColor: 'grey.300' }}>
-								<Box sx={{ height: '12rem' }}>
+								<Box sx={{ minHeight: '12rem' }}>
 									<Box sx={{ display: 'flex', width: '100%', height: '5rem' }}>
 										{detailCol.map((detailItem, detailIdx) => {
 											return (
@@ -514,7 +514,17 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 											);
 										})}
 									</Box>
-									<Box sx={{ overflow: 'hidden', width: '100%', height: '6rem', mt: '0.5rem' }}>
+									<Box
+										sx={{
+											overflow: 'hidden',
+											width: '100%',
+											minHeight: '6rem',
+											mt: '0.5rem',
+											padding: '1rem',
+											backgroundColor: 'grey.50',
+											borderRadius: '1rem',
+										}}
+									>
 										<CustomReactCalendarTimeline
 											itemList={activeTimelineData.data}
 											visibleTimeStart={activeTimelineData.visibleTimeStart}

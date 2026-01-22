@@ -27,6 +27,14 @@ export interface AttendanceDayResInterface {
 
 export interface AttendanceResInterface {
 	dayData: AttendanceDayResInterface;
+
+	attendanceType: string;
+	settlementPeriod: string;
+	worktimeRule: string;
+	startTime: Date;
+	endTime: Date;
+
+	maxPolicyWorkTime: number;
 	policyWorkDay: number;
 	policyWorkTime: number;
 	effectiveWorkDay: number;

@@ -7,9 +7,11 @@ import axiosConfig from '@/app/_lib/axiosConfig';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
+import useLoaderStore from '@/store/useLoaderStore';
+
 /** MUI */
 import { Box, Grid, IconButton, Typography, useTheme } from '@mui/material';
-import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
+import { ArrowLeftRounded, ArrowRightRounded, LineStyle } from '@mui/icons-material';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -26,6 +28,7 @@ dayjs.extend(duration);
 
 export default function AttendanceUserPage() {
 	const theme = useTheme();
+	const { loader, setLoader } = useLoaderStore();
 
 	const [attendanceData, setAttenceData] = useState<AttendanceResInterface>({});
 	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
@@ -49,6 +52,8 @@ export default function AttendanceUserPage() {
 			workDate: today.format('YYYY-MM-DD'),
 		};
 
+		if (!loader) setLoader(true);
+
 		axiosConfig
 			.post('/api/attendance/today', req)
 			.then((res) => {
@@ -57,7 +62,10 @@ export default function AttendanceUserPage() {
 					makeChartOption(res.data);
 				}
 			})
-			.catch((err) => {});
+			.catch((err) => {})
+			.finally(() => {
+				setLoader(false);
+			});
 	};
 
 	const getAttendanceCalendarData = () => {
@@ -66,6 +74,8 @@ export default function AttendanceUserPage() {
 			workDate: calendarDate.format('YYYY-MM-DD'),
 		};
 
+		if (!loader) setLoader(true);
+
 		axiosConfig
 			.post('/api/attendance/calendar', req)
 			.then((res) => {
@@ -73,7 +83,10 @@ export default function AttendanceUserPage() {
 					setCalendarData(res.data);
 				}
 			})
-			.catch((err) => {});
+			.catch((err) => {})
+			.finally(() => {
+				setLoader(false);
+			});
 	};
 
 	const makeChartOption = (data: AttendanceResInterface) => {
@@ -83,11 +96,19 @@ export default function AttendanceUserPage() {
 				right: 0,
 			},
 			xAxis: {
-				max: 100,
+				axisLabel: {
+					show: true,
+					color: 'rgba(0,0,0,0)',
+				},
+				splitLine: {
+					show: false,
+				},
+				max: data.maxPolicyWorkTime,
 			},
 			yAxis: {
 				data: [''],
 				nameGap: 0,
+				inverse: false,
 			},
 			series: [
 				{
@@ -111,9 +132,48 @@ export default function AttendanceUserPage() {
 							],
 						},
 					},
-					data: [Math.floor((data.workTime / data.effectiveWorkTime) * 100)],
+					data: [data.workTime],
 					backgroundStyle: {
 						color: 'rgba(180, 180, 180, 0.2)',
+					},
+					markLine: {
+						symbol: ['none'],
+						label: {
+							show: true,
+							position: 'start',
+							fontFamily: 'Pretendard Variable',
+							color: theme.palette.grey[700],
+							formatter: (item) => {
+								const hours = Math.floor(item.value / 60);
+								const minutes = item.value % 60;
+
+								const h = String(hours).padStart(2, '0');
+								const m = String(minutes).padStart(2, '0');
+
+								return `${h}h ${m}m`;
+							},
+						},
+						lineStyle: {
+							type: 'solid',
+							color: theme.palette.grey[300],
+						},
+						clip: false,
+						data: [{ xAxis: data.effectiveWorkTime }, { xAxis: data.maxPolicyWorkTime }],
+					},
+					markArea: {
+						itemStyle: {
+							color: 'rgba(0, 0, 0, 0.03)',
+						},
+						data: [
+							[
+								{
+									xAxis: data.effectiveWorkTime,
+								},
+								{
+									xAxis: data.maxPolicyWorkTime,
+								},
+							],
+						],
 					},
 				},
 			],
@@ -187,7 +247,7 @@ export default function AttendanceUserPage() {
 							}}
 						>
 							<ColTitleAndText subtitle={'잔여 근무일'} sx={{ flex: '1' }}>
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', textAlign: 'center' }}>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6' sx={{ color: 'primary.main' }}>
 										{attendanceData.effectiveWorkDay ? attendanceData.effectiveWorkDay - attendanceData.workDay : 0}d
 									</Typography>
@@ -195,7 +255,7 @@ export default function AttendanceUserPage() {
 								</Box>
 							</ColTitleAndText>
 							<ColTitleAndText subtitle={'잔여 근로시간'} sx={{ flex: '1' }}>
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', textAlign: 'center' }}>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6' sx={{ color: 'primary.main' }}>
 										{formatMinutes(attendanceData.effectiveWorkTime ? attendanceData.effectiveWorkTime - attendanceData.workTime : 0)}
 									</Typography>
@@ -203,12 +263,12 @@ export default function AttendanceUserPage() {
 								</Box>
 							</ColTitleAndText>
 							<ColTitleAndText subtitle={'총 근로시간'} sx={{ flex: '1' }}>
-								<Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6'>{formatMinutes(attendanceData.workTime)}</Typography>
 								</Box>
 							</ColTitleAndText>
 							<ColTitleAndText subtitle={'휴가'} sx={{ flex: '1' }}>
-								<Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6'>{formatMinutes(attendanceData.vacationTime)}</Typography>
 								</Box>
 							</ColTitleAndText>

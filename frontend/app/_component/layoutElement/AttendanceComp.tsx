@@ -7,18 +7,22 @@ import dayjs from 'dayjs';
 import LiveClock from '@/app/_component/LiveClock';
 import axiosConfig from '@/app/_lib/axiosConfig';
 
+import useLoaderStore from '@/store/useLoaderStore';
+
 /** MUI */
 import { Box, Button, Typography } from '@mui/material';
 import { ArrowForwardRounded, AccessTimeRounded } from '@mui/icons-material';
 
 /** Custom */
 import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
-import { CURRENTSTATE } from '@/constant/attendanceConst';
+import { CURRENTSTATE, ATTENDANCETYPE } from '@/constant/attendanceConst';
 
 /** Type / Interface */
 import { attendanceSaveReqInterface, AttendanceResInterface } from '@/type/attendanceInterface';
 
 export default function AttendanceComp({ attendanceData, onSuccess }: { attendanceData?: AttendanceResInterface; onSuccess?: () => void }) {
+	const { loader, setLoader } = useLoaderStore();
+
 	const [workingStatus, setWorkingStatus] = useState('BEFORE_WORK');
 	const [activated, setActived] = useState<boolean>(false);
 	const [workData, setWorkData] = useState<AttendanceResInterface>({});
@@ -78,6 +82,10 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			registerLongitude: locate ? locate.longitude : null,
 		};
 
+		if (!loader) {
+			setLoader(true);
+		}
+
 		axiosConfig
 			.post('/api/attendance/start', req)
 			.then((res) => {
@@ -88,7 +96,10 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 					alert(res.data.message);
 				}
 			})
-			.catch((err) => {});
+			.catch((err) => {})
+			.finally(() => {
+				setLoader(false);
+			});
 	};
 
 	const finishTimeAttendanceData = (locate: GeolocationCoordinates) => {
@@ -101,6 +112,10 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			registerLongitude: locate ? locate.longitude : null,
 		};
 
+		if (!loader) {
+			setLoader(true);
+		}
+
 		axiosConfig
 			.post('/api/attendance/finish', req)
 			.then((res) => {
@@ -111,7 +126,10 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 					alert(res.data.message);
 				}
 			})
-			.catch((err) => {});
+			.catch((err) => {})
+			.finally(() => {
+				setLoader(false);
+			});
 	};
 
 	return (
@@ -119,7 +137,8 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
 				<LiveClock />
 				<Typography variant={'subtitle2'} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-					<AccessTimeRounded sx={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} /> 고정 근무제 (09:00 ~ 18:00)
+					<AccessTimeRounded sx={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} />
+					{Object.keys(workData).length > 0 ? `${ATTENDANCETYPE[workData?.attendanceType]} (${workData.startTime} ~ ${workData.endTime})` : ''}
 				</Typography>
 			</Box>
 

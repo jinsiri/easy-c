@@ -4,7 +4,7 @@ import React from 'react';
 import { Box } from '@mui/material';
 
 /** lib */
-import { Timeline, TimelineGroupBase, TimelineItemBase } from 'react-calendar-timeline';
+import { Timeline, TimelineGroupBase, TimelineItemBase, TimelineHeaders, DateHeader } from 'react-calendar-timeline';
 
 const defaultGroup: TimelineGroupBase[] = [
 	{
@@ -41,7 +41,12 @@ const CustomReactCalendarTimeline = ({
 				useResizeHandle={false}
 				stackItems={true}
 				traditionalZoom={false}
-			/>
+			>
+				<TimelineHeaders>
+					<DateHeader unit='primaryHeader' />
+					<DateHeader />
+				</TimelineHeaders>
+			</Timeline>
 		</Box>
 	);
 };
