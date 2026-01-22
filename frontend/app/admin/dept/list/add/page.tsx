@@ -1,42 +1,18 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Box, Paper, Typography, Button, Divider, Container } from '@mui/material';
-import DeptAddForm, { DeptFormValues } from '@/app/admin/dept/_component/DeptAddForm';
-import axiosConfig from '@/app/_lib/axiosConfig';
+import { Box, Paper, Typography, Button, Container } from '@mui/material';
+import DeptAddForm from '@/app/admin/dept/_component/DeptAddForm';
 import { ArrowBack } from '@mui/icons-material';
+import { useDeptAdd } from '@/app/admin/dept/_component/hooks/useDeptAdd';
 
 export default function AddDeptPage() {
-	const router = useRouter();
-	const [loading, setLoading] = useState(false);
-
 	const {
 		control,
-		handleSubmit,
 		formState: { errors },
-	} = useForm<DeptFormValues>({
-		defaultValues: {
-			deptNm: '',
-			deptEmail: '',
-			deptCode: '',
-			deptShortNm: '',
-		},
-	});
-
-	const onConfirm = handleSubmit(async (data) => {
-		setLoading(true);
-		try {
-			// await axiosConfig.post('/admin/dept/add', data);
-			router.push('/admin/dept/list');
-		} catch (error) {
-			console.error(error);
-			alert('저장 중 오류가 발생했습니다.');
-		} finally {
-			setLoading(false);
-		}
-	});
+		loading,
+		onSubmit,
+		router,
+	} = useDeptAdd(() => router.back());
 
 	return (
 		<Container maxWidth='md' sx={{ py: 4 }}>
@@ -49,28 +25,13 @@ export default function AddDeptPage() {
 				</Button>
 			</Box>
 
-			<Paper sx={{ p: 4, borderRadius: '12px' }} elevation={1}>
-				<Typography variant='h6' sx={{ mb: 3, fontWeight: 600 }}>
-					기본 정보 입력
-				</Typography>
-
-				<Divider sx={{ mb: 4 }} />
-
+			<Paper sx={{ p: 4 }}>
 				<DeptAddForm control={control} errors={errors} />
-
 				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-					<Button variant='outlined' onClick={() => router.back()} disabled={loading}>
+					<Button onClick={() => router.back()} disabled={loading}>
 						취소
 					</Button>
-					<Button
-						variant='contained'
-						onClick={onConfirm}
-						disabled={loading}
-						sx={{
-							bgcolor: '#5C67D3',
-							px: 4,
-						}}
-					>
+					<Button variant='contained' onClick={onSubmit} disabled={loading}>
 						{loading ? '저장 중...' : '저장'}
 					</Button>
 				</Box>

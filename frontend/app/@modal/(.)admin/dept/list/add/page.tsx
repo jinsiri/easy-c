@@ -1,50 +1,20 @@
 'use client';
 
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import DeptAddForm, { DeptFormValues } from '@/app/admin/dept/_component/DeptAddForm';
-import axiosConfig from '@/app/_lib/axiosConfig';
+import DeptAddForm from '@/app/admin/dept/_component/DeptAddForm';
+import { useDeptAdd } from '@/app/admin/dept/_component/hooks/useDeptAdd';
 
 export default function AddDeptModal() {
-	const router = useRouter();
-	const searchParams = useSearchParams();
-	const parentIdStr = searchParams.get('parentId');
-	const parentId = parentIdStr ? parseInt(parentIdStr, 10) : null;
-	const [isSaving, setIsSaving] = useState(false);
-
 	const {
 		control,
-		handleSubmit,
 		formState: { errors },
-	} = useForm<DeptFormValues>({
-		defaultValues: {
-			deptNm: '',
-			deptEmail: '',
-			deptCode: '',
-			deptShortNm: '',
-			treeParentId: parentId,
-		},
-	});
-
-	const handleClose = () => router.back();
-
-	const handleSave = handleSubmit(async (data) => {
-		setIsSaving(true);
-		try {
-			await axiosConfig.post('/api/dept', data);
-			handleClose();
-		} catch (error) {
-			console.error('부서 저장 실패:', error);
-			alert('저장 중 오류가 발생했습니다.');
-		} finally {
-			setIsSaving(false);
-		}
-	});
+		loading,
+		onSubmit,
+		router,
+	} = useDeptAdd(() => router.back());
 
 	return (
-		<BaseDialog title={'부서 추가'} loading={isSaving} onConfirm={handleSave}>
+		<BaseDialog title={'부서 추가'} loading={loading} onConfirm={onSubmit}>
 			<DeptAddForm control={control} errors={errors} />
 		</BaseDialog>
 	);
