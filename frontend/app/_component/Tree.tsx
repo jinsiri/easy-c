@@ -13,6 +13,7 @@ export type TreeData<T> = T & {
 	label: string;
 	treeParentId: string | number | null;
 	treeSiblingOrder: number;
+	treeChildCount: number;
 };
 
 export type TreeNode<T> = TreeData<T> & {
@@ -118,7 +119,7 @@ const RecursiveTreeItem = <T,>({ nodes, searchTerm }: { nodes: TreeNode<T>[]; se
 					label={
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
 							<Box sx={{ display: 'flex', mr: 1, '& svg': { fontSize: '1.125rem' } }}>{getIconByDataType((node as any).dataType)}</Box>
-							<HighlightText text={node.label} highlight={searchTerm} />
+							<HighlightText text={`${node.label}(${node.treeChildCount})`} highlight={searchTerm} />
 						</Box>
 					}
 				>
