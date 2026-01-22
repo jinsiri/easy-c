@@ -12,6 +12,8 @@ INSERT INTO attendance_policy (
     attendance_policy_name,
     attendance_policy_desc,
     attendance_type,
+    settlement_period,
+    work_time_rule,
     working_time_day,
     working_day,
     start_time,
@@ -27,6 +29,8 @@ VALUES (
     '기본 정책',
     null,
     'FIXED',
+    'WEEK',
+    'ALWAYS_40',
     8,
     '1,2,3,4,5'
     '09:00:00',

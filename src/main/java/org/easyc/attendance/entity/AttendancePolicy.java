@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.easyc.common.constant.AttendanceType;
+import org.easyc.common.constant.SettlementPeriod;
+import org.easyc.common.constant.WorktimeRule;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -28,7 +30,15 @@ public class AttendancePolicy {
     private String attendancePolicyDesc;
 
     @Column(name = "attendance_type")
-    private String attendanceType;
+    private AttendanceType attendanceType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "settlement_period")
+    private SettlementPeriod settlementPeriod;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "worktime_rule")
+    private WorktimeRule worktimeRule;
 
     @Column(name = "working_time_day")
     private Integer workingTimeDay;
