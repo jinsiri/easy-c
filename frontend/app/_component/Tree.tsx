@@ -132,25 +132,18 @@ const RecursiveTreeItem = <T,>({ nodes, searchTerm }: { nodes: TreeNode<T>[]; se
 interface Props<T> {
 	rawData: T[];
 	mapEntityToTree: (item: T) => TreeData<T>;
+	selectedId?: number | string;
 	onNodeClick?: (node: TreeNode<T>) => void;
 	placeholder?: string;
 }
 
-export default function CommonTreeview<T>({ rawData, mapEntityToTree, onNodeClick, placeholder = '검색어를 입력하세요.' }: Props<T>) {
+export default function CommonTreeview<T>({ rawData, mapEntityToTree, selectedId, onNodeClick, placeholder = '검색어를 입력하세요.' }: Props<T>) {
 	const [searchTerm, setSearchTerm] = useState('');
-	const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
 	const treeStructure = useMemo(() => {
 		const formattedData = rawData.map(mapEntityToTree);
 		return buildTree(formattedData);
 	}, [rawData, mapEntityToTree]);
-
-	useEffect(() => {
-		if (treeStructure.length > 0) {
-			setSelectedItemId(String(treeStructure[0].id));
-			if (onNodeClick) onNodeClick(treeStructure[0]);
-		}
-	}, [treeStructure, onNodeClick]);
 
 	return (
 		<Box sx={{ '& input': { fontSize: '.875rem' }, '& .MuiTreeItem-label ': { fontSize: '.875rem' } }}>
@@ -173,9 +166,10 @@ export default function CommonTreeview<T>({ rawData, mapEntityToTree, onNodeClic
 			/>
 
 			<SimpleTreeView
-				selectedItems={selectedItemId}
+				selectedItems={selectedId ? String(selectedId) : null}
 				onSelectedItemsChange={(_, itemId) => {
-					setSelectedItemId(itemId);
+					if (!itemId) return;
+
 					if (onNodeClick) {
 						const findNode = (nodes: TreeNode<T>[]): TreeNode<T> | undefined => {
 							for (const n of nodes) {

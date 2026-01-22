@@ -51,7 +51,7 @@ const mapDeptToTree = (dept: DeptResponseDto) => ({
 export default function AdminDeptListView({ dbData }: Props) {
 	const router = useRouter();
 	const theme = useTheme();
-	const [selectedDeptId, setSelectedDeptId] = useState(1);
+	const [selectedDeptId, setSelectedDeptId] = useState<number | null>(dbData?.[0]?.deptId || null);
 
 	const dummyDept = {
 		deptNm: dbData?.[0]?.deptNm || '부서 선택 안됨',
@@ -127,10 +127,10 @@ export default function AdminDeptListView({ dbData }: Props) {
 						<CommonTreeview
 							rawData={dbData || []}
 							mapEntityToTree={mapDeptToTree}
+							selectedId={String(selectedDeptId)}
 							placeholder='부서명을 검색하세요.'
 							onNodeClick={(node) => {
-								console.log('선택된 부서의 코드:', node.label); // 원본 필드 접근 가능
-								setSelectedDeptId(node.deptId);
+								setSelectedDeptId(Number(node.id));
 							}}
 						/>
 					</Box>
