@@ -9,6 +9,7 @@ import CommonTreeview from '@/app/_component/Tree';
 import { useRouter } from 'next/navigation';
 import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
 import { useEffect, useState } from 'react';
+import axiosConfig from '@/app/_lib/axiosConfig';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -81,6 +82,21 @@ export default function AdminDeptListView({ dbData }: Props) {
 		{ label: '부서원 목록', content: <AdminDeptDetailView deptId={1} /> },
 	];
 
+	const deleteDept = async (deptId: number) => {
+		await axiosConfig.delete(`/api/dept/${deptId}`);
+	};
+
+	const handleDelete = async (deptId: number) => {
+		if (confirm('정말 이 부서를 삭제하시겠습니까? 삭제 시 하위부서도 삭제됩니다.')) {
+			try {
+				await deleteDept(deptId);
+				router.refresh();
+			} catch (error) {
+				alert('삭제에 실패했습니다.');
+			}
+		}
+	};
+
 	useEffect(() => {
 		if (dbData?.length > 0 && expandedIds.length === 0) {
 			setExpandedIds([String(dbData[0].deptId)]);
@@ -126,9 +142,11 @@ export default function AdminDeptListView({ dbData }: Props) {
 							<IconButton className='contained-primary light' onClick={() => router.push(`/admin/dept/list/add?parentId=${selectedDeptId}`)}>
 								<AddCircleOutline className='svg-small' />
 							</IconButton>
-							<IconButton className='contained-primary light'>
-								<RemoveCircleOutline className='svg-small' />
-							</IconButton>
+							{selectedDeptId && (
+								<IconButton className='contained-primary light' onClick={() => handleDelete(selectedDeptId)}>
+									<RemoveCircleOutline className='svg-small' />
+								</IconButton>
+							)}
 						</Stack>
 					</Box>
 

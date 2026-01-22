@@ -1,5 +1,6 @@
 package org.easyc.dept.repository;
 
+import jakarta.transaction.Transactional;
 import org.easyc.dept.entity.Dept;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,6 +19,7 @@ public interface DeptRepository extends JpaRepository<Dept, Long> {
     Optional<String> findMaxSortCodeByParent(@Param("parentCode") String parentCode, @Param("targetLength") int targetLength);
 
     @Modifying
-    @Query("UPDATE Dept d SET d.deleted = true WHERE d.treeSortCode LIKE :sortCode%")
+    @Transactional
+    @Query(value = "UPDATE dept SET deleted = true WHERE tree_sort_code LIKE CONCAT(:sortCode, '%')", nativeQuery = true)
     void softDeleteByTreeSortCode(@Param("sortCode") String sortCode);
 }

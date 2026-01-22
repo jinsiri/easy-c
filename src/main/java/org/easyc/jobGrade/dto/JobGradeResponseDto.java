@@ -25,7 +25,6 @@ public class JobGradeResponseDto extends BaseDto {
                 .jobGradeNm(jobGrade.getJobGradeNm())
                 .jobGradeCode(jobGrade.getJobGradeCode())
                 .jobGradeLevel(jobGrade.getJobGradeLevel())
-                .deleted(jobGrade.isDeleted())
                 .active(jobGrade.isActive())
                 .registerDate(jobGrade.getRegisterDate())
                 .registerIp(jobGrade.getRegisterIp())

@@ -33,7 +33,7 @@ public class DeptService {
         return DeptResponseDto.fromEntityList(depts);
     }
 
-    public Dept addChildDept(DeptRequestDto deptRequestDto) {
+    public Dept saveChildDept(DeptRequestDto deptRequestDto) {
         Long parentId = deptRequestDto.getTreeParentId();
         Dept parent = deptRepository.findById(parentId)
                 .orElseThrow(() -> new IllegalArgumentException("부모 부서 ID가 유효하지 않습니다: " + parentId));
@@ -61,7 +61,6 @@ public class DeptService {
                 .treeParentId(parentId)
                 .treeChildCount(0)
                 .treeSortCode(newSortCode)
-                .deleted(false)
                 .active(true)
                 .registerIp(deptRequestDto.getRegisterIp())
                 .registerId(deptRequestDto.getRegisterId())

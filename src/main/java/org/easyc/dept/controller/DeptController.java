@@ -34,8 +34,16 @@ public class DeptController {
     }
 
     @PostMapping
-    public ResponseEntity<Dept> addChildDept(@RequestBody DeptRequestDto deptRequestDto) {
-        Dept savedDept = deptService.addChildDept(deptRequestDto);
+    public ResponseEntity<Dept> saveChildDept(@RequestBody DeptRequestDto deptRequestDto) {
+        Dept savedDept = deptService.saveChildDept(deptRequestDto);
+
         return ResponseEntity.ok(savedDept);
+    }
+
+    @DeleteMapping("/{deptId}")
+    public ResponseEntity<Void> deleteDept(@PathVariable Long deptId) {
+        deptService.softDeleteDept(deptId);
+
+        return ResponseEntity.noContent().build();
     }
 }

@@ -25,7 +25,6 @@ public class JobTitleResponseDto extends BaseDto {
                 .jobTitleNm(jobTitle.getJobTitleNm())
                 .jobTitleCode(jobTitle.getJobTitleCode())
                 .jobTitleLevel(jobTitle.getJobTitleLevel())
-                .deleted(jobTitle.isDeleted())
                 .active(jobTitle.isActive())
                 .registerDate(jobTitle.getRegisterDate())
                 .registerIp(jobTitle.getRegisterIp())

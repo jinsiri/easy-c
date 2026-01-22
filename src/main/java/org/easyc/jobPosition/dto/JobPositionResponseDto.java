@@ -25,7 +25,6 @@ public class JobPositionResponseDto extends BaseDto {
                 .jobPositionNm(jobPosition.getJobPositionNm())
                 .jobPositionCode(jobPosition.getJobPositionCode())
                 .jobPositionLevel(jobPosition.getJobPositionLevel())
-                .deleted(jobPosition.isDeleted())
                 .active(jobPosition.isActive())
                 .registerDate(jobPosition.getRegisterDate())
                 .registerIp(jobPosition.getRegisterIp())
