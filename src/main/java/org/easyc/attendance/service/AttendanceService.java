@@ -11,9 +11,7 @@ import org.easyc.attendance.entity.MappingAttendancePolicy;
 import org.easyc.attendance.repository.AttendancePolicyRepository;
 import org.easyc.attendance.repository.AttendanceRepository;
 import org.easyc.attendance.repository.MappingAttendancePolicyRepository;
-import org.easyc.common.constant.VacationType;
-import org.easyc.common.constant.WorkStatus;
-import org.easyc.common.constant.WorkType;
+import org.easyc.common.constant.*;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -41,9 +39,9 @@ public class AttendanceService {
                 .build());
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getMemberId());
 
-        AttendanceResponseDto findWeekData = findWeekData(req.getMemberId(), workDate, targetPolicy);
+        AttendanceResponseDto findStatData = findStatData(req.getMemberId(), workDate, targetPolicy);
         AttendanceResponseDto result = new AttendanceResponseDto(targetAttendance);
-        result.applyWeekData(findWeekData);
+        result.applyWeekData(findStatData);
 
         return result;
     }
@@ -130,9 +128,9 @@ public class AttendanceService {
         Attendance saveTargetAttendance = attendanceRepository.saveAndFlush(updateAttendanceByStartTime(req, targetAttendance, targetPolicy, startTime));
 
        // 주단위 데이터 생성
-        AttendanceResponseDto findWeekData = findWeekData(req.getMemberId(), workDate, targetPolicy);
+        AttendanceResponseDto findStatData = findStatData(req.getMemberId(), workDate, targetPolicy);
         AttendanceResponseDto result = new AttendanceResponseDto(saveTargetAttendance);
-        result.applyWeekData(findWeekData);
+        result.applyWeekData(findStatData);
 
         Map<String, Object> res = new HashMap<>();
         res.put("status", "success");
@@ -162,9 +160,9 @@ public class AttendanceService {
         Attendance saveTargetAttendance = attendanceRepository.saveAndFlush(updateAttendanceByEndTime(req, targetAttendance, targetPolicy, endTime));
 
         // 주단위 데이터 생성
-        AttendanceResponseDto findWeekData = findWeekData(req.getMemberId(), workDate, targetPolicy);
+        AttendanceResponseDto findStatData = findStatData(req.getMemberId(), workDate, targetPolicy);
         AttendanceResponseDto result = new AttendanceResponseDto(saveTargetAttendance);
-        result.applyWeekData(findWeekData);
+        result.applyWeekData(findStatData);
 
         Map<String, Object> res = new HashMap<>();
         res.put("status", "success");
@@ -264,41 +262,38 @@ public class AttendanceService {
     private AttendancePolicy findAttendancePolicy(Long memberId) {
         MappingAttendancePolicy mappingAttendancePolicy = mappingAttendancePolicyRepository.findTopByMemberIdOrderByAttendancePolicyIdDesc(memberId).orElse(null);
         AttendancePolicy attendancePolicy = attendancePolicyRepository.findByAttendancePolicyId(mappingAttendancePolicy != null ? mappingAttendancePolicy.getAttendancePolicyId() : 1).orElseGet(() -> AttendancePolicy.builder()
+                .attendancePolicyName("기본 정책")
+                .attendanceType(AttendanceType.FIXED)
+                .settlementPeriod(SettlementPeriod.WEEK)
+                .worktimeRule(WorktimeRule.ALWAYS_40)
+                .workingTimeDay( 8 * 60)
+                .workingDay("1,2,3,4,5")
                 .startTime(LocalTime.of(9,0))
                 .endTime(LocalTime.of(18,0))
                 .halfLeaveStartTime(LocalTime.of(13,0))
                 .halfLeaveEndTime(LocalTime.of(13,0))
                 .allowMarginMinute(Long.valueOf(5))
-                .workingDay("1,2,3,4,5")
                 .build());
 
         return attendancePolicy;
     }
 
-    private AttendanceResponseDto findWeekData (Long memberId, LocalDate workDate, AttendancePolicy targetPolicy) {
-        //정책 확인해서 이번주 근무일 확인
+    private AttendanceResponseDto findStatData (Long memberId, LocalDate workDate, AttendancePolicy targetPolicy) {
+        //근무시간 정산 기준 가져오기
         Set<Integer> dayOfWeekSet =  Arrays.stream(targetPolicy.getWorkingDay().trim().split(",")).map(Integer::valueOf).collect(Collectors.toSet());
-        LocalDate monday = workDate.with(DayOfWeek.MONDAY);
-        LocalDate sunday = workDate.with(DayOfWeek.SUNDAY);
 
-        List<LocalDate> dateList = new ArrayList<>();
-        for (int i = 1; i <= 7; i++) {
-            if(dayOfWeekSet.contains(i)){
-                dateList.add(monday.plusDays(i - 1));
-            }
-        }
+        SettlementPeriod settlementPeriod = targetPolicy.getSettlementPeriod(); // 정산 기준 단위
+        Integer defaultTotalWorkDay = dayOfWeekSet.size() * settlementPeriod.getWeekNumber(); // 단위 근로일
+        Integer defaultTotalWorkTime = settlementPeriod.getBaseMinute(); // 단위 근로시간(분)
+        Integer defaultDayWorkTime = targetPolicy.getWorkingTimeDay();  // 일일 기준 근로시간(분)
 
-        //근태 데이터 조회
-        List<Attendance> weekAttendanceData = attendanceRepository.findAllByMemberIdAndWorkDateBetween(memberId, monday, sunday)
-                .stream().filter(a -> dateList.contains(a.getWorkDate())).toList();
+        //단위 기간으로 근태 데이터 조회
+        Map<String, LocalDate> resolveDateRange = resolveDateRange(settlementPeriod, workDate);
+        List<Attendance> weekAttendanceData = attendanceRepository.findAllByMemberIdAndWorkDateBetween(memberId, resolveDateRange.get("start"), resolveDateRange.get("end"));
 
-
-        Integer defaultTotalWorkDay = dayOfWeekSet.size(); // 주 단위 근로일
-        Long defaultDayWorkTime = ChronoUnit.MINUTES.between(targetPolicy.getStartTime(), targetPolicy.getEndTime()); // 일 단위 근로시간(분)
-        Long defaultTotalWorkTime = Long.valueOf(defaultDayWorkTime * defaultTotalWorkDay); // 주 단위 근로시간(븐)
 
         Integer effectiveWorkDay = defaultTotalWorkDay;
-        Long effectiveWorkTime = defaultTotalWorkTime;
+        Integer effectiveWorkTime = defaultTotalWorkTime;
         Long workTime = Long.valueOf(0); //분 단위
         Long vacationTime = Long.valueOf(0); //분 단위
 
@@ -326,15 +321,75 @@ public class AttendanceService {
         }
 
         AttendanceResponseDto resDto = new AttendanceResponseDto();
+        resDto.setAttendanceType(targetPolicy.getAttendanceType());
+        resDto.setSettlementPeriod(targetPolicy.getSettlementPeriod());
+        resDto.setWorktimeRule(targetPolicy.getWorktimeRule());
+        resDto.setStartTime(targetPolicy.getStartTime());
+        resDto.setEndTime(targetPolicy.getEndTime());
+
+        resDto.setMaxPolicyWorkTime(settlementPeriod.getMaxMinute());
         resDto.setPolicyWorkDay(defaultTotalWorkDay);
-        resDto.setPolicyWorkTime(defaultTotalWorkTime);
+        resDto.setPolicyWorkTime(Long.valueOf(defaultTotalWorkTime));
         resDto.setEffectiveWorkDay(effectiveWorkDay);
-        resDto.setEffectiveWorkTime(effectiveWorkTime);
+        resDto.setEffectiveWorkTime(Long.valueOf(effectiveWorkTime));
         resDto.setWorkDay(weekAttendanceData.size());
         resDto.setWorkTime(workTime);
         resDto.setVacationTime(vacationTime);
 
         return resDto;
+    }
+
+    public Map<String, LocalDate> resolveDateRange(SettlementPeriod period, LocalDate today) {
+        Map<String, LocalDate> dateMap = new HashMap<>();
+
+        switch (period) {
+            case WEEK -> {
+                LocalDate monday = today.with(DayOfWeek.MONDAY);
+                LocalDate sunday = today.with(DayOfWeek.SUNDAY);
+
+                dateMap.put("start", monday);
+                dateMap.put("end", sunday);
+                return dateMap;
+            }
+
+            case WEEK_2 -> {
+                LocalDate monday = today.with(DayOfWeek.MONDAY);
+                LocalDate sunday = monday.plusWeeks(2).with(DayOfWeek.SUNDAY);
+
+                dateMap.put("start", monday);
+                dateMap.put("end", sunday);
+                return dateMap;
+            }
+
+            case MONTH -> {
+                LocalDate start = today.withDayOfMonth(1);
+                LocalDate end = today.withDayOfMonth(today.lengthOfMonth());
+
+                dateMap.put("start", start);
+                dateMap.put("end", end);
+                return dateMap;
+            }
+
+            case MONTH_2 -> {
+                LocalDate start = today.withDayOfMonth(1);
+                LocalDate end = start.plusMonths(2).minusDays(1);
+
+                dateMap.put("start", start);
+                dateMap.put("end", end);
+                return dateMap;
+            }
+
+            case MONTH_3 -> {
+                LocalDate start = today.withDayOfMonth(1);
+                LocalDate end = start.plusMonths(3).minusDays(1);
+
+                dateMap.put("start", start);
+                dateMap.put("end", end);
+                return dateMap;
+            }
+
+            default -> throw new IllegalArgumentException("Unsupported settlement period: " + period);
+        }
     }
 
 }
