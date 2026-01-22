@@ -143,15 +143,7 @@ export default function AttendanceUserPage() {
 							position: 'start',
 							fontFamily: 'Pretendard Variable',
 							color: theme.palette.grey[700],
-							formatter: (item) => {
-								const hours = Math.floor(item.value / 60);
-								const minutes = item.value % 60;
-
-								const h = String(hours).padStart(2, '0');
-								const m = String(minutes).padStart(2, '0');
-
-								return `${h}h ${m}m`;
-							},
+							formatter: (item) => formatMinutes(item.value),
 						},
 						lineStyle: {
 							type: 'solid',
