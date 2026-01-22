@@ -11,7 +11,7 @@ export default function AddDeptModal() {
 		loading,
 		onSubmit,
 		router,
-	} = useDeptAdd(() => router.back());
+	} = useDeptAdd(() => router.refresh());
 
 	return (
 		<BaseDialog title={'부서 추가'} loading={loading} onConfirm={onSubmit}>
