@@ -13,7 +13,7 @@ INSERT INTO attendance_policy (
     attendance_policy_desc,
     attendance_type,
     settlement_period,
-    work_time_rule,
+    worktime_rule,
     working_time_day,
     working_day,
     start_time,
@@ -22,7 +22,7 @@ INSERT INTO attendance_policy (
     half_leave_end_time,
     core_start_time,
     core_end_time,
-    allow_margin_minute,
+    allow_margin_minute
 )
 VALUES (
     1,
@@ -31,8 +31,8 @@ VALUES (
     'FIXED',
     'WEEK',
     'ALWAYS_40',
-    8,
-    '1,2,3,4,5'
+    480,
+    '1,2,3,4,5',
     '09:00:00',
     '18:00:00',
     '13:00:00',

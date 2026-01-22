@@ -29,12 +29,16 @@ public class AttendancePolicy {
     @Column(name = "attendance_policy_desc")
     private String attendancePolicyDesc;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "attendance_type")
     private AttendanceType attendanceType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "settlement_period")
-    private SettlementPeriod settlementPeriod;
+    @Column(name = "settlement_period",
+            columnDefinition = "varchar default 'WEEK'",
+            nullable = false)
+    @Builder.Default
+    private SettlementPeriod settlementPeriod = SettlementPeriod.WEEK;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "worktime_rule")
