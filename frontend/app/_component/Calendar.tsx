@@ -375,22 +375,61 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 													{subItem.header}
 												</Typography>
 											</Box>
-											<Box sx={{ height: '5rem', padding: '0.5rem' }}>
+											<Box sx={{ height: '6rem', padding: '0.5rem' }}>
+												<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center' }}>
+													{item[subItem.key].detailData.workStatus === 'VACATION' && (
+														<Typography
+															sx={{
+																display: 'flex',
+																justifyContent: 'center',
+																alignItems: 'center',
+																marginBottom: '0.5rem',
+																padding: '0.125rem 0.5rem',
+																fontSize: '0.75rem',
+																fontWeight: 600,
+																backgroundColor: 'secondary.main',
+																borderRadius: '1rem',
+																color: 'grey.50',
+															}}
+														>
+															{VACATIONTYPE[item[subItem.key].detailData.vacationType as vacationType]}
+														</Typography>
+													)}
+													{item[subItem.key].detailData.workStatus === 'OUTSIDE' && (
+														<Typography
+															sx={{
+																display: 'flex',
+																justifyContent: 'center',
+																alignItems: 'center',
+																marginBottom: '0.5rem',
+																padding: '0.125rem 0.5rem',
+																fontSize: '0.75rem',
+																fontWeight: 600,
+																backgroundColor: 'secondary.main',
+																borderRadius: '1rem',
+																color: 'grey.50',
+															}}
+														>
+															{WORKSTATUS[item[subItem.key].detailData.workStatus as workStatus]}
+														</Typography>
+													)}
+												</Box>
+
 												{item[subItem.key].detailData.startTime && (
-													<Box sx={{ display: 'flex', flexDirection: 'row' }}>
+													<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 														<Typography
 															variant={'caption'}
 															sx={{
 																display: 'flex',
 																justifyContent: 'center',
 																alignItems: 'center',
-																width: '1.25rem',
-																height: '1.25rem',
+																width: '1.125rem',
+																height: '1.125rem',
 																marginRight: '0.25rem',
 																borderRadius: '100%',
-																fontSize: '0.75rem',
-																backgroundColor: 'primary.main',
-																color: 'grey.50',
+																fontSize: '0.625rem',
+																backgroundColor: 'primary.100',
+																color: 'primary.600',
 															}}
 														>
 															출
@@ -403,17 +442,17 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 													</Box>
 												)}
 												{item[subItem.key].detailData.endTime && (
-													<Box sx={{ display: 'flex', flexDirection: 'row' }}>
+													<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 														<Typography
 															sx={{
 																display: 'flex',
 																justifyContent: 'center',
 																alignItems: 'center',
-																width: '1.25rem',
-																height: '1.25rem',
+																width: '1.125rem',
+																height: '1.125rem',
 																marginRight: '0.25rem',
 																borderRadius: '100%',
-																fontSize: '0.75rem',
+																fontSize: '0.625rem',
 																backgroundColor: 'primary.main',
 																color: 'grey.50',
 															}}

@@ -198,7 +198,7 @@ public class AttendanceService {
             LocalTime currentTime = startTime.toLocalTime();
 
             // 지각 여부 판별
-            LocalTime limitTime = (targetAttendance.isVacationed() && VacationType.HALF_AM.name().equals(targetAttendance.getVacationType()))
+            LocalTime limitTime = (targetAttendance.isVacationed() && VacationType.HALF_AM.equals(targetAttendance.getVacationType()))
                     ? targetPolicy.getHalfLeaveStartTime().plus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES)
                     : targetPolicy.getStartTime().plus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES);
 
@@ -228,7 +228,7 @@ public class AttendanceService {
 
             // 조퇴 여부 판별
             // 날짜가 바뀌지 않았고(당일 퇴근), 정책의 퇴근 시간보다 일찍 나갔을 때
-            LocalTime limitTime = (targetAttendance.isVacationed() && VacationType.HALF_PM.name().equals(targetAttendance.getVacationType()))
+            LocalTime limitTime = (targetAttendance.isVacationed() && VacationType.HALF_PM.equals(targetAttendance.getVacationType()))
                     ? targetPolicy.getHalfLeaveEndTime().minus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES)
                     : targetPolicy.getEndTime().minus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES);
 

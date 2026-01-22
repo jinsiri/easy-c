@@ -6,6 +6,8 @@ export const WORKSTATUS: Record<workStatus, string> = {
 	EARLY_LEAVE: '조퇴',
 	ABSENT: '결근',
 	VACATION: '휴가',
+	OUTSIDE: '외근',
+	BUSINESS_TRIP: '출장',
 };
 
 export const VACATIONTYPE: Record<vacationType, string> = {
