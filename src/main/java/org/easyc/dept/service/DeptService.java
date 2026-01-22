@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static org.easyc.common.util.treeFunc.calculateOrder;
+import static org.easyc.common.util.treeFunc.incrementSortCode;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,7 +34,6 @@ public class DeptService {
     }
 
     public Dept addChildDept(DeptRequestDto deptRequestDto) {
-        // 1. 부모 데이터 조회
         Long parentId = deptRequestDto.getTreeParentId();
         Dept parent = deptRepository.findById(parentId)
                 .orElseThrow(() -> new IllegalArgumentException("부모 부서 ID가 유효하지 않습니다: " + parentId));
@@ -39,7 +41,6 @@ public class DeptService {
         String parentCode = parent.getTreeSortCode();
         int childTargetLength = parentCode.length() + 3;
 
-        // 2. 부모 바로 아래 레벨의 마지막 자식 코드 조회
         String maxChildCode = deptRepository.findMaxSortCodeByParent(parentCode, childTargetLength)
                 .orElse(null);
 
@@ -47,10 +48,9 @@ public class DeptService {
         if (maxChildCode == null) {
             newSortCode = parentCode + "001";
         } else {
-            newSortCode = incrementSortCode(maxChildCode);
+            newSortCode = incrementSortCode(maxChildCode,"부서");
         }
 
-        // 3. Entity 생성 및 저장
         Dept newDept = Dept.builder()
                 .deptNm(deptRequestDto.getDeptNm())
                 .deptShortNm(deptRequestDto.getDeptShortNm())
@@ -68,28 +68,10 @@ public class DeptService {
                 .registerNm(deptRequestDto.getRegisterNm())
                 .build();
 
-        // 4. 먼저 저장 (DB에 새로운 자식이 들어가야 COUNT가 맞음)
         Dept savedDept = deptRepository.save(newDept);
-
-        // 5. 부모의 자식 수 동기화
         parent.addChild();
 
         return savedDept;
-    }
-
-    private String incrementSortCode(String maxCode) {
-        String prefix = maxCode.substring(0, maxCode.length() - 3);
-        int lastThree = Integer.parseInt(maxCode.substring(maxCode.length() - 3));
-
-        if (lastThree >= 999) {
-            throw new IllegalStateException("한 레벨에 999개 이상의 부서를 생성할 수 없습니다.");
-        }
-
-        return prefix + String.format("%03d", lastThree + 1);
-    }
-
-    private int calculateOrder(String sortCode) {
-        return Integer.parseInt(sortCode.substring(sortCode.length() - 3));
     }
 
     public void softDeleteDept(Long deptId) {
