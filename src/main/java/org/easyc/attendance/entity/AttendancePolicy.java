@@ -21,8 +21,20 @@ public class AttendancePolicy {
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="attendance_policy_seq")
     private Long attendancePolicyId;
 
+    @Column(name = "attendance_policy_name")
+    private String attendancePolicyName;
+
+    @Column(name = "attendance_policy_desc")
+    private String attendancePolicyDesc;
+
     @Column(name = "attendance_type")
     private String attendanceType;
+
+    @Column(name = "working_time_day")
+    private Integer workingTimeDay;
+
+    @Column(name = "working_day")
+    private String workingDay;
 
     @Column(name = "start_time")
     private LocalTime startTime;
@@ -44,7 +56,4 @@ public class AttendancePolicy {
 
     @Column(name = "allow_margin_minute")
     private Long allowMarginMinute;
-
-    @Column(name = "working_day")
-    private String workingDay;
 }
