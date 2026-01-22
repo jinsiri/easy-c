@@ -21,7 +21,7 @@ public class DeptService {
     private final DeptMemberMapRepository deptMemberMapRepository;
 
     public List<DeptResponseDto> getDeptTree () {
-        List<Dept> depts = deptRepository.findAll();
+        List<Dept> depts = deptRepository.findAllByOrderByTreeSortCodeAsc();
 
 //        List<Dept> allDepts = deptRepository.findAllByOrderByTreeSortCodeAsc();
 //        List<DeptMemberMap> allDeptMemberMap = deptMemberMapRepository.findAll();
