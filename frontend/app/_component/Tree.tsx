@@ -134,10 +134,20 @@ interface Props<T> {
 	mapEntityToTree: (item: T) => TreeData<T>;
 	selectedId?: number | string;
 	onNodeClick?: (node: TreeNode<T>) => void;
+	expandedIds?: string[];
+	onExpandedItemsChange?: (itemIds: string[]) => void;
 	placeholder?: string;
 }
 
-export default function CommonTreeview<T>({ rawData, mapEntityToTree, selectedId, onNodeClick, placeholder = '검색어를 입력하세요.' }: Props<T>) {
+export default function CommonTreeview<T>({
+	rawData,
+	mapEntityToTree,
+	selectedId,
+	onNodeClick,
+	expandedIds,
+	onExpandedItemsChange,
+	placeholder = '검색어를 입력하세요.',
+}: Props<T>) {
 	const [searchTerm, setSearchTerm] = useState('');
 
 	const treeStructure = useMemo(() => {
@@ -166,7 +176,14 @@ export default function CommonTreeview<T>({ rawData, mapEntityToTree, selectedId
 			/>
 
 			<SimpleTreeView
+				expansionTrigger='iconContainer'
 				selectedItems={selectedId ? String(selectedId) : null}
+				expandedItems={expandedIds}
+				onExpandedItemsChange={(event, itemIds) => {
+					if (onExpandedItemsChange) {
+						onExpandedItemsChange(itemIds);
+					}
+				}}
 				onSelectedItemsChange={(_, itemId) => {
 					if (!itemId) return;
 

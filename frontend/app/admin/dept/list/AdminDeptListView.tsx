@@ -8,7 +8,7 @@ import CommonTabs from '@/app/_component/CommonTabs';
 import CommonTreeview from '@/app/_component/Tree';
 import { useRouter } from 'next/navigation';
 import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -51,7 +51,9 @@ const mapDeptToTree = (dept: DeptResponseDto) => ({
 export default function AdminDeptListView({ dbData }: Props) {
 	const router = useRouter();
 	const theme = useTheme();
+	const rootId = dbData?.[0]?.deptId ? String(dbData[0].deptId) : null;
 	const [selectedDeptId, setSelectedDeptId] = useState<number | null>(dbData?.[0]?.deptId || null);
+	const [expandedIds, setExpandedIds] = useState<string[]>(rootId ? [rootId] : []);
 
 	const dummyDept = {
 		deptNm: dbData?.[0]?.deptNm || '부서 선택 안됨',
@@ -78,6 +80,13 @@ export default function AdminDeptListView({ dbData }: Props) {
 		},
 		{ label: '부서원 목록', content: <AdminDeptDetailView deptId={1} /> },
 	];
+
+	useEffect(() => {
+		if (dbData?.length > 0 && expandedIds.length === 0) {
+			setExpandedIds([String(dbData[0].deptId)]);
+			setSelectedDeptId(dbData[0].deptId);
+		}
+	}, [dbData]);
 
 	return (
 		<Box
@@ -127,6 +136,8 @@ export default function AdminDeptListView({ dbData }: Props) {
 						<CommonTreeview
 							rawData={dbData || []}
 							mapEntityToTree={mapDeptToTree}
+							expandedIds={expandedIds}
+							onExpandedItemsChange={(ids) => setExpandedIds(ids)}
 							selectedId={String(selectedDeptId)}
 							placeholder='부서명을 검색하세요.'
 							onNodeClick={(node) => {
