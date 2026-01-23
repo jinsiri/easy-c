@@ -146,8 +146,8 @@ export default function AttendanceUserPage() {
 							formatter: (item) => formatMinutes(item.value),
 						},
 						lineStyle: {
-							type: 'solid',
-							color: theme.palette.grey[300],
+							type: 'dashed',
+							color: theme.palette.grey[500],
 						},
 						clip: false,
 						data: [{ xAxis: data.effectiveWorkTime }, { xAxis: data.maxPolicyWorkTime }],
@@ -174,9 +174,14 @@ export default function AttendanceUserPage() {
 		setChartOption(_option);
 	};
 
-	const onSuccessEvent = () => {
-		getAttendanceTodayData();
-		getAttendanceCalendarData();
+	const onSuccessEvent = async () => {
+		setLoader(true);
+
+		try {
+			await Promise.all([getAttendanceTodayData(), getAttendanceCalendarData()]);
+		} finally {
+			setLoader(false);
+		}
 	};
 
 	return (

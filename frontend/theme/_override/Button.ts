@@ -6,6 +6,9 @@ const Button = (theme: Theme) => ({
 			root: {
 				textWrap: 'nowrap',
 			},
+			sizeMedium: {
+				minHeight: '2.5rem',
+			},
 			sizeLarge: {
 				padding: '0.625rem 1.5rem',
 				fontSize: '1rem',

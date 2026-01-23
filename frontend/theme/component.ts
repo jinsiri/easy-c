@@ -6,6 +6,7 @@ import IconButton from './_override/IconButton';
 import ListItemIcon from './_override/ListItemIcon';
 import MuiCssBaseline from './_override/MuiCssBaseline';
 import OutlinedInput from './_override/OutlinedInput';
+import PickersTextField from './_override/PickersTextField';
 import Tab from './_override/Tab';
 
 const component = (theme: Theme) => ({
@@ -15,6 +16,7 @@ const component = (theme: Theme) => ({
 	...ListItemIcon(theme),
 	...MuiCssBaseline(theme),
 	...OutlinedInput(theme),
+	...PickersTextField(theme),
 	...Tab(theme),
 });
 

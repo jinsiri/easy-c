@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -21,6 +22,7 @@ import { CURRENTSTATE, ATTENDANCETYPE } from '@/constant/attendanceConst';
 import { attendanceSaveReqInterface, AttendanceResInterface } from '@/type/attendanceInterface';
 
 export default function AttendanceComp({ attendanceData, onSuccess }: { attendanceData?: AttendanceResInterface; onSuccess?: () => void }) {
+	const router = useRouter();
 	const { loader, setLoader } = useLoaderStore();
 
 	const [workingStatus, setWorkingStatus] = useState('BEFORE_WORK');
@@ -43,6 +45,10 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 	}, [attendanceData]);
 
 	const onClickWorkingStatusButton = async (event: React.MouseEvent<HTMLButtonElement>) => {
+		if (!loader) {
+			setLoader(true);
+		}
+
 		try {
 			const locate = await findUserLocate();
 
@@ -54,6 +60,8 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 		} catch (error) {
 			console.error('위치 획득 실패:', error);
 			alert('위치 정보 권한을 허용해주세요.');
+		} finally {
+			setLoader(false);
 		}
 	};
 
@@ -82,10 +90,6 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			registerLongitude: locate ? locate.longitude : null,
 		};
 
-		if (!loader) {
-			setLoader(true);
-		}
-
 		axiosConfig
 			.post('/api/attendance/start', req)
 			.then((res) => {
@@ -96,10 +100,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 					alert(res.data.message);
 				}
 			})
-			.catch((err) => {})
-			.finally(() => {
-				setLoader(false);
-			});
+			.catch((err) => {});
 	};
 
 	const finishTimeAttendanceData = (locate: GeolocationCoordinates) => {
@@ -112,10 +113,6 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			registerLongitude: locate ? locate.longitude : null,
 		};
 
-		if (!loader) {
-			setLoader(true);
-		}
-
 		axiosConfig
 			.post('/api/attendance/finish', req)
 			.then((res) => {
@@ -126,10 +123,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 					alert(res.data.message);
 				}
 			})
-			.catch((err) => {})
-			.finally(() => {
-				setLoader(false);
-			});
+			.catch((err) => {});
 	};
 
 	return (
@@ -227,7 +221,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 					>
 						{activated ? '퇴근하기' : '출근하기'}
 					</Button>
-					<Button variant='outlined' size='large'>
+					<Button variant='outlined' size='large' onClick={() => router.push('/attendance/user/modal')}>
 						요청하기
 					</Button>
 				</Box>
