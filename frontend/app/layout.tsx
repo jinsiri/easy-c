@@ -4,8 +4,10 @@ import type { Metadata } from 'next';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-
 import theme from '../theme/Theme';
+
+/** Custom */
+import ClientLocalizationProvider from './_component/baseElement/ClientLocalizationProvider';
 
 /** CSS */
 import '@/style/globals.css';
@@ -28,10 +30,12 @@ export default function RootLayout({
 			<body>
 				<AppRouterCacheProvider>
 					<ThemeProvider theme={theme}>
-						<CssBaseline />
-						{children}
-						{modal}
-						<Loader />
+						<ClientLocalizationProvider>
+							<CssBaseline />
+							{children}
+							{modal}
+							<Loader />
+						</ClientLocalizationProvider>
 					</ThemeProvider>
 				</AppRouterCacheProvider>
 			</body>
