@@ -6,7 +6,7 @@ import {useRouter} from 'next/navigation';
 import {Box, Button, Checkbox, FormControlLabel, TextField, Typography} from '@mui/material';
 
 import {authService} from "@/app/services/authService";
-import {encryptRSA} from "@/app/_utils/crypto";
+import {encryptRSA} from "@/utils/crypto";
 
 const LoginPage = () => {
 
@@ -27,6 +27,8 @@ const LoginPage = () => {
 				loginId: memberId,
 				encryptedPassword: encryptedPw
 			});
+
+			console.log(res);
 
 			alert('로그인 성공!');
 			router.push('/');  // 메인 페이지 이동

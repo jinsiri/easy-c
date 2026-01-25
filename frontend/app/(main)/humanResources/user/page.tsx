@@ -363,7 +363,7 @@ export default function HumanResourceUserPage() {
 											padding: '0.5rem',
 										}}
 									>
-										<Box sx={{ width: '6rem', textWrap: 'nowrap', fontSize: '0.875rem', color: theme.palette.gray[700] }}>{label}</Box>
+										<Box sx={{ width: '6rem', textWrap: 'nowrap', fontSize: '0.875rem', color: theme.palette.grey[700] }}>{label}</Box>
 										<Box sx={{ width: 'calc(100% - 6rem)', textWrap: 'nowrap' }}>{displayValue}</Box>
 									</ListItem>
 								);
