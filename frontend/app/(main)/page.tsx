@@ -5,6 +5,7 @@ import { Box, Grid, Typography, useTheme } from '@mui/material';
 
 /** Custom */
 import ColTitleAndText from '../_component/layoutElement/ColTitleAndText';
+import AttendanceComp from '../_component/layoutElement/AttendanceComp';
 
 export default function Home() {
 	const theme = useTheme();
@@ -34,11 +35,11 @@ export default function Home() {
 							width: '60%',
 							borderRadius: '1rem',
 							padding: '1rem',
-							backgroundColor: theme.palette.grey[50],
+							backgroundColor: 'grey.50',
 						}}
 					>
 						<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '8rem' }}>
-							<Box sx={{ width: '6rem', height: '6rem', borderRadius: '1rem', backgroundColor: theme.palette.grey[500] }}></Box>
+							<Box sx={{ width: '6rem', height: '6rem', borderRadius: '1rem', backgroundColor: 'grey.500' }}></Box>
 						</Box>
 						<Box sx={{ display: 'flex', flexDirection: 'column', marginLeft: '0.5rem' }}>
 							<Box sx={{ display: 'flex', alignItems: 'baseline' }}>
@@ -47,7 +48,7 @@ export default function Home() {
 								</Typography>
 								<Typography sx={{ marginLeft: '0.25rem', fontWeight: '600' }}>{dummyInfo['직위']}</Typography>
 							</Box>
-							<Box sx={{ fontSize: '0.875rem', color: theme.palette.grey[500] }}>{dummyInfo['부서/직책']}</Box>
+							<Box sx={{ fontSize: '0.875rem', color: 'grey.500' }}>{dummyInfo['부서/직책']}</Box>
 							<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: '1rem' }}>
 								<ColTitleAndText subtitle='결재할 문서' sx={{ mr: '1.5rem' }}>
 									<Box sx={{ fontSize: '1.625rem', fontWeight: '600' }}> 15 </Box>
@@ -69,10 +70,11 @@ export default function Home() {
 							marginLeft: '1rem',
 							padding: '1rem',
 							borderRadius: '1rem',
-							backgroundColor: theme.palette.grey[50],
+							backgroundColor: 'grey.50',
 						}}
 					></Box>
 				</Box>
+				<AttendanceComp attendanceData={{}} onSuccess={() => {}} />
 			</Grid>
 		</Grid>
 	);

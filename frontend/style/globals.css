@@ -23,7 +23,7 @@
 		'Segoe UI Emoji',
 		'Segoe UI Symbol',
 		sans-serif;
-	color: var(--mui-palette-gray-900);
+	color: var(--mui-palette-grey-900);
 }
 
 html,
@@ -188,39 +188,53 @@ a {
 
 .ag-header-cell-text,
 .ag-header-group-text {
-	color: var(--mui-palette-gray-700);
+	color: var(--mui-palette-grey-700);
 }
 
 /** React Timelime */
 .react-calendar-timeline .rct-header-root {
-	background: var(--mui-palette-gray-50);
-	border-bottom: var(--mui-palette-gray-300);
+	background: transparent;
+	border-bottom: 0;
 }
 
 .react-calendar-timeline .rct-calendar-header {
-	border: 1px solid var(--mui-palette-gray-300);
+	border: 0;
 }
 
 .react-calendar-timeline .rct-dateHeader {
-	border-bottom: 1px solid var(--mui-palette-gray-300);
+	border-bottom: 0;
 	cursor: pointer;
-	font-size: 14px;
-	background-color: var(--mui-palette-gray-100);
-	border-left: 1px solid var(--mui-palette-gray-300);
+	font-size: 13px;
+	background-color: transparent;
+	border-left: 1px solid var(--mui-palette-grey-300);
+}
+
+.react-calendar-timeline .rct-dateHeader:nth-child(24n + 1) {
+	border-left: 0;
 }
 
 .react-calendar-timeline .rct-dateHeader-primary {
-	border-left: 1px solid var(--mui-palette-gray-300);
-	border-right: 1px solid var(--mui-palette-gray-300);
+	border-left: 0;
+	border-right: 0;
 }
 
 .react-calendar-timeline .rct-horizontal-lines .rct-hl-even,
 .react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
-	border-bottom: 1px solid var(--mui-palette-gray-300);
+	/*border-bottom: 1px solid var(--mui-palette-grey-300);*/
+	border-bottom: 0;
 }
 
 .react-calendar-timeline .rct-vertical-lines .rct-vl {
-	border-left: 1px solid var(--mui-palette-gray-300);
+	border-left: 1px solid var(--mui-palette-grey-300);
+}
+
+.react-calendar-timeline .rct-vertical-lines .rct-vl.rct-vl-first {
+	border-left-width: 0;
+}
+
+.react-calendar-timeline .rct-vertical-lines .rct-vl.rct-day-6,
+.react-calendar-timeline .rct-vertical-lines .rct-vl.rct-day-0 {
+	background-color: transparent;
 }
 
 .react-calendar-timeline .rct-items .rct-item {

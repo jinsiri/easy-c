@@ -9,25 +9,37 @@ SELECT setval('dept_seq', COALESCE((SELECT MAX(dept_id) FROM dept), 1));
 --근태 정책 초기
 INSERT INTO attendance_policy (
     attendance_policy_id,
-    allow_margin_minute,
+    attendance_policy_name,
+    attendance_policy_desc,
+    attendance_type,
+    settlement_period,
+    worktime_rule,
+    working_time_day,
+    working_day,
     start_time,
     end_time,
     half_leave_start_time,
     half_leave_end_time,
     core_start_time,
     core_end_time,
-    working_day
+    allow_margin_minute
 )
 VALUES (
     1,
-    5,
+    '기본 정책',
+    null,
+    'FIXED',
+    'WEEK',
+    'ALWAYS_40',
+    480,
+    '1,2,3,4,5',
     '09:00:00',
     '18:00:00',
     '13:00:00',
     '13:00:00',
     '11:00:00',
     '15:00:00',
-    '1,2,3,4,5'
+    5
 )
 ON CONFLICT (attendance_policy_id) DO NOTHING;
 

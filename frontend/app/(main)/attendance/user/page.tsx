@@ -7,9 +7,11 @@ import axiosConfig from '@/app/_lib/axiosConfig';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
+import useLoaderStore from '@/store/useLoaderStore';
+
 /** MUI */
 import { Box, Grid, IconButton, Typography, useTheme } from '@mui/material';
-import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
+import { ArrowLeftRounded, ArrowRightRounded, LineStyle } from '@mui/icons-material';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -26,6 +28,7 @@ dayjs.extend(duration);
 
 export default function AttendanceUserPage() {
 	const theme = useTheme();
+	const { loader, setLoader } = useLoaderStore();
 
 	const [attendanceData, setAttenceData] = useState<AttendanceResInterface>({});
 	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
@@ -49,6 +52,8 @@ export default function AttendanceUserPage() {
 			workDate: today.format('YYYY-MM-DD'),
 		};
 
+		if (!loader) setLoader(true);
+
 		axiosConfig
 			.post('/api/attendance/today', req)
 			.then((res) => {
@@ -57,7 +62,10 @@ export default function AttendanceUserPage() {
 					makeChartOption(res.data);
 				}
 			})
-			.catch((err) => {});
+			.catch((err) => {})
+			.finally(() => {
+				setLoader(false);
+			});
 	};
 
 	const getAttendanceCalendarData = () => {
@@ -66,6 +74,8 @@ export default function AttendanceUserPage() {
 			workDate: calendarDate.format('YYYY-MM-DD'),
 		};
 
+		if (!loader) setLoader(true);
+
 		axiosConfig
 			.post('/api/attendance/calendar', req)
 			.then((res) => {
@@ -73,7 +83,10 @@ export default function AttendanceUserPage() {
 					setCalendarData(res.data);
 				}
 			})
-			.catch((err) => {});
+			.catch((err) => {})
+			.finally(() => {
+				setLoader(false);
+			});
 	};
 
 	const makeChartOption = (data: AttendanceResInterface) => {
@@ -83,11 +96,19 @@ export default function AttendanceUserPage() {
 				right: 0,
 			},
 			xAxis: {
-				max: 100,
+				axisLabel: {
+					show: true,
+					color: 'rgba(0,0,0,0)',
+				},
+				splitLine: {
+					show: false,
+				},
+				max: data.maxPolicyWorkTime,
 			},
 			yAxis: {
 				data: [''],
 				nameGap: 0,
+				inverse: false,
 			},
 			series: [
 				{
@@ -111,9 +132,40 @@ export default function AttendanceUserPage() {
 							],
 						},
 					},
-					data: [Math.floor((data.workTime / data.totalWorkTime) * 100)],
+					data: [data.workTime],
 					backgroundStyle: {
 						color: 'rgba(180, 180, 180, 0.2)',
+					},
+					markLine: {
+						symbol: ['none'],
+						label: {
+							show: true,
+							position: 'start',
+							fontFamily: 'Pretendard Variable',
+							color: theme.palette.grey[700],
+							formatter: (item) => formatMinutes(item.value),
+						},
+						lineStyle: {
+							type: 'dashed',
+							color: theme.palette.grey[500],
+						},
+						clip: false,
+						data: [{ xAxis: data.effectiveWorkTime }, { xAxis: data.maxPolicyWorkTime }],
+					},
+					markArea: {
+						itemStyle: {
+							color: 'rgba(0, 0, 0, 0.03)',
+						},
+						data: [
+							[
+								{
+									xAxis: data.effectiveWorkTime,
+								},
+								{
+									xAxis: data.maxPolicyWorkTime,
+								},
+							],
+						],
 					},
 				},
 			],
@@ -122,9 +174,14 @@ export default function AttendanceUserPage() {
 		setChartOption(_option);
 	};
 
-	const onSuccessEvent = () => {
-		getAttendanceTodayData();
-		getAttendanceCalendarData();
+	const onSuccessEvent = async () => {
+		setLoader(true);
+
+		try {
+			await Promise.all([getAttendanceTodayData(), getAttendanceCalendarData()]);
+		} finally {
+			setLoader(false);
+		}
 	};
 
 	return (
@@ -139,7 +196,7 @@ export default function AttendanceUserPage() {
 						borderRadius: '1rem',
 						borderWidth: '1px',
 						borderStyle: 'solid',
-						borderColor: 'gray.300',
+						borderColor: 'grey.300',
 						gap: '1rem',
 					}}
 				>
@@ -154,7 +211,7 @@ export default function AttendanceUserPage() {
 							padding: '1rem 1.5rem',
 							borderLeftWidth: '1px',
 							borderStyle: 'solid',
-							borderColor: 'gray.300',
+							borderColor: 'grey.300',
 							gap: '1rem',
 						}}
 					>
@@ -170,9 +227,9 @@ export default function AttendanceUserPage() {
 									{formatMinutes(attendanceData.workTime)}
 								</Typography>
 							</Box>
-							<Typography sx={{ color: 'gray.700' }}>
-								이번 주 {attendanceData.totalWorkTime ? Math.floor((attendanceData.workTime / attendanceData.totalWorkTime) * 100) : 0}% 근무
-								했어요.
+							<Typography sx={{ color: 'grey.700' }}>
+								이번 주 {attendanceData.effectiveWorkTime ? Math.floor((attendanceData.workTime / attendanceData.effectiveWorkTime) * 100) : 0}%
+								근무 했어요.
 							</Typography>
 						</Box>
 
@@ -187,28 +244,28 @@ export default function AttendanceUserPage() {
 							}}
 						>
 							<ColTitleAndText subtitle={'잔여 근무일'} sx={{ flex: '1' }}>
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', textAlign: 'center' }}>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6' sx={{ color: 'primary.main' }}>
-										{attendanceData.totalWorkDay ? attendanceData.totalWorkDay - attendanceData.workDay : 0}d
+										{attendanceData.effectiveWorkDay ? attendanceData.effectiveWorkDay - attendanceData.workDay : 0}d
 									</Typography>
-									<Typography sx={{ marginLeft: '0.25rem' }}>/ {attendanceData.totalWorkDay}d</Typography>
+									<Typography sx={{ marginLeft: '0.25rem' }}>/ {attendanceData.effectiveWorkDay}d</Typography>
 								</Box>
 							</ColTitleAndText>
 							<ColTitleAndText subtitle={'잔여 근로시간'} sx={{ flex: '1' }}>
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', textAlign: 'center' }}>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6' sx={{ color: 'primary.main' }}>
-										{formatMinutes(attendanceData.totalWorkTime ? attendanceData.totalWorkTime - attendanceData.workTime : 0)}
+										{formatMinutes(attendanceData.effectiveWorkTime ? attendanceData.effectiveWorkTime - attendanceData.workTime : 0)}
 									</Typography>
-									<Typography sx={{ marginLeft: '0.25rem' }}>/ {formatMinutes(attendanceData.totalWorkTime)}</Typography>
+									<Typography sx={{ marginLeft: '0.25rem' }}>/ {formatMinutes(attendanceData.effectiveWorkTime)}</Typography>
 								</Box>
 							</ColTitleAndText>
 							<ColTitleAndText subtitle={'총 근로시간'} sx={{ flex: '1' }}>
-								<Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6'>{formatMinutes(attendanceData.workTime)}</Typography>
 								</Box>
 							</ColTitleAndText>
 							<ColTitleAndText subtitle={'휴가'} sx={{ flex: '1' }}>
-								<Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6'>{formatMinutes(attendanceData.vacationTime)}</Typography>
 								</Box>
 							</ColTitleAndText>
@@ -225,7 +282,7 @@ export default function AttendanceUserPage() {
 							height: '1.25rem',
 							borderRadius: '100%',
 							border: '2px solid',
-							borderColor: 'gray.900',
+							borderColor: 'grey.900',
 						}}
 						onClick={(e) => setCalendarDate((prev) => prev.subtract(1, 'month'))}
 					>
@@ -243,7 +300,7 @@ export default function AttendanceUserPage() {
 							height: '1.25rem',
 							borderRadius: '100%',
 							border: '2px solid',
-							borderColor: 'gray.900',
+							borderColor: 'grey.900',
 						}}
 						onClick={(e) => setCalendarDate((prev) => prev.add(1, 'month'))}
 					>
