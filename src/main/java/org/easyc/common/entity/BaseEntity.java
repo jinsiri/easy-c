@@ -3,6 +3,7 @@ package org.easyc.common.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,16 +29,16 @@ public abstract class BaseEntity {
 
     // --- 등록 정보 (Register) ---
     @CreatedDate
-    @Column(name = "register_date")
+    @Column(name = "register_date", updatable = false)
     private LocalDateTime registerDate;
 
-    @Column(name = "register_ip")
+    @Column(name = "register_ip", updatable = false)
     private String registerIp;
 
-    @Column(name = "register_id")
+    @Column(name = "register_id", updatable = false)
     private String registerId;
 
-    @Column(name = "register_nm")
+    @Column(name = "register_nm", updatable = false)
     private String registerNm;
 
     // --- 수정 정보 (Last Update) ---
@@ -53,4 +54,28 @@ public abstract class BaseEntity {
 
     @Column(name = "last_update_nm")
     private String lastUpdateNm;
+
+    @PrePersist
+    public void prePersist() {
+        this.deleted = false;
+        this.active = true;
+    }
+
+    public void delete() {
+        this.deleted = true;
+        this.active = false;
+    }
+
+    public void restore() {
+        this.deleted = false;
+        this.active = true;
+    }
+
+    public void activate() {
+        this.active = true;
+    }
+
+    public void deactivate() {
+        this.active = false;
+    }
 }

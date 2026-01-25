@@ -1,4 +1,4 @@
-package org.easyc;
+package org.easyc.config;
 
 import lombok.RequiredArgsConstructor;
 import org.easyc.auth.jwt.JwtAuthenticationFilter;

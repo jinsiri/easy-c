@@ -1,25 +1,27 @@
 package org.easyc.member.dto;
 
 import lombok.Getter;
+import org.easyc.member.constant.AccountStatus;
 import org.easyc.member.constant.MemberRole;
 import org.easyc.member.entity.Member;
 
 @Getter
 public class MemberRequestDto {
-
     private Long memberId;
     private String loginId;
-    private String password;
-//    private String nickname;
+    private String memberNm;
+    private String memberNmEn; // 영문 이름
     private MemberRole memberRole;
+    private AccountStatus accountStatus;
 
-    public Member toEntity(MemberRequestDto memberRequestDto) {
+    public Member toEntity() {
         return Member.builder()
-                .memberId(memberRequestDto.getMemberId())
-                .loginId(memberRequestDto.getLoginId())
-                .password(memberRequestDto.getPassword()) //암호화
-//                .nickname(memberRequestDto.getNickname())
-                .memberRole(memberRequestDto.getMemberRole())
+                .memberId(memberId)
+                .loginId(loginId)
+                .memberNm(memberNm)
+                .memberNmEn(memberNmEn)
+                .memberRole(memberRole)
+                .accountStatus(accountStatus)
                 .build();
     }
 }

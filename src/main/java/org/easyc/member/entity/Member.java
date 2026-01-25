@@ -1,18 +1,17 @@
 package org.easyc.member.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.easyc.common.entity.BaseEntity;
+import org.easyc.member.constant.AccountStatus;
 import org.easyc.member.constant.MemberRole;
 
 @Entity
 @Builder
-@Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Member {
+@Getter
+public class Member extends BaseEntity {
 
     @Id
     @SequenceGenerator(name="member_seq", sequenceName="member_seq", allocationSize=1)
@@ -21,9 +20,14 @@ public class Member {
 
     private String loginId;
     private String password;
-    private String nickname; // 사용 안함
+    private String memberNm;
+    private String memberNmEn; // 영문 이름
+//    private String mainPhoneNumber; // 대표전화, 필요한지?
 
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
+    //계정 상태
+    @Enumerated(EnumType.STRING)
+    private AccountStatus accountStatus;
 }

@@ -1,14 +1,17 @@
 package org.easyc.common.dto;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Getter
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class BaseDto {
     private boolean deleted = false;
     private boolean active = true;
@@ -19,4 +22,5 @@ public class BaseDto {
     private LocalDateTime lastUpdateDate;
     private String lastUpdateIp;
     private String lastUpdateId;
+    private String lastUpdateNm;
 }

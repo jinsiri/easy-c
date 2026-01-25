@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse> handleException(CustomException exception) {
         return ResponseEntity
-                .status(exception.getCustomExceptionCode().getHttpStatus())
+                .status(exception.getHttpStatus())
                 .body(ApiResponse.ofFailure(exception.getCustomExceptionCode()));
     }
 
@@ -27,6 +27,5 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.ofFailure(CustomExceptionCode.AUTH_LOGIN_FAILED));
     }
-    
-    // setErrorResponse 정의
+
 }

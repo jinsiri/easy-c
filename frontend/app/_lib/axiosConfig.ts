@@ -49,16 +49,51 @@ const processQueue = (error: any) => {
 	failedQueue = [];
 };
 
-// 응답 인터셉터 (선택)
+// API 응답 타입 정의
+export interface ApiResponse<T = any> {
+	status: string;
+	result: 'S' | 'F';
+	message: string;
+	timestamp: string;
+	data: T;
+	exception: any | null;
+}
+
+// 응답 인터셉터 - ApiResponse 언래핑
 axiosConfig.interceptors.response.use(
-	(response) => response,
+	(response) => {
+		const apiResponse = response.data;
+
+		// ApiResponse 구조인지 확인 (status, result, data 필드가 있는 경우)
+		const isApiResponse = apiResponse
+			&& typeof apiResponse === 'object'
+			&& 'result' in apiResponse
+			&& 'status' in apiResponse
+			&& 'data' in apiResponse;
+
+		if (isApiResponse) {
+			// 실패 응답 처리
+			if (apiResponse.result === 'F') {
+				return Promise.reject({
+					message: apiResponse.message,
+					status: apiResponse.status,
+					exception: apiResponse.exception,
+				});
+			}
+			// 성공 응답: data 필드를 response.data로 설정
+			response.data = apiResponse.data;
+		}
+		// ApiResponse 구조가 아니면 그대로 반환 (예: plain string, null 등)
+		return response;
+	},
 	async (error) => {
+
 		const originalRequest = error.config;
 
 		// AccessToken 만료
 		if (error.response?.status === 401 && !originalRequest._retry) {
-			if (isRefreshing) {
-				// 동시호출 방지
+
+			if (isRefreshing) { // 동시호출 방지
 				// refresh 중이면 나머지 요청 대기
 				return new Promise((resolve, reject) => {
 					failedQueue.push({ resolve, reject });
