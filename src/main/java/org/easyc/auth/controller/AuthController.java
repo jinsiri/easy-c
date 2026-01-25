@@ -44,13 +44,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequestDto requestDto) throws Exception {
 
-        String decryptedPassword = rsaUtil.decrypt(requestDto.getEncryptedPassword());
+        String rawPassword = rsaUtil.decrypt(requestDto.getEncryptedPassword());
 
         Authentication authentication =
                 authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(
                                 requestDto.getLoginId(),
-                                decryptedPassword
+                                rawPassword
                         )
                 );
 

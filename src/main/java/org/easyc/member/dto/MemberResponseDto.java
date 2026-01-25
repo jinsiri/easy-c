@@ -1,31 +1,54 @@
 package org.easyc.member.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.easyc.common.dto.BaseDto;
+import org.easyc.member.constant.AccountStatus;
 import org.easyc.member.constant.MemberRole;
 import org.easyc.member.entity.Member;
 
-@Builder
+import java.util.List;
+
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class MemberResponseDto {
+@Setter
+@SuperBuilder
+public class MemberResponseDto extends BaseDto {
     private Long memberId;
     private String loginId;
-//    private String password;
-//    private String nickname;
+    private String memberNm;
+    private String memberNmEn; // 영문 이름
     private MemberRole memberRole;
+    private AccountStatus accountStatus;
 
-    @Builder
+    @JsonUnwrapped // 중첩 해제
+    private MemberProfileResponseDto memberProfile;
+
+    @JsonUnwrapped
+    private MemberPersonalResponseDto memberPersonal;
+
+    private List<MemberCareerResponseDto> memberCareers;
+
+
     public static MemberResponseDto fromEntity(Member member) {
         return MemberResponseDto.builder()
                 .memberId(member.getMemberId())
                 .loginId(member.getLoginId())
-//                .password(member.getPassword()) //암호화
-//                .nickname(member.getNickname())
+                .memberNm(member.getMemberNm())
+                .memberNmEn(member.getMemberNmEn())
                 .memberRole(member.getMemberRole())
+                .accountStatus(member.getAccountStatus())
+                .deleted(member.isDeleted())
+                .active(member.isActive())
+                .registerDate(member.getRegisterDate())
+                .registerIp(member.getRegisterIp())
+                .registerId(member.getRegisterId())
+                .registerNm(member.getRegisterNm())
+                .lastUpdateDate(member.getLastUpdateDate())
+                .lastUpdateIp(member.getLastUpdateIp())
+                .lastUpdateId(member.getLastUpdateId())
+                .lastUpdateNm(member.getLastUpdateNm())
                 .build();
     }
 }

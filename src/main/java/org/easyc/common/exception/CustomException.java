@@ -1,5 +1,7 @@
 package org.easyc.common.exception;
 
+import org.springframework.http.HttpStatus;
+
 public class CustomException extends RuntimeException {
     private final CustomExceptionCode customExceptionCode;
 
@@ -15,6 +17,10 @@ public class CustomException extends RuntimeException {
 
     public CustomExceptionCode getCustomExceptionCode() {
         return customExceptionCode;
+    }
+
+    public HttpStatus getHttpStatus() {
+        return customExceptionCode.getHttpStatus();
     }
 
     // 기본 예외 생성

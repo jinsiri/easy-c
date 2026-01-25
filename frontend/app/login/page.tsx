@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import {useState} from 'react';
+import {useRouter} from 'next/navigation';
 
-import { TextField, Button, Typography, Box, FormControlLabel, Checkbox } from '@mui/material';
+import {Box, Button, Checkbox, FormControlLabel, TextField, Typography} from '@mui/material';
 
 import {authService} from "@/app/services/authService";
 import {encryptRSA} from "@/app/_utils/crypto";
@@ -12,7 +12,7 @@ const LoginPage = () => {
 
 	const router = useRouter();
 
-	const [userId, setUserId] = useState('');
+	const [memberId, setMemberId] = useState('');
 	const [password, setPassword] = useState('');
 
 	const handleLogin = async (e: React.FormEvent) => {
@@ -24,7 +24,7 @@ const LoginPage = () => {
 			const encryptedPw = encryptRSA(password, publicKey);
 
 			const res = await authService.login({
-				loginId: userId,
+				loginId: memberId,
 				encryptedPassword: encryptedPw
 			});
 
@@ -65,8 +65,8 @@ const LoginPage = () => {
 						<TextField
 							label='ID'
 							type='text'
-							value={userId}
-							onChange={(e) => setUserId(e.target.value)}
+							value={memberId}
+							onChange={(e) => setMemberId(e.target.value)}
 							fullWidth
 							margin='normal'
 							required
