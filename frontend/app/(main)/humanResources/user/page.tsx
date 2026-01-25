@@ -1,5 +1,6 @@
 'use client';
 import {useEffect, useMemo, useState} from 'react';
+
 /** MUI */
 import {Box, Grid, List, ListItem, OutlinedInput, Typography, useTheme} from '@mui/material';
 
@@ -149,7 +150,6 @@ const transformGridData = (data: any[]): Record<string, any>[] => {
 
 export default function HumanResourceUserPage() {
 	const theme = useTheme();
-
 
 	const [memberInfo, setMemberInfo] = useState<any>({});
 	const [basicInfo, setBasicInfo] = useState<any>({});

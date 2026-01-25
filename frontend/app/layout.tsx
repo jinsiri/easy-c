@@ -8,7 +8,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from '../theme/Theme';
 
 /** CSS */
-import './_css/globals.css';
+import '@/style/globals.css';
+import Loader from './_component/baseElement/Loader';
 
 export const metadata: Metadata = {
 	title: 'EASY-C',
@@ -17,8 +18,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
 	children,
+	modal,
 }: Readonly<{
 	children: React.ReactNode;
+	modal: React.ReactNode;
 }>) {
 	return (
 		<html lang='ko' suppressHydrationWarning>
@@ -27,6 +30,8 @@ export default function RootLayout({
 					<ThemeProvider theme={theme}>
 						<CssBaseline />
 						{children}
+						{modal}
+						<Loader />
 					</ThemeProvider>
 				</AppRouterCacheProvider>
 			</body>

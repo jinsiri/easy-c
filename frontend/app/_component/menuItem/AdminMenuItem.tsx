@@ -2,7 +2,7 @@
 import { AccountTree, ApprovalRounded, CalendarMonthRounded } from '@mui/icons-material';
 
 /** Custom */
-import { menuType } from '../../_constant/Types';
+import { menuType } from '@/type/types';
 
 const AdminMenuItem: menuType[] = [
 	{

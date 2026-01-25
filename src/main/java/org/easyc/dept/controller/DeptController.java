@@ -2,13 +2,35 @@ package org.easyc.dept.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.easyc.dept.dto.DeptResponseDto;
 import org.easyc.dept.service.DeptService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+@CrossOrigin(origins = "*", maxAge = 3600)
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/dept")
 public class DeptController {
     private final DeptService deptService;
 
+    @GetMapping("/tree")
+    public ResponseEntity<List<DeptResponseDto>> getOrgTree() {
+        log.info("조직도 트리 조회 요청 시작");
+
+        try {
+            List<DeptResponseDto> tree = deptService.getDeptTree();
+            log.info("조직도 트리 조회 성공 (루트 노드 수: {})", tree.size());
+            return ResponseEntity.ok(tree);
+        } catch (Exception e) {
+            log.error("조직도 조회 중 오류 발생: ", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

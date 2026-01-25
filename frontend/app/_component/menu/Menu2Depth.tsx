@@ -1,14 +1,12 @@
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 /** MUI */
-import { Box, Collapse, List, ListItemButton, ListItemText, Fade } from '@mui/material';
-import { ExpandMoreRounded } from '@mui/icons-material';
+import { Box, ListItemButton, ListItemText, Fade } from '@mui/material';
 
 /** Custom */
-import { menuType } from '../../_constant/Types';
-import theme from '@/theme/Theme';
+import { menuType } from '@/type/types';
 
 interface propsType {
 	item: menuType;
@@ -29,7 +27,7 @@ export default function Menu2Depth({ item, drawerOpen, prevUrl }: propsType) {
 				sx={{
 					height: drawerOpen ? 'auto' : '3rem',
 					borderRadius: drawerOpen ? '1rem' : 0,
-					backgroundColor: isActive ? theme.palette.primary[50] : 'transparent',
+					backgroundColor: isActive ? 'primary.50' : 'transparent',
 				}}
 			>
 				{drawerOpen ? (
@@ -41,7 +39,7 @@ export default function Menu2Depth({ item, drawerOpen, prevUrl }: propsType) {
 								left: '2rem',
 								width: '1px',
 								height: '100%',
-								backgroundColor: theme.palette.grey[200],
+								backgroundColor: 'gray.200',
 								zIndex: 10,
 							}}
 						/>

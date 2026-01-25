@@ -2,7 +2,7 @@
 import { Box, List, Paper } from '@mui/material';
 
 /** Custom */
-import { menuType } from '../_constant/Types';
+import { menuType } from '@/type/types';
 import MainMenuItem from './menuItem/MainMenuItem';
 import Menu1Depth from './menu/Menu1Depth';
 
@@ -23,7 +23,7 @@ export default function Sidebar(props: propsType) {
 				width: drawerOpen ? '19rem' : '4.5rem',
 				height: '100%',
 				transition: 'all easeInOut 0.4s',
-				zIndex: 500,
+				zIndex: 100,
 			}}
 		>
 			<Box sx={{ width: '100%', height: headerHeight }}></Box>

@@ -7,34 +7,42 @@ import { TextField, Box, InputAdornment } from '@mui/material';
 import theme from '@/theme/Theme';
 import { Search } from '@mui/icons-material';
 
-export interface FlatData {
-	id: number;
+export type TreeData<T> = T & {
+	id: string | number;
 	label: string;
-	treeParentId: number | null;
+	treeParentId: string | number | null;
 	treeSiblingOrder: number;
-}
+};
 
-export interface TreeNode extends FlatData {
-	children: TreeNode[];
-}
+export type TreeNode<T> = TreeData<T> & {
+	children: TreeNode<T>[];
+};
 
-export const buildTree = (data: FlatData[]): TreeNode[] => {
-	const map: { [key: number]: TreeNode } = {};
-	const roots: TreeNode[] = [];
+export const buildTree = <T,>(data: TreeData<T>[]): TreeNode<T>[] => {
+	const map: { [key: string]: TreeNode<T> } = {};
+	const roots: TreeNode<T>[] = [];
 
 	data.forEach((item) => {
-		map[item.id] = { ...item, children: [] };
+		map[String(item.id)] = { ...item, children: [] };
 	});
 
 	data.forEach((item) => {
-		const node = map[item.id];
-		if (item.treeParentId !== null && map[item.treeParentId]) {
-			map[item.treeParentId].children.push(node);
+		const node = map[String(item.id)];
+		if (item.treeParentId !== null && map[String(item.treeParentId)]) {
+			map[String(item.treeParentId)].children.push(node);
 		} else {
 			roots.push(node);
 		}
 	});
 
+	const sortTree = (nodes: TreeNode<T>[]) => {
+		nodes.sort((a, b) => a.treeSiblingOrder - b.treeSiblingOrder);
+		nodes.forEach((node) => {
+			if (node.children.length > 0) sortTree(node.children);
+		});
+	};
+
+	sortTree(roots);
 	return roots;
 };
 
@@ -56,11 +64,11 @@ const HighlightText = ({ text, highlight }: { text: string; highlight: string })
 	);
 };
 
-const RecursiveTreeItem = ({ nodes, searchTerm }: { nodes: TreeNode[]; searchTerm: string }) => {
+const RecursiveTreeItem = <T,>({ nodes, searchTerm }: { nodes: TreeNode<T>[]; searchTerm: string }) => {
 	return (
 		<>
 			{nodes.map((node) => (
-				<TreeItem key={node.id} itemId={String(node.id)} label={<HighlightText text={node.label} highlight={searchTerm} />}>
+				<TreeItem key={String(node.id)} itemId={String(node.id)} label={<HighlightText text={node.label} highlight={searchTerm} />}>
 					{node.children.length > 0 && <RecursiveTreeItem nodes={node.children} searchTerm={searchTerm} />}
 				</TreeItem>
 			))}
@@ -68,10 +76,20 @@ const RecursiveTreeItem = ({ nodes, searchTerm }: { nodes: TreeNode[]; searchTer
 	);
 };
 
-export default function CommonTreeview({ dbData }: { dbData: FlatData[] }) {
+interface Props<T> {
+	rawData: T[];
+	mapEntityToTree: (item: T) => TreeData<T>;
+	onNodeClick?: (node: TreeNode<T>) => void;
+	placeholder?: string;
+}
+
+export default function CommonTreeview<T>({ rawData, mapEntityToTree, onNodeClick, placeholder = '검색어를 입력하세요.' }: Props<T>) {
 	const [searchTerm, setSearchTerm] = useState('');
 
-	const treeStructure = useMemo(() => buildTree(dbData), [dbData]);
+	const treeStructure = useMemo(() => {
+		const formattedData = rawData.map(mapEntityToTree);
+		return buildTree(formattedData);
+	}, [rawData, mapEntityToTree]);
 
 	return (
 		<Box sx={{ '& input': { fontSize: '.875rem' }, '& .MuiTreeItem-label ': { fontSize: '.875rem' } }}>
@@ -79,7 +97,7 @@ export default function CommonTreeview({ dbData }: { dbData: FlatData[] }) {
 				fullWidth
 				variant='outlined'
 				hiddenLabel
-				placeholder='부서/부서원을 검색하세요.'
+				placeholder={placeholder}
 				slotProps={{
 					input: {
 						startAdornment: (
@@ -93,7 +111,23 @@ export default function CommonTreeview({ dbData }: { dbData: FlatData[] }) {
 				sx={{ mb: 2 }}
 			/>
 
-			<SimpleTreeView>
+			<SimpleTreeView
+				onSelectedItemsChange={(_, itemId) => {
+					if (onNodeClick) {
+						const findNode = (nodes: TreeNode<T>[]): TreeNode<T> | undefined => {
+							for (const n of nodes) {
+								if (String(n.id) === itemId) return n;
+								if (n.children) {
+									const found = findNode(n.children);
+									if (found) return found;
+								}
+							}
+						};
+						const clickedNode = findNode(treeStructure);
+						if (clickedNode) onNodeClick(clickedNode);
+					}
+				}}
+			>
 				<RecursiveTreeItem nodes={treeStructure} searchTerm={searchTerm} />
 			</SimpleTreeView>
 		</Box>

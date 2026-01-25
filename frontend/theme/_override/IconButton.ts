@@ -31,10 +31,6 @@ const IconButton = (theme: Theme) => ({
 
 					'&.light': {
 						backgroundColor: theme.palette.primary.light,
-
-						'& .MuiSvgIcon-root': {
-							fill: theme.palette.primary.main,
-						},
 					},
 				},
 

@@ -2,7 +2,7 @@
 import { AssignmentIndRounded, WorkHistoryRounded, BeachAccessRounded } from '@mui/icons-material';
 
 /** Custom */
-import { menuType } from '../../_constant/Types';
+import { menuType } from '@/type/types';
 
 const MainMenuItem: menuType[] = [
 	{
@@ -44,6 +44,12 @@ const MainMenuItem: menuType[] = [
 						title: '내 근태 정보',
 						type: '2depth',
 						url: '/user',
+					},
+					{
+						id: 'main-attendance-team',
+						title: '팀별 근태 정보',
+						type: '2depth',
+						url: '/team',
 					},
 				],
 			},

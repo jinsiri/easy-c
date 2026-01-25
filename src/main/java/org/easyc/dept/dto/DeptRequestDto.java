@@ -1,8 +1,18 @@
 package org.easyc.dept.dto;
 
-import lombok.Getter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.easyc.common.dto.BaseTreeDto;
 
 @Getter
-public class DeptRequestDto {
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(callSuper = true)
+public class DeptRequestDto extends BaseTreeDto {
     private Long deptId;
+    private String deptNm;
+    private String deptShortNm;
+    private String deptCode;
+    private String deptEmail;
 }
