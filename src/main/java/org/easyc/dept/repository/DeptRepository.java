@@ -20,6 +20,6 @@ public interface DeptRepository extends JpaRepository<Dept, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE dept SET deleted = true WHERE tree_sort_code LIKE CONCAT(:sortCode, '%')", nativeQuery = true)
+    @Query("UPDATE Dept d SET d.deleted = true WHERE d.treeSortCode LIKE :sortCode%")
     void softDeleteByTreeSortCode(@Param("sortCode") String sortCode);
 }

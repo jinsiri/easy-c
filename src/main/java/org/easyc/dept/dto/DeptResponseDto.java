@@ -44,6 +44,7 @@ public class DeptResponseDto extends BaseTreeDto {
                 .treeParentId(dept.getTreeParentId())
                 .treeChildCount(dept.getTreeChildCount())
                 .treeSortCode(dept.getTreeSortCode())
+                .deleted(dept.isDeleted())
                 .active(dept.isActive())
                 .registerDate(dept.getRegisterDate())
                 .registerIp(dept.getRegisterIp())

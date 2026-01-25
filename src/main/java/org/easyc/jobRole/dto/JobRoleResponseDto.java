@@ -25,6 +25,7 @@ public class JobRoleResponseDto extends BaseDto {
                 .jobRoleCategory(jobRole.getJobRoleCategory())
                 .jobRoleType(jobRole.getJobRoleType())
                 .jobRoleNm(jobRole.getJobRoleNm())
+                .deleted(jobRole.isDeleted())
                 .active(jobRole.isActive())
                 .registerDate(jobRole.getRegisterDate())
                 .registerIp(jobRole.getRegisterIp())
