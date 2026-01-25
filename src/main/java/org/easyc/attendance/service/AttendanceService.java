@@ -7,9 +7,11 @@ import org.easyc.attendance.dto.AttendanceResponseDto;
 import org.easyc.attendance.dto.AttendanceSaveRequestDto;
 import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.entity.AttendancePolicy;
+import org.easyc.attendance.entity.HolidayCalendar;
 import org.easyc.attendance.entity.MappingAttendancePolicy;
 import org.easyc.attendance.repository.AttendancePolicyRepository;
 import org.easyc.attendance.repository.AttendanceRepository;
+import org.easyc.attendance.repository.HolidayCalendarRepository;
 import org.easyc.attendance.repository.MappingAttendancePolicyRepository;
 import org.easyc.common.constant.*;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final AttendancePolicyRepository attendancePolicyRepository;
     private final MappingAttendancePolicyRepository mappingAttendancePolicyRepository;
+    private final HolidayCalendarRepository holidayCalendarRepository;
 
     public AttendanceResponseDto getAttendanceTodayData (AttendanceRequestDto req){
         LocalDate workDate = parseDate(req.getWorkDate());
@@ -62,6 +65,10 @@ public class AttendanceService {
         Map<Integer, Attendance> attendanceMap = targetMonthAttendanceList.stream()
                 .collect(Collectors.toMap(a -> a.getWorkDate().getDayOfMonth(), a -> a));
 
+        List<HolidayCalendar> holidayCalendarList = holidayCalendarRepository.findByYearEquals("2026");
+        Map<LocalDate,String> holidayMap = holidayCalendarList.stream().collect(Collectors.toMap(a -> a.getStartDate() , a -> a.getSubject()));
+
+
         String[] weekKeys = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
         List<Map<String, AttendanceCalendarResponseDto>> calendarList = new ArrayList<>();
         Map<String, AttendanceCalendarResponseDto> currentWeek = new LinkedHashMap<>();
@@ -85,6 +92,12 @@ public class AttendanceService {
 
             Attendance targetAttendance = attendanceMap.get(cursor.getDayOfMonth());
             AttendanceCalendarResponseDto dto = createResDto(cursor, targetAttendance, true );
+
+            if(holidayMap.containsKey(cursor)){
+                dto.setIsHoliday(true);
+                dto.setHolidaySubject(holidayMap.get(cursor));
+            }
+
             currentWeek.put(key, dto);
 
             // 일요일이거나 월의 마지막 날이면 리스트에 추가
@@ -290,7 +303,6 @@ public class AttendanceService {
         //단위 기간으로 근태 데이터 조회
         Map<String, LocalDate> resolveDateRange = resolveDateRange(settlementPeriod, workDate);
         List<Attendance> weekAttendanceData = attendanceRepository.findAllByMemberIdAndWorkDateBetween(memberId, resolveDateRange.get("start"), resolveDateRange.get("end"));
-
 
         Integer effectiveWorkDay = defaultTotalWorkDay;
         Integer effectiveWorkTime = defaultTotalWorkTime;

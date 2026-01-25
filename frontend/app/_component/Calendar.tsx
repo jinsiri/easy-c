@@ -30,6 +30,8 @@ interface CalendarData {
 	month: number;
 	day: number;
 	isCurrentMonth: boolean;
+	isHoliday: boolean;
+	holidaySubject: string;
 	defaultStartTime: Date | null;
 	defaultEndTime: Date | null;
 	detailData: AttendanceDayResInterface;
@@ -287,8 +289,9 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 		};
 	};
 
-	const getDayColor = (currentMonth: boolean, dayKey: dayName) => {
+	const getDayColor = (currentMonth: boolean, holiday: boolean, dayKey: dayName) => {
 		if (!currentMonth) return 'grey.500';
+		if (holiday) return 'error.500';
 
 		switch (dayKey) {
 			case 'sat':
@@ -361,7 +364,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 													sx={{
 														marginRight: '0.5rem',
 														fontWeight: 'bold',
-														color: getDayColor(item[subItem.key].isCurrentMonth, subItem.key),
+														color: getDayColor(item[subItem.key].isCurrentMonth, item[subItem.key].isHoliday, subItem.key),
 													}}
 												>
 													{item[subItem.key].day}
@@ -369,7 +372,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 												<Typography
 													sx={{
 														display: { xs: 'none', md: 'block' },
-														color: getDayColor(item[subItem.key].isCurrentMonth, subItem.key),
+														color: getDayColor(item[subItem.key].isCurrentMonth, item[subItem.key].isHoliday, subItem.key),
 													}}
 												>
 													{subItem.header}
@@ -377,6 +380,11 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 											</Box>
 											<Box sx={{ height: '6rem', padding: '0.5rem' }}>
 												<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center' }}>
+													{item[subItem.key].isHoliday && (
+														<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+															<Typography sx={{ color: 'error.500' }}>{item[subItem.key]?.holidaySubject ?? ''}</Typography>
+														</Box>
+													)}
 													{item[subItem.key].detailData.workStatus === 'VACATION' && (
 														<Typography
 															sx={{

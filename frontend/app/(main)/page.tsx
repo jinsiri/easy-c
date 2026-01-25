@@ -5,6 +5,7 @@ import { Box, Grid, Typography, useTheme } from '@mui/material';
 
 /** Custom */
 import ColTitleAndText from '../_component/layoutElement/ColTitleAndText';
+import AttendanceComp from '../_component/layoutElement/AttendanceComp';
 
 export default function Home() {
 	const theme = useTheme();
@@ -73,6 +74,7 @@ export default function Home() {
 						}}
 					></Box>
 				</Box>
+				<AttendanceComp attendanceData={{}} onSuccess={() => {}} />
 			</Grid>
 		</Grid>
 	);

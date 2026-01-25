@@ -16,6 +16,8 @@ public class AttendanceCalendarResponseDto {
     private Integer month;
     private Integer day;
     private Boolean isCurrentMonth;
+    private Boolean isHoliday;
+    private String holidaySubject;
     private LocalTime defaultStartTime;
     private LocalTime defaultEndTime;
     private AttendanceDayResponseDto detailData = new AttendanceDayResponseDto();
