@@ -12,6 +12,7 @@ import ClientLocalizationProvider from './_component/baseElement/ClientLocalizat
 /** CSS */
 import '@/style/globals.css';
 import Loader from './_component/baseElement/Loader';
+import { SystemDialog } from '@/app/_component/baseElement/SystemDialog';
 
 export const metadata: Metadata = {
 	title: 'EASY-C',
@@ -34,6 +35,7 @@ export default function RootLayout({
 							<CssBaseline />
 							{children}
 							{modal}
+							<SystemDialog />
 							<Loader />
 						</ClientLocalizationProvider>
 					</ThemeProvider>

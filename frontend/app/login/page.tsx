@@ -1,14 +1,16 @@
 'use client';
 
-import {useState} from 'react';
-import {useRouter} from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-import {Box, Button, Checkbox, FormControlLabel, TextField, Typography} from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 
-import {authService} from "@/app/services/authService";
-import {encryptRSA} from "@/utils/crypto";
+import { authService } from '@/app/services/authService';
+import { encryptRSA } from '@/utils/crypto';
+import { useDialogStore } from '@/store/useDialogStore';
 
 const LoginPage = () => {
+	const { alert } = useDialogStore();
 
 	const router = useRouter();
 
@@ -25,15 +27,15 @@ const LoginPage = () => {
 
 			const res = await authService.login({
 				loginId: memberId,
-				encryptedPassword: encryptedPw
+				encryptedPassword: encryptedPw,
 			});
 
 			console.log(res);
 
-			alert('로그인 성공!');
-			router.push('/');  // 메인 페이지 이동
+			await alert('로그인 성공!');
+			router.push('/'); // 메인 페이지 이동
 		} catch (error: any) {
-			alert('로그인 실패! ' + error.message);
+			await alert('로그인 실패!' + error.message);
 		}
 	};
 
