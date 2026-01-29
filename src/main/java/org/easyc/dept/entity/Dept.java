@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.entity.BaseTreeEntity;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
@@ -14,6 +15,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @DynamicUpdate
+@SQLRestriction("deleted = false")
 public class Dept extends BaseTreeEntity {
     @Id
     @SequenceGenerator(name="dept_seq", sequenceName="dept_seq", allocationSize=1)

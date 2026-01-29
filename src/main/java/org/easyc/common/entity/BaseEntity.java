@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@SQLRestriction("deleted = false")
 public abstract class BaseEntity {
     // --- 공통 상태 (Common) ---
 //    @Column(name = "deleted")
