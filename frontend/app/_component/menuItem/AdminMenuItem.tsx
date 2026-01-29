@@ -1,5 +1,5 @@
 /** MUI */
-import { AccountTree, ApprovalRounded, CalendarMonthRounded } from '@mui/icons-material';
+import { AccountTree, WorkHistoryRounded, CalendarMonthRounded } from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '@/type/types';
@@ -74,6 +74,27 @@ const AdminMenuItem: menuType[] = [
 						title: '직위체계',
 						type: '2depth',
 						url: '/role',
+					},
+				],
+			},
+			{
+				id: 'admin-attendance',
+				title: '근태 관리',
+				type: '1depth',
+				url: '/attendance',
+				icon: WorkHistoryRounded,
+				children: [
+					{
+						id: 'admin-attendance-company',
+						title: '전사 근태 관리',
+						type: '2depth',
+						url: '/company',
+					},
+					{
+						id: 'admin-attendance-modify',
+						title: '근태 신청 관리',
+						type: '2depth',
+						url: '/modify',
 					},
 				],
 			},
