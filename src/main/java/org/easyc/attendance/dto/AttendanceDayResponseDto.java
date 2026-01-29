@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.easyc.attendance.entity.Attendance;
+import org.easyc.common.constant.WorkType;
+import org.easyc.common.constant.WorkStatus;
+import org.easyc.common.constant.VacationType;
 
 import java.time.LocalDateTime;
 
@@ -16,9 +19,10 @@ public class AttendanceDayResponseDto {
     private LocalDateTime endTime;
     private Long fullTime;
     private Long overTime;
-    private String workStatus;
-    private String vacation;
-    private String confirm;
+    private WorkType workType;
+    private WorkStatus workStatus;
+    private VacationType vacationType;
+    private String detail;
 
     public AttendanceDayResponseDto(Attendance entity) {
         this.attendanceId = entity.getAttendanceId();
@@ -26,7 +30,9 @@ public class AttendanceDayResponseDto {
         this.endTime = entity.getEndTime();
         this.fullTime = entity.getTotalWorkMinute();
         this.overTime = entity.getOvertimeMinute();
+        this.workType = entity.getWorkType();
         this.workStatus = entity.getWorkStatus();
+        this.vacationType = entity.getVacationType();
     }
 }
 

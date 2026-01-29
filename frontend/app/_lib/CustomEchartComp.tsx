@@ -41,6 +41,9 @@ import {
 	TitleComponent,
 	DatasetComponent,
 	LegendComponent,
+	MarkPointComponent,
+	MarkLineComponent,
+	MarkAreaComponent,
 	// GridSimpleComponent,
 	// PolarComponent,
 	// RadarComponent,
@@ -53,9 +56,6 @@ import {
 	// AxisPointerComponent,
 	// BrushComponent,
 	// TimelineComponent,
-	// MarkPointComponent,
-	// MarkLineComponent,
-	// MarkAreaComponent,
 	// LegendScrollComponent,
 	// LegendPlainComponent,
 	// DataZoomComponent,
@@ -79,6 +79,9 @@ echarts.use([
 	GridComponent,
 	DatasetComponent,
 	LegendComponent,
+	MarkPointComponent,
+	MarkLineComponent,
+	MarkAreaComponent,
 	LineChart,
 	PieChart,
 	BarChart,
@@ -139,7 +142,7 @@ const CustomEchartComp = forwardRef<EchartCompRef, ChartOptionProps>(({ chartTyp
 	}, [chartType, option, data]);
 
 	return (
-		<Box sx={{ width: '100%', height: '100%' }}>
+		<Box sx={{ width: '100%', height: '100%', minHeight: '4rem' }}>
 			{chartOption && (
 				<ReactEChartsCore
 					ref={echartRef}

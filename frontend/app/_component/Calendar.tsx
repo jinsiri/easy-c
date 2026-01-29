@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
 /** MUI */
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography, useTheme } from '@mui/material';
 
 /** lib */
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import CustomReactCalendarTimeline from '../_lib/CustomReactCalendarTimeline';
 import { TimelineItemBase } from 'react-calendar-timeline';
 
@@ -15,7 +15,8 @@ import { formatMinutes } from '@/utils/commonFunc';
 
 /** type / interface */
 import { AttendanceDayResInterface } from '@/type/attendanceInterface';
-import { WORKSTATUS } from '@/constant/attendanceConst';
+import { VACATIONTYPE, WORKSTATUS } from '@/constant/attendanceConst';
+import { vacationType, workStatus } from '@/type/types';
 
 type dayName = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
 
@@ -29,6 +30,10 @@ interface CalendarData {
 	month: number;
 	day: number;
 	isCurrentMonth: boolean;
+	isHoliday: boolean;
+	holidaySubject: string;
+	defaultStartTime: Date | null;
+	defaultEndTime: Date | null;
 	detailData: AttendanceDayResInterface;
 }
 
@@ -176,7 +181,15 @@ const detailCol: ColData[] = [
 		header: '근로 상태',
 		key: 'workStatus',
 		formatter: (value, row) => {
-			return <Typography>{WORKSTATUS[value]}</Typography>;
+			console.log(row);
+			console.log(row?.vacationType);
+			return (
+				<Typography>
+					{row?.vacationType
+						? WORKSTATUS[value as workStatus] + ' - ' + VACATIONTYPE[row?.vacationType as vacationType]
+						: WORKSTATUS[value as workStatus]}
+				</Typography>
+			);
 		},
 	},
 	{
@@ -200,6 +213,8 @@ const detailCol: ColData[] = [
 ];
 
 export default function Calendar({ calendarRow }: { calendarRow: Record<dayName, CalendarData>[] }) {
+	const theme = useTheme();
+
 	const [targetCalendarRow, setTargetCalendarRow] = useState<Record<dayName, CalendarData>[]>(defaultCalendarRow);
 	const [activeCell, setActiveCell] = useState<string | null>(null);
 	const [activeTimelineData, setActiveTimelineData] = useState<TimelineDataInterface>({
@@ -263,13 +278,20 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 					canMove: false,
 					canResize: false,
 					canChangeGroup: false,
+					itemProps: {
+						style: {
+							background: theme.palette.primary[500],
+							borderWidth: 0,
+						},
+					},
 				},
 			],
 		};
 	};
 
-	const getDayColor = (currentMonth: boolean, dayKey: dayName) => {
-		if (!currentMonth) return 'gray.500';
+	const getDayColor = (currentMonth: boolean, holiday: boolean, dayKey: dayName) => {
+		if (!currentMonth) return 'grey.500';
+		if (holiday) return 'error.500';
 
 		switch (dayKey) {
 			case 'sat':
@@ -281,8 +303,16 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 		}
 	};
 
+	const getTimelineInnerData = (target: any): ReactNode => {
+		if (target instanceof Date) {
+			return target ? dayjs(target).format('YYYY-MM-DD HH:mm') : '-';
+		} else {
+			return target;
+		}
+	};
+
 	return (
-		<Grid container sx={{ flexDirection: 'column', border: `1px solid`, borderColor: 'gray.300', borderRadius: '1rem' }}>
+		<Grid container sx={{ flexDirection: 'column', border: `1px solid`, borderColor: 'grey.300', borderRadius: '1rem' }}>
 			{targetCalendarRow.map((item: Record<dayName, CalendarData>, idx: number) => {
 				return (
 					<Grid
@@ -292,7 +322,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 							...(idx !== 0 && {
 								marginTop: '-1px',
 								borderTop: `1px solid`,
-								borderColor: 'gray.300',
+								borderColor: 'grey.300',
 							}),
 						}}
 					>
@@ -309,7 +339,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 											...(subIdx !== 0 && {
 												marginLeft: '-1px',
 												borderLeft: `1px solid`,
-												borderColor: 'gray.300',
+												borderColor: 'grey.300',
 											}),
 											...(activeCell === idx + '_' + subIdx && {
 												outline: `2px solid`,
@@ -327,14 +357,14 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 													width: '100%',
 													padding: '0.375rem 0.625rem',
 													borderBottom: `1px solid`,
-													borderColor: 'gray.300',
+													borderColor: 'grey.300',
 												}}
 											>
 												<Typography
 													sx={{
 														marginRight: '0.5rem',
 														fontWeight: 'bold',
-														color: getDayColor(item[subItem.key].isCurrentMonth, subItem.key),
+														color: getDayColor(item[subItem.key].isCurrentMonth, item[subItem.key].isHoliday, subItem.key),
 													}}
 												>
 													{item[subItem.key].day}
@@ -342,28 +372,72 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 												<Typography
 													sx={{
 														display: { xs: 'none', md: 'block' },
-														color: getDayColor(item[subItem.key].isCurrentMonth, subItem.key),
+														color: getDayColor(item[subItem.key].isCurrentMonth, item[subItem.key].isHoliday, subItem.key),
 													}}
 												>
 													{subItem.header}
 												</Typography>
 											</Box>
-											<Box sx={{ height: '5rem', padding: '0.5rem' }}>
+											<Box sx={{ height: '6rem', padding: '0.5rem' }}>
+												<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center' }}>
+													{item[subItem.key].isHoliday && (
+														<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+															<Typography sx={{ color: 'error.500' }}>{item[subItem.key]?.holidaySubject ?? ''}</Typography>
+														</Box>
+													)}
+													{item[subItem.key].detailData.workStatus === 'VACATION' && (
+														<Typography
+															sx={{
+																display: 'flex',
+																justifyContent: 'center',
+																alignItems: 'center',
+																marginBottom: '0.5rem',
+																padding: '0.125rem 0.5rem',
+																fontSize: '0.75rem',
+																fontWeight: 600,
+																backgroundColor: 'secondary.main',
+																borderRadius: '1rem',
+																color: 'grey.50',
+															}}
+														>
+															{VACATIONTYPE[item[subItem.key].detailData.vacationType as vacationType]}
+														</Typography>
+													)}
+													{item[subItem.key].detailData.workStatus === 'OUTSIDE' && (
+														<Typography
+															sx={{
+																display: 'flex',
+																justifyContent: 'center',
+																alignItems: 'center',
+																marginBottom: '0.5rem',
+																padding: '0.125rem 0.5rem',
+																fontSize: '0.75rem',
+																fontWeight: 600,
+																backgroundColor: 'secondary.main',
+																borderRadius: '1rem',
+																color: 'grey.50',
+															}}
+														>
+															{WORKSTATUS[item[subItem.key].detailData.workStatus as workStatus]}
+														</Typography>
+													)}
+												</Box>
+
 												{item[subItem.key].detailData.startTime && (
-													<Box sx={{ display: 'flex', flexDirection: 'row' }}>
+													<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 														<Typography
 															variant={'caption'}
 															sx={{
 																display: 'flex',
 																justifyContent: 'center',
 																alignItems: 'center',
-																width: '1.25rem',
-																height: '1.25rem',
+																width: '1.125rem',
+																height: '1.125rem',
 																marginRight: '0.25rem',
 																borderRadius: '100%',
-																fontSize: '0.75rem',
-																backgroundColor: 'primary.main',
-																color: 'gray.50',
+																fontSize: '0.625rem',
+																backgroundColor: 'primary.100',
+																color: 'primary.600',
 															}}
 														>
 															출
@@ -376,19 +450,19 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 													</Box>
 												)}
 												{item[subItem.key].detailData.endTime && (
-													<Box sx={{ display: 'flex', flexDirection: 'row' }}>
+													<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 														<Typography
 															sx={{
 																display: 'flex',
 																justifyContent: 'center',
 																alignItems: 'center',
-																width: '1.25rem',
-																height: '1.25rem',
+																width: '1.125rem',
+																height: '1.125rem',
 																marginRight: '0.25rem',
 																borderRadius: '100%',
-																fontSize: '0.75rem',
+																fontSize: '0.625rem',
 																backgroundColor: 'primary.main',
-																color: 'gray.50',
+																color: 'grey.50',
 															}}
 														>
 															퇴
@@ -407,8 +481,8 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 							})}
 						</Box>
 						{activeCell && Number(activeCell.split('_')[0]) === idx && (
-							<Box sx={{ padding: '0.5rem', borderTop: `1px solid`, borderColor: 'gray.300' }}>
-								<Box sx={{ height: '12rem' }}>
+							<Box sx={{ padding: '0.5rem', borderTop: `1px solid`, borderColor: 'grey.300' }}>
+								<Box sx={{ minHeight: '12rem' }}>
 									<Box sx={{ display: 'flex', width: '100%', height: '5rem' }}>
 										{detailCol.map((detailItem, detailIdx) => {
 											return (
@@ -421,7 +495,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 															padding: '0.5rem',
 															textAlign: 'center',
 															borderBottom: `1px solid`,
-															borderColor: 'gray.300',
+															borderColor: 'grey.300',
 														}}
 													>
 														{detailItem.header}
@@ -437,19 +511,28 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 													>
 														{detailItem.formatter
 															? detailItem.formatter(
-																	targetCalendarRow[idx][calendarCol[Number(activeCell.split('_')[1])].key]['detailData'][
-																		detailItem.key
-																	],
+																	item[calendarCol[Number(activeCell.split('_')[1])].key].detailData[detailItem.key],
+																	item[calendarCol[Number(activeCell.split('_')[1])].key].detailData,
 																)
-															: targetCalendarRow[idx][calendarCol[Number(activeCell.split('_')[1])].key]['detailData'][
-																	detailItem.key
-																]}
+															: getTimelineInnerData(
+																	item[calendarCol[Number(activeCell.split('_')[1])].key].detailData[detailItem.key],
+																)}
 													</Box>
 												</Box>
 											);
 										})}
 									</Box>
-									<Box sx={{ overflow: 'hidden', width: '100%', height: '6rem', mt: '0.5rem' }}>
+									<Box
+										sx={{
+											overflow: 'hidden',
+											width: '100%',
+											minHeight: '6rem',
+											mt: '0.5rem',
+											padding: '1rem',
+											backgroundColor: 'grey.50',
+											borderRadius: '1rem',
+										}}
+									>
 										<CustomReactCalendarTimeline
 											itemList={activeTimelineData.data}
 											visibleTimeStart={activeTimelineData.visibleTimeStart}

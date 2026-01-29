@@ -25,31 +25,31 @@ public class AttendanceController {
     private AttendanceService attendanceService;
 
     @PostMapping("/today")
-    public ResponseEntity<AttendanceResponseDto> getAttendanceTodayData(@RequestBody AttendanceRequestDto request) {
-        AttendanceResponseDto reault = attendanceService.getAttendanceTodayData(request);
-        return ResponseEntity.ok(reault);
+    public AttendanceResponseDto getAttendanceTodayData(@RequestBody AttendanceRequestDto request) {
+        AttendanceResponseDto result = attendanceService.getAttendanceTodayData(request);
+        return result;
     }
 
    @PostMapping("/calendar")
-    public ResponseEntity<List<Map<String, AttendanceCalendarResponseDto>>> getAttendanceCalendarData(@RequestBody AttendanceRequestDto request) {
-       List<Map<String, AttendanceCalendarResponseDto>> reault = attendanceService.getAttendanceCalendarData(request);
-        return ResponseEntity.ok(reault);
+    public List<Map<String, AttendanceCalendarResponseDto>>getAttendanceCalendarData(@RequestBody AttendanceRequestDto request) {
+       List<Map<String, AttendanceCalendarResponseDto>> result = attendanceService.getAttendanceCalendarData(request);
+        return result;
     }
 
     @PostMapping("/start")
-    public ResponseEntity<Map<String, Object>> startAttendanceData(HttpServletRequest httpRequest, @RequestBody AttendanceSaveRequestDto request) {
+    public Map<String, Object> startAttendanceData(HttpServletRequest httpRequest, @RequestBody AttendanceSaveRequestDto request) {
        String ipAddress = getClientIp(httpRequest);
 
-        Map<String, Object> reault = attendanceService.startAttendanceData(request, ipAddress);
-        return ResponseEntity.ok(reault);
+        Map<String, Object> result = attendanceService.startAttendanceData(request, ipAddress);
+        return result;
     }
 
     @PostMapping("/finish")
-    public ResponseEntity<Map<String, Object>> finishAttendanceCalendar(HttpServletRequest httpRequest, @RequestBody AttendanceSaveRequestDto request) {
+    public Map<String, Object> finishAttendanceCalendar(HttpServletRequest httpRequest, @RequestBody AttendanceSaveRequestDto request) {
         String ipAddress = getClientIp(httpRequest);
 
-        Map<String, Object> reault = attendanceService.finishAttendanceCalendar(request, ipAddress);
-        return ResponseEntity.ok(reault);
+        Map<String, Object> result = attendanceService.finishAttendanceCalendar(request, ipAddress);
+        return result;
     }
 
 }

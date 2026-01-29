@@ -1,11 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
 import LiveClock from '@/app/_component/LiveClock';
 import axiosConfig from '@/app/_lib/axiosConfig';
+
+import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
 import { Box, Button, Typography } from '@mui/material';
@@ -13,12 +16,15 @@ import { ArrowForwardRounded, AccessTimeRounded } from '@mui/icons-material';
 
 /** Custom */
 import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
-import { CURRENTSTATE } from '@/constant/attendanceConst';
+import { CURRENTSTATE, ATTENDANCETYPE } from '@/constant/attendanceConst';
 
 /** Type / Interface */
 import { attendanceSaveReqInterface, AttendanceResInterface } from '@/type/attendanceInterface';
 
 export default function AttendanceComp({ attendanceData, onSuccess }: { attendanceData?: AttendanceResInterface; onSuccess?: () => void }) {
+	const router = useRouter();
+	const { loader, setLoader } = useLoaderStore();
+
 	const [workingStatus, setWorkingStatus] = useState('BEFORE_WORK');
 	const [activated, setActived] = useState<boolean>(false);
 	const [workData, setWorkData] = useState<AttendanceResInterface>({});
@@ -39,6 +45,10 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 	}, [attendanceData]);
 
 	const onClickWorkingStatusButton = async (event: React.MouseEvent<HTMLButtonElement>) => {
+		if (!loader) {
+			setLoader(true);
+		}
+
 		try {
 			const locate = await findUserLocate();
 
@@ -50,6 +60,8 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 		} catch (error) {
 			console.error('위치 획득 실패:', error);
 			alert('위치 정보 권한을 허용해주세요.');
+		} finally {
+			setLoader(false);
 		}
 	};
 
@@ -119,7 +131,8 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
 				<LiveClock />
 				<Typography variant={'subtitle2'} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-					<AccessTimeRounded sx={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} /> 고정 근무제 (09:00 ~ 18:00)
+					<AccessTimeRounded sx={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} />
+					{Object.keys(workData).length > 0 ? `${ATTENDANCETYPE[workData?.attendanceType]} (${workData.startTime} ~ ${workData.endTime})` : ''}
 				</Typography>
 			</Box>
 
@@ -144,7 +157,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 							padding: '1rem',
 							borderRadius: '1rem',
 							border: '2px solid',
-							borderColor: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'gray.300',
+							borderColor: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'grey.300',
 							gap: { sm: '0.5rem', md: '1rem', lg: '1.5rem' },
 						}}
 					>
@@ -152,7 +165,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 							sx={{
 								fontSize: '1rem',
 								fontWeight: 600,
-								color: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'gray.300',
+								color: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'grey.300',
 							}}
 						>
 							{CURRENTSTATE[workingStatus]}
@@ -168,7 +181,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 							alignItems: 'center',
 							padding: '1rem',
 							borderRadius: '1rem',
-							backgroundColor: 'gray.100',
+							backgroundColor: 'grey.100',
 							gap: { sm: '0.5rem', md: '1rem', lg: '1.5rem' },
 						}}
 					>
@@ -208,7 +221,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 					>
 						{activated ? '퇴근하기' : '출근하기'}
 					</Button>
-					<Button variant='outlined' size='large'>
+					<Button variant='outlined' size='large' onClick={() => router.push('/attendance/user/modal')}>
 						요청하기
 					</Button>
 				</Box>

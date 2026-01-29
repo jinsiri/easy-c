@@ -1,14 +1,16 @@
 'use client';
 
-import {useState} from 'react';
-import {useRouter} from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-import {Box, Button, Checkbox, FormControlLabel, TextField, Typography} from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 
-import {authService} from "@/app/services/authService";
-import {encryptRSA} from "@/utils/crypto";
+import { authService } from '@/app/services/authService';
+import { encryptRSA } from '@/utils/crypto';
+import { useDialogStore } from '@/store/useDialogStore';
 
 const LoginPage = () => {
+	const { alert } = useDialogStore();
 
 	const router = useRouter();
 
@@ -25,15 +27,15 @@ const LoginPage = () => {
 
 			const res = await authService.login({
 				loginId: memberId,
-				encryptedPassword: encryptedPw
+				encryptedPassword: encryptedPw,
 			});
 
 			console.log(res);
 
-			alert('로그인 성공!');
-			router.push('/');  // 메인 페이지 이동
+			await alert('로그인 성공!');
+			router.push('/'); // 메인 페이지 이동
 		} catch (error: any) {
-			alert('로그인 실패! ' + error.message);
+			await alert('로그인 실패!' + error.message);
 		}
 	};
 
@@ -49,9 +51,9 @@ const LoginPage = () => {
 			<Box sx={{ maxWidth: '560px', padding: '88px 56px', borderRadius: '32px', bgcolor: '#fff' }}>
 				<Box
 					sx={{
-						'& .MuiOutlinedInput-notchedOutline': { borderColor: 'gray.500' },
-						'& .MuiInputLabel-root': { color: 'gray.900' },
-						'& input::placeholder': { color: 'gray.500', fontWeight: 400 },
+						'& .MuiOutlinedInput-notchedOutline': { borderColor: 'grey.500' },
+						'& .MuiInputLabel-root': { color: 'grey.900' },
+						'& input::placeholder': { color: 'grey.500', fontWeight: 400 },
 					}}
 				>
 					<Box
@@ -59,7 +61,7 @@ const LoginPage = () => {
 						flexDirection='column'
 						alignItems='center'
 						justifyContent={'center'}
-						sx={{ bgcolor: 'gray.500', mb: 6, minHeight: '72px' }}
+						sx={{ bgcolor: 'grey.500', mb: 6, minHeight: '72px' }}
 					>
 						로고
 					</Box>
@@ -101,8 +103,8 @@ const LoginPage = () => {
 							sx={{
 								'&>span': { pr: '8px' },
 								'& input+.MuiSvgIcon-root': { fontSize: '1.25rem' },
-								'& input:not(:checked)+.MuiSvgIcon-root, & input:not(:checked)+.MuiSvgIcon-root *': { color: 'gray.500' },
-								'& .MuiFormControlLabel-label': { fontSize: '.813rem', color: 'gray.900' },
+								'& input:not(:checked)+.MuiSvgIcon-root, & input:not(:checked)+.MuiSvgIcon-root *': { color: 'grey.500' },
+								'& .MuiFormControlLabel-label': { fontSize: '.813rem', color: 'grey.900' },
 							}}
 						/>
 						<Button
@@ -115,7 +117,7 @@ const LoginPage = () => {
 							로그인
 						</Button>
 					</form>
-					<Typography textAlign={'center'} sx={{ fontSize: '.75rem', color: 'gray.700' }} mt={3}>
+					<Typography textAlign={'center'} sx={{ fontSize: '.75rem', color: 'grey.700' }} mt={3}>
 						비밀번호를 잊어버리셨나요?
 						<a href={'#'}>
 							<Typography component={'strong'} sx={{ font: 'inherit', color: 'primary.400' }} ml={1}>

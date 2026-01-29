@@ -43,13 +43,16 @@ export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
 	useEffect(() => {
 		if (currentPathName !== '') {
 			const pathSegments = currentPathName.split('/').filter(Boolean);
+			console.log(pathSegments);
 
 			// 각 경로에 맞는 메뉴 찾기
 			const _targetMenuItem: menuType[] = pathSegments[0] === 'admin' ? AdminMenuItem : MainMenuItem;
 			const _breadcrumbs: menuType[] = pathSegments
 				.map((path, idx) => {
-					const currentId = [pathSegments[0] === 'admin' ? 'admin' : 'main', ...pathSegments.slice(0, idx + 1)].join('-');
-					return findMenuById(_targetMenuItem, currentId);
+					const splitList = [...pathSegments.slice(0, idx + 1)];
+					if (pathSegments[0] !== 'admin') splitList.unshift('main');
+
+					return findMenuById(_targetMenuItem, splitList.join('-'));
 				})
 				.filter(Boolean);
 			setBreadcrumbs(_breadcrumbs);
