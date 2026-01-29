@@ -23,7 +23,7 @@ export default function BaseDialog(props: BaseDialogProps) {
 		<Dialog onClose={handleClose} open={true}>
 			<DialogTitle>{title}</DialogTitle>
 			<DialogContent>{children}</DialogContent>
-			<DialogActions>
+			<DialogActions className='base-dialog'>
 				<Button variant='text' onClick={handleClose}>
 					닫기
 				</Button>
