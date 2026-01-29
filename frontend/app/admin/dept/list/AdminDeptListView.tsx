@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
 import { useEffect, useState } from 'react';
 import axiosConfig from '@/app/_lib/axiosConfig';
+import { useDialogStore } from '@/store/useDialogStore';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -53,6 +54,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 	const router = useRouter();
 	const theme = useTheme();
 	const rootId = dbData?.[0]?.deptId ? String(dbData[0].deptId) : null;
+	const { alert, success, danger } = useDialogStore();
 	const [selectedDeptId, setSelectedDeptId] = useState<number | null>(dbData?.[0]?.deptId || null);
 	const [expandedIds, setExpandedIds] = useState<string[]>(rootId ? [rootId] : []);
 
@@ -87,12 +89,15 @@ export default function AdminDeptListView({ dbData }: Props) {
 	};
 
 	const handleDelete = async (deptId: number) => {
-		if (confirm('정말 이 부서를 삭제하시겠습니까? 삭제 시 하위부서도 삭제됩니다.')) {
+		const isConfirmed = await danger('정말 이 부서를 삭제하시겠습니까? 삭제 시 하위부서도 삭제됩니다.');
+
+		if (isConfirmed) {
 			try {
 				await deleteDept(deptId);
+				await success('부서가 정상적으로 삭제되었습니다.');
 				router.refresh();
 			} catch (error) {
-				alert('삭제에 실패했습니다.');
+				await alert('삭제 중 문제가 발생했습니다.');
 			}
 		}
 	};
@@ -116,12 +121,6 @@ export default function AdminDeptListView({ dbData }: Props) {
 			}}
 		>
 			<PathBreadcrumbs />
-
-			<Box component={'section'} sx={{ width: '100%', marginBottom: '1.5rem' }}>
-				<Typography variant='h5' sx={{ fontWeight: '800' }}>
-					조직설계
-				</Typography>
-			</Box>
 
 			<Grid container spacing={3} sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
 				<Grid

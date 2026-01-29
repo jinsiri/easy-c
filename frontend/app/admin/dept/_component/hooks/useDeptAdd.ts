@@ -3,12 +3,14 @@ import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axiosConfig from '@/app/_lib/axiosConfig';
 import { DeptFormValues } from '@/app/admin/dept/_component/DeptAddForm';
+import { useDialogStore } from '@/store/useDialogStore';
 
 export function useDeptAdd(onSuccess?: () => void) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const parentIdStr = searchParams.get('parentId');
 	const parentId = parentIdStr ? parseInt(parentIdStr, 10) : null;
+	const { alert } = useDialogStore();
 	const [loading, setLoading] = useState(false);
 
 	const formMethods = useForm<DeptFormValues>({
@@ -33,7 +35,7 @@ export function useDeptAdd(onSuccess?: () => void) {
 			}
 		} catch (error) {
 			console.error(error);
-			alert('저장 중 오류가 발생했습니다.');
+			await alert('저장 중 오류가 발생했습니다.');
 		} finally {
 			setLoading(false);
 		}
