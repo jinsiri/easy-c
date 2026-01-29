@@ -8,6 +8,7 @@ import org.easyc.common.constant.WorkType;
 import org.easyc.common.constant.WorkStatus;
 import org.easyc.common.constant.VacationType;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AttendanceDayResponseDto {
     private Long attendanceId;
+    private LocalDate workDate;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Long fullTime;
@@ -26,6 +28,7 @@ public class AttendanceDayResponseDto {
 
     public AttendanceDayResponseDto(Attendance entity) {
         this.attendanceId = entity.getAttendanceId();
+        this.workDate = entity.getWorkDate();
         this.startTime = entity.getStartTime();
         this.endTime = entity.getEndTime();
         this.fullTime = entity.getTotalWorkMinute();

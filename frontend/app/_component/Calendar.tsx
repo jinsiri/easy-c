@@ -3,7 +3,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 
 /** MUI */
-import { Box, Grid, Typography, useTheme } from '@mui/material';
+import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
 
 /** lib */
 import dayjs, { Dayjs } from 'dayjs';
@@ -17,6 +17,7 @@ import { formatMinutes } from '@/utils/commonFunc';
 import { AttendanceDayResInterface } from '@/type/attendanceInterface';
 import { VACATIONTYPE, WORKSTATUS } from '@/constant/attendanceConst';
 import { vacationType, workStatus } from '@/type/types';
+import { useRouter } from 'next/navigation';
 
 type dayName = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
 
@@ -30,10 +31,10 @@ interface CalendarData {
 	month: number;
 	day: number;
 	isCurrentMonth: boolean;
-	isHoliday: boolean;
-	holidaySubject: string;
-	defaultStartTime: Date | null;
-	defaultEndTime: Date | null;
+	isHoliday?: boolean;
+	holidaySubject?: string;
+	defaultStartTime?: Date | null;
+	defaultEndTime?: Date | null;
 	detailData: AttendanceDayResInterface;
 }
 
@@ -71,8 +72,6 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 				endTime: null,
 				fullTime: null,
 				overTime: null,
-				vacation: '',
-				confirm: '',
 			},
 		},
 		tue: {
@@ -85,8 +84,6 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 				endTime: null,
 				fullTime: null,
 				overTime: null,
-				vacation: '',
-				confirm: '',
 			},
 		},
 		wed: {
@@ -99,8 +96,6 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 				endTime: null,
 				fullTime: null,
 				overTime: null,
-				vacation: '',
-				confirm: '',
 			},
 		},
 		thu: {
@@ -113,8 +108,6 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 				endTime: null,
 				fullTime: null,
 				overTime: null,
-				vacation: '',
-				confirm: '',
 			},
 		},
 		fri: {
@@ -127,8 +120,6 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 				endTime: null,
 				fullTime: null,
 				overTime: null,
-				vacation: '',
-				confirm: '',
 			},
 		},
 		sat: {
@@ -141,8 +132,6 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 				endTime: null,
 				fullTime: null,
 				overTime: null,
-				vacation: '',
-				confirm: '',
 			},
 		},
 		sun: {
@@ -155,65 +144,73 @@ const defaultCalendarRow: Record<dayName, CalendarData>[] = [
 				endTime: null,
 				fullTime: null,
 				overTime: null,
-				vacation: '',
-				confirm: '',
 			},
 		},
 	},
 ];
 
-const detailCol: ColData[] = [
-	{
-		header: '출근 시간',
-		key: 'startTime',
-		formatter: (value, row) => {
-			return <Typography>{value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}</Typography>;
-		},
-	},
-	{
-		header: '퇴근 시간',
-		key: 'endTime',
-		formatter: (value, row) => {
-			return <Typography>{value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}</Typography>;
-		},
-	},
-	{
-		header: '근로 상태',
-		key: 'workStatus',
-		formatter: (value, row) => {
-			console.log(row);
-			console.log(row?.vacationType);
-			return (
-				<Typography>
-					{row?.vacationType
-						? WORKSTATUS[value as workStatus] + ' - ' + VACATIONTYPE[row?.vacationType as vacationType]
-						: WORKSTATUS[value as workStatus]}
-				</Typography>
-			);
-		},
-	},
-	{
-		header: '총 근로시간',
-		key: 'fullTime',
-		formatter: (value, row) => {
-			return formatMinutes(value);
-		},
-	},
-	{
-		header: '초과 근로시간',
-		key: 'overTime',
-		formatter: (value, row) => {
-			return formatMinutes(value);
-		},
-	},
-	{
-		header: '상세',
-		key: 'detail',
-	},
-];
-
 export default function Calendar({ calendarRow }: { calendarRow: Record<dayName, CalendarData>[] }) {
 	const theme = useTheme();
+	const router = useRouter();
+
+	const detailCol: ColData[] = [
+		{
+			header: '출근 시간',
+			key: 'startTime',
+			formatter: (value, row) => {
+				return <Typography>{value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}</Typography>;
+			},
+		},
+		{
+			header: '퇴근 시간',
+			key: 'endTime',
+			formatter: (value, row) => {
+				return <Typography>{value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}</Typography>;
+			},
+		},
+		{
+			header: '근로 상태',
+			key: 'workStatus',
+			formatter: (value, row) => {
+				console.log(row);
+				console.log(row?.vacationType);
+				return (
+					<Typography>
+						{row?.vacationType
+							? WORKSTATUS[value as workStatus] + ' - ' + VACATIONTYPE[row?.vacationType as vacationType]
+							: WORKSTATUS[value as workStatus]}
+					</Typography>
+				);
+			},
+		},
+		{
+			header: '총 근로시간',
+			key: 'fullTime',
+			formatter: (value, row) => {
+				return formatMinutes(value);
+			},
+		},
+		{
+			header: '초과 근로시간',
+			key: 'overTime',
+			formatter: (value, row) => {
+				return formatMinutes(value);
+			},
+		},
+		{
+			header: '상세',
+			key: 'detail',
+			formatter: () => {
+				return (
+					<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+						<Button variant='contained' size='small' onClick={() => router.push('/attendance/user/modal?type=detail')}>
+							수정
+						</Button>
+					</Box>
+				);
+			},
+		},
+	];
 
 	const [targetCalendarRow, setTargetCalendarRow] = useState<Record<dayName, CalendarData>[]>(defaultCalendarRow);
 	const [activeCell, setActiveCell] = useState<string | null>(null);
