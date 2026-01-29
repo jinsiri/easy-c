@@ -43,7 +43,6 @@ export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
 	useEffect(() => {
 		if (currentPathName !== '') {
 			const pathSegments = currentPathName.split('/').filter(Boolean);
-			console.log(pathSegments);
 
 			// 각 경로에 맞는 메뉴 찾기
 			const _targetMenuItem: menuType[] = pathSegments[0] === 'admin' ? AdminMenuItem : MainMenuItem;
@@ -56,8 +55,6 @@ export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
 				})
 				.filter(Boolean);
 			setBreadcrumbs(_breadcrumbs);
-
-			console.log(_breadcrumbs);
 		}
 	}, [currentPathName]);
 
