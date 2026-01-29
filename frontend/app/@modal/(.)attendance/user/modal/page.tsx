@@ -1,45 +1,42 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-/** Lib */
-import { useForm, Control, FieldErrors } from 'react-hook-form';
+/** MUI */
+import { Box } from '@mui/material';
 
 /** Custom */
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import RequestCorrection from './RequestCorrection';
 
-type DeptFormValues = Omit<DeptResponseDto, 'deptId'>;
-interface Props {
-	control: Control<DeptFormValues>;
-	errors: FieldErrors<DeptFormValues>;
+interface RequestCorrectionRef {
+	submit: () => void;
 }
 
-export default function AttendanceUserModal({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
-	const router = useRouter();
-	const type = searchParams.type;
+export default function AttendanceUserModal() {
+	const searchParams = useSearchParams();
+	const type = searchParams.get('type');
+
+	const requestCorrectionRef = useRef<RequestCorrectionRef>();
 
 	const [isSaving, setIsSaving] = useState(false);
 
-	const {
-		control,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<DeptFormValues>({
-		defaultValues: {
-			deptNm: '',
-			deptEmail: '',
-			deptCode: '',
-			deptShortNm: '',
-		},
-	});
+	const handleSave = () => {
+		//setIsSaving(true);
 
-	const handleSave = handleSubmit(async (data) => {});
+		// ref가 mount된 후라면 submit 호출 가능
+		if (requestCorrectionRef.current) {
+			console.log('ref is');
+			requestCorrectionRef.current.submit();
+		} else {
+			console.warn('ref is not ready yet');
+		}
+	};
 
 	return (
 		<BaseDialog title={'근무시간 수정'} loading={isSaving} onConfirm={handleSave}>
-			<RequestCorrection />
+			{type === 'request' ? <RequestCorrection ref={requestCorrectionRef} /> : <Box></Box>}
 		</BaseDialog>
 	);
 }

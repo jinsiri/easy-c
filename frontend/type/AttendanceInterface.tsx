@@ -14,7 +14,8 @@ export interface attendanceSaveReqInterface {
 }
 
 export interface AttendanceDayResInterface {
-	attendanceId?: number | null;
+	attendanceId: number | null;
+	workDate: Date | null;
 	startTime?: Date | null;
 	endTime?: Date | null;
 	fullTime?: number | null;

@@ -5,15 +5,14 @@ import Link from 'next/link';
 import { Box, IconButton, Paper, Stack, Popper, Fade, List, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
 import { FormatIndentIncrease, PersonOutlineRounded, LogoutRounded, ManageAccountsRounded, ContactsRounded } from '@mui/icons-material';
 import PopupState, { bindToggle, bindPopper } from 'material-ui-popup-state';
-import {authService} from "@/app/services/authService";
-import {useRouter} from "next/navigation";
+import { authService } from '@/app/services/authService';
+import { useRouter } from 'next/navigation';
 
 interface propsType {
 	drawerOpen: boolean;
 	setDrawerOpen: Dispatch<SetStateAction<boolean>>;
 	headerHeight: string;
 }
-
 
 export default function Header(props: propsType) {
 	const { drawerOpen, setDrawerOpen, headerHeight } = props;
@@ -38,13 +37,11 @@ export default function Header(props: propsType) {
 		}
 	};
 
-
 	const list = [
 		{ title: '관리자 모드', icon: <ManageAccountsRounded />, component: Link, url: '/admin/normal/setting' },
 		{ title: '내 정보', icon: <ContactsRounded />, component: Link, url: '/management/user' },
-		{ title: '로그아웃', icon: <LogoutRounded />, component: 'button', onClick: handleLogout},
+		{ title: '로그아웃', icon: <LogoutRounded />, component: 'button', onClick: handleLogout },
 	];
-
 
 	return (
 		<Paper
@@ -96,6 +93,7 @@ export default function Header(props: propsType) {
 																key={item.title}
 																component={item.component}
 																{...(item.component === Link && item.url ? { href: item.url } : {})}
+																sx={{ width: '100%' }}
 																onClick={item.onClick}
 															>
 																<ListItemIcon>{item.icon}</ListItemIcon>

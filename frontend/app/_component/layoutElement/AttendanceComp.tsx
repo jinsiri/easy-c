@@ -221,7 +221,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 					>
 						{activated ? '퇴근하기' : '출근하기'}
 					</Button>
-					<Button variant='outlined' size='large' onClick={() => router.push('/attendance/user/modal')}>
+					<Button variant='outlined' size='large' onClick={() => router.push('/attendance/user/modal?type=request')}>
 						요청하기
 					</Button>
 				</Box>

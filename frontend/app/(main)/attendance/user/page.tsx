@@ -11,7 +11,7 @@ import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
 import { Box, Grid, IconButton, Typography, useTheme } from '@mui/material';
-import { ArrowLeftRounded, ArrowRightRounded, LineStyle } from '@mui/icons-material';
+import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -187,9 +187,8 @@ export default function AttendanceUserPage() {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
 			<PathBreadcrumbs />
-			<Grid container spacing={2}>
+			<Grid container spacing={2} sx={{ flexDirection: 'column', flexGrow: 1 }}>
 				<Grid
-					size={12}
 					sx={{
 						display: 'flex',
 						flexDirection: { xs: 'column', sm: 'column', md: 'row' },
@@ -307,7 +306,7 @@ export default function AttendanceUserPage() {
 						<ArrowRightRounded sx={{ fontSize: '1.5rem' }} />
 					</IconButton>
 				</Grid>
-				<Grid size={12}>
+				<Grid size={12} sx={{ flexGrow: 1 }}>
 					<Calendar calendarRow={calendarData} />
 				</Grid>
 			</Grid>

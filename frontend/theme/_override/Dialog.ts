@@ -35,7 +35,7 @@ const Dialog = (theme: Theme) => ({
 				overflowY: 'auto',
 				padding: '1.5rem',
 				'&.MuiDialogContent-root': {
-					paddingTop: '2.5rem',
+					paddingTop: '1rem',
 				},
 
 				'&::-webkit-scrollbar': { width: '8px' },
@@ -49,14 +49,16 @@ const Dialog = (theme: Theme) => ({
 	MuiDialogActions: {
 		styleOverrides: {
 			root: {
-				padding: '1.5rem',
-				gap: '0.75rem',
+				'&.base-dialog': {
+					padding: '1.5rem',
+					gap: '0.75rem',
 
-				'& .MuiButton-root': {
-					padding: '.813rem 2.25rem',
-					fontSize: '1rem',
-					fontWeight: 600,
-					lineHeight: 1,
+					'& .MuiButton-root': {
+						padding: '.813rem 2.25rem',
+						fontSize: '1rem',
+						fontWeight: 600,
+						lineHeight: 1,
+					},
 				},
 			},
 		},
