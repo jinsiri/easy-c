@@ -146,7 +146,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 							<IconButton className='contained-primary light' onClick={() => router.push(`/admin/dept/list/add?parentId=${selectedDeptId}`)}>
 								<AddCircleOutline className='svg-small' />
 							</IconButton>
-							{selectedDeptId && (
+							{selectedDeptId && selectedDeptId !== 1 && (
 								<IconButton className='contained-primary light' onClick={() => handleDelete(selectedDeptId)}>
 									<RemoveCircleOutline className='svg-small' />
 								</IconButton>
