@@ -95,6 +95,11 @@ export default function AdminDeptListView({ dbData }: Props) {
 			try {
 				await deleteDept(deptId);
 				await success('부서가 정상적으로 삭제되었습니다.');
+
+				const selectedDept = dbData.find((dept) => dept.deptId === selectedDeptId);
+				const nextId = selectedDept?.treeParentId ?? 1;
+				setSelectedDeptId(nextId);
+
 				router.refresh();
 			} catch (error) {
 				await alert('삭제 중 문제가 발생했습니다.');
