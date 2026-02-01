@@ -72,8 +72,9 @@ axiosConfig.interceptors.response.use(
 			// 성공 응답: data 필드를 response.data로 설정
 			response.data = apiResponse.data;
 		}
-		// ApiResponse 구조가 아니면 그대로 반환 (예: plain string, null 등)
-		return response;
+
+		// 항상 response.data 반환 (ApiResponse면 언래핑된 data, 아니면 원본 data)
+		return response.data;
 	},
 	async (error) => {
 
