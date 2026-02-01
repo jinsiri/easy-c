@@ -10,44 +10,34 @@ import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import { ColDef } from 'ag-grid-community';
 import { Add, ArrowBack, Remove, Reorder } from '@mui/icons-material';
 import { useState } from 'react';
+import { ALL_POSITIONS, JobFieldType } from '@/constant/positionConst';
 
 const positionTemplateColDefs: ColDef<Record<string, any>>[] = [
-	{ field: '명칭', headerName: '명칭', editable: false },
-	{ field: '코드', headerName: '코드', editable: false },
+	{ field: 'positionNm', headerName: '명칭', editable: false },
+	{ field: 'positionCode', headerName: '코드', editable: false },
 ];
 
 const positionColDefs: ColDef<Record<string, any>>[] = [
-	{ field: '명칭', headerName: '명칭', editable: false },
-	{ field: '코드', headerName: '코드', editable: false },
-	{ field: '사용멤버(명)', headerName: '사용멤버(명)', editable: false },
+	{ field: 'positionNm', headerName: '명칭', editable: false },
+	{ field: 'positionCode', headerName: '코드', editable: false },
+	{ field: 'positionCount', headerName: '사용멤버(명)', editable: false },
 ];
 
 const dummyPosition: Record<string, any>[] = [
 	{
-		명칭: '회장',
-		코드: '001',
-		'사용멤버(명)': 0,
-	},
-];
-
-const positionTemplate: Record<string, any>[] = [
-	{
-		명칭: '회장',
-		코드: '001',
-	},
-	{
-		명칭: '대표이사',
-		코드: '002',
+		positionNm: '회장',
+		positionCode: '001',
+		positionCount: 0,
 	},
 ];
 
 export default function AdminDeptRolePage() {
 	const theme = useTheme();
 
-	const [jobField, setJobField] = useState('office');
+	const [jobField, setJobField] = useState<JobFieldType>('OFFICE');
 
 	const handleChange = (event: SelectChangeEvent) => {
-		setJobField(event.target.value);
+		setJobField(event.target.value as JobFieldType);
 	};
 
 	const roleTabs = [
@@ -143,16 +133,18 @@ export default function AdminDeptRolePage() {
 														},
 													}}
 												>
-													<MenuItem value={'office'}>사무직</MenuItem>
-													<MenuItem value={'research'}>연구직</MenuItem>
-													<MenuItem value={'blueCollor'}>생산직</MenuItem>
+													{Object.entries(ALL_POSITIONS).map(([key, value]) => (
+														<MenuItem key={key} value={key}>
+															{value.label}
+														</MenuItem>
+													))}
 												</Select>
 											</FormControl>
 										</Stack>
 									</Stack>
 								</Grid>
 							</Grid>
-							<CustomAgGridComp rowData={positionTemplate} colDefs={positionTemplateColDefs} />
+							<CustomAgGridComp rowData={ALL_POSITIONS[jobField].list} colDefs={positionTemplateColDefs} />
 						</Grid>
 					</Grid>
 				</>
