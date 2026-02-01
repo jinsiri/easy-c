@@ -1,4 +1,13 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
+
+// 인터셉터가 response.data를 반환하므로 타입 오버라이드
+export interface ApiClient {
+	get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
+	post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>;
+	put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>;
+	patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>;
+	delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
+}
 
 const getBaseURL = () => {
 	if (typeof window !== 'undefined') {
@@ -122,4 +131,4 @@ axiosConfig.interceptors.response.use(
 	},
 );
 
-export default axiosConfig;
+export default axiosConfig as ApiClient;

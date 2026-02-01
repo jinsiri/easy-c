@@ -172,37 +172,37 @@ export default function HumanResourceUserPage() {
 			const requests = [
 				// 기본 인사정보 조회
 				memberService.getMember(memberId)
-					.then(res => setMemberInfo(res.data))
+					.then(res => setMemberInfo(res))
 					.catch(err => console.error('기본 인사정보 조회 실패:', err)),
 
 				// 기본정보 탭 조회
 				memberService.getMemberBasicInfo(memberId)
-					.then(res => setBasicInfo(res.data))
+					.then(res => setBasicInfo(res))
 					.catch(err => console.error('기본정보 조회 실패:', err)),
 
 				// 신상정보 탭 조회
 				memberService.getMemberPersonalInfo(memberId)
-					.then(res => setPersonalInfo(res.data))
+					.then(res => setPersonalInfo(res))
 					.catch(err => console.error('신상정보 조회 실패:', err)),
 
 				// 경력 탭 조회
 				memberService.getMemberCareerInfo(memberId)
-					.then(res => setCareerInfo(res.data))
+					.then(res => setCareerInfo(res))
 					.catch(err => console.error('경력 조회 실패:', err)),
 
 				// 포상/징계 탭 조회
 				memberService.getMemberRewardDisciplineInfo(memberId)
-					.then(res => setRewardInfo(res.data))
+					.then(res => setRewardInfo(res))
 					.catch(err => console.error('포상/징계 조회 실패:', err)),
 
 				// 자격 탭 조회
 				memberService.getMemberQualificationInfo(memberId)
-					.then(res => setQualificationInfo(res.data))
+					.then(res => setQualificationInfo(res))
 					.catch(err => console.error('자격 조회 실패:', err)),
 
 				// 어학 탭 조회
 				memberService.getMemberLanguageInfo(memberId)
-					.then(res => setLanguageInfo(res.data))
+					.then(res => setLanguageInfo(res))
 					.catch(err => console.error('어학 조회 실패:', err)),
 			];
 

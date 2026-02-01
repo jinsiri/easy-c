@@ -5,7 +5,7 @@ import { DeptResponseDto } from '@/type/dept';
 export async function getDeptList() {
 	try {
 		const res = await axiosConfig.get('/api/dept/tree');
-		return res.data;
+		return res;
 	} catch (error: any) {
 		console.error('에러 발생:', error.message);
 		throw error;

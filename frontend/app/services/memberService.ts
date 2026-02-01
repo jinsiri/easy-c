@@ -44,7 +44,7 @@ export interface MemberLanguageResponseDto {
 export const memberService = {
     // 전체 멤버 조회
     getAllMembers: () =>
-        axiosConfig.get<MemberLightResponseDto>(`/api/members`),
+        axiosConfig.get<MemberLightResponseDto[]>(`/api/members`),
 
     // 기본 인사정보 조회
     getMember: (memberId: number) =>
