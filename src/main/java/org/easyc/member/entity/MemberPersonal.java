@@ -55,10 +55,12 @@ public class MemberPersonal extends BaseEntity { //회원정보_개인정보
     // 장애 등록 번호
     private String disabilityRegistrationNumber;
     // 장애구분
+    @Enumerated(EnumType.STRING)
     private DisabilityType disabilityType;
     // 장애등급
     private String disabilityGrade;
     // 장애인정구분
+    @Enumerated(EnumType.STRING)
     private DisabilityRecognition disabilityRecognition;
 
     // 계좌(급여)
@@ -92,6 +94,10 @@ public class MemberPersonal extends BaseEntity { //회원정보_개인정보
         this.accountNumber = dto.getAccountNumber();
         this.accountHolderName = dto.getAccountHolderName();
         this.accountType = dto.getAccountType();
+    }
+
+    public boolean isVeteranFamily() {
+        return Boolean.TRUE.equals(veteranFamily);
     }
 
     public static MemberPersonal of(Member member, MemberPersonalRequestDto dto) {
