@@ -25,7 +25,7 @@ const getDisplayValue = (value: any): string => {
 // 상단 기본 인사정보 (카드 영역)
 const memberInfoFields: { key: string; label: string }[] = [
 	{ key: 'memberNm', label: '직원 이름' },
-	{ key: 'employeeId', label: '사원번호' },
+	{ key: 'employeeId', label: '사번' },
 	{ key: 'departmentPosition', label: '부서/직책' }, // TODO: 부서/직책 필드 추가 필요
 	{ key: 'positionTitle', label: '직위' }, // TODO: 직위 필드 추가 필요
 	{ key: 'jobTitle', label: '직무' }, // TODO: 직무 필드 추가 필요

@@ -1,6 +1,10 @@
 import axiosConfig from '../_lib/axiosConfig';
 
 // 타입 정의 (필요시 별도 파일로 분리 가능)
+export interface MemberLightResponseDto {
+    // 기본 인사정보 타입 (백엔드 DTO에 맞게 조정)
+    [key: string]: any;
+}
 export interface MemberResponseDto {
     // 기본 인사정보 타입 (백엔드 DTO에 맞게 조정)
     [key: string]: any;
@@ -38,6 +42,10 @@ export interface MemberLanguageResponseDto {
 
 // API 정의
 export const memberService = {
+    // 전체 멤버 조회
+    getAllMembers: () =>
+        axiosConfig.get<MemberLightResponseDto>(`/api/members`),
+
     // 기본 인사정보 조회
     getMember: (memberId: number) =>
         axiosConfig.get<MemberResponseDto>(`/api/members/${memberId}`),

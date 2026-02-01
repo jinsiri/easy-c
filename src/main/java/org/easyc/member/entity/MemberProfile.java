@@ -29,7 +29,6 @@ public class MemberProfile extends BaseEntity { //회원정보_회사 관련
     @JoinColumn(name="member_id")
     private Member member;
 
-
     //채용구분
     @Enumerated(EnumType.STRING)
     private RecruitmentType recruitmentType;

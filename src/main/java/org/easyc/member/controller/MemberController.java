@@ -27,6 +27,16 @@ public class MemberController {
     }
 
     /**
+     * 전체 멤버 조회
+     * @return
+     */
+    @GetMapping
+    public List<MemberLightResponseDto> getAllMembers() {
+        return memberService.getAllMembers();
+        //todo 부서정보, 직위직무 등 필요
+    }
+    
+    /**
      * 인사정보 조회 - 기본 인사정보
      * @param memberId
      * @return

@@ -50,6 +50,12 @@ public class MemberService {
         return MemberResponseDto.fromEntity(member);
     }
 
+    public List<MemberLightResponseDto> getAllMembers() {
+        List<MemberLightResponseDto> members = memberRepository.findLightMembers();
+
+        return members;
+    }
+
     public MemberResponseDto getLoginUserByLoginId(String loginId) {
         if (loginId == null) return null;
 
