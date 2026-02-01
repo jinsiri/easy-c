@@ -1,3 +1,5 @@
+import { workType, workStatus, vacationType } from '@/type/types';
+
 export interface attendanceReqInterface {
 	memberId: number;
 	workDate: string;
@@ -17,16 +19,26 @@ export interface AttendanceDayResInterface {
 	endTime?: Date | null;
 	fullTime?: number | null;
 	overTime?: number | null;
-	workStatus?: string;
-	vacation?: string;
+	workType?: workType;
+	workStatus?: workStatus;
+	vacationType?: vacationType;
 	detail?: string;
-	confirm?: string;
 }
 
 export interface AttendanceResInterface {
 	dayData: AttendanceDayResInterface;
-	totalWorkDay: number;
-	totalWorkTime: number;
+
+	attendanceType: string;
+	settlementPeriod: string;
+	worktimeRule: string;
+	startTime: Date;
+	endTime: Date;
+
+	maxPolicyWorkTime: number;
+	policyWorkDay: number;
+	policyWorkTime: number;
+	effectiveWorkDay: number;
+	effectiveWorkTime: number;
 	workDay: number;
 	workTime: number;
 	vacationTime: number;

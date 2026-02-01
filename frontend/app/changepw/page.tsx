@@ -20,14 +20,14 @@ const ChangePwPage = () => {
 			flexDirection='column'
 			alignItems='center'
 			justifyContent={'center'}
-			sx={{ bgcolor: 'gray.100' }}
+			sx={{ bgcolor: 'grey.100' }}
 		>
 			<Box sx={{ maxWidth: '560px', padding: '88px 56px', borderRadius: '32px', bgcolor: '#fff' }}>
 				<Box
 					sx={{
-						'& .MuiOutlinedInput-notchedOutline': { borderColor: 'gray.500' },
-						'& .MuiInputLabel-root': { color: 'gray.900' },
-						'& input::placeholder': { color: 'gray.500', fontWeight: 400 },
+						'& .MuiOutlinedInput-notchedOutline': { borderColor: 'grey.500' },
+						'& .MuiInputLabel-root': { color: 'grey.900' },
+						'& input::placeholder': { color: 'grey.500', fontWeight: 400 },
 					}}
 				>
 					<Box
@@ -35,7 +35,7 @@ const ChangePwPage = () => {
 						flexDirection='column'
 						alignItems='center'
 						justifyContent={'center'}
-						sx={{ bgcolor: 'gray.500', mb: 3, minHeight: '72px' }}
+						sx={{ bgcolor: 'grey.500', mb: 3, minHeight: '72px' }}
 					>
 						로고
 					</Box>

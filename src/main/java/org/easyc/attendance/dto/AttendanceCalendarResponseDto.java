@@ -5,6 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.easyc.attendance.entity.Attendance;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,6 +16,10 @@ public class AttendanceCalendarResponseDto {
     private Integer month;
     private Integer day;
     private Boolean isCurrentMonth;
+    private Boolean isHoliday;
+    private String holidaySubject;
+    private LocalTime defaultStartTime;
+    private LocalTime defaultEndTime;
     private AttendanceDayResponseDto detailData = new AttendanceDayResponseDto();
 
     public AttendanceCalendarResponseDto(Attendance entity) {

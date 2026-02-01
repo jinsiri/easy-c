@@ -39,7 +39,7 @@ export default function Menu2Depth({ item, drawerOpen, prevUrl }: propsType) {
 								left: '2rem',
 								width: '1px',
 								height: '100%',
-								backgroundColor: 'gray.200',
+								backgroundColor: 'grey.200',
 								zIndex: 10,
 							}}
 						/>

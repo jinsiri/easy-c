@@ -83,7 +83,7 @@ const AdminMenuItem: menuType[] = [
 					},
 				],
 			},
-			{
+			/*{
 				id: 'admin-approval',
 				title: '전자결재',
 				type: '1depth',
@@ -163,7 +163,7 @@ const AdminMenuItem: menuType[] = [
 						url: '/statistics',
 					},
 				],
-			},
+			},*/
 		],
 	},
 ];
