@@ -15,8 +15,9 @@ interface LoginResponseDto {
 }
 
 // API 정의
+// 인터셉터가 response.data를 반환하므로 실제 반환 타입은 data 타입
 export const authService = {
-	getPublicKey: () => axiosConfig.get<string>('/api/auth/public-key'),
-	login: (data: LoginRequestDto) => axiosConfig.post<LoginResponseDto>('/api/auth/login', data),
+	getPublicKey: (): Promise<string> => axiosConfig.get('/api/auth/public-key') as any,
+	login: (data: LoginRequestDto): Promise<LoginResponseDto> => axiosConfig.post('/api/auth/login', data) as any,
 	logout: () => axiosConfig.post('/api/auth/logout'),
 };

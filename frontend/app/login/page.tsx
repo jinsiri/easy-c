@@ -19,7 +19,7 @@ const LoginPage = () => {
 		e.preventDefault();
 
 		try {
-			const { data: publicKey } = await authService.getPublicKey();
+			const publicKey = await authService.getPublicKey();
 
 			const encryptedPw = encryptRSA(password, publicKey);
 
