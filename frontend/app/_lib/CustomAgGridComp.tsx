@@ -14,10 +14,11 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 interface propsType {
 	rowData: Record<string, any>[];
 	colDefs: ColDef<Record<string, any>>[];
+	pageable?: boolean;
 	onGridReady?: (params: GridReadyEvent) => void;
 }
 
-const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady }: propsType, ref) => {
+const CustomAgGridComp = forwardRef(({ rowData, colDefs, pageable = true, onGridReady }: propsType, ref) => {
 	const gridRef = useRef<AgGridReact>(null);
 	const theme = useTheme();
 	const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
@@ -49,7 +50,7 @@ const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady }: propsTyp
 
 	return (
 		<Box sx={{ width: '100%', height: '100%' }}>
-			<AgGridReact ref={gridRef} theme={gridTheme} rowData={rowData} columnDefs={colDefs} pagination={true} onGridReady={onGridReadyEvent} />
+			<AgGridReact ref={gridRef} theme={gridTheme} rowData={rowData} columnDefs={colDefs} pagination={pageable} onGridReady={onGridReadyEvent} />
 		</Box>
 	);
 });

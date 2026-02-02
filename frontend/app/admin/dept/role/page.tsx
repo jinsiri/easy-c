@@ -88,7 +88,7 @@ export default function AdminDeptRolePage() {
 									</Stack>
 								</Grid>
 							</Grid>
-							<CustomAgGridComp rowData={dummyPosition} colDefs={positionColDefs} />
+							<CustomAgGridComp rowData={dummyPosition} colDefs={positionColDefs} pageable={false} />
 						</Grid>
 						<Grid
 							size={{
@@ -144,7 +144,7 @@ export default function AdminDeptRolePage() {
 									</Stack>
 								</Grid>
 							</Grid>
-							<CustomAgGridComp rowData={ALL_POSITIONS[jobField].list} colDefs={positionTemplateColDefs} />
+							<CustomAgGridComp rowData={ALL_POSITIONS[jobField].list} colDefs={positionTemplateColDefs} pageable={false} />
 						</Grid>
 					</Grid>
 				</>
