@@ -5,7 +5,8 @@ import { Add, ArrowBack, Remove, Reorder } from '@mui/icons-material';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import { RANK_TEMPLATES, RANK_CATEGORY_INFO, RankCategory } from '@/constant/deptConst';
 import { ColDef, GridOptions } from 'ag-grid-community';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { deptService } from '@/app/services/deptService';
 
 const templateColDefs: ColDef<Record<string, any>>[] = [
 	{ field: 'deptRankNm', headerName: '명칭', editable: false },
@@ -37,11 +38,28 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 	const categoryName = RANK_CATEGORY_INFO[rankType];
 	const subCategories = RANK_TEMPLATES[rankType].subTypes;
 	const [activeSubCategory, setActiveSubCategory] = useState<SubCategoryType>('OFFICE');
+	const [activeCategoryData, setActiveCategoryData] = useState<any[]>([]);
+
+	const getRankTypeData = useCallback(async (rankType: RankCategory) => {
+		const serviceMap = {
+			POSITION: deptService.getJobPosition,
+			TITLE: deptService.getJobTitle,
+			GRADE: deptService.getJobGrade,
+		} as const;
+
+		try {
+			const res = await serviceMap[rankType]();
+			setActiveCategoryData(res.data);
+		} catch (err) {
+			console.error('정보 조회 실패:', err);
+		}
+	}, []);
 
 	useEffect(() => {
 		const firstSubKey = Object.keys(RANK_TEMPLATES[rankType].subTypes)[0];
 		setActiveSubCategory(firstSubKey);
-	}, [rankType]);
+		getRankTypeData(rankType).catch(console.error);
+	}, [rankType, getRankTypeData]);
 
 	const handleChange = (event: SelectChangeEvent) => {
 		setActiveSubCategory(event.target.value as SubCategoryType);
@@ -112,7 +130,7 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 						</Stack>
 					</Grid>
 				</Grid>
-				<CustomAgGridComp rowData={dummyPosition} colDefs={deptRankColDefs} rowSelection={dataRowSelection} pagination={false} />
+				<CustomAgGridComp rowData={activeCategoryData} colDefs={deptRankColDefs} rowSelection={dataRowSelection} pagination={false} />
 			</Grid>
 			<Grid
 				size={{
