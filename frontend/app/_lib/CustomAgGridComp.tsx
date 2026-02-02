@@ -6,7 +6,7 @@ import { useRef, forwardRef, useImperativeHandle } from 'react';
 import { Box, useTheme } from '@mui/material';
 
 /** Ag Grid */
-import { AllCommunityModule, ModuleRegistry, ColDef, themeQuartz, iconSetQuartzLight, GridReadyEvent } from 'ag-grid-community';
+import { AllCommunityModule, ModuleRegistry, ColDef, themeQuartz, iconSetQuartzLight, GridReadyEvent, RowSelectionOptions } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -14,11 +14,12 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 interface propsType {
 	rowData: Record<string, any>[];
 	colDefs: ColDef<Record<string, any>>[];
+	rowSelection?: RowSelectionOptions;
 	pageable?: boolean;
 	onGridReady?: (params: GridReadyEvent) => void;
 }
 
-const CustomAgGridComp = forwardRef(({ rowData, colDefs, pageable = true, onGridReady }: propsType, ref) => {
+const CustomAgGridComp = forwardRef(({ rowData, colDefs, rowSelection, pageable = true, onGridReady }: propsType, ref) => {
 	const gridRef = useRef<AgGridReact>(null);
 	const theme = useTheme();
 	const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
@@ -50,7 +51,15 @@ const CustomAgGridComp = forwardRef(({ rowData, colDefs, pageable = true, onGrid
 
 	return (
 		<Box sx={{ width: '100%', height: '100%' }}>
-			<AgGridReact ref={gridRef} theme={gridTheme} rowData={rowData} columnDefs={colDefs} pagination={pageable} onGridReady={onGridReadyEvent} />
+			<AgGridReact
+				ref={gridRef}
+				theme={gridTheme}
+				rowData={rowData}
+				columnDefs={colDefs}
+				rowSelection={rowSelection}
+				pagination={pageable}
+				onGridReady={onGridReadyEvent}
+			/>
 		</Box>
 	);
 });

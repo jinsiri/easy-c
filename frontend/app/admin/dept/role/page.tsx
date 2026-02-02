@@ -7,9 +7,9 @@ import { Box, Button, FormControl, Grid, IconButton, MenuItem, Select, SelectCha
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import CommonTabs from '@/app/_component/CommonTabs';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, GridOptions } from 'ag-grid-community';
 import { Add, ArrowBack, Remove, Reorder } from '@mui/icons-material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ALL_POSITIONS, JobFieldType } from '@/constant/positionConst';
 
 const positionTemplateColDefs: ColDef<Record<string, any>>[] = [
@@ -31,6 +31,38 @@ const dummyPosition: Record<string, any>[] = [
 	},
 ];
 
+const dutyTemplate: Record<string, any>[] = [
+	{ positionNm: '대표이사', positionCode: 'DU0010' },
+	{ positionNm: '팀장', positionCode: 'DU0020' },
+	{ positionNm: '팀원', positionCode: 'DU0030' },
+	{ positionNm: '부팀장', positionCode: 'DU0040' },
+	{ positionNm: '파트장', positionCode: 'DU0050' },
+	{ positionNm: '부서장', positionCode: 'DU0060' },
+	{ positionNm: '실장', positionCode: 'DU0070' },
+	{ positionNm: '본부장', positionCode: 'DU0080' },
+	{ positionNm: '그룹장', positionCode: 'DU0090' },
+	{ positionNm: '부문장', positionCode: 'DU0100' },
+	{ positionNm: 'CEO', positionCode: 'DU0110' },
+	{ positionNm: 'COO', positionCode: 'DU0120' },
+	{ positionNm: 'CFO', positionCode: 'DU0130' },
+	{ positionNm: 'CTO', positionCode: 'DU0140' },
+	{ positionNm: 'CIO', positionCode: 'DU0150' },
+	{ positionNm: 'CMO', positionCode: 'DU0160' },
+	{ positionNm: '연구소장', positionCode: 'DU0170' },
+	{ positionNm: '사업부장', positionCode: 'DU0180' },
+	{ positionNm: '전문임원', positionCode: 'DU0190' },
+	{ positionNm: '지사장', positionCode: 'DU0200' },
+	{ positionNm: '소장', positionCode: 'DU0210' },
+	{ positionNm: '담당', positionCode: 'DU0220' },
+	{ positionNm: '점장', positionCode: 'DU0230' },
+	{ positionNm: '지점장', positionCode: 'DU0240' },
+	{ positionNm: '센터장', positionCode: 'DU0250' },
+	{ positionNm: '공장장', positionCode: 'DU0260' },
+	{ positionNm: '법인장', positionCode: 'DU0270' },
+	{ positionNm: 'PD', positionCode: 'DU0280' },
+	{ positionNm: 'PM', positionCode: 'DU0290' },
+];
+
 export default function AdminDeptRolePage() {
 	const theme = useTheme();
 
@@ -39,6 +71,24 @@ export default function AdminDeptRolePage() {
 	const handleChange = (event: SelectChangeEvent) => {
 		setJobField(event.target.value as JobFieldType);
 	};
+
+	const dataRowSelection: GridOptions['rowSelection'] = useMemo(() => {
+		return {
+			mode: 'multiRow',
+			checkboxes: true,
+			enableClickSelection: true,
+			headerCheckbox: false,
+		};
+	}, []);
+
+	const templateRowSelection: GridOptions['rowSelection'] = useMemo(() => {
+		return {
+			mode: 'multiRow',
+			checkboxes: true,
+			enableClickSelection: true,
+			headerCheckbox: true,
+		};
+	}, []);
 
 	const roleTabs = [
 		{
@@ -88,7 +138,7 @@ export default function AdminDeptRolePage() {
 									</Stack>
 								</Grid>
 							</Grid>
-							<CustomAgGridComp rowData={dummyPosition} colDefs={positionColDefs} pageable={false} />
+							<CustomAgGridComp rowData={dummyPosition} colDefs={positionColDefs} rowSelection={dataRowSelection} pageable={false} />
 						</Grid>
 						<Grid
 							size={{
@@ -144,7 +194,12 @@ export default function AdminDeptRolePage() {
 									</Stack>
 								</Grid>
 							</Grid>
-							<CustomAgGridComp rowData={ALL_POSITIONS[jobField].list} colDefs={positionTemplateColDefs} pageable={false} />
+							<CustomAgGridComp
+								rowData={ALL_POSITIONS[jobField].list}
+								colDefs={positionTemplateColDefs}
+								rowSelection={templateRowSelection}
+								pageable={false}
+							/>
 						</Grid>
 					</Grid>
 				</>
@@ -168,11 +223,6 @@ export default function AdminDeptRolePage() {
 		<>
 			<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem', bgcolor: theme.palette.grey[50] }}>
 				<PathBreadcrumbs />
-				<Box component={'section'} sx={{ width: '100%', marginBottom: '1.5rem' }}>
-					<Typography variant='h5' sx={{ fontWeight: '800' }}>
-						직위체계
-					</Typography>
-				</Box>
 				<Box
 					sx={{
 						display: 'flex',
