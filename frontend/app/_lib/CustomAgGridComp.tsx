@@ -15,11 +15,11 @@ interface propsType {
 	rowData: Record<string, any>[];
 	colDefs: ColDef<Record<string, any>>[];
 	rowSelection?: RowSelectionOptions;
-	pageable?: boolean;
+	pagination?: boolean;
 	onGridReady?: (params: GridReadyEvent) => void;
 }
 
-const CustomAgGridComp = forwardRef(({ rowData, colDefs, rowSelection, pageable = true, onGridReady }: propsType, ref) => {
+const CustomAgGridComp = forwardRef(({ rowData, colDefs, rowSelection, pagination = true, onGridReady }: propsType, ref) => {
 	const gridRef = useRef<AgGridReact>(null);
 	const theme = useTheme();
 	const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
@@ -57,7 +57,7 @@ const CustomAgGridComp = forwardRef(({ rowData, colDefs, rowSelection, pageable 
 				rowData={rowData}
 				columnDefs={colDefs}
 				rowSelection={rowSelection}
-				pagination={pageable}
+				pagination={pagination}
 				onGridReady={onGridReadyEvent}
 			/>
 		</Box>
