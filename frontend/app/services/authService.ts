@@ -7,11 +7,14 @@ interface LoginRequestDto {
 }
 
 interface LoginResponseDto {
-	token: string;
-	user: {
-		id: string;
-		name: string;
-	};
+	//token: string;
+	//user: {
+	//	id: string;
+	//	name: string;
+	//};
+	loginId: string;
+	memberId: number;
+	memberRole: string;
 }
 
 // API 정의

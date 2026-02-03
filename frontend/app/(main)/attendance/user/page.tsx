@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import secureLocalStorage from 'react-secure-storage';
 
 /** Lib */
-import axiosConfig from '@/app/_lib/axiosConfig';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
@@ -21,7 +20,8 @@ import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
 import { formatMinutes } from '@/utils/commonFunc';
 
 /** Type / Interface */
-import { attendanceReqInterface, AttendanceResInterface } from '@/type/attendanceInterface';
+import { dayName } from '@/type/types';
+import { attendanceService, AttendanceResDto, CalendarData } from '@/app/services/attendanceService';
 import CustomEchartComp from '@/app/_lib/CustomEchartComp';
 
 dayjs.extend(duration);
@@ -30,9 +30,9 @@ export default function AttendanceUserPage() {
 	const theme = useTheme();
 	const { loader, setLoader } = useLoaderStore();
 
-	const [attendanceData, setAttenceData] = useState<AttendanceResInterface>({});
+	const [attendanceData, setAttenceData] = useState<AttendanceResDto>({});
 	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
-	const [calendarData, setCalendarData] = useState([]);
+	const [calendarData, setCalendarData] = useState<Record<dayName, CalendarData>[]>([]);
 	const [chartOption, setChartOption] = useState<Record<string, any>>({});
 
 	useEffect(() => {
@@ -45,51 +45,45 @@ export default function AttendanceUserPage() {
 		getAttendanceCalendarData();
 	}, [calendarDate]);
 
-	const getAttendanceTodayData = () => {
-		const today = dayjs();
-		const req: attendanceReqInterface = {
-			memberId: 1,
-			workDate: today.format('YYYY-MM-DD'),
-		};
-
+	const getAttendanceTodayData = async () => {
 		if (!loader) setLoader(true);
 
-		axiosConfig
-			.post('/api/attendance/today', req)
-			.then((res) => {
-				if (res) {
-					setAttenceData(res);
-					makeChartOption(res);
-				}
-			})
-			.catch((err) => {})
-			.finally(() => {
-				setLoader(false);
+		try {
+			const today = dayjs();
+			const res = await attendanceService.getAttendanceTodayData({
+				memberId: Number(secureLocalStorage.getItem('memberId')) ?? 1,
+				workDate: today.format('YYYY-MM-DD'),
 			});
+
+			if (res.data) {
+				setAttenceData(res.data);
+				makeChartOption(res.data);
+			}
+		} catch (error: any) {
+		} finally {
+			setLoader(false);
+		}
 	};
 
-	const getAttendanceCalendarData = () => {
-		const req: attendanceReqInterface = {
-			memberId: 1,
-			workDate: calendarDate.format('YYYY-MM-DD'),
-		};
-
+	const getAttendanceCalendarData = async () => {
 		if (!loader) setLoader(true);
 
-		axiosConfig
-			.post('/api/attendance/calendar', req)
-			.then((res) => {
-				if (Object.keys(res).length > 0) {
-					setCalendarData(res);
-				}
-			})
-			.catch((err) => {})
-			.finally(() => {
-				setLoader(false);
+		try {
+			const res = await attendanceService.getAttendanceCalendarData({
+				memberId: Number(secureLocalStorage.getItem('memberId')) ?? 1,
+				workDate: calendarDate.format('YYYY-MM-DD'),
 			});
+
+			if (Object.keys(res.data).length > 0) {
+				setCalendarData(res.data);
+			}
+		} catch (error: any) {
+		} finally {
+			setLoader(false);
+		}
 	};
 
-	const makeChartOption = (data: AttendanceResInterface) => {
+	const makeChartOption = (data: AttendanceResDto) => {
 		const _option = {
 			grid: {
 				left: 0,

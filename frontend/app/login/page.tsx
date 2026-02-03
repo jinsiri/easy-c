@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import secureLocalStorage from 'react-secure-storage';
 
 import { Box, Button, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 
@@ -31,6 +32,9 @@ const LoginPage = () => {
 			});
 
 			console.log(res);
+			secureLocalStorage.setItem('loginId', res.data.loginId);
+			secureLocalStorage.setItem('memberId', res.data.memberId);
+			secureLocalStorage.setItem('memberRole', res.data.memberRole);
 
 			await alert('로그인 성공!');
 			router.push('/'); // 메인 페이지 이동

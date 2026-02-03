@@ -5,6 +5,7 @@ import lombok.*;
 import org.easyc.common.constant.WorkType;
 import org.easyc.common.constant.WorkStatus;
 import org.easyc.common.constant.VacationType;
+import org.easyc.common.entity.BaseEntity;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Attendance {
+public class Attendance extends BaseEntity {
 
     @Id
     @SequenceGenerator(name="attendance_seq", sequenceName="attendance_seq", allocationSize=1)
@@ -31,12 +32,9 @@ public class Attendance {
     private boolean normalized = false;
 
 
-    /** 등록자 정보 */
+    /** 등록자 정보 추가 */
     @Column(name = "member_id")
     private Long memberId;
-
-    @Column(name = "register_ip")
-    private String registerIp;
 
     @Column(name = "register_latitude")
     private BigDecimal registerLatitude;
@@ -92,16 +90,4 @@ public class Attendance {
     @Enumerated(EnumType.STRING)
     @Column(name = "vacation_type")
     private VacationType vacationType;
-
-
-    /** 수정 정보 */
-    @LastModifiedDate
-    @Column(name = "last_update_date")
-    private LocalDateTime lastUpdateDate;
-
-    @Column(name = "last_update_ip")
-    private String lastUpdateIp;
-
-    @Column(name = "last_update_id")
-    private String lastUpdateId;
 }
