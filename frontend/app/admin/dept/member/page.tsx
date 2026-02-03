@@ -1,15 +1,17 @@
 'use client';
 
 /** MUI */
-import {Box, Button, Grid, Stack, Typography, useTheme} from '@mui/material';
+import { Box, Button, Grid, Stack, Typography, useTheme } from '@mui/material';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
-import {ColDef} from 'ag-grid-community';
-import {Add, Remove, Reorder} from '@mui/icons-material';
-import {useEffect, useState} from 'react';
-import {MemberResponseDto, memberService} from "@/app/services/memberService";
+import { ColDef } from 'ag-grid-community';
+import { Add, Remove, Reorder } from '@mui/icons-material';
+import { useEffect, useRef, useState } from 'react';
+import { MemberResponseDto, memberService } from '@/app/services/memberService';
+import { AgGridReact } from 'ag-grid-react';
+import { useDialogStore } from '@/store/useDialogStore';
 
 const memberColDefs: ColDef<Record<string, any>>[] = [
 	{ field: 'employeeId', headerName: '사번', editable: false },
@@ -27,46 +29,69 @@ const memberColDefs: ColDef<Record<string, any>>[] = [
 
 export default function AdminDeptRolePage() {
 	const theme = useTheme();
+	const { alert } = useDialogStore();
 
+	const gridRef = useRef<AgGridReact>(null);
 	const [members, setMembers] = useState<MemberResponseDto[]>([]);
 
 	useEffect(() => {
-		const fetchMembers = async () => {
-			try {
-				const res = await memberService.getAllMembers();
-				if (res) {
-					const data = Array.isArray(res) ? res : [res];
-					setMembers(data);
-				}
-			} catch (error) {
-				console.error('멤버 조회 실패:', error); // 에러 로깅
-			}
-		};
-
 		fetchMembers();
-
 	}, []);
+
+	const fetchMembers = async () => {
+		await memberService
+			.getAllMembers()
+			.then((res) => {
+				const data = Array.isArray(res) ? res : [res];
+				setMembers(data);
+			})
+			.catch((error) => {
+				if (error.status === 403) {
+					alert('인증 정보가 유효하지 않습니다.');
+				} else {
+					alert(error.message);
+				}
+				console.error('멤버 조회 실패:', error); // 에러 로깅
+			});
+	};
+
+	const deleteMembers = async () => {
+		const selectedRows = gridRef.current?.api.getSelectedRows() || [];
+		selectedRows.forEach((row: any) => console.log(row));
+		const memberIds = selectedRows.map((row: any) => row.memberId);
+
+		await memberService
+			.deleteMembers({
+				ids: memberIds,
+			})
+			.then((res) => {
+				alert('삭제되었습니다.');
+				fetchMembers();
+			})
+			.catch((error) => {
+				if (error.status === 403) {
+					alert('인증 정보가 유효하지 않습니다.');
+				} else {
+					alert(error.message);
+				}
+				console.error('멤버 삭제 실패:', error); // 에러 로깅
+			});
+	};
 
 	return (
 		<>
 			<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem', bgcolor: theme.palette.grey[50] }}>
 				<PathBreadcrumbs />
-				<Box component={'section'} sx={{ width: '100%', marginBottom: '1.5rem' }}>
-					<Typography variant='h5' sx={{ fontWeight: '800' }}>
-						멤버관리
-					</Typography>
-				</Box>
-
 				<Grid container direction={'row'} spacing={2} sx={{ flexGrow: 1, width: '100%', p: 2 }}>
 					<Grid
 						size={{
-							xs: 12
+							xs: 12,
 						}}
 						sx={{ display: 'flex', flexDirection: 'column' }}
 					>
 						<Grid container justifyContent={'space-between'} alignItems={'center'}>
 							<Grid>
-								<Typography variant='h6'>직위 목록</Typography>
+								<Typography variant='h6'>회원 목록</Typography>
 							</Grid>
 							<Grid>
 								<Stack
@@ -86,7 +111,7 @@ export default function AdminDeptRolePage() {
 										</Button>
 									</Stack>
 									<Stack>
-										<Button variant='outlined' size='small' startIcon={<Remove />}>
+										<Button variant='outlined' size='small' startIcon={<Remove />} onClick={deleteMembers}>
 											삭제
 										</Button>
 									</Stack>
@@ -98,7 +123,7 @@ export default function AdminDeptRolePage() {
 								</Stack>
 							</Grid>
 						</Grid>
-						<CustomAgGridComp rowData={members} colDefs={memberColDefs} />
+						<CustomAgGridComp ref={gridRef} rowData={members} colDefs={memberColDefs} rowSelectionMode={'multiple'} />
 					</Grid>
 				</Grid>
 			</Box>

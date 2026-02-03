@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throws UsernameNotFoundException {
 
         Member member = memberRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("Member not found: " + loginId));
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(member.getLoginId())

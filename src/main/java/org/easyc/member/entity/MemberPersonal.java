@@ -22,7 +22,7 @@ public class MemberPersonal extends BaseEntity { //회원정보_개인정보
     private Long memberId;
 
     @MapsId
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
     private Member member;
 

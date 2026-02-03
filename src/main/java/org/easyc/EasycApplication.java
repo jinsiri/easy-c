@@ -63,7 +63,7 @@ public class EasycApplication {
 						RecruitmentType.OPEN,
 						EmploymentType.REGULAR,
 						SalaryType.ANNUAL,
-						EmploymentStatus.RETIRING_SOON,
+						EmploymentStatus.ACTIVE,
 						employeeId,
 						"easyc@email.com",
 						"02-1234-1234",

@@ -2,15 +2,17 @@ package org.easyc.member.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.exception.CustomException;
+import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.member.dto.*;
 import org.easyc.member.entity.*;
 import org.easyc.member.repository.*;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -45,7 +47,7 @@ public class MemberService {
 
         Optional<Member> optionalUser = memberRepository.findById(memberId);
         Member member = optionalUser
-                .orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         return MemberResponseDto.fromEntity(member);
     }
@@ -61,7 +63,7 @@ public class MemberService {
 
         Optional<Member> optionalUser = memberRepository.findByLoginId(loginId);
         Member member = optionalUser
-                .orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         return MemberResponseDto.fromEntity(member);
     }
@@ -71,7 +73,7 @@ public class MemberService {
 
         Optional<Member> optionalUser = memberRepository.findById(memberId);
         Member member = optionalUser
-                .orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         MemberResponseDto memberDto = MemberResponseDto.fromEntity(member);
 
@@ -88,7 +90,7 @@ public class MemberService {
         if (memberId == null) return null;
 
         Optional<Member> optionalUser = memberRepository.findById(memberId);
-        optionalUser.orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+        optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         Optional<MemberProfile> optionalProfile = memberProfileRepository.findById(memberId);
         return MemberProfileResponseDto.fromEntity(optionalProfile.get());
@@ -98,7 +100,7 @@ public class MemberService {
         if (memberId == null) return null;
 
         Optional<Member> optionalUser = memberRepository.findById(memberId);
-        optionalUser.orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+        optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         Optional<MemberPersonal> optionalPersonal = memberPersonalRepository.findById(memberId);
         return MemberPersonalResponseDto.fromEntity(optionalPersonal.get());
@@ -109,7 +111,7 @@ public class MemberService {
         if (memberId == null) return null;
 
         Optional<Member> optionalUser = memberRepository.findById(memberId);
-        optionalUser.orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+        optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         List<MemberCareer> memberCareerList = memberCareerRepository.findAllByMember_memberId(memberId);
         return MemberCareerResponseDto.fromEntityList(memberCareerList);
@@ -120,7 +122,7 @@ public class MemberService {
         if (memberId == null) return null;
 
         Optional<Member> optionalUser = memberRepository.findById(memberId);
-        optionalUser.orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+        optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         List<MemberRewardDiscipline> memberRewardDisciplines = memberRewardDisciplineRepository.findAllByMember_memberId(memberId);
         return MemberRewardDisciplineResponseDto.fromEntityList(memberRewardDisciplines);
@@ -130,7 +132,7 @@ public class MemberService {
         if (memberId == null) return null;
 
         Optional<Member> optionalUser = memberRepository.findById(memberId);
-        optionalUser.orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+        optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         List<MemberQualification> memberRewardDisciplines = memberQualificationRepository.findAllByMember_memberId(memberId);
         return MemberQualificationResponseDto.fromEntityList(memberRewardDisciplines);
@@ -140,7 +142,7 @@ public class MemberService {
         if (memberId == null) return null;
 
         Optional<Member> optionalUser = memberRepository.findById(memberId);
-        optionalUser.orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+        optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         List<MemberLanguage> memberLanguages = memberLanguageRepository.findAllByMember_memberId(memberId);
         return MemberLanguageResponseDto.fromEntityList(memberLanguages);
@@ -183,7 +185,38 @@ public class MemberService {
         languageDtos.forEach(dto ->
                 memberLanguageRepository.save(MemberLanguage.of(member, dto))
         );
+    }
 
+    @Transactional
+    public void delete(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
+
+        member.delete(); // dirty checking으로 업데이트
+
+        memberCareerRepository.deleteByMemberId(memberId);
+        memberRewardDisciplineRepository.deleteByMemberId(memberId);
+        memberQualificationRepository.deleteByMemberId(memberId);
+        memberLanguageRepository.deleteByMemberId(memberId);
+    }
+
+    @Transactional
+    public void delete(Set<Long> memberIds) {
+
+        List<Member> members = memberRepository.findAllById(memberIds);
+
+        if (members.size() != memberIds.size()) {
+            throw new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND);
+        }
+
+        for(Member member : members) {
+            member.delete();
+        }
+
+        memberCareerRepository.deleteByMemberIds(memberIds);
+        memberRewardDisciplineRepository.deleteByMemberIds(memberIds);
+        memberQualificationRepository.deleteByMemberIds(memberIds);
+        memberLanguageRepository.deleteByMemberIds(memberIds);
     }
 
 }
