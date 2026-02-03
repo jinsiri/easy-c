@@ -8,7 +8,6 @@ export interface ApiClient {
 	patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>;
 	delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
 }
-import axios, { InternalAxiosRequestConfig } from 'axios';
 
 const getBaseURL = () => {
 	if (typeof window === 'undefined') {
