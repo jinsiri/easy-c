@@ -37,7 +37,7 @@ public class MemberPersonalResponseDto extends BaseDto {
     // 보훈번호
     private String veteranNumber;
     // 보훈 가족 여부
-    private Boolean veteranFamily;
+    private boolean veteranFamily;
 
     // 장애정보
     // 장애 등록 번호
@@ -74,7 +74,7 @@ public class MemberPersonalResponseDto extends BaseDto {
                 .faxNumber(memberPersonal.getFaxNumber())
                 .veteranType(memberPersonal.getVeteranType())
                 .veteranNumber(memberPersonal.getVeteranNumber())
-                .veteranFamily(memberPersonal.getVeteranFamily())
+                .veteranFamily(memberPersonal.isVeteranFamily())
                 .disabilityRegistrationNumber(memberPersonal.getDisabilityRegistrationNumber())
                 .disabilityType(EnumOptionMapper.toOption(memberPersonal.getDisabilityType(), "disability.type"))
                 .disabilityGrade(memberPersonal.getDisabilityGrade())

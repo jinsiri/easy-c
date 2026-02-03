@@ -51,4 +51,10 @@ public class MemberResponseDto extends BaseDto {
                 .lastUpdateNm(member.getLastUpdateNm())
                 .build();
     }
+
+    public static List<MemberResponseDto> fromEntityList(List<Member> members) {
+        return members.stream()
+                .map(MemberResponseDto::fromEntity)
+                .toList();
+    }
 }

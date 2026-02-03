@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class BaseDto {
-    private boolean deleted = false;
-    private boolean active = true;
+    private boolean deleted;
+    private boolean active;
     private LocalDateTime registerDate;
     private String registerIp;
     private String registerId;

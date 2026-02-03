@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Component
 public class EnumOptionMapper {
@@ -43,16 +44,12 @@ public class EnumOptionMapper {
             String messagePrefix
     ) {
 
-        Locale locale = LocaleContextHolder.getLocale();
-//        System.out.println("### EnumOption locale =" + locale);
-
-        if (locale == null) {
-            locale = Locale.KOREA; // 강제로 KO 사용
-        }
-
-        if (enumValue == null) {
+        if (enumValue == null || messagePrefix == null) {
             return null;
         }
+
+        Locale locale = Optional.of(LocaleContextHolder.getLocale())
+                .orElse(Locale.KOREA);
 
         String code = enumValue.name();
         String key = messagePrefix + "." + code;
@@ -65,5 +62,29 @@ public class EnumOptionMapper {
         );
 
         return new EnumOption(code, label);
+    }
+
+
+    public static <E extends Enum<E>> String getLabel(
+            E enumValue,
+            String messagePrefix
+    ) {
+
+        if (enumValue == null || messagePrefix == null) {
+            return null;
+        }
+
+        Locale locale = Optional.ofNullable(LocaleContextHolder.getLocale())
+                .orElse(Locale.KOREA);
+
+        String code = enumValue.name();
+        String key = messagePrefix + "." + code;
+
+        return messageSource.getMessage(
+                key,
+                null,
+                code,
+                locale
+        );
     }
 }

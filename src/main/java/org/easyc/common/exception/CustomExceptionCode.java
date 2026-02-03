@@ -18,7 +18,7 @@ public enum CustomExceptionCode {
      *
      * - DOMAIN: 에러가 발생한 영역
      *     - AUTH: 인증/인가 관련
-     *     - USER: 사용자 관련
+     *     - MEMBER: 사용자 관련
      *     - SYSTEM: 시스템/서버 관련
      *
      * - 설명: 에러 상황을 명확히 표현 (대문자 + 언더스코어)
@@ -42,10 +42,10 @@ public enum CustomExceptionCode {
     AUTH_ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     AUTH_DECRYPT_FAILED(HttpStatus.BAD_REQUEST, "비밀번호 복호화에 실패했습니다."),
 
-    // ========== User (사용자) ==========
-    USER_INVALID_INPUT(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자 입력입니다."),
-    USER_MISSING_INFO(HttpStatus.BAD_REQUEST, "필수 사용자 정보가 누락되었습니다."),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
+    // ========== Member (회원) ==========
+    MEMBER_INVALID_INPUT(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자 입력입니다."),
+    MEMBER_MISSING_INFO(HttpStatus.BAD_REQUEST, "필수 사용자 정보가 누락되었습니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
 
     // ========== System (시스템) ==========
     SYSTEM_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다."),

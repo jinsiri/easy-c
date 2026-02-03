@@ -2,7 +2,7 @@
 import { AccountTree, WorkHistoryRounded, CalendarMonthRounded } from '@mui/icons-material';
 
 /** Custom */
-import { menuType } from '@/type/types';
+import {menuType} from '@/type/types';
 
 const AdminMenuItem: menuType[] = [
 	{
@@ -74,6 +74,12 @@ const AdminMenuItem: menuType[] = [
 						title: '직위체계',
 						type: '2depth',
 						url: '/role',
+					},
+					{
+						id: 'admin-dept-member',
+						title: '멤버관리',
+						type: '2depth',
+						url: '/member',
 					},
 				],
 			},
