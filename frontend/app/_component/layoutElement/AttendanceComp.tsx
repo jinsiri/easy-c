@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 /** Lib */
 import dayjs from 'dayjs';
 import LiveClock from '@/app/_component/LiveClock';
-import axiosConfig from '@/app/_lib/axiosConfig';
 
 import useLoaderStore from '@/store/useLoaderStore';
 
@@ -19,15 +18,15 @@ import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
 import { CURRENTSTATE, ATTENDANCETYPE } from '@/constant/attendanceConst';
 
 /** Type / Interface */
-import { attendanceSaveReqInterface, AttendanceResInterface } from '@/type/attendanceInterface';
+import { attendanceService, AttendanceResDto } from '@/app/services/attendanceService';
 
-export default function AttendanceComp({ attendanceData, onSuccess }: { attendanceData?: AttendanceResInterface; onSuccess?: () => void }) {
+export default function AttendanceComp({ attendanceData, onSuccess }: { attendanceData?: AttendanceResDto; onSuccess?: () => void }) {
 	const router = useRouter();
 	const { loader, setLoader } = useLoaderStore();
 
 	const [workingStatus, setWorkingStatus] = useState('BEFORE_WORK');
 	const [activated, setActived] = useState<boolean>(false);
-	const [workData, setWorkData] = useState<AttendanceResInterface>({});
+	const [workData, setWorkData] = useState<AttendanceResDto>({});
 
 	useEffect(() => {
 		if (attendanceData && attendanceData.dayData) {
@@ -50,11 +49,10 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 		}
 
 		try {
-			const locate = await findUserLocate();
-
 			if (activated) {
-				finishTimeAttendanceData(locate);
+				finishTimeAttendanceData();
 			} else {
+				const locate = await findUserLocate();
 				startTimeAttendanceData(locate);
 			}
 		} catch (error) {
@@ -80,50 +78,44 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 		});
 	};
 
-	const startTimeAttendanceData = (locate: GeolocationCoordinates) => {
-		const currentTime = dayjs();
+	const startTimeAttendanceData = async (locate: GeolocationCoordinates) => {
+		try {
+			const currentTime = dayjs();
+			const res = await attendanceService.startTimeAttendanceData({
+				memberId: 1,
+				startTime: currentTime.format('YYYY-MM-DD HH:mm:ss'),
+				registerLatitude: locate ? locate.latitude : null,
+				registerLongitude: locate ? locate.longitude : null,
+			});
 
-		const req: attendanceSaveReqInterface = {
-			memberId: 1,
-			startTime: currentTime.format('YYYY-MM-DD HH:mm:ss'),
-			registerLatitude: locate ? locate.latitude : null,
-			registerLongitude: locate ? locate.longitude : null,
-		};
-
-		axiosConfig
-			.post('/api/attendance/start', req)
-			.then((res) => {
-				if (res.data.status === 'success') {
-					setActived(true);
-					if (onSuccess) onSuccess();
-				} else {
-					alert(res.data.message);
-				}
-			})
-			.catch((err) => {});
+			console.log(res);
+			if (res) {
+				setActived(true);
+				if (onSuccess) onSuccess();
+			}
+		} catch (error: any) {
+			alert(error.message);
+		} finally {
+		}
 	};
 
-	const finishTimeAttendanceData = (locate: GeolocationCoordinates) => {
-		const currentTime = dayjs();
+	const finishTimeAttendanceData = async () => {
+		try {
+			const currentTime = dayjs();
+			const res = await attendanceService.finishTimeAttendanceData({
+				memberId: 1,
+				endTime: currentTime.format('YYYY-MM-DD HH:mm:ss'),
+			});
 
-		const req: attendanceSaveReqInterface = {
-			memberId: 1,
-			endTime: currentTime.format('YYYY-MM-DD HH:mm:ss'),
-			registerLatitude: locate ? locate.latitude : null,
-			registerLongitude: locate ? locate.longitude : null,
-		};
-
-		axiosConfig
-			.post('/api/attendance/finish', req)
-			.then((res) => {
-				if (res.data.status === 'success') {
-					setActived(true);
-					if (onSuccess) onSuccess();
-				} else {
-					alert(res.data.message);
-				}
-			})
-			.catch((err) => {});
+			console.log(res);
+			if (res) {
+				setActived(true);
+				if (onSuccess) onSuccess();
+			}
+		} catch (error: any) {
+			alert(error.message);
+		} finally {
+		}
 	};
 
 	return (

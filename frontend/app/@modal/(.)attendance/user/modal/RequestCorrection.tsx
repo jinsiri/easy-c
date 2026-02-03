@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useImperativeHandle, useRef, forwardRef } from 'react';
+import { useState, useImperativeHandle, forwardRef } from 'react';
+import secureLocalStorage from 'react-secure-storage';
+import { useRouter } from 'next/navigation';
 
 /** MUI */
 import { Box, TextField, Typography, Checkbox, FormControl, FormControlLabel, Select, MenuItem, Button, SelectChangeEvent } from '@mui/material';
@@ -8,22 +10,19 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 /** Lib */
-import { Dayjs } from 'dayjs';
 import { useForm, Controller } from 'react-hook-form';
 
-interface RequestCorrectionInterface {
-	workDate: Dayjs | null;
-	startTime: Dayjs | null;
-	endTime: Dayjs | null;
-	modifyDocument: string;
-	modifyReason: string;
-}
+/** Type / Interface */
+import { AttendanceRequestController, attendanceChangeRequestService } from '@/app/services/attendanceChangeRequestService';
+import dayjs from 'dayjs';
 
 export interface RequestCorrectionRef {
 	submit: () => void;
 }
 
 const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
+	const router = useRouter();
+
 	const [modifyStatus, setModifyStatus] = useState<string>('PRESENT');
 	const [isStartTime, setIsStartTime] = useState<boolean>(false);
 	const [isEndTime, setIsEndTime] = useState<boolean>(false);
@@ -33,21 +32,34 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 		control,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<RequestCorrectionInterface>({
+	} = useForm<AttendanceRequestController>({
 		defaultValues: {
 			workDate: null,
 			startTime: null,
 			endTime: null,
-			modifyDocument: '',
-			modifyReason: '',
+			documentsAddress: '',
+			violationReason: '',
 		},
 	});
 
 	useImperativeHandle(ref, () => ({
 		submit: () => {
-			console.log('submit 호출됨'); // <- 이건 항상 찍혀
-			handleSubmit((data) => {
-				console.log('폼 데이터 제출:', data);
+			handleSubmit(async (data) => {
+				try {
+					await attendanceChangeRequestService.submitWorkRequest({
+						...data,
+						memberId: Number(secureLocalStorage.getItem('memberId')) ?? 1,
+						workDate: dayjs(data.workDate).format('YYYY-MM-DD'),
+						startTime: data.startTime ? dayjs(data.startTime).format('HH:mm') : null,
+						endTime: data.endTime ? dayjs(data.endTime).format('HH:mm') : null,
+					});
+
+					if (confirm('요청이 성공적으로 등록되었습니다.')) {
+						router.back();
+					}
+				} catch (error: any) {
+				} finally {
+				}
 			})();
 		},
 	}));
@@ -94,7 +106,11 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
 								<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 									<Box sx={{ minWidth: 130, display: 'flex', alignItems: 'center' }}>
-										<FormControlLabel control={<Checkbox size='small' />} color='primary' label='출근시간' />
+										<FormControlLabel
+											control={<Checkbox size='small' checked={isStartTime} onChange={() => setIsStartTime((prev) => !prev)} />}
+											color='primary'
+											label='출근시간'
+										/>
 									</Box>
 									<Controller
 										name='startTime'
@@ -112,6 +128,7 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 												{...field}
 												slotProps={{
 													textField: {
+														disabled: !isStartTime,
 														error: !!errors.startTime,
 														helperText: errors.startTime?.message,
 													},
@@ -122,7 +139,11 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 								</Box>
 								<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 									<Box sx={{ minWidth: 130, display: 'flex', alignItems: 'center' }}>
-										<FormControlLabel control={<Checkbox size='small' />} color='primary' label='퇴근시간' />
+										<FormControlLabel
+											control={<Checkbox size='small' checked={isEndTime} onChange={() => setIsEndTime((prev) => !prev)} />}
+											color='primary'
+											label='퇴근시간'
+										/>
 									</Box>
 									<Controller
 										name='endTime'
@@ -140,6 +161,7 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 												{...field}
 												slotProps={{
 													textField: {
+														disabled: !isEndTime,
 														error: !!errors.endTime,
 														helperText: errors.endTime?.message,
 													},
@@ -156,8 +178,6 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 							<FormControl sx={{ minWidth: 168 }} size='small'>
 								<Select id='demo-select-small' value={modifyStatus} onChange={handleChangeModifyStatus}>
 									<MenuItem value='PRESENT'>정상 출근</MenuItem>
-									<MenuItem value='LATE'>지각</MenuItem>
-									<MenuItem value='EARLY_LEAVE'>조퇴</MenuItem>
 									<MenuItem value='ABSENT'>결근</MenuItem>
 									<MenuItem value='VACATION'>휴가</MenuItem>
 									<MenuItem value='OUTSIDE'>외근</MenuItem>
@@ -168,7 +188,7 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 						<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 							<Typography sx={{ width: '100%', marginBottom: '0.5rem', fontWeight: 500 }}>첨부 파일</Typography>
 							<Controller
-								name='modifyDocument'
+								name='documentsAddress'
 								control={control}
 								render={({ field }) => (
 									<Box sx={{ display: 'flex', gap: 1 }}>
@@ -202,7 +222,7 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 					</Typography>
 				</Box>
 				<Controller
-					name='modifyReason'
+					name='violationReason'
 					control={control}
 					rules={{ required: '신청사유는 필수 입력사항입니다.' }}
 					render={({ field }) => (
@@ -212,8 +232,8 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 							size='small'
 							multiline
 							maxRows={5}
-							error={!!errors.modifyReason}
-							helperText={errors.modifyReason?.message}
+							error={!!errors.violationReason}
+							helperText={errors.violationReason?.message}
 						/>
 					)}
 				/>

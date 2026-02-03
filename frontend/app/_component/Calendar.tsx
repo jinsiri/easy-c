@@ -6,7 +6,7 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
 
 /** lib */
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import CustomReactCalendarTimeline from '../_lib/CustomReactCalendarTimeline';
 import { TimelineItemBase } from 'react-calendar-timeline';
 
@@ -14,37 +14,23 @@ import { TimelineItemBase } from 'react-calendar-timeline';
 import { formatMinutes } from '@/utils/commonFunc';
 
 /** type / interface */
-import { AttendanceDayResInterface } from '@/type/attendanceInterface';
+import { AttendanceDayResDto, CalendarData } from '@/app/services/attendanceService';
 import { VACATIONTYPE, WORKSTATUS } from '@/constant/attendanceConst';
-import { vacationType, workStatus } from '@/type/types';
+import { vacationType, workStatus, dayName } from '@/type/types';
 import { useRouter } from 'next/navigation';
 
-type dayName = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
-
-interface CalendarColData {
+export interface CalendarColData {
 	key: dayName;
 	header: string;
 }
 
-interface CalendarData {
-	year: number;
-	month: number;
-	day: number;
-	isCurrentMonth: boolean;
-	isHoliday?: boolean;
-	holidaySubject?: string;
-	defaultStartTime?: Date | null;
-	defaultEndTime?: Date | null;
-	detailData: AttendanceDayResInterface;
-}
-
-interface ColData {
-	key: keyof AttendanceDayResInterface;
+export interface ColData {
+	key: keyof AttendanceDayResDto;
 	header: string;
-	formatter?: (value: any, row?: AttendanceDayResInterface) => React.ReactNode;
+	formatter?: (value: any, row?: AttendanceDayResDto) => React.ReactNode;
 }
 
-interface TimelineDataInterface {
+export interface TimelineDataInterface {
 	visibleTimeStart: number | undefined;
 	visibleTimeEnd: number | undefined;
 	data: TimelineItemBase<Date>[];
@@ -172,8 +158,6 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 			header: '근로 상태',
 			key: 'workStatus',
 			formatter: (value, row) => {
-				console.log(row);
-				console.log(row?.vacationType);
 				return (
 					<Typography>
 						{row?.vacationType
@@ -203,7 +187,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 			formatter: () => {
 				return (
 					<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-						<Button variant='contained' size='small' onClick={() => router.push('/attendance/user/modal?type=detail')}>
+						<Button size='small' onClick={() => router.push('/attendance/user/modal?type=detail')}>
 							수정
 						</Button>
 					</Box>

@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
 /** MUI */
 import { Box } from '@mui/material';
 
@@ -9,22 +13,43 @@ import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import GridInnerButton from '@/app/_component/GridInnerButton';
 
+/** Type / Interface */
+import { attendanceChangeRequestService } from '@/app/services/attendanceChangeRequestService';
+
 export default function AttendanceModifyPage() {
-	const rowData: Record<string, any>[] = [
-		{ workDate: '2026-01-26', name: '김호두', startTime: '2026-01-26T08:50:00', endTime: '2026-01-26T18:00:01', workStatus: '일반' },
-	];
+	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
 
 	const colDefs: ColDef<Record<string, any>>[] = [
-		{ field: 'workDate', headerName: '근무일' },
-		{ field: 'name', headerName: '근무자' },
-		{ field: 'startTime', headerName: '출근시간' },
-		{ field: 'endTime', headerName: '퇴근시간' },
-		{ field: 'workStatus', headerName: '근로 상태' },
-		{ field: 'modify', headerName: '', cellRenderer: GridInnerButton, minWidth: 160 },
+		{ field: 'status', headerName: '상태' },
+		{ field: 'memberNm', headerName: '근무자' },
+		{ field: 'workDate', headerName: '수정 근무일' },
+		{ field: 'type', headerName: '수정 타입' },
+		{ field: 'summary', headerName: '요약' },
+		{ field: 'registerDate', headerName: '신청일' },
+		{ field: 'lastUpdateDate', headerName: '처리일' },
+		{ field: 'confirm', headerName: '상세', cellRenderer: GridInnerButton, minWidth: 160 },
 	];
+
+	useEffect(() => {
+		getWorkRequestData();
+	}, []);
+
+	const getWorkRequestData = async () => {
+		try {
+			const res = await attendanceChangeRequestService.getWorkRequestData();
+			setRowData(res.data);
+
+			console.log(res);
+		} catch (error: any) {
+		} finally {
+		}
+	};
+
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
-			<PathBreadcrumbs />
+		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+			<Box sx={{ padding: '0 1.5rem' }}>
+				<PathBreadcrumbs />
+			</Box>
 			<Box sx={{ flexDirection: 'column', flexGrow: 1 }}>
 				<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelect='single' />
 			</Box>
