@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 
 // 인터셉터가 response.data를 반환하므로 타입 오버라이드
 export interface ApiClient {
