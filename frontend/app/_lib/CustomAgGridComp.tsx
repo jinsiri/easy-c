@@ -7,7 +7,6 @@ import { Box, useTheme } from '@mui/material';
 
 /** Ag Grid */
 import { AllCommunityModule, ColDef, GridReadyEvent, iconSetQuartzLight, ModuleRegistry, RowSelectionOptions, themeQuartz } from 'ag-grid-community';
-import { AllCommunityModule, ModuleRegistry, ColDef, themeQuartz, iconSetQuartzLight, GridReadyEvent, RowSelectionOptions } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 
 // Ag-grid Row selection 옵션 추가
@@ -30,7 +29,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 interface propsType {
 	rowData: Record<string, any>[];
 	colDefs: ColDef<Record<string, any>>[];
-    pagination?: boolean;
+	pagination?: boolean;
 	onGridReady?: (params: GridReadyEvent) => void;
 	rowSelectionMode?: 'single' | 'multiple' | 'none';
 }
