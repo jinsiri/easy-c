@@ -85,7 +85,7 @@ export default function Header(props: propsType) {
 								<Popper {...bindPopper(popupState)} placement='bottom-end' transition>
 									{({ TransitionProps }) => (
 										<Fade {...TransitionProps} timeout={350}>
-											<Paper>
+											<Paper sx={{ bgcolor: '#fff', zIndex: 1000 }}>
 												<List>
 													{list.map((item) => {
 														return (
