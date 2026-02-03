@@ -14,6 +14,7 @@ const getBaseURL = () => {
 		return 'http://localhost:8081';
 	}
 
+	console.log();
 	return `${window.location.protocol}//${window.location.hostname}:8081`;
 };
 
