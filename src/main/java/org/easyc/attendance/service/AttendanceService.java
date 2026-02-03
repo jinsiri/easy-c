@@ -1,19 +1,12 @@
 package org.easyc.attendance.service;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.attendance.dto.AttendanceCalendarResponseDto;
-import org.easyc.attendance.dto.AttendanceRequestDto;
-import org.easyc.attendance.dto.AttendanceResponseDto;
-import org.easyc.attendance.dto.AttendanceSaveRequestDto;
-import org.easyc.attendance.entity.Attendance;
-import org.easyc.attendance.entity.AttendancePolicy;
-import org.easyc.attendance.entity.HolidayCalendar;
-import org.easyc.attendance.entity.MappingAttendancePolicy;
-import org.easyc.attendance.repository.AttendancePolicyRepository;
-import org.easyc.attendance.repository.AttendanceRepository;
-import org.easyc.attendance.repository.HolidayCalendarRepository;
-import org.easyc.attendance.repository.MappingAttendancePolicyRepository;
+import org.easyc.attendance.dto.*;
+import org.easyc.attendance.entity.*;
+import org.easyc.attendance.repository.*;
 import org.easyc.common.constant.*;
+import org.easyc.member.entity.Member;
+import org.easyc.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -132,7 +125,6 @@ public class AttendanceService {
                 .orElseGet(() -> Attendance.builder()
                         .memberId(req.getMemberId())
                         .workDate(workDate)
-                        .registerIp(ipAddress)
                         .build());
 
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getMemberId());
