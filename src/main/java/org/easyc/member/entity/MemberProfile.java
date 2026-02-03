@@ -25,10 +25,9 @@ public class MemberProfile extends BaseEntity { //회원정보_회사 관련
     private Long memberId;
 
     @MapsId
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
     private Member member;
-
 
     //채용구분
     @Enumerated(EnumType.STRING)

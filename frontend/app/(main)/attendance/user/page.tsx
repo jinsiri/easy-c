@@ -57,9 +57,9 @@ export default function AttendanceUserPage() {
 		axiosConfig
 			.post('/api/attendance/today', req)
 			.then((res) => {
-				if (res.data) {
-					setAttenceData(res.data);
-					makeChartOption(res.data);
+				if (res) {
+					setAttenceData(res);
+					makeChartOption(res);
 				}
 			})
 			.catch((err) => {})
@@ -79,8 +79,8 @@ export default function AttendanceUserPage() {
 		axiosConfig
 			.post('/api/attendance/calendar', req)
 			.then((res) => {
-				if (Object.keys(res.data).length > 0) {
-					setCalendarData(res.data);
+				if (Object.keys(res).length > 0) {
+					setCalendarData(res);
 				}
 			})
 			.catch((err) => {})

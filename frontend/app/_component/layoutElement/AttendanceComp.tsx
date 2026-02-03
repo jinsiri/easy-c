@@ -92,12 +92,12 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 
 		axiosConfig
 			.post('/api/attendance/start', req)
-			.then((res) => {
-				if (res.data.status === 'success') {
+			.then((res: any) => {
+				if (res.status === 'success') {
 					setActived(true);
 					if (onSuccess) onSuccess();
 				} else {
-					alert(res.data.message);
+					alert(res.message);
 				}
 			})
 			.catch((err) => {});
@@ -115,12 +115,12 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 
 		axiosConfig
 			.post('/api/attendance/finish', req)
-			.then((res) => {
-				if (res.data.status === 'success') {
+			.then((res: any) => {
+				if (res.status === 'success') {
 					setActived(true);
 					if (onSuccess) onSuccess();
 				} else {
-					alert(res.data.message);
+					alert(res.message);
 				}
 			})
 			.catch((err) => {});

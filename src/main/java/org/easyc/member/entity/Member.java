@@ -30,4 +30,21 @@ public class Member extends BaseEntity {
     //계정 상태
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
+
+    // 연관관계는 삭제 제어용 + 도메인 표현용
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
+    private MemberProfile profile;
+
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
+    private MemberPersonal personal;
+
+    public void delete() {
+        super.delete();
+        if(profile != null) {
+            profile.delete();
+        }
+        if(personal != null) {
+            personal.delete();
+        }
+    }
 }

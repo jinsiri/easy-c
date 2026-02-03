@@ -5,7 +5,6 @@ import org.easyc.member.constant.*;
 import org.easyc.member.dto.*;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.member.service.MemberService;
-import org.easyc.util.RsaUtil;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -64,7 +63,7 @@ public class EasycApplication {
 						RecruitmentType.OPEN,
 						EmploymentType.REGULAR,
 						SalaryType.ANNUAL,
-						EmploymentStatus.RETIRING_SOON,
+						EmploymentStatus.ACTIVE,
 						employeeId,
 						"easyc@email.com",
 						"02-1234-1234",
