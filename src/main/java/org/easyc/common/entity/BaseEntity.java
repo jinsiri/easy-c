@@ -5,6 +5,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -23,9 +24,11 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity {
     // --- 공통 상태 (Common) ---
     @Column(name = "deleted")
+    @Builder.Default
     private boolean deleted = false;
 
     @Column(name = "active")
+    @Builder.Default
     private boolean active = true;
 
     // --- 등록 정보 (Register) ---
