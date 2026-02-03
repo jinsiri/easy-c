@@ -37,7 +37,7 @@ export default function AttendanceModifyPage() {
 	const getWorkRequestData = async () => {
 		try {
 			const res = await attendanceChangeRequestService.getWorkRequestData();
-			setRowData(res.data);
+			setRowData(res);
 
 			console.log(res);
 		} catch (error: any) {

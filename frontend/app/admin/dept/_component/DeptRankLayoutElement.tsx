@@ -49,7 +49,7 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 
 		try {
 			const res = await serviceMap[rankType]();
-			setActiveCategoryData(res.data);
+			setActiveCategoryData(res);
 		} catch (err) {
 			console.error('정보 조회 실패:', err);
 		}
