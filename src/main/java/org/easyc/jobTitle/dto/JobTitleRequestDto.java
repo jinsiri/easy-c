@@ -3,6 +3,7 @@ package org.easyc.jobTitle.dto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.dto.BaseDto;
+import org.easyc.jobTitle.entity.JobTitle;
 
 @Getter
 @SuperBuilder
@@ -14,4 +15,14 @@ public class JobTitleRequestDto extends BaseDto {
     private String jobTitleNm;
     private String jobTitleCode;
     private int jobTitleLevel;
+
+    public JobTitle toEntity() {
+        return JobTitle.builder()
+                .jobTitleId(jobTitleId)
+                .jobTitleNm(jobTitleNm)
+                .jobTitleCode(jobTitleCode)
+                .jobTitleLevel(jobTitleLevel)
+                .build()
+                ;
+    }
 }

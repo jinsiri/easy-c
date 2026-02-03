@@ -26,8 +26,7 @@ public abstract class BaseEntity {
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
-    @Builder.Default
-    @Column(name = "active", nullable = false)
+    @Column(name = "active")
     private boolean active = true;
 
     // --- 등록 정보 (Register) ---

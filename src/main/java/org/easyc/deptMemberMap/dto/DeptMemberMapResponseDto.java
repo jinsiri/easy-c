@@ -1,0 +1,29 @@
+package org.easyc.deptMemberMap.dto;
+
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.easyc.common.dto.BaseDto;
+import org.easyc.deptMemberMap.constant.DeptRole;
+import org.easyc.deptMemberMap.entity.DeptMemberMap;
+
+@Getter
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(callSuper = true)
+public class DeptMemberMapResponseDto extends BaseDto {
+    private Long deptMemberMapId;
+    private Long deptId;
+    private Long memberId;
+    private DeptRole deptRole;
+
+    @Builder
+    public static DeptMemberMapResponseDto fromEntity(DeptMemberMap deptMemberMap) {
+        return DeptMemberMapResponseDto.builder()
+                .deptMemberMapId(deptMemberMap.getDeptMemberMapId())
+                .deptId(deptMemberMap.getDeptId())
+                .memberId(deptMemberMap.getMemberId())
+                .deptRole(deptMemberMap.getDeptRole())
+                .build();
+    }
+}

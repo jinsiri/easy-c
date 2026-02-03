@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.entity.BaseTreeEntity;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
@@ -12,6 +14,8 @@ import org.easyc.common.entity.BaseTreeEntity;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@DynamicUpdate
+@SQLRestriction("deleted = false")
 public class Dept extends BaseTreeEntity {
     @Id
     @SequenceGenerator(name="dept_seq", sequenceName="dept_seq", allocationSize=1)
@@ -29,4 +33,12 @@ public class Dept extends BaseTreeEntity {
 
     @Column(name="dept_email", length = 150)
     private String deptEmail;
+
+    public void addChild() {
+        this.treeChildCount++;
+    }
+
+    public void removeChild() {
+        if (this.treeChildCount > 0) this.treeChildCount--;
+    }
 }

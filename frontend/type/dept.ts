@@ -6,4 +6,5 @@ export interface DeptResponseDto extends BaseTreeDto {
 	deptShortNm: string;
 	deptCode: string;
 	deptEmail: string | null;
+	dataType: string;
 }

@@ -29,11 +29,12 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 interface propsType {
 	rowData: Record<string, any>[];
 	colDefs: ColDef<Record<string, any>>[];
+	pagination?: boolean;
 	onGridReady?: (params: GridReadyEvent) => void;
 	rowSelectionMode?: 'single' | 'multiple' | 'none';
 }
 
-const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, rowSelectionMode = 'none' }: propsType, ref) => {
+const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination = true, rowSelectionMode = 'none' }: propsType, ref) => {
 	const gridRef = useRef<AgGridReact>(null);
 	const theme = useTheme();
 	const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
@@ -73,10 +74,10 @@ const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, rowSelecti
 			<AgGridReact
 				ref={gridRef}
 				theme={gridTheme}
-				rowSelection={rowSelection}
 				rowData={rowData}
 				columnDefs={colDefs}
-				pagination={true}
+				rowSelection={rowSelection}
+				pagination={pagination}
 				onGridReady={onGridReadyEvent}
 			/>
 		</Box>

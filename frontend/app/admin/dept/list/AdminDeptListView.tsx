@@ -7,6 +7,10 @@ import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import CommonTabs from '@/app/_component/CommonTabs';
 import CommonTreeview from '@/app/_component/Tree';
 import { useRouter } from 'next/navigation';
+import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
+import { useEffect, useState } from 'react';
+import axiosConfig from '@/app/_lib/axiosConfig';
+import { useDialogStore } from '@/store/useDialogStore';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -49,6 +53,10 @@ const mapDeptToTree = (dept: DeptResponseDto) => ({
 export default function AdminDeptListView({ dbData }: Props) {
 	const router = useRouter();
 	const theme = useTheme();
+	const rootId = dbData?.[0]?.deptId ? String(dbData[0].deptId) : null;
+	const { alert, success, danger } = useDialogStore();
+	const [selectedDeptId, setSelectedDeptId] = useState<number | null>(dbData?.[0]?.deptId || null);
+	const [expandedIds, setExpandedIds] = useState<string[]>(rootId ? [rootId] : []);
 
 	const dummyDept = {
 		deptNm: dbData?.[0]?.deptNm || '부서 선택 안됨',
@@ -61,18 +69,50 @@ export default function AdminDeptListView({ dbData }: Props) {
 		{
 			label: '부서 정보',
 			content: (
-				<InfoList
-					items={[
-						{ label: '부서명(한글)', value: dummyDept.deptNm },
-						{ label: '부서메일아이디', value: dummyDept.deptEmail },
-						{ label: '부서코드', value: dummyDept.deptCode },
-						{ label: '부서 약어', value: dummyDept.deptShortNm },
-					]}
-				/>
+				<Box sx={{ p: '1rem 1.5rem' }}>
+					<InfoList
+						items={[
+							{ label: '부서명(한글)', value: dummyDept.deptNm },
+							{ label: '부서메일아이디', value: dummyDept.deptEmail },
+							{ label: '부서코드', value: dummyDept.deptCode },
+							{ label: '부서 약어', value: dummyDept.deptShortNm },
+						]}
+					/>
+				</Box>
 			),
 		},
-		{ label: '부서원 목록', content: <>부서원 목록</> },
+		{ label: '부서원 목록', content: <AdminDeptDetailView deptId={1} /> },
 	];
+
+	const deleteDept = async (deptId: number) => {
+		await axiosConfig.delete(`/api/dept/${deptId}`);
+	};
+
+	const handleDelete = async (deptId: number) => {
+		const isConfirmed = await danger('정말 이 부서를 삭제하시겠습니까? 삭제 시 하위부서도 삭제됩니다.');
+
+		if (isConfirmed) {
+			try {
+				await deleteDept(deptId);
+				await success('부서가 정상적으로 삭제되었습니다.');
+
+				const selectedDept = dbData.find((dept) => dept.deptId === selectedDeptId);
+				const nextId = selectedDept?.treeParentId ?? 1;
+				setSelectedDeptId(nextId);
+
+				router.refresh();
+			} catch (error) {
+				await alert('삭제 중 문제가 발생했습니다.');
+			}
+		}
+	};
+
+	useEffect(() => {
+		if (dbData?.length > 0 && expandedIds.length === 0) {
+			setExpandedIds([String(dbData[0].deptId)]);
+			setSelectedDeptId(dbData[0].deptId);
+		}
+	}, [dbData]);
 
 	return (
 		<Box
@@ -86,12 +126,6 @@ export default function AdminDeptListView({ dbData }: Props) {
 			}}
 		>
 			<PathBreadcrumbs />
-
-			<Box component={'section'} sx={{ width: '100%', marginBottom: '1.5rem' }}>
-				<Typography variant='h5' sx={{ fontWeight: '800' }}>
-					조직설계
-				</Typography>
-			</Box>
 
 			<Grid container spacing={3} sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
 				<Grid
@@ -109,12 +143,14 @@ export default function AdminDeptListView({ dbData }: Props) {
 
 					<Box sx={{ mb: 1 }}>
 						<Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-							<IconButton className='contained-primary light' onClick={() => router.push('/admin/dept/list/add')}>
+							<IconButton className='contained-primary light' onClick={() => router.push(`/admin/dept/list/add?parentId=${selectedDeptId}`)}>
 								<AddCircleOutline className='svg-small' />
 							</IconButton>
-							<IconButton className='contained-primary light'>
-								<RemoveCircleOutline className='svg-small' />
-							</IconButton>
+							{selectedDeptId && selectedDeptId !== 1 && (
+								<IconButton className='contained-primary light' onClick={() => handleDelete(selectedDeptId)}>
+									<RemoveCircleOutline className='svg-small' />
+								</IconButton>
+							)}
 						</Stack>
 					</Box>
 
@@ -122,9 +158,12 @@ export default function AdminDeptListView({ dbData }: Props) {
 						<CommonTreeview
 							rawData={dbData || []}
 							mapEntityToTree={mapDeptToTree}
+							expandedIds={expandedIds}
+							onExpandedItemsChange={(ids) => setExpandedIds(ids)}
+							selectedId={String(selectedDeptId)}
 							placeholder='부서명을 검색하세요.'
 							onNodeClick={(node) => {
-								console.log('선택된 부서의 코드:', node.label); // 원본 필드 접근 가능
+								setSelectedDeptId(Number(node.id));
 							}}
 						/>
 					</Box>

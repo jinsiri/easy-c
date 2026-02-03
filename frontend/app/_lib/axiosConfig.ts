@@ -8,13 +8,14 @@ export interface ApiClient {
 	patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>;
 	delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
 }
+import axios, { InternalAxiosRequestConfig } from 'axios';
 
 const getBaseURL = () => {
-	if (typeof window !== 'undefined') {
-		// 현재 프로토콜://호스트:8081 (포트만 고정)
-		return `${window.location.protocol}//${window.location.hostname}:8081`;
+	if (typeof window === 'undefined') {
+		return 'http://localhost:8081';
 	}
-	return '';
+
+	return `${window.location.protocol}//${window.location.hostname}:8081`;
 };
 
 const axiosConfig = axios.create({
@@ -27,10 +28,21 @@ const axiosConfig = axios.create({
 
 // 요청 인터셉터 (선택)
 axiosConfig.interceptors.request.use(
-	(config) => {
-		// 예: 토큰 추가
-		// const token = localStorage.getItem('token');
-		// if (token) config.headers.Authorization = `Bearer ${token}`;
+	async (config: InternalAxiosRequestConfig) => {
+		if (typeof window === 'undefined') {
+			// only server component
+			try {
+				const { cookies } = await import('next/headers');
+				const cookieStore = await cookies();
+				const token = cookieStore.get('ACCESS_TOKEN')?.value;
+
+				if (token) {
+					config.headers.Cookie = `ACCESS_TOKEN=${token}`;
+				}
+			} catch (error) {
+				console.error('서버 사이드 쿠키 주입 실패:', error);
+			}
+		}
 		return config;
 	},
 	(error) => Promise.reject(error),

@@ -2,11 +2,10 @@ package org.easyc.jobGrade.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.easyc.jobGrade.dto.JobGradeRequestDto;
-import org.easyc.jobGrade.dto.JobGradeResponseDto;
 import org.easyc.jobGrade.service.JobGradeService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.easyc.jobPosition.dto.JobPositionRequestDto;
+import org.easyc.jobPosition.dto.JobPositionResponseDto;
+import org.easyc.jobPosition.service.JobPositionService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,19 +23,15 @@ public class JobGradeCotroller {
     //수정: update()
     //삭제: delete()
 
+    private final JobPositionService jobPositionService;
+
     @GetMapping
-    public ResponseEntity<List<JobGradeResponseDto>> findAll() {
-        try {
-            List<JobGradeResponseDto> tree = jobGradeService.findAll();
-            return ResponseEntity.ok(tree);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+    public List<JobPositionResponseDto> findAll() {
+        return jobPositionService.findAll();
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@RequestBody JobGradeRequestDto dto) {
-        jobGradeService.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public void save(@RequestBody JobPositionRequestDto dto) {
+        jobPositionService.save(dto);
     }
 }

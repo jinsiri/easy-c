@@ -2,13 +2,12 @@ package org.easyc.dept.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.easyc.dept.dto.DeptRequestDto;
 import org.easyc.dept.dto.DeptResponseDto;
+import org.easyc.dept.entity.Dept;
 import org.easyc.dept.service.DeptService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,5 +31,19 @@ public class DeptController {
             log.error("조직도 조회 중 오류 발생: ", e);
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @PostMapping
+    public ResponseEntity<Dept> saveChildDept(@RequestBody DeptRequestDto deptRequestDto) {
+        Dept savedDept = deptService.saveChildDept(deptRequestDto);
+
+        return ResponseEntity.ok(savedDept);
+    }
+
+    @DeleteMapping("/{deptId}")
+    public ResponseEntity<Void> deleteDept(@PathVariable Long deptId) {
+        deptService.softDeleteDept(deptId);
+
+        return ResponseEntity.noContent().build();
     }
 }
