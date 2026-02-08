@@ -49,7 +49,7 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 
 		try {
 			const res = await serviceMap[rankType]();
-			setActiveCategoryData(res.data);
+			setActiveCategoryData(res);
 		} catch (err) {
 			console.error('정보 조회 실패:', err);
 		}
@@ -68,24 +68,6 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 	const currentData = useMemo(() => {
 		return RANK_TEMPLATES[rankType].subTypes[activeSubCategory]?.list || [];
 	}, [rankType, activeSubCategory]);
-
-	const dataRowSelection: GridOptions['rowSelection'] = useMemo(() => {
-		return {
-			mode: 'multiRow',
-			checkboxes: true,
-			enableClickSelection: true,
-			headerCheckbox: false,
-		};
-	}, []);
-
-	const templateRowSelection: GridOptions['rowSelection'] = useMemo(() => {
-		return {
-			mode: 'multiRow',
-			checkboxes: true,
-			enableClickSelection: true,
-			headerCheckbox: true,
-		};
-	}, []);
 
 	return (
 		<Grid container direction={'row'} spacing={2} sx={{ flexGrow: 1, width: '100%', p: 2 }}>
@@ -130,7 +112,7 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 						</Stack>
 					</Grid>
 				</Grid>
-				<CustomAgGridComp rowData={activeCategoryData} colDefs={deptRankColDefs} rowSelection={dataRowSelection} pagination={false} />
+				<CustomAgGridComp rowData={activeCategoryData} colDefs={deptRankColDefs} rowSelectionMode={'multiple'} pagination={false} />
 			</Grid>
 			<Grid
 				size={{
@@ -186,7 +168,7 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 						</Stack>
 					</Grid>
 				</Grid>
-				<CustomAgGridComp rowData={currentData} colDefs={templateColDefs} rowSelection={templateRowSelection} pagination={false} />
+				<CustomAgGridComp rowData={currentData} colDefs={templateColDefs} rowSelectionMode={'multiple'} pagination={false} />
 			</Grid>
 		</Grid>
 	);
