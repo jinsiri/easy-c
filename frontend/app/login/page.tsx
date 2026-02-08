@@ -32,9 +32,9 @@ const LoginPage = () => {
 			});
 
 			console.log(res);
-			secureLocalStorage.setItem('loginId', res.data.loginId);
-			secureLocalStorage.setItem('memberId', res.data.memberId);
-			secureLocalStorage.setItem('memberRole', res.data.memberRole);
+			secureLocalStorage.setItem('loginId', res.loginId);
+			secureLocalStorage.setItem('memberId', res.memberId);
+			secureLocalStorage.setItem('memberRole', res.memberRole);
 
 			await alert('로그인 성공!');
 			router.push('/'); // 메인 페이지 이동

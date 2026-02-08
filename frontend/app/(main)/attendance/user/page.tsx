@@ -55,9 +55,9 @@ export default function AttendanceUserPage() {
 				workDate: today.format('YYYY-MM-DD'),
 			});
 
-			if (res.data) {
-				setAttenceData(res.data);
-				makeChartOption(res.data);
+			if (res) {
+				setAttenceData(res);
+				makeChartOption(res);
 			}
 		} catch (error: any) {
 		} finally {
@@ -74,8 +74,8 @@ export default function AttendanceUserPage() {
 				workDate: calendarDate.format('YYYY-MM-DD'),
 			});
 
-			if (Object.keys(res.data).length > 0) {
-				setCalendarData(res.data);
+			if (Object.keys(res).length > 0) {
+				setCalendarData(res);
 			}
 		} catch (error: any) {
 		} finally {
