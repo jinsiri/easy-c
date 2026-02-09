@@ -14,6 +14,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class AttendanceChangeDataDto {
     private Long memberId;
+    private String loginId;
     private String requestType;
     private LocalDate workDate;
     private LocalTime startTime;
@@ -24,7 +25,6 @@ public class AttendanceChangeDataDto {
 
     public AttendanceChangeRequest returnAttendanceChangeEntity () {
         AttendanceChangeRequest entity = new AttendanceChangeRequest();
-        entity.setMemberId(this.memberId);
         entity.setWorkDate(this.workDate);
         entity.setStartTime(this.startTime);
         entity.setEndTime(this.endTime);

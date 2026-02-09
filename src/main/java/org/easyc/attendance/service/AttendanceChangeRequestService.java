@@ -28,8 +28,6 @@ public class AttendanceChangeRequestService {
     }
 
     public void saveAttendanceChangeRequest (AttendanceChangeDataDto req){
-        Member targetMember = memberRepository.findByMemberId(req.getMemberId()).orElseThrow();
-
         String type = "근무상태 수정";
 
         if(req.getStartTime() != null || req.getEndTime() != null){
@@ -37,7 +35,6 @@ public class AttendanceChangeRequestService {
         }
 
         AttendanceChangeRequest attendanceChangeRequest = req.returnAttendanceChangeEntity();
-        attendanceChangeRequest.setMemberNm(targetMember.getMemberNm());
         attendanceChangeRequest.setType(type);
         attendanceChangeRequestRepository.save(attendanceChangeRequest);
     }

@@ -33,8 +33,11 @@ public class Attendance extends BaseEntity {
 
 
     /** 등록자 정보 추가 */
-    @Column(name = "member_id")
-    private Long memberId;
+    @Column(name = "register_dept_nm")
+    private String deptNm;
+
+    @Column(name = "register_job_grade")
+    private String jobGrade;
 
     @Column(name = "register_latitude")
     private BigDecimal registerLatitude;
@@ -78,7 +81,6 @@ public class Attendance extends BaseEntity {
 
 
     /** 휴가 관련 */
-
     @Column(name = "remoted", columnDefinition = "boolean default false")
     @Builder.Default
     private boolean remoted = false;

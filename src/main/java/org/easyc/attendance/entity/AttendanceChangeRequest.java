@@ -6,6 +6,7 @@ import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.constant.WorkStatus;
 import org.easyc.common.entity.BaseEntity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -21,22 +22,12 @@ public class AttendanceChangeRequest extends BaseEntity {
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="attendance_change_request_seq")
     private Long workRequestId;
 
-    @Column(name = "member_id")
-    private Long memberId;
+    /** 등록자 정보 추가 */
+    @Column(name = "register_dept_nm")
+    private String deptNm;
 
-    @Column(name = "member_Nm")
-    private String memberNm;
-
-    @Column(name="status")
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private BasicStatus status = BasicStatus.PENDING;
-
-    @Column(name="type")
-    private String type;
-
-    @Column(name="summary")
-    private String summary;
+    @Column(name = "register_job_grade")
+    private String jobGrade;
 
 
     //요청서 내용
@@ -57,4 +48,16 @@ public class AttendanceChangeRequest extends BaseEntity {
 
     @Column(name="documents_address")
     private String documentsAddress;
+
+    //요청 상태
+    @Column(name="status")
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private BasicStatus status = BasicStatus.PENDING;
+
+    @Column(name="type")
+    private String type;
+
+    @Column(name="summary")
+    private String summary;
 }

@@ -31,3 +31,9 @@ export const ATTENDANCETYPE: Record<string, string> = {
 	FLEXIBLE: '탄력근로',
 	SHIFT: '교대근무',
 };
+
+export const BASICSTATUS: Record<string, string> = {
+	PENDING: '대기',
+	APPROVED: '승인',
+	REJECTED: '거절',
+};
