@@ -9,5 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AttendanceRequestDto {
     private Long memberId;
+    private String loginId;
     private String workDate;
 }

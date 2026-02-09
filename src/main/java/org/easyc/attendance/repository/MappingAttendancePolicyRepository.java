@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface MappingAttendancePolicyRepository extends JpaRepository<MappingAttendancePolicy, Long> {
-    Optional<MappingAttendancePolicy> findTopByMemberIdOrderByAttendancePolicyIdDesc(Long memberId);
+    Optional<MappingAttendancePolicy> findTopByLoginIdOrderByAttendancePolicyIdDesc(String loginId);
 }

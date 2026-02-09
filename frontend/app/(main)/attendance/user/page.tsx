@@ -15,7 +15,7 @@ import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
-import Calendar from '@/app/_component/Calendar';
+import Calendar from '@/app/(main)/attendance/Calendar';
 import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
 import { formatMinutes } from '@/utils/commonFunc';
 

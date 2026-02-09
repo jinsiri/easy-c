@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class AttendanceSaveRequestDto {
     private Long memberId;
+    private String loginId;
     private String startTime;
     private String endTime;
     private BigDecimal registerLatitude;

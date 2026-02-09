@@ -63,8 +63,9 @@ public class DeptService {
                 .treeSortCode(newSortCode)
                 .active(true)
                 .registerIp(deptRequestDto.getRegisterIp())
-                .registerId(deptRequestDto.getRegisterId())
-                .registerNm(deptRequestDto.getRegisterNm())
+                .registerUser(deptRequestDto.getRegisterUser())
+                //.registerId(deptRequestDto.getRegisterId())
+                //.registerNm(deptRequestDto.getRegisterNm())
                 .build();
 
         Dept savedDept = deptRepository.save(newDept);

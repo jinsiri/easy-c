@@ -1,6 +1,7 @@
 package org.easyc.auth.service;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.auth.dto.CustomUserDetails;
 import org.easyc.member.entity.Member;
 import org.easyc.member.repository.MemberRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,16 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
+    public CustomUserDetails loadUserByUsername(String loginId)
+            throws UsernameNotFoundException {
+
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new UsernameNotFoundException("Member not found: " + loginId));
+
+        return new CustomUserDetails(member);
+    }
+
+    /*@Override
     public UserDetails loadUserByUsername(String loginId)
             throws UsernameNotFoundException {
 
@@ -26,5 +37,5 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .password(member.getPassword())
                 .authorities(member.getMemberRole().name())
                 .build();
-    }
+    }*/
 }

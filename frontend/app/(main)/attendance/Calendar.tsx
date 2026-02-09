@@ -7,7 +7,7 @@ import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
 
 /** lib */
 import dayjs from 'dayjs';
-import CustomReactCalendarTimeline from '../_lib/CustomReactCalendarTimeline';
+import CustomReactCalendarTimeline from '../../_lib/CustomReactCalendarTimeline';
 import { TimelineItemBase } from 'react-calendar-timeline';
 
 /** Custom */
@@ -44,95 +44,6 @@ const calendarCol: CalendarColData[] = [
 	{ key: 'fri', header: '금요일' },
 	{ key: 'sat', header: '토요일' },
 	{ key: 'sun', header: '일요일' },
-];
-
-const defaultCalendarRow: Record<dayName, CalendarData>[] = [
-	{
-		mon: {
-			year: 2026,
-			month: 1,
-			day: 1,
-			isCurrentMonth: true,
-			detailData: {
-				startTime: null,
-				endTime: null,
-				fullTime: null,
-				overTime: null,
-			},
-		},
-		tue: {
-			year: 2026,
-			month: 1,
-			day: 1,
-			isCurrentMonth: true,
-			detailData: {
-				startTime: null,
-				endTime: null,
-				fullTime: null,
-				overTime: null,
-			},
-		},
-		wed: {
-			year: 2026,
-			month: 1,
-			day: 1,
-			isCurrentMonth: true,
-			detailData: {
-				startTime: null,
-				endTime: null,
-				fullTime: null,
-				overTime: null,
-			},
-		},
-		thu: {
-			year: 2026,
-			month: 1,
-			day: 1,
-			isCurrentMonth: true,
-			detailData: {
-				startTime: null,
-				endTime: null,
-				fullTime: null,
-				overTime: null,
-			},
-		},
-		fri: {
-			year: 2026,
-			month: 1,
-			day: 1,
-			isCurrentMonth: true,
-			detailData: {
-				startTime: null,
-				endTime: null,
-				fullTime: null,
-				overTime: null,
-			},
-		},
-		sat: {
-			year: 2026,
-			month: 1,
-			day: 1,
-			isCurrentMonth: true,
-			detailData: {
-				startTime: null,
-				endTime: null,
-				fullTime: null,
-				overTime: null,
-			},
-		},
-		sun: {
-			year: 2026,
-			month: 1,
-			day: 1,
-			isCurrentMonth: true,
-			detailData: {
-				startTime: null,
-				endTime: null,
-				fullTime: null,
-				overTime: null,
-			},
-		},
-	},
 ];
 
 export default function Calendar({ calendarRow }: { calendarRow: Record<dayName, CalendarData>[] }) {
@@ -196,7 +107,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 		},
 	];
 
-	const [targetCalendarRow, setTargetCalendarRow] = useState<Record<dayName, CalendarData>[]>(defaultCalendarRow);
+	const [targetCalendarRow, setTargetCalendarRow] = useState<Record<dayName, CalendarData>[]>([]);
 	const [activeCell, setActiveCell] = useState<string | null>(null);
 	const [activeTimelineData, setActiveTimelineData] = useState<TimelineDataInterface>({
 		visibleTimeStart: undefined,

@@ -14,13 +14,20 @@ import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import GridInnerButton from '@/app/_component/GridInnerButton';
 
 /** Type / Interface */
+import { BASICSTATUS } from '@/constant/attendanceConst';
 import { attendanceChangeRequestService } from '@/app/services/attendanceChangeRequestService';
 
 export default function AttendanceModifyPage() {
 	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
 
 	const colDefs: ColDef<Record<string, any>>[] = [
-		{ field: 'status', headerName: '상태' },
+		{
+			field: 'status',
+			headerName: '상태',
+			valueFormatter: (params) => {
+				return params.value ? BASICSTATUS[params.value] : '-';
+			},
+		},
 		{ field: 'memberNm', headerName: '근무자' },
 		{ field: 'workDate', headerName: '수정 근무일' },
 		{ field: 'type', headerName: '수정 타입' },
@@ -51,7 +58,7 @@ export default function AttendanceModifyPage() {
 				<PathBreadcrumbs />
 			</Box>
 			<Box sx={{ flexDirection: 'column', flexGrow: 1 }}>
-				<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelect='single' />
+				<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='single' />
 			</Box>
 		</Box>
 	);

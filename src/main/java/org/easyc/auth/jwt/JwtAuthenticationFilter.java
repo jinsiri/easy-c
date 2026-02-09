@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.dto.BaseUserDto;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,10 +36,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             if (token != null && jwtProvider.validateToken(token)) {
-                String loginId = jwtProvider.getSubject(token);
-//                UserDetails userDetails = userDetailsService.loadUserByUsername(loginId);
+//              UserDetails userDetails = userDetailsService.loadUserByUsername(loginId);
 
+                String loginId = jwtProvider.getSubject(token);
+                String memberNm = jwtProvider.getMemberNm(token);
                 String role = jwtProvider.getRole(token);
+
+                BaseUserDto loginUser =
+                        new BaseUserDto(loginId, memberNm, role);
 
                 GrantedAuthority authority =
                         new SimpleGrantedAuthority(role);
@@ -47,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Authentication
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                loginId,
+                                loginUser,
                                 null,
                                 List.of(authority) // DB에서 가져온 권한 (MemberRole)
                         );
