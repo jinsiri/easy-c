@@ -17,8 +17,7 @@ public class BaseDto {
     private boolean active;
     private LocalDateTime registerDate;
     private String registerIp;
-    private String registerId;
-    private String registerNm;
+    private BaseUserDto registerUser;
     private LocalDateTime lastUpdateDate;
     private String lastUpdateIp;
     private String lastUpdateId;

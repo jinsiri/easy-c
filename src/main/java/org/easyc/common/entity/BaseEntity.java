@@ -1,6 +1,7 @@
 package org.easyc.common.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.easyc.common.dto.BaseUserDto;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -37,11 +40,15 @@ public abstract class BaseEntity {
     @Column(name = "register_ip", updatable = false)
     private String registerIp;
 
-    @Column(name = "register_id", updatable = false)
+    @CreatedBy
+    @Embedded
+    private BaseUserDto registerUser;
+
+   /* @Column(name = "register_id", updatable = false)
     private String registerId;
 
     @Column(name = "register_nm", updatable = false)
-    private String registerNm;
+    private String registerNm;*/
 
     // --- 수정 정보 (Last Update) ---
     @LastModifiedDate

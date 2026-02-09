@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.easyc.auth.dto.CustomUserDetails;
+import org.easyc.common.dto.BaseUserDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -54,31 +56,47 @@ public class JwtProvider {
 
 
     public String createAccessToken(Authentication auth) {
-
-        String role = auth.getAuthorities().iterator().next().getAuthority();
+        CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
 
         return Jwts.builder()
+                .setSubject(user.getUsername())
+                .claim("memberNm", user.getMemberNm())
+                .claim("role", user.getAuthorities().iterator().next().getAuthority())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXP))
+                .signWith(accessTokenKey)
+                .compact();
+
+        /*return Jwts.builder()
                     .setSubject(auth.getName()) // loginId
-                    .claim("role", role)
+                    .claim("role", auth.getAuthorities().iterator().next().getAuthority())
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXP))
-//                    .signWith(SignatureAlgorithm.HS256, SECRET) // 구식 - 문자열 서명, 보안적으로 권장하지 않음.
+                  //  .signWith(SignatureAlgorithm.HS256, SECRET) // 구식 - 문자열 서명, 보안적으로 권장하지 않음.
                     .signWith(accessTokenKey)
-                    .compact();
+                    .compact();*/
     }
 
     public String createRefreshToken(Authentication auth) {
-
-        String role = auth.getAuthorities().iterator().next().getAuthority();
+        CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
 
         return Jwts.builder()
+                .setSubject(user.getUsername())
+                .claim("memberNm", user.getMemberNm())
+                .claim("role", user.getAuthorities().iterator().next().getAuthority())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXP))
+                .signWith(refreshTokenKey)
+                .compact();
+
+        /*return Jwts.builder()
                     .setSubject(auth.getName()) // loginId
-                    .claim("role", role)
+                    .claim("role", auth.getAuthorities().iterator().next().getAuthority())
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXP))
-//                    .signWith(SignatureAlgorithm.HS256, SECRET) // 구식 - 문자열 서명, 보안적으로 권장하지 않음.
+                //  .signWith(SignatureAlgorithm.HS256, SECRET) // 구식 - 문자열 서명, 보안적으로 권장하지 않음.
                     .signWith(refreshTokenKey)
-                    .compact();
+                    .compact();*/
     }
 
     public boolean validateToken(String token) {
@@ -114,10 +132,14 @@ public class JwtProvider {
                 .getBody();
 
         String loginId = claims.getSubject();
+        String memberNm = claims.get("memberNm", String.class);
         String role = claims.get("role", String.class);
 
+        BaseUserDto loginUser =
+                new BaseUserDto(loginId, memberNm, role);
+
         return new UsernamePasswordAuthenticationToken(
-                loginId,
+                loginUser,
                 null,
                 List.of(new SimpleGrantedAuthority(role)) // role_~
         );
@@ -133,6 +155,15 @@ public class JwtProvider {
         return claimsJws.getBody().getSubject();
     }
 
+    public String getMemberNm(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(accessTokenKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("memberNm", String.class);
+    }
 
     public String getRole(String token) {
         Claims claims = Jwts.parserBuilder()
