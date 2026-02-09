@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axiosConfig from '@/app/_lib/axiosConfig';
-import { DeptFormValues } from '@/app/admin/dept/_component/DeptAddForm';
 import { useDialogStore } from '@/store/useDialogStore';
+import { DeptAddFormValues } from '@/app/admin/dept/_component/DeptAddForm';
 
 export function useDeptAdd(onSuccess?: () => void) {
 	const router = useRouter();
@@ -13,7 +13,7 @@ export function useDeptAdd(onSuccess?: () => void) {
 	const { alert } = useDialogStore();
 	const [loading, setLoading] = useState(false);
 
-	const formMethods = useForm<DeptFormValues>({
+	const formMethods = useForm<DeptAddFormValues>({
 		defaultValues: {
 			deptNm: '',
 			deptEmail: '',

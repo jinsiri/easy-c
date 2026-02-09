@@ -4,9 +4,10 @@ import { Button, FormControl, Grid, IconButton, MenuItem, Select, SelectChangeEv
 import { Add, ArrowBack, Remove, Reorder } from '@mui/icons-material';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import { RANK_TEMPLATES, RANK_CATEGORY_INFO, RankCategory } from '@/constant/deptConst';
-import { ColDef, GridOptions } from 'ag-grid-community';
+import { ColDef } from 'ag-grid-community';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { deptService } from '@/app/services/deptService';
+import { useRouter } from 'next/navigation';
 
 const templateColDefs: ColDef<Record<string, any>>[] = [
 	{ field: 'deptRankNm', headerName: '명칭', editable: false },
@@ -19,14 +20,6 @@ const deptRankColDefs: ColDef<Record<string, any>>[] = [
 	{ field: 'userCount', headerName: '사용멤버(명)', editable: false },
 ];
 
-const dummyPosition: Record<string, any>[] = [
-	{
-		deptRankNm: '회장',
-		deptRankCode: '001',
-		userCount: 0,
-	},
-];
-
 type SubCategoryType = string;
 
 interface DeptRankLayoutElementProps {
@@ -34,6 +27,7 @@ interface DeptRankLayoutElementProps {
 }
 
 export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElementProps) {
+	const router = useRouter();
 	const theme = useTheme();
 	const categoryName = RANK_CATEGORY_INFO[rankType];
 	const subCategories = RANK_TEMPLATES[rankType].subTypes;
@@ -49,7 +43,14 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 
 		try {
 			const res = await serviceMap[rankType]();
-			setActiveCategoryData(res);
+			setActiveCategoryData(
+				res.map((el) => ({
+					...el,
+					deptRankNm: el.jobPositionNm,
+					deptRankCode: el.jobPositionCode,
+					userCount: el.userCount ?? 0,
+				})),
+			);
 		} catch (err) {
 			console.error('정보 조회 실패:', err);
 		}
@@ -63,6 +64,10 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 
 	const handleChange = (event: SelectChangeEvent) => {
 		setActiveSubCategory(event.target.value as SubCategoryType);
+	};
+
+	const goToAddRolePage = (categoryName: RankCategory) => {
+		router.push(`/admin/dept/role/${categoryName.toLowerCase()}/add`);
 	};
 
 	const currentData = useMemo(() => {
@@ -95,7 +100,7 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 							}}
 						>
 							<Stack>
-								<Button variant='outlined' size='small' startIcon={<Add />}>
+								<Button variant='outlined' size='small' startIcon={<Add />} onClick={() => goToAddRolePage(rankType)}>
 									추가
 								</Button>
 							</Stack>

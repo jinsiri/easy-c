@@ -13,7 +13,6 @@ interface FieldProps<TFieldValues extends FieldValues> {
 export interface FormProps<T extends FieldValues> {
 	control: Control<T>;
 	errors: FieldErrors<T>;
-	fields: any[];
 }
 
 export const FormItem = <TFieldValues extends FieldValues>({ name, label, placeholder, required, control, error }: FieldProps<TFieldValues>) => (
