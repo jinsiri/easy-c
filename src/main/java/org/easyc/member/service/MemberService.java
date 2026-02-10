@@ -45,8 +45,7 @@ public class MemberService {
     public MemberResponseDto getLoginUserByMemberId(Long memberId) {
         if(memberId == null) return null;
 
-        Optional<Member> optionalUser = memberRepository.findById(memberId);
-        Member member = optionalUser
+        Member member = memberRepository.findByDeletedFalseAndMemberId(memberId)
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         return MemberResponseDto.fromEntity(member);
@@ -61,8 +60,7 @@ public class MemberService {
     public MemberResponseDto getLoginUserByLoginId(String loginId) {
         if (loginId == null) return null;
 
-        Optional<Member> optionalUser = memberRepository.findByLoginId(loginId);
-        Member member = optionalUser
+        Member member = memberRepository.findByDeletedFalseAndLoginId(loginId)
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         return MemberResponseDto.fromEntity(member);
@@ -71,8 +69,7 @@ public class MemberService {
     public MemberResponseDto getMember(Long memberId) {
         if (memberId == null) return null;
 
-        Optional<Member> optionalUser = memberRepository.findById(memberId);
-        Member member = optionalUser
+        Member member = memberRepository.findByDeletedFalseAndMemberId(memberId)
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         MemberResponseDto memberDto = MemberResponseDto.fromEntity(member);
@@ -189,7 +186,7 @@ public class MemberService {
 
     @Transactional
     public void delete(Long memberId) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByDeletedFalseAndMemberId(memberId)
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         member.delete(); // dirty checking으로 업데이트
@@ -203,7 +200,7 @@ public class MemberService {
     @Transactional
     public void delete(Set<Long> memberIds) {
 
-        List<Member> members = memberRepository.findAllById(memberIds);
+        List<Member> members = memberRepository.findAllByDeletedFalseAndMemberIdIn(memberIds);
 
         if (members.size() != memberIds.size()) {
             throw new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND);
