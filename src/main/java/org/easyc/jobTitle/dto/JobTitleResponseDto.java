@@ -32,7 +32,8 @@ public class JobTitleResponseDto extends BaseDto {
                 .registerUser(jobTitle.getRegisterUser())
                 .lastUpdateDate(jobTitle.getLastUpdateDate())
                 .lastUpdateIp(jobTitle.getLastUpdateIp())
-                .lastUpdateId(jobTitle.getLastUpdateId())
+//                .lastUpdateId(jobTitle.getLastUpdateId())
+                .lastUpdateUser(jobTitle.getLastUpdateUser())
                 .build();
     }
 

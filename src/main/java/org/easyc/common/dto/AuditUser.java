@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BaseUserDto {
+public class AuditUser {
 
-    @Column(name = "user_id")
-    private String userId;
+    @Column(name = "login_id")
+    private String loginId;
 
-    @Column(name = "user_nm")
-    private String userNm;
+    @Column(name = "member_nm")
+    private String memberNm;
 
-    @Column(name = "role")
-    private String role;
+    @Column(name = "member_role")
+    private String memberRole;
 }

@@ -32,7 +32,8 @@ public class JobGradeResponseDto extends BaseDto {
                 .registerUser(jobGrade.getRegisterUser())
                 .lastUpdateDate(jobGrade.getLastUpdateDate())
                 .lastUpdateIp(jobGrade.getLastUpdateIp())
-                .lastUpdateId(jobGrade.getLastUpdateId())
+//                .lastUpdateId(jobGrade.getLastUpdateId())
+                .lastUpdateUser(jobGrade.getLastUpdateUser())
                 .build();
     }
 

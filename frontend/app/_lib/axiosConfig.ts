@@ -14,7 +14,6 @@ const getBaseURL = () => {
 		return 'http://localhost:8081';
 	}
 
-	console.log();
 	return `${window.location.protocol}//${window.location.hostname}:8081`;
 };
 
@@ -26,7 +25,22 @@ const axiosConfig = axios.create({
 	},
 });
 
-// 요청 인터셉터 (선택)
+// 큐 처리 및 Refresh 상태
+let isRefreshing = false;
+let failedQueue: {
+	resolve: (value?: any) => void;
+	reject: (error: any) => void;
+}[] = [];
+
+const processQueue = (error: any) => {
+	failedQueue.forEach((promise) => {
+		if (error) promise.reject(error);
+		else promise.resolve();
+	});
+	failedQueue = [];
+};
+
+// 요청 인터셉터
 axiosConfig.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
 		if (typeof window === 'undefined') {
@@ -42,22 +56,21 @@ axiosConfig.interceptors.request.use(
 			} catch (error) {
 				console.error('서버 사이드 쿠키 주입 실패:', error);
 			}
+			// } else {
+			// 	//todo
+			// 	// 브라우저: Authorization 헤더 추가
+			// 	const token = document.cookie
+			// 		.split('; ')
+			// 		.find((row) => row.startsWith('ACCESS_TOKEN='))
+			// 		?.split('=')[1];
+			// 	if (token) {
+			// 		config.headers.Authorization = `Bearer ${token}`;
+			// 	}
 		}
 		return config;
 	},
 	(error) => Promise.reject(error),
 );
-
-let isRefreshing = false;
-let failedQueue: any[] = [];
-
-const processQueue = (error: any) => {
-	failedQueue.forEach((promise) => {
-		if (error) promise.reject(error);
-		else promise.resolve();
-	});
-	failedQueue = [];
-};
 
 // API 응답 타입 정의
 export interface ApiResponse<T = any> {
@@ -98,28 +111,35 @@ axiosConfig.interceptors.response.use(
 		const status = error.response?.status;
 		const apiResponse = error.response?.data;
 
-		// AccessToken 만료
-		if (status === 401 && !error.config._retry) {
+		// AccessToken 만료 처리
+		if ((status === 401 || status === 403) && originalRequest && !originalRequest._retry && !originalRequest.url?.includes('/api/auth/refresh')) {
+			// 동시호출 방지
+			// refresh 중이면 나머지 요청 대기
 			if (isRefreshing) {
-				// 동시호출 방지
-				// refresh 중이면 나머지 요청 대기
 				return new Promise((resolve, reject) => {
 					failedQueue.push({ resolve, reject });
 				}).then(() => axiosConfig(originalRequest));
 			}
 
+			// 참조 Refresh 요청
 			originalRequest._retry = true;
 			isRefreshing = true;
 
 			try {
-				await axiosConfig.post('/api/auth/refresh');
+				// await axiosConfig.post('/api/auth/refresh'); // Refresh Token 기반 Access Token 재발급
+				// Refresh Token 요청은 별도 Axios 인스턴스로 호출 → 기존 인터셉터 영향 안 받음
+				await axios.create({ baseURL: getBaseURL(), withCredentials: true }).post('/api/auth/refresh');
+				console.log('refresh');
 
-				processQueue(null); // refresh 끝난 뒤 한번에 재시도
-				return axiosConfig(originalRequest);
+				processQueue(null); // refresh 끝난 뒤 대기 중인 요청 재시도
+				return axiosConfig(originalRequest); // 원래 요청 재시도
 			} catch (refreshError) {
 				processQueue(refreshError);
 				// 로그아웃 처리
-				window.location.href = '/login';
+				if (typeof window !== 'undefined') {
+					window.location.href = '/login';
+				}
+
 				return Promise.reject(refreshError);
 			} finally {
 				isRefreshing = false;

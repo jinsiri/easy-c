@@ -18,7 +18,7 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="member_seq")
     private Long memberId;
 
-    private String loginId;
+    private String loginId; //todo 삭제된 loginId는 영원히 사용 불가
     private String password;
     private String memberNm;
     private String memberNmEn; // 영문 이름

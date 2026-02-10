@@ -1,17 +1,15 @@
 package org.easyc.common.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.easyc.common.dto.BaseUserDto;
+import org.easyc.common.dto.AuditUser;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -42,7 +40,12 @@ public abstract class BaseEntity {
 
     @CreatedBy
     @Embedded
-    private BaseUserDto registerUser;
+    @AttributeOverrides({
+            @AttributeOverride(name = "loginId", column = @Column(name = "register_id", updatable = false)),
+            @AttributeOverride(name = "memberNm", column = @Column(name = "register_nm", updatable = false)),
+            @AttributeOverride(name = "memberRole", column = @Column(name = "register_role", updatable = false))
+    })
+    private AuditUser registerUser;
 
    /* @Column(name = "register_id", updatable = false)
     private String registerId;
@@ -58,11 +61,20 @@ public abstract class BaseEntity {
     @Column(name = "last_update_ip")
     private String lastUpdateIp;
 
-    @Column(name = "last_update_id")
-    private String lastUpdateId;
+//    @Column(name = "last_update_id")
+//    private String lastUpdateId;
+//
+//    @Column(name = "last_update_nm")
+//    private String lastUpdateNm;
 
-    @Column(name = "last_update_nm")
-    private String lastUpdateNm;
+    @LastModifiedBy
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "loginId", column = @Column(name = "last_update_id", updatable = false)),
+            @AttributeOverride(name = "memberNm", column = @Column(name = "last_update_nm", updatable = false)),
+            @AttributeOverride(name = "memberRole", column = @Column(name = "last_update_role", updatable = false))
+    })
+    private AuditUser lastUpdateUser;
 
     public void delete() {
         this.deleted = true;

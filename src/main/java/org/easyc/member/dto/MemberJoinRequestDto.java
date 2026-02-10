@@ -38,7 +38,7 @@ public class MemberJoinRequestDto { //회원가입 등 비밀번호 필요할 �
                 .password(this.password)
                 .memberNm(this.memberNm)
                 .memberNmEn(this.memberNmEn)
-                .memberRole(MemberRole.ROLE_USER)
+                .memberRole(this.memberRole)
                 .accountStatus(this.accountStatus)
                 .build();
     }
@@ -50,7 +50,7 @@ public class MemberJoinRequestDto { //회원가입 등 비밀번호 필요할 �
                 .password(encodedPassword)
                 .memberNm(this.memberNm)
                 .memberNmEn(this.memberNmEn)
-                .memberRole(MemberRole.ROLE_USER)
+                .memberRole(this.memberRole)
                 .accountStatus(this.accountStatus)
                 .build();
     }

@@ -53,7 +53,9 @@ public class DeptResponseDto extends BaseTreeDto {
                 //.registerNm(dept.getRegisterNm())
                 .lastUpdateDate(dept.getLastUpdateDate())
                 .lastUpdateIp(dept.getLastUpdateIp())
-                .lastUpdateId(dept.getLastUpdateId())
+//                .lastUpdateId(dept.getLastUpdateId())
+//                .lastUpdateNm(dept.getLastUpdateNm())
+                .lastUpdateUser(dept.getLastUpdateUser())
                 .build();
     }
 

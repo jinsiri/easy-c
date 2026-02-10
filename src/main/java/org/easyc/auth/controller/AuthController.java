@@ -1,6 +1,7 @@
 package org.easyc.auth.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.easyc.auth.dto.LoginRequestDto;
 import org.easyc.auth.dto.LoginResponseDto;
 import org.easyc.auth.jwt.JwtProvider;
@@ -16,15 +17,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-    private final JwtProvider jwtProvider;
     private final RsaUtil rsaUtil;
     private final MemberRepository memberRepository;
+    private final JwtProvider jwtProvider;
+
 
     @GetMapping("/test")
     public String test() {
@@ -81,14 +84,14 @@ public class AuthController {
         ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", accessToken)
                 .httpOnly(true)
                 .path("/") // 모든 API 요청에 accessToken이 자동으로 포함됨
-                .maxAge(60 * 15) // 15분
+                .maxAge(jwtProvider.getAccessExpiration())
                 .sameSite("Lax")
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", refreshToken)
                 .httpOnly(true)
                 .path("/api/auth/refresh") // /api/auth/refresh 요청일 때만 브라우저가 자동으로 보냄
-                .maxAge(60 * 60 * 24 * 14) // 14일
+                .maxAge(jwtProvider.getRefreshExpiration())
                 .sameSite("Lax")
                 .build();
 
@@ -154,15 +157,22 @@ public class AuthController {
             ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", newAccessToken)
                     .httpOnly(true)
                     .path("/")
-                    .maxAge(60 * 15) // 15분
+                    .maxAge(jwtProvider.getAccessExpiration())
                     .sameSite("Lax")
                     .build();
+
+            System.out.println("==============================refresh token=================================");
+            System.out.println(refreshToken);
+            System.out.println("==============================new access token=================================");
+            System.out.println(newAccessToken);
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
                     .build();
 
         } catch (Exception e) {
+            log.info(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }

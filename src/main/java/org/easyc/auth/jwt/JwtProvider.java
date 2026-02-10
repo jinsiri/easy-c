@@ -5,8 +5,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.easyc.auth.dto.CustomUserDetails;
-import org.easyc.common.dto.BaseUserDto;
-import org.springframework.beans.factory.annotation.Value;
+import org.easyc.common.dto.AuditUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,27 +32,43 @@ public class JwtProvider {
 
     private final Key accessTokenKey;
     private final Key refreshTokenKey;
-    private final long ACCESS_EXP;
-    private final long REFRESH_EXP;
+//    private final long ACCESS_EXP;
+//    private final long REFRESH_EXP;
+
+    private final JwtProperties jwtProperties;
 
 //    // 테스트용
 //    private static final long ACCESS_TOKEN_EXPIRE = 10 * 1000L; // 10초
 
 
     public JwtProvider(
-            @Value("${jwt.access.secret}") String accessSecret,
-            @Value("${jwt.refresh.secret}") String refreshSecret,
-            @Value("${jwt.access.expiration}") long accessExp,
-            @Value("${jwt.refresh.expiration}") long refreshExp
+//            @Value("${jwt.access.secret}") String accessSecret,
+//            @Value("${jwt.refresh.secret}") String refreshSecret,
+//            @Value("${jwt.access.expiration}") long accessExp,
+//            @Value("${jwt.refresh.expiration}") long refreshExp
+            JwtProperties jwtProperties
     ) {
 
-        this.accessTokenKey = Keys.hmacShaKeyFor(accessSecret.getBytes(StandardCharsets.UTF_8));
-        this.refreshTokenKey = Keys.hmacShaKeyFor(refreshSecret.getBytes(StandardCharsets.UTF_8));
+        this.jwtProperties = jwtProperties;
+        this.accessTokenKey = Keys.hmacShaKeyFor(jwtProperties.getAccessSecret().getBytes(StandardCharsets.UTF_8));
+        this.refreshTokenKey = Keys.hmacShaKeyFor(jwtProperties.getRefreshSecret().getBytes(StandardCharsets.UTF_8));
 //        this.ACCESS_EXP = ACCESS_TOKEN_EXPIRE ; //테스트용
-        this.ACCESS_EXP = accessExp;
-        this.REFRESH_EXP = refreshExp;
+//        this.ACCESS_EXP = accessExp;
+//        this.REFRESH_EXP = refreshExp;
+
+        System.out.println("===========================ACCESS_EXP===========================");
+        System.out.println(jwtProperties.getAccessExpiration());
+        System.out.println("===========================REFRESH_EXP===========================");
+        System.out.println(jwtProperties.getRefreshExpiration());
     }
 
+    public long getAccessExpiration() {
+        return jwtProperties.getAccessExpiration();
+    }
+
+    public long getRefreshExpiration() {
+        return jwtProperties.getRefreshExpiration();
+    }
 
     public String createAccessToken(Authentication auth) {
         CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
@@ -63,7 +78,7 @@ public class JwtProvider {
                 .claim("memberNm", user.getMemberNm())
                 .claim("role", user.getAuthorities().iterator().next().getAuthority())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXP))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessExpiration()))
                 .signWith(accessTokenKey)
                 .compact();
 
@@ -85,7 +100,7 @@ public class JwtProvider {
                 .claim("memberNm", user.getMemberNm())
                 .claim("role", user.getAuthorities().iterator().next().getAuthority())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXP))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshExpiration()))
                 .signWith(refreshTokenKey)
                 .compact();
 
@@ -135,11 +150,14 @@ public class JwtProvider {
         String memberNm = claims.get("memberNm", String.class);
         String role = claims.get("role", String.class);
 
-        BaseUserDto loginUser =
-                new BaseUserDto(loginId, memberNm, role);
+//        BaseUserDto loginUser =
+//                new BaseUserDto(loginId, memberNm, role);
+
+        // 토큰 정보로 CustomUserDetails 생성
+        CustomUserDetails user = new CustomUserDetails(new AuditUser(loginId, memberNm, role));
 
         return new UsernamePasswordAuthenticationToken(
-                loginUser,
+                user,
                 null,
                 List.of(new SimpleGrantedAuthority(role)) // role_~
         );

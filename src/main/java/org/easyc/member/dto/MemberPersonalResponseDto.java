@@ -90,8 +90,9 @@ public class MemberPersonalResponseDto extends BaseDto {
                 .registerUser(memberPersonal.getRegisterUser())
                 .lastUpdateDate(memberPersonal.getLastUpdateDate())
                 .lastUpdateIp(memberPersonal.getLastUpdateIp())
-                .lastUpdateId(memberPersonal.getLastUpdateId())
-                .lastUpdateNm(memberPersonal.getLastUpdateNm())
+//                .lastUpdateId(memberPersonal.getLastUpdateId())
+//                .lastUpdateNm(memberPersonal.getLastUpdateNm())
+                .lastUpdateUser(memberPersonal.getLastUpdateUser())
                 .build();
     }
 

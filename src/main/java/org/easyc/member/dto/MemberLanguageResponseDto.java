@@ -40,8 +40,9 @@ public class MemberLanguageResponseDto extends BaseDto {
                 .registerUser(memberLanguage.getRegisterUser())
                 .lastUpdateDate(memberLanguage.getLastUpdateDate())
                 .lastUpdateIp(memberLanguage.getLastUpdateIp())
-                .lastUpdateId(memberLanguage.getLastUpdateId())
-                .lastUpdateNm(memberLanguage.getLastUpdateNm())
+//                .lastUpdateId(memberLanguage.getLastUpdateId())
+//                .lastUpdateNm(memberLanguage.getLastUpdateNm())
+                .lastUpdateUser(memberLanguage.getLastUpdateUser())
                 .build();
     }
 

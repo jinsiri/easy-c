@@ -53,8 +53,9 @@ public class MemberCareerResponseDto extends BaseDto {
                 .registerUser(memberCareer.getRegisterUser())
                 .lastUpdateDate(memberCareer.getLastUpdateDate())
                 .lastUpdateIp(memberCareer.getLastUpdateIp())
-                .lastUpdateId(memberCareer.getLastUpdateId())
-                .lastUpdateNm(memberCareer.getLastUpdateNm())
+//                .lastUpdateId(memberCareer.getLastUpdateId())
+//                .lastUpdateNm(memberCareer.getLastUpdateNm())
+                .lastUpdateUser(memberCareer.getLastUpdateUser())
                 .build();
     }
 
