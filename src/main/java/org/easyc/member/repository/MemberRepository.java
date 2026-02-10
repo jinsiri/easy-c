@@ -17,7 +17,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "mp2.phoneNumber, " +
 //            todo deptnm positiontitle
             "m.deleted, m.active, m.registerDate, m.registerIp, m.registerUser, " +
-            "m.lastUpdateDate, m.lastUpdateIp, m.lastUpdateId, m.lastUpdateNm) "+
+            "m.lastUpdateDate, m.lastUpdateIp, m.lastUpdateUser) "+
             "FROM Member m " +
             "left join MemberProfile mp on m.memberId = mp.memberId " +
             "left join MemberPersonal mp2 on m.memberId = mp2.memberId " +

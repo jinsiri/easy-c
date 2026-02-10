@@ -5,8 +5,6 @@ import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.*;
 import org.easyc.attendance.repository.*;
 import org.easyc.common.constant.*;
-import org.easyc.member.entity.Member;
-import org.easyc.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -29,7 +27,7 @@ public class AttendanceService {
         LocalDate workDate = parseDate(req.getWorkDate());
 
         //데이터 조회
-        Attendance targetAttendance = attendanceRepository.findByRegisterUser_UserIdAndWorkDate(req.getLoginId(), workDate).orElseGet(() -> Attendance.builder()
+        Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate).orElseGet(() -> Attendance.builder()
                 .workDate(workDate)
                 .build());
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getLoginId());
@@ -53,7 +51,7 @@ public class AttendanceService {
         LocalDate firstDay = yearMonth.atDay(1);
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
-        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByRegisterUser_UserIdAndWorkDateBetween(loginId, firstDay, lastDay);
+        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByRegisterUser_LoginIdAndWorkDateBetween(loginId, firstDay, lastDay);
         Map<Integer, Attendance> attendanceMap = targetMonthAttendanceList.stream()
                 .collect(Collectors.toMap(a -> a.getWorkDate().getDayOfMonth(), a -> a));
 
@@ -120,7 +118,7 @@ public class AttendanceService {
         /** ip Address가 등록한 IP와 같은지 확인하는 로직 추가 필요 */
 
         // 데이터 조회
-        Attendance targetAttendance = attendanceRepository.findByRegisterUser_UserIdAndWorkDate(req.getLoginId(), workDate)
+        Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate)
                 .orElseGet(() -> Attendance.builder()
                         .workDate(workDate)
                         .build());
@@ -156,7 +154,7 @@ public class AttendanceService {
         /** ip Address가 등록한 IP와 같은지 확인하는 로직 추가 필요 */
 
         // 데이터 조회
-        Attendance targetAttendance = attendanceRepository.findByRegisterUser_UserIdAndWorkDate(req.getLoginId(), workDate).orElseThrow(() -> new RuntimeException(workDate + " 날짜의 출근 기록을 찾을 수 없습니다."));
+        Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate).orElseThrow(() -> new RuntimeException(workDate + " 날짜의 출근 기록을 찾을 수 없습니다."));
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getLoginId());
 
         // 상태업데이트 해서 save
@@ -181,7 +179,7 @@ public class AttendanceService {
        if (attendance != null) {
             dto = new AttendanceCalendarResponseDto(attendance);
 
-            AttendancePolicy targetPolicy = findAttendancePolicy(attendance.getRegisterUser().getUserId());
+            AttendancePolicy targetPolicy = findAttendancePolicy(attendance.getRegisterUser().getLoginId());
             dto.setDefaultStartTime(targetPolicy.getStartTime());
             dto.setDefaultEndTime(targetPolicy.getEndTime());
         }
@@ -292,7 +290,7 @@ public class AttendanceService {
 
         //단위 기간으로 근태 데이터 조회
         Map<String, LocalDate> resolveDateRange = resolveDateRange(settlementPeriod, workDate);
-        List<Attendance> weekAttendanceData = attendanceRepository.findAllByRegisterUser_UserIdAndWorkDateBetween(loginId, resolveDateRange.get("start"), resolveDateRange.get("end"));
+        List<Attendance> weekAttendanceData = attendanceRepository.findAllByRegisterUser_LoginIdAndWorkDateBetween(loginId, resolveDateRange.get("start"), resolveDateRange.get("end"));
 
         Integer effectiveWorkDay = defaultTotalWorkDay;
         Integer effectiveWorkTime = defaultTotalWorkTime;

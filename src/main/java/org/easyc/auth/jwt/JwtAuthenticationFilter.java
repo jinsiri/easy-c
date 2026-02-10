@@ -6,7 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.easyc.common.dto.BaseUserDto;
+import org.easyc.common.dto.AuditUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -42,8 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String memberNm = jwtProvider.getMemberNm(token);
                 String role = jwtProvider.getRole(token);
 
-                BaseUserDto loginUser =
-                        new BaseUserDto(loginId, memberNm, role);
+                AuditUser loginUser =
+                        new AuditUser(loginId, memberNm, role);
 
                 GrantedAuthority authority =
                         new SimpleGrantedAuthority(role);

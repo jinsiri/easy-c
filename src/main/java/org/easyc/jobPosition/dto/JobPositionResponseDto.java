@@ -32,7 +32,8 @@ public class JobPositionResponseDto extends BaseDto {
                 .registerUser(jobPosition.getRegisterUser())
                 .lastUpdateDate(jobPosition.getLastUpdateDate())
                 .lastUpdateIp(jobPosition.getLastUpdateIp())
-                .lastUpdateId(jobPosition.getLastUpdateId())
+//                .lastUpdateId(jobPosition.getLastUpdateId())
+                .lastUpdateUser(jobPosition.getLastUpdateUser())
                 .build();
     }
 

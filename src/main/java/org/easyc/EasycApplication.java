@@ -1,6 +1,7 @@
 
 package org.easyc;
 
+import org.easyc.auth.jwt.JwtProperties;
 import org.easyc.member.constant.*;
 import org.easyc.member.dto.*;
 import org.easyc.member.repository.MemberRepository;
@@ -8,14 +9,16 @@ import org.easyc.member.service.MemberService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@EnableJpaAuditing
 @SpringBootApplication
+@EnableJpaAuditing
+@EnableConfigurationProperties(JwtProperties.class)
 public class EasycApplication {
 
 

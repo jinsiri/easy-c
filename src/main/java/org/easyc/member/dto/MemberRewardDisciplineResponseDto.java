@@ -38,8 +38,9 @@ public class MemberRewardDisciplineResponseDto extends BaseDto {
                 .registerUser(memberRewardDiscipline.getRegisterUser())
                 .lastUpdateDate(memberRewardDiscipline.getLastUpdateDate())
                 .lastUpdateIp(memberRewardDiscipline.getLastUpdateIp())
-                .lastUpdateId(memberRewardDiscipline.getLastUpdateId())
-                .lastUpdateNm(memberRewardDiscipline.getLastUpdateNm())
+//                .lastUpdateId(memberRewardDiscipline.getLastUpdateId())
+//                .lastUpdateNm(memberRewardDiscipline.getLastUpdateNm())
+                .lastUpdateUser(memberRewardDiscipline.getLastUpdateUser())
                 .build();
     }
 

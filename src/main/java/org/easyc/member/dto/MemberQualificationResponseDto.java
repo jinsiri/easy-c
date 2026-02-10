@@ -42,8 +42,9 @@ public class MemberQualificationResponseDto extends BaseDto {
                 .registerUser(memberQualification.getRegisterUser())
                 .lastUpdateDate(memberQualification.getLastUpdateDate())
                 .lastUpdateIp(memberQualification.getLastUpdateIp())
-                .lastUpdateId(memberQualification.getLastUpdateId())
-                .lastUpdateNm(memberQualification.getLastUpdateNm())
+//                .lastUpdateId(memberQualification.getLastUpdateId())
+//                .lastUpdateNm(memberQualification.getLastUpdateNm())
+                .lastUpdateUser(memberQualification.getLastUpdateUser())
                 .build();
     }
 

@@ -52,8 +52,9 @@ public class MemberProfileResponseDto extends BaseDto {
                 .registerUser(memberProfile.getRegisterUser())
                 .lastUpdateDate(memberProfile.getLastUpdateDate())
                 .lastUpdateIp(memberProfile.getLastUpdateIp())
-                .lastUpdateId(memberProfile.getLastUpdateId())
-                .lastUpdateNm(memberProfile.getLastUpdateNm())
+//                .lastUpdateId(memberProfile.getLastUpdateId())
+//                .lastUpdateNm(memberProfile.getLastUpdateNm())
+                .lastUpdateUser(memberProfile.getLastUpdateUser())
                 .build();
     }
 }

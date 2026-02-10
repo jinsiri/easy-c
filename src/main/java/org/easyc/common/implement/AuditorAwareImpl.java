@@ -1,6 +1,6 @@
 package org.easyc.common.implement;
 
-import org.easyc.common.dto.BaseUserDto;
+import org.easyc.common.dto.AuditUser;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class AuditorAwareImpl implements AuditorAware<BaseUserDto> {
+public class AuditorAwareImpl implements AuditorAware<AuditUser> {
 
     @Override
-    public Optional<BaseUserDto> getCurrentAuditor() {
+    public Optional<AuditUser> getCurrentAuditor() {
 
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -24,13 +24,13 @@ public class AuditorAwareImpl implements AuditorAware<BaseUserDto> {
             return Optional.empty();
         }
 
-        BaseUserDto user =
-                (BaseUserDto) authentication.getPrincipal();
+        AuditUser user =
+                (AuditUser) authentication.getPrincipal();
 
-        BaseUserDto dto =
-                new BaseUserDto(
-                        user.getUserId(),
-                        user.getUserNm(),
+        AuditUser dto =
+                new AuditUser(
+                        user.getLoginId(),
+                        user.getMemberNm(),
                         authentication.getAuthorities()
                                 .iterator()
                                 .next()
