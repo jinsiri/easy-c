@@ -5,6 +5,7 @@ import org.easyc.jobPosition.dto.JobPositionRequestDto;
 import org.easyc.jobPosition.dto.JobPositionResponseDto;
 import org.easyc.jobPosition.entity.JobPosition;
 import org.easyc.jobPosition.repository.JobPositionRepository;
+import org.easyc.jobPosition.repository.JobPositionRepositoryCustom;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,17 +14,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JobPositionService {
     private final JobPositionRepository jobPositionRepository;
+    private final JobPositionRepositoryCustom jobPositionRepositoryCustom;
     
     public List<JobPositionResponseDto> findAll() {
-        List<JobPosition> jobPosition = jobPositionRepository.findAll();
-
-        return JobPositionResponseDto.fromEntityList(jobPosition);
+        return jobPositionRepositoryCustom.findAllWithMemberCountOrderByLevel();
     }
 
     public void save(JobPositionRequestDto jobPositionRequestDto) {
         JobPosition jobPosition = jobPositionRequestDto.toEntity();
-
-        // todo: 작성자 세팅해야함
         jobPositionRepository.save(jobPosition);
     }
 }
