@@ -26,6 +26,10 @@ export const useDialogStore = create<DialogState>((set, get) => ({
 	config: null,
 	resolve: () => {},
 	open: (config) => {
+		if (get().isOpen) {
+			return Promise.resolve(false);
+		}
+
 		set({ isOpen: true, config });
 		return new Promise<boolean>((resolve) => {
 			set({ resolve });
