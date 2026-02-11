@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import { useDialogStore } from '@/store/useDialogStore';
 
 // 인터셉터가 response.data를 반환하므로 타입 오버라이드
 export interface ApiClient {
@@ -94,6 +95,7 @@ axiosConfig.interceptors.response.use(
 		return response.data;
 	},
 	async (error) => {
+		const { alert } = useDialogStore.getState();
 		const originalRequest = error.config;
 		const status = error.response?.status;
 		const apiResponse = error.response?.data;
@@ -101,8 +103,6 @@ axiosConfig.interceptors.response.use(
 		// AccessToken 만료
 		if (status === 401 && !error.config._retry) {
 			if (isRefreshing) {
-				// 동시호출 방지
-				// refresh 중이면 나머지 요청 대기
 				return new Promise((resolve, reject) => {
 					failedQueue.push({ resolve, reject });
 				}).then(() => axiosConfig(originalRequest));
@@ -119,6 +119,7 @@ axiosConfig.interceptors.response.use(
 			} catch (refreshError) {
 				processQueue(refreshError);
 				// 로그아웃 처리
+				await alert('세션이 만료되어 로그인 페이지로 이동합니다.'); //인증 만료
 				window.location.href = '/login';
 				return Promise.reject(refreshError);
 			} finally {
@@ -126,8 +127,9 @@ axiosConfig.interceptors.response.use(
 			}
 		}
 
-		// 서버가 ApiResponse 내려준 경우
 		if (apiResponse?.message) {
+			await alert(apiResponse.message); // 오류 발생
+
 			return Promise.reject({
 				message: apiResponse.message,
 				status,
@@ -136,8 +138,11 @@ axiosConfig.interceptors.response.use(
 		}
 
 		// 그 외 (네트워크, 서버 다운 등)
+		const fallbackMsg = error.message ?? '서버 오류가 발생했습니다.';
+		await alert(fallbackMsg); // 시스템 오류
+
 		return Promise.reject({
-			message: error.message ?? '서버 오류가 발생했습니다.',
+			message: fallbackMsg,
 			status,
 		});
 
