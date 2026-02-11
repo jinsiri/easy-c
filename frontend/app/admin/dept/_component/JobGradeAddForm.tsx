@@ -2,9 +2,9 @@ import { JobGradeResponseDto } from '@/type/dept';
 import { FormItem, FormProps } from '@/app/_component/baseElement/FormComp';
 import { Box } from '@mui/material';
 
-type JobGradeFormValues = Omit<JobGradeResponseDto, 'jobGradeId'>;
+export type JobGradeAddFormValues = Omit<JobGradeResponseDto, 'jobGradeId' | 'jobGradeLevel'>;
 
-export default function JobGradeAddForm({ control, errors }: FormProps<JobGradeFormValues>) {
+export default function JobGradeAddForm({ control, errors }: FormProps<JobGradeAddFormValues>) {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', py: 2 }}>
 			<FormItem name='jobGradeNm' label='직급명' required control={control} error={errors.jobGradeNm?.message} />

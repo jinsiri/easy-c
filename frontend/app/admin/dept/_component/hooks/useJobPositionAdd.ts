@@ -5,7 +5,7 @@ import axiosConfig from '@/app/_lib/axiosConfig';
 import { useDialogStore } from '@/store/useDialogStore';
 import { JobPositionAddFormValues } from '@/app/admin/dept/_component/JobPositionAddForm';
 
-export function useJobPositionAdd(onSuccess?: () => void) {
+export default function useJobPositionAdd(onSuccess?: () => void) {
 	const router = useRouter();
 	const { alert } = useDialogStore();
 	const [loading, setLoading] = useState(false);
@@ -25,7 +25,7 @@ export function useJobPositionAdd(onSuccess?: () => void) {
 			if (onSuccess) {
 				onSuccess();
 			} else {
-				router.push('/admin/dept/role/position');
+				router.push('/admin/dept/role');
 			}
 		} catch (error) {
 			console.error(error);
