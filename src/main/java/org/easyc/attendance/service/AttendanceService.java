@@ -1,10 +1,10 @@
 package org.easyc.attendance.service;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.attendance.constant.*;
 import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.*;
 import org.easyc.attendance.repository.*;
-import org.easyc.common.constant.*;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -24,15 +24,13 @@ public class AttendanceService {
     private final HolidayCalendarRepository holidayCalendarRepository;
 
     public AttendanceResponseDto getAttendanceTodayData (AttendanceRequestDto req){
-        LocalDate workDate = parseDate(req.getWorkDate());
-
         //데이터 조회
-        Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate).orElseGet(() -> Attendance.builder()
-                .workDate(workDate)
+        Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), req.getWorkDate()).orElseGet(() -> Attendance.builder()
+                .workDate(req.getWorkDate())
                 .build());
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getLoginId());
 
-        AttendanceResponseDto findStatData = findStatData(req.getLoginId(), workDate, targetPolicy);
+        AttendanceResponseDto findStatData = findStatData(req.getLoginId(), req.getWorkDate(), targetPolicy);
         AttendanceResponseDto result = new AttendanceResponseDto(targetAttendance);
         result.applyWeekData(findStatData);
 
@@ -41,11 +39,9 @@ public class AttendanceService {
 
     public List<Map<String, AttendanceCalendarResponseDto>> getAttendanceCalendarData(AttendanceRequestDto req) {
         String loginId = req.getLoginId();
-        String workDateStr = req.getWorkDate();
-        LocalDate workDate = parseDate(workDateStr);
 
-        Integer targetYear = workDate.getYear();
-        Integer targetMonth = workDate.getMonthValue();
+        Integer targetYear = req.getWorkDate().getYear();
+        Integer targetMonth = req.getWorkDate().getMonthValue();
 
         YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
         LocalDate firstDay = yearMonth.atDay(1);

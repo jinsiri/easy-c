@@ -1,4 +1,4 @@
-package org.easyc.common.constant;
+package org.easyc.attendance.constant;
 
 public enum WorkStatus {
     PRESENT,        //정상 출근

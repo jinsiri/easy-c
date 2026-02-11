@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.easyc.attendance.entity.AttendanceChangeRequest;
-import org.easyc.common.constant.WorkStatus;
+import org.easyc.attendance.constant.WorkStatus;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

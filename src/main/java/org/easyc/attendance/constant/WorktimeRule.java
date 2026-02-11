@@ -1,4 +1,4 @@
-package org.easyc.common.constant;
+package org.easyc.attendance.constant;
 
 public enum WorktimeRule {
     CAP_AT_40,	    // 주 40시간 상한, 초과해도 40시간 근무로 자름

@@ -1,4 +1,4 @@
-package org.easyc.common.constant;
+package org.easyc.attendance.constant;
 
 public enum WorkType {
     NORMAL, // 평일 근무

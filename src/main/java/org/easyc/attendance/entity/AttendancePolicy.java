@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.easyc.common.constant.AttendanceType;
-import org.easyc.common.constant.SettlementPeriod;
-import org.easyc.common.constant.WorktimeRule;
+import org.easyc.attendance.constant.AttendanceType;
+import org.easyc.attendance.constant.SettlementPeriod;
+import org.easyc.attendance.constant.WorktimeRule;
 
 import java.time.LocalTime;
 
