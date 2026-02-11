@@ -5,6 +5,9 @@ const OutlinedInput = (theme: Theme) => ({
 		styleOverrides: {
 			root: {
 				padding: 0,
+				'& .MuiInputAdornment-positionStart': {
+					marginLeft: '0.75rem',
+				},
 			},
 			input: {
 				padding: '0.625rem 1rem',
