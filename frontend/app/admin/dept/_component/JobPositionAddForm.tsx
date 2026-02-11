@@ -8,7 +8,7 @@ export default function JobPositionAddForm({ control, errors }: FormProps<JobPos
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', py: 2 }}>
 			<FormItem name='jobPositionNm' label='직위명' required control={control} error={errors.jobPositionNm?.message} />
-			<FormItem name='jobPositionCode' label='직위코드' control={control} error={errors.jobPositionCode?.message} />
+			<FormItem name='jobPositionCode' label='직위코드' required control={control} error={errors.jobPositionCode?.message} />
 		</Box>
 	);
 }

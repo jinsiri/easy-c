@@ -1,6 +1,8 @@
 package org.easyc.jobPosition.service;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.exception.CustomException;
+import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.jobPosition.dto.JobPositionRequestDto;
 import org.easyc.jobPosition.dto.JobPositionResponseDto;
 import org.easyc.jobPosition.entity.JobPosition;
@@ -22,6 +24,14 @@ public class JobPositionService {
     }
 
     public void save(JobPositionRequestDto jobPositionRequestDto) {
+        if (jobPositionRepository.existsByJobPositionNm(jobPositionRequestDto.getJobPositionNm())) {
+            throw new CustomException(CustomExceptionCode.MEMBER_JOB_DUPLICATE_NM);
+        }
+
+        if (jobPositionRepository.existsByJobPositionCode(jobPositionRequestDto.getJobPositionCode())) {
+            throw new CustomException(CustomExceptionCode.MEMBER_JOB_DUPLICATE_CODE);
+        }
+
         JobPosition jobPosition = jobPositionRequestDto.toEntity();
         jobPositionRepository.save(jobPosition);
     }
