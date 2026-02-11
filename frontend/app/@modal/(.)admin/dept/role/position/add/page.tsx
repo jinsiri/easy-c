@@ -2,7 +2,7 @@
 
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import { startTransition } from 'react';
-import { useJobPositionAdd } from '@/app/admin/dept/_component/hooks/useJobPositionAdd';
+import useJobPositionAdd from '@/app/admin/dept/_component/hooks/useJobPositionAdd';
 import JobPositionAddForm from '@/app/admin/dept/_component/JobPositionAddForm';
 
 export default function AddJobPositionModal() {

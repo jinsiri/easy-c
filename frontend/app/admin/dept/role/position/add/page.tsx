@@ -3,7 +3,7 @@
 import { Box, Paper, Typography, Button, Container } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import JobPositionAddForm from '@/app/admin/dept/_component/JobPositionAddForm';
-import { useJobPositionAdd } from '@/app/admin/dept/_component/hooks/useJobPositionAdd';
+import useJobPositionAdd from '@/app/admin/dept/_component/hooks/useJobPositionAdd';
 
 export default function AddJobPositionPage() {
 	const {

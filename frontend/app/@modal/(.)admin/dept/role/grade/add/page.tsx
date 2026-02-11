@@ -22,7 +22,7 @@ export default function AddJobGradeModal() {
 	});
 
 	return (
-		<BaseDialog title={'직위 추가'} loading={loading} onConfirm={onSubmit}>
+		<BaseDialog title={'직급 추가'} loading={loading} onConfirm={onSubmit}>
 			<JobGradeAddForm control={control} errors={errors} />
 		</BaseDialog>
 	);

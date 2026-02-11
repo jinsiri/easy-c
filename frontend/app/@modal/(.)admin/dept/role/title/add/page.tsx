@@ -22,7 +22,7 @@ export default function AddJobTtitleModal() {
 	});
 
 	return (
-		<BaseDialog title={'직위 추가'} loading={loading} onConfirm={onSubmit}>
+		<BaseDialog title={'직책 추가'} loading={loading} onConfirm={onSubmit}>
 			<JobTitleAddForm control={control} errors={errors} />
 		</BaseDialog>
 	);
