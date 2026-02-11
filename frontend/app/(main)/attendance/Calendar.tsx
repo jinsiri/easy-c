@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 /** MUI */
 import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
@@ -11,7 +11,7 @@ import CustomReactCalendarTimeline from '../../_lib/CustomReactCalendarTimeline'
 import { TimelineItemBase } from 'react-calendar-timeline';
 
 /** Custom */
-import { formatMinutes } from '@/utils/commonFunc';
+import { formatMinutes, getTimelineInnerData } from '@/utils/commonFunc';
 
 /** type / interface */
 import { AttendanceDayResDto, CalendarData } from '@/app/services/attendanceService';
@@ -192,14 +192,6 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 				return 'error.500';
 			default:
 				return 'inherit'; // 또는 기본 색상
-		}
-	};
-
-	const getTimelineInnerData = (target: any): ReactNode => {
-		if (target instanceof Date) {
-			return target ? dayjs(target).format('YYYY-MM-DD HH:mm') : '-';
-		} else {
-			return target;
 		}
 	};
 

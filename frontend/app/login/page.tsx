@@ -31,7 +31,6 @@ const LoginPage = () => {
 				encryptedPassword: encryptedPw,
 			});
 
-			console.log(res);
 			secureLocalStorage.setItem('loginId', res.loginId);
 			secureLocalStorage.setItem('memberId', res.memberId);
 			secureLocalStorage.setItem('memberRole', res.memberRole);

@@ -28,6 +28,7 @@ export default function AttendanceModifyPage() {
 				return params.value ? BASICSTATUS[params.value] : '-';
 			},
 		},
+		{ field: 'depth', headerName: '부서/직급' },
 		{ field: 'memberNm', headerName: '근무자' },
 		{ field: 'workDate', headerName: '수정 근무일' },
 		{ field: 'type', headerName: '수정 타입' },
