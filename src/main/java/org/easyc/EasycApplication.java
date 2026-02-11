@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class EasycApplication {
 
 
 	@Bean
+    @Profile("!test")
 	CommandLineRunner init(MemberRepository memberRepo, MemberService memberService) {
 		return args -> {
 			if (memberRepo.findByLoginId("admin").isEmpty()) {

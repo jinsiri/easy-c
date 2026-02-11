@@ -8,6 +8,7 @@ import org.easyc.jobPosition.repository.JobPositionRepository;
 import org.easyc.jobPosition.repository.JobPositionRepositoryCustom;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,5 +24,26 @@ public class JobPositionService {
     public void save(JobPositionRequestDto jobPositionRequestDto) {
         JobPosition jobPosition = jobPositionRequestDto.toEntity();
         jobPositionRepository.save(jobPosition);
+    }
+
+    public void saveList(List<JobPositionRequestDto> selectedTemplates) {
+        int currentMaxLevel = jobPositionRepository.findMaxLevel().orElse(0);
+
+        List<JobPosition> newPositions = new ArrayList<>();
+        for (int i = 0; i < selectedTemplates.size(); i++) {
+            JobPositionRequestDto dto = selectedTemplates.get(i);
+
+            JobPosition entity = JobPosition.builder()
+                    .jobPositionNm(dto.getJobPositionNm())
+                    .jobPositionCode(dto.getJobPositionCode())
+                    .jobPositionLevel(currentMaxLevel + i + 1)
+                    .deleted(false)
+                    .active(true)
+                    .build();
+
+            newPositions.add(entity);
+        }
+
+        jobPositionRepository.saveAll(newPositions);
     }
 }
