@@ -20,7 +20,7 @@ export default function useJobPositionAdd(onSuccess?: () => void) {
 	const onSubmit = formMethods.handleSubmit(async (data) => {
 		setLoading(true);
 		try {
-			await axiosConfig.post('/api/job-position', data);
+			await axiosConfig.post('/api/job-positions', data);
 
 			if (onSuccess) {
 				onSuccess();

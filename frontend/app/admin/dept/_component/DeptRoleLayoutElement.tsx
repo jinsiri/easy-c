@@ -35,6 +35,7 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 	const categoryName = RANK_CATEGORY_INFO[category];
 	const subCategories = RANK_TEMPLATES[category].subTypes;
 	const gridRef = useRef<AgGridReact>(null);
+	const templateRef = useRef<AgGridReact>(null);
 	const [activeSubCategory, setActiveSubCategory] = useState<SubCategoryType>('OFFICE');
 	const [activeCategoryData, setActiveCategoryData] = useState<any[]>([]);
 
@@ -102,6 +103,28 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 		getCategoryData(category);
 	};
 
+	const saveTemplates = async (category: RoleCategory) => {
+		const selectedRows = templateRef.current?.api.getSelectedRows() || [];
+		if (selectedRows.length === 0) return alert('추가할 항목을 선택해주세요.');
+
+		const templateConfig = {
+			POSITION: { api: deptService.saveJobPositionTemplates, domain: 'jobPosition' },
+			TITLE: { api: deptService.saveJobTitleTemplates, domain: 'jobTitle' },
+			GRADE: { api: deptService.saveJobGradeTemplates, domain: 'jobGrade' },
+		} as const;
+
+		const { api, domain } = templateConfig[category];
+		const data = selectedRows.map((row: any) => ({
+			...row,
+			[`${domain}Nm`]: row.deptRoleNm,
+			[`${domain}Code`]: row.deptRoleCode,
+		}));
+
+		await api(data);
+		alert('추가되었습니다.');
+		getCategoryData(category);
+	};
+
 	const currentData = useMemo(() => {
 		return RANK_TEMPLATES[category].subTypes[activeSubCategory]?.list || [];
 	}, [category, activeSubCategory]);
@@ -158,7 +181,7 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 				}}
 				sx={{ display: 'flex', flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
 			>
-				<IconButton className={'contained-primary light'} sx={{ ml: 1 }}>
+				<IconButton className={'contained-primary light'} sx={{ ml: 1 }} onClick={() => saveTemplates(category)}>
 					<ArrowBack fontSize={'small'} />
 				</IconButton>
 			</Grid>
@@ -205,7 +228,7 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 						</Stack>
 					</Grid>
 				</Grid>
-				<CustomAgGridComp rowData={currentData} colDefs={templateColDefs} rowSelectionMode={'multiple'} pagination={false} />
+				<CustomAgGridComp ref={templateRef} rowData={currentData} colDefs={templateColDefs} rowSelectionMode={'multiple'} pagination={false} />
 			</Grid>
 		</Grid>
 	);

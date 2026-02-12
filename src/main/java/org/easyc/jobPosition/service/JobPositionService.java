@@ -25,42 +25,54 @@ public class JobPositionService {
         return jobPositionRepositoryCustom.findAllWithMemberCountOrderByLevel();
     }
 
-    @Transactional
-    public void save(JobPositionRequestDto jobPositionRequestDto) {
-        if (jobPositionRepository.existsByJobPositionNm(jobPositionRequestDto.getJobPositionNm())) {
+    /**
+     * 중복 검증 및 엔티티 생성 공통 로직
+     */
+    private JobPosition createValidatedEntity(JobPositionRequestDto dto, int level) {
+        if (jobPositionRepository.existsByJobPositionNm(dto.getJobPositionNm())) {
             throw new CustomException(CustomExceptionCode.MEMBER_JOB_DUPLICATE_NM);
         }
 
-        if (jobPositionRepository.existsByJobPositionCode(jobPositionRequestDto.getJobPositionCode())) {
+        if (jobPositionRepository.existsByJobPositionCode(dto.getJobPositionCode())) {
             throw new CustomException(CustomExceptionCode.MEMBER_JOB_DUPLICATE_CODE);
         }
 
-        JobPosition jobPosition = jobPositionRequestDto.toEntity();
-        jobPositionRepository.save(jobPosition);
+        return JobPosition.builder()
+                .jobPositionNm(dto.getJobPositionNm())
+                .jobPositionCode(dto.getJobPositionCode())
+                .jobPositionLevel(level)
+                .deleted(false)
+                .active(true)
+                .build();
     }
 
+    /**
+     *  직위 단건 추가
+     * */
     @Transactional
-    public void saveList(List<JobPositionRequestDto> selectedTemplates) {
+    public void save(JobPositionRequestDto dto) {
+        int nextLevel = jobPositionRepository.findMaxLevel().orElse(0) + 1;
+        jobPositionRepository.save(createValidatedEntity(dto, nextLevel));
+    }
+
+    /**
+     *  직위 일괄 추가(템플릿 활용)
+     * */
+    @Transactional
+    public void saveList(List<JobPositionRequestDto> dtos) {
         int currentMaxLevel = jobPositionRepository.findMaxLevel().orElse(0);
 
-        List<JobPosition> newPositions = new ArrayList<>();
-        for (int i = 0; i < selectedTemplates.size(); i++) {
-            JobPositionRequestDto dto = selectedTemplates.get(i);
-
-            JobPosition entity = JobPosition.builder()
-                    .jobPositionNm(dto.getJobPositionNm())
-                    .jobPositionCode(dto.getJobPositionCode())
-                    .jobPositionLevel(currentMaxLevel + i + 1)
-                    .deleted(false)
-                    .active(true)
-                    .build();
-
-            newPositions.add(entity);
+        List<JobPosition> entities = new ArrayList<>();
+        for (int i = 0; i < dtos.size(); i++) {
+            entities.add(createValidatedEntity(dtos.get(i), currentMaxLevel + i + 1));
         }
 
-        jobPositionRepository.saveAll(newPositions);
+        jobPositionRepository.saveAll(entities);
     }
 
+    /**
+     *  직위 일괄 삭제
+     * */
     @Transactional
     public void delete(Set<Long> positionIds) {
         List<JobPosition> positions = jobPositionRepository.findAllById(positionIds);
