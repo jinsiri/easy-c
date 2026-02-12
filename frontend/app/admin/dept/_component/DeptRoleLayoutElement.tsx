@@ -1,10 +1,10 @@
 'use client';
 
 import { Button, FormControl, Grid, IconButton, MenuItem, Select, SelectChangeEvent, Stack, Typography, useTheme } from '@mui/material';
-import { Add, ArrowBack, Remove, Reorder } from '@mui/icons-material';
+import { Add, ArrowBack, Remove, Reorder, SaveAlt } from '@mui/icons-material';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import { RANK_TEMPLATES, RANK_CATEGORY_INFO, RoleCategory } from '@/constant/deptConst';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, RowDragEndEvent } from 'ag-grid-community';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { deptService } from '@/app/services/deptService';
 import { useRouter } from 'next/navigation';
@@ -13,14 +13,14 @@ import { useDialogStore } from '@/store/useDialogStore';
 import useRefreshStore from '@/store/useRefreshStore';
 
 const templateColDefs: ColDef<Record<string, any>>[] = [
-	{ field: 'deptRoleNm', headerName: '명칭', editable: false },
-	{ field: 'deptRoleCode', headerName: '코드', editable: false },
+	{ field: 'deptRoleNm', headerName: '명칭' },
+	{ field: 'deptRoleCode', headerName: '코드' },
 ];
 
 const deptRoleColDefs: ColDef<Record<string, any>>[] = [
-	{ field: 'deptRoleNm', headerName: '명칭', editable: false },
-	{ field: 'deptRoleCode', headerName: '코드', editable: false },
-	{ field: 'userCount', headerName: '사용멤버(명)', editable: false },
+	{ field: 'deptRoleNm', headerName: '명칭' },
+	{ field: 'deptRoleCode', headerName: '코드' },
+	{ field: 'userCount', headerName: '사용멤버(명)' },
 ];
 
 type SubCategoryType = string;
@@ -40,6 +40,8 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 	const templateRef = useRef<AgGridReact>(null);
 	const [activeSubCategory, setActiveSubCategory] = useState<SubCategoryType>('OFFICE');
 	const [activeCategoryData, setActiveCategoryData] = useState<any[]>([]);
+	const [isReorderMode, setIsReorderMode] = useState(false);
+	const [initialOrder, setInitialOrder] = useState<number[]>([]);
 
 	const getCategoryData = useCallback(async (category: RoleCategory) => {
 		const categoryConfig = {
@@ -84,6 +86,44 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 			getCategoryData(category);
 		}
 	}, [refreshTicket, category]);
+
+	const toggleReorderMode = () => {
+		if (isReorderMode) {
+			handleSaveOrder();
+		}
+		setIsReorderMode(!isReorderMode);
+	};
+
+	const handleSaveOrder = async () => {
+		if (!gridRef.current?.api) return;
+
+		const updatedRows: any[] = [];
+		gridRef.current.api.forEachNode((node: any) => updatedRows.push(node.data));
+
+		const reorderConfig = {
+			POSITION: { api: deptService.updateJobPositionLevels, domain: 'jobPosition' },
+			TITLE: { api: deptService.updateJobTitleLevels, domain: 'jobTitle' },
+			GRADE: { api: deptService.updateJobGradeLevels, domain: 'jobGrade' },
+		} as const;
+
+		const { api, domain } = reorderConfig[category];
+		const currentOrderIds = updatedRows.map((row) => row[`${domain}Id`]);
+
+		if (JSON.stringify(initialOrder) === JSON.stringify(currentOrderIds)) {
+			setIsReorderMode(false);
+			return;
+		}
+
+		const payload = updatedRows.map((row, index) => ({
+			[`${domain}Id`]: row[`${domain}Id`],
+			[`${domain}Level`]: index + 1,
+		}));
+
+		await api(payload);
+		await alert('순서가 성공적으로 변경되었습니다.');
+		getCategoryData(category);
+		setIsReorderMode(false);
+	};
 
 	const handleChange = (event: SelectChangeEvent) => {
 		setActiveSubCategory(event.target.value as SubCategoryType);
@@ -173,14 +213,22 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 								</Button>
 							</Stack>
 							<Stack>
-								<Button variant='outlined' size='small' startIcon={<Reorder />}>
-									순서바꾸기
+								<Button variant='outlined' size='small' startIcon={isReorderMode ? <SaveAlt /> : <Reorder />} onClick={toggleReorderMode}>
+									{isReorderMode ? '순서바꾸기 완료' : '순서바꾸기'}
 								</Button>
 							</Stack>
 						</Stack>
 					</Grid>
 				</Grid>
-				<CustomAgGridComp ref={gridRef} rowData={activeCategoryData} colDefs={deptRoleColDefs} rowSelectionMode={'multiple'} pagination={false} />
+				<CustomAgGridComp
+					ref={gridRef}
+					rowData={activeCategoryData}
+					colDefs={deptRoleColDefs}
+					rowSelectionMode={'multiple'}
+					pagination={false}
+					isReorderMode={isReorderMode}
+					animateRows={true}
+				/>
 			</Grid>
 			<Grid
 				size={{
