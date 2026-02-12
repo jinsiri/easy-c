@@ -8,7 +8,7 @@ export default function JobGradeAddForm({ control, errors }: FormProps<JobGradeA
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', py: 2 }}>
 			<FormItem name='jobGradeNm' label='직급명' required control={control} error={errors.jobGradeNm?.message} />
-			<FormItem name='jobGradeCode' label='직급코드' control={control} error={errors.jobGradeCode?.message} />
+			<FormItem name='jobGradeCode' label='직급코드' required control={control} error={errors.jobGradeCode?.message} />
 		</Box>
 	);
 }
