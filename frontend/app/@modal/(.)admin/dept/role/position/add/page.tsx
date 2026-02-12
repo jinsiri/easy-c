@@ -11,15 +11,7 @@ export default function AddJobPositionModal() {
 		formState: { errors },
 		loading,
 		onSubmit,
-		router,
-	} = useJobPositionAdd(() => {
-		startTransition(() => {
-			router.refresh();
-			setTimeout(() => {
-				router.back();
-			}, 500);
-		});
-	});
+	} = useJobPositionAdd();
 
 	return (
 		<BaseDialog title={'직위 추가'} loading={loading} onConfirm={onSubmit}>

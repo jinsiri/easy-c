@@ -10,6 +10,7 @@ import { deptService } from '@/app/services/deptService';
 import { useRouter } from 'next/navigation';
 import { AgGridReact } from 'ag-grid-react';
 import { useDialogStore } from '@/store/useDialogStore';
+import useRefreshStore from '@/store/useRefreshStore';
 
 const templateColDefs: ColDef<Record<string, any>>[] = [
 	{ field: 'deptRoleNm', headerName: '명칭', editable: false },
@@ -32,6 +33,7 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 	const { alert } = useDialogStore();
 	const router = useRouter();
 	const theme = useTheme();
+	const refreshTicket = useRefreshStore((state) => state.refreshTicket);
 	const categoryName = RANK_CATEGORY_INFO[category];
 	const subCategories = RANK_TEMPLATES[category].subTypes;
 	const gridRef = useRef<AgGridReact>(null);
@@ -76,6 +78,12 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 		setActiveSubCategory(firstSubKey);
 		getCategoryData(category);
 	}, [category, getCategoryData]);
+
+	useEffect(() => {
+		if (refreshTicket > 0) {
+			getCategoryData(category);
+		}
+	}, [refreshTicket, category]);
 
 	const handleChange = (event: SelectChangeEvent) => {
 		setActiveSubCategory(event.target.value as SubCategoryType);

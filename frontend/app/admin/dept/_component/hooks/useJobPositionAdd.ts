@@ -4,10 +4,12 @@ import { useRouter } from 'next/navigation';
 import axiosConfig from '@/app/_lib/axiosConfig';
 import { useDialogStore } from '@/store/useDialogStore';
 import { JobPositionAddFormValues } from '@/app/admin/dept/_component/JobPositionAddForm';
+import useRefreshStore from '@/store/useRefreshStore';
 
 export default function useJobPositionAdd(onSuccess?: () => void) {
 	const router = useRouter();
 	const { alert } = useDialogStore();
+	const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 	const [loading, setLoading] = useState(false);
 
 	const formMethods = useForm<JobPositionAddFormValues>({
@@ -24,8 +26,10 @@ export default function useJobPositionAdd(onSuccess?: () => void) {
 
 			if (onSuccess) {
 				onSuccess();
+				console.log('none modal test');
 			} else {
-				router.push('/admin/dept/role');
+				triggerRefresh();
+				router.back();
 			}
 		} catch (error) {
 			console.error(error);

@@ -12,7 +12,7 @@ export default function AddJobPositionPage() {
 		loading,
 		onSubmit,
 		router,
-	} = useJobPositionAdd(() => router.back());
+	} = useJobPositionAdd();
 
 	return (
 		<Container maxWidth='md' sx={{ py: 4 }}>
