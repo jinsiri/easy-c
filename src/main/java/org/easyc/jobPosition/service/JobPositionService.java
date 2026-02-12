@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,6 +85,25 @@ public class JobPositionService {
 
         for(JobPosition position : positions) {
             position.delete();
+        }
+    }
+
+    @Transactional
+    public void updateLevels(List<JobPositionRequestDto> dtos) {
+        List<Long> ids = dtos.stream()
+                .map(JobPositionRequestDto::getJobPositionId)
+                .toList();
+
+        List<JobPosition> positions = jobPositionRepository.findAllById(ids);
+
+        Map<Long, JobPosition> gradeMap = positions.stream()
+                .collect(Collectors.toMap(JobPosition::getJobPositionId, g -> g));
+
+        for (JobPositionRequestDto dto : dtos) {
+            JobPosition position = gradeMap.get(dto.getJobPositionId());
+            if (position != null) {
+                position.changeLevel(dto.getJobPositionLevel());
+            }
         }
     }
 }

@@ -37,4 +37,9 @@ public class JobPositionController {
     public void deleteJobPositions(@RequestBody BulkDeleteRequestDto requestDto) {
         jobPositionService.delete(requestDto.getIds());
     }
+
+    @PostMapping("/update-levels")
+    public void updateGradeLevels(@RequestBody List<JobPositionRequestDto> dtos) {
+        jobPositionService.updateLevels(dtos);
+    }
 }

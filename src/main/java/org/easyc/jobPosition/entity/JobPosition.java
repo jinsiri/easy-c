@@ -30,8 +30,14 @@ public class JobPosition extends BaseEntity {
     @Column(name="job_position_level")
     private int jobPositionLevel;
 
-
     public void delete() {
         super.delete();
+    }
+
+    public void changeLevel(Integer newLevel) {
+        if (newLevel == null || newLevel < 1) {
+            throw new IllegalArgumentException("유효하지 않은 레벨입니다.");
+        }
+        this.jobPositionLevel = newLevel;
     }
 }
