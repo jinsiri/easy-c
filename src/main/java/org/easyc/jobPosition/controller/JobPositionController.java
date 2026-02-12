@@ -2,6 +2,7 @@ package org.easyc.jobPosition.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.easyc.common.dto.BulkDeleteRequestDto;
 import org.easyc.jobPosition.dto.JobPositionRequestDto;
 import org.easyc.jobPosition.dto.JobPositionResponseDto;
 import org.easyc.jobPosition.service.JobPositionService;
@@ -13,7 +14,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/job-position")
+@RequestMapping("/api/job-positions")
 public class JobPositionController {
     private final JobPositionService jobPositionService;
 
@@ -23,7 +24,22 @@ public class JobPositionController {
     }
 
     @PostMapping
-    public void save(@RequestBody JobPositionRequestDto dto) {
+    public void saveJobPosition(@RequestBody JobPositionRequestDto dto) {
         jobPositionService.save(dto);
+    }
+
+    @PostMapping("/from-template")
+    public void saveJobPositions(@RequestBody List<JobPositionRequestDto> dtos) {
+        jobPositionService.saveList(dtos);
+    }
+
+    @DeleteMapping
+    public void deleteJobPositions(@RequestBody BulkDeleteRequestDto requestDto) {
+        jobPositionService.delete(requestDto.getIds());
+    }
+
+    @PostMapping("/update-levels")
+    public void updateGradeLevels(@RequestBody List<JobPositionRequestDto> dtos) {
+        jobPositionService.updateLevels(dtos);
     }
 }

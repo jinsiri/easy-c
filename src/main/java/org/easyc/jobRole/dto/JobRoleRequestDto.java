@@ -3,6 +3,7 @@ package org.easyc.jobRole.dto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.dto.BaseDto;
+import org.easyc.jobRole.entity.JobRole;
 
 @Getter
 @SuperBuilder
@@ -15,4 +16,13 @@ public class JobRoleRequestDto extends BaseDto {
     private String jobRoleType;
     private int jobRoleNm;
 
+    public JobRole toEntity() {
+        return JobRole.builder()
+                .jobRoleId(jobRoleId)
+                .jobRoleCategory(jobRoleCategory)
+                .jobRoleType(jobRoleType)
+                .jobRoleNm(jobRoleNm)
+                .build()
+                ;
+    }
 }

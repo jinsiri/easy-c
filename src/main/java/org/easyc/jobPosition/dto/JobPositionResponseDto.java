@@ -11,13 +11,14 @@ import java.util.stream.Collectors;
 @Getter
 @SuperBuilder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class JobPositionResponseDto extends BaseDto {
     private Long jobPositionId;
     private String jobPositionNm;
     private String jobPositionCode;
     private int jobPositionLevel;
+    private int userCount;
 
     public static JobPositionResponseDto fromEntity(JobPosition jobPosition) {
         return JobPositionResponseDto.builder()

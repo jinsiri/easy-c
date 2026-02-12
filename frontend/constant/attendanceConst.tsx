@@ -32,6 +32,20 @@ export const ATTENDANCETYPE: Record<string, string> = {
 	SHIFT: '교대근무',
 };
 
+export const SETTLEMENTPERIOD: Record<string, string> = {
+	WEEK: '1주',
+	WEEK_2: '2주',
+	MONTH: '1개월',
+	MONTH_2: '2개월',
+	MONTH_3: '3개월',
+};
+
+export const WORKTIMERULE: Record<string, string> = {
+	CAP_AT_40: '주 40시간 제한',
+	ALWAYS_40: '주 40시간 기준',
+	BY_WORK_DAYS: '근무일 기준',
+};
+
 export const BASICSTATUS: Record<string, string> = {
 	PENDING: '대기',
 	APPROVED: '승인',

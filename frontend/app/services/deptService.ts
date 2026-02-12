@@ -1,6 +1,11 @@
 import axiosConfig from '../_lib/axiosConfig';
+import { BulkDeleteRequestDto } from '@/app/services/memberService';
 
 export interface JobPositionResponseDto {
+	[key: string]: any;
+}
+
+export interface JobPositionRequestDto {
 	[key: string]: any;
 }
 
@@ -8,17 +13,34 @@ export interface JobTitleResponseDto {
 	[key: string]: any;
 }
 
+export interface JobTitleRequestDto {
+	[key: string]: any;
+}
+
 export interface JobGradeResponseDto {
 	[key: string]: any;
 }
 
+export interface JobGradeRequestDto {
+	[key: string]: any;
+}
+
 export const deptService = {
-	// 직위 목록 조회
-	getJobPosition: () => axiosConfig.get<JobPositionResponseDto[]>(`/api/job-position`),
+	// 직위
+	getJobPositions: () => axiosConfig.get<JobPositionResponseDto[]>(`/api/job-positions`),
+	saveJobPositionTemplates: (dtos: JobPositionRequestDto[]) => axiosConfig.post(`/api/job-positions/from-template`, dtos),
+	deleteJobPositions: (requestDto: BulkDeleteRequestDto) => axiosConfig.delete(`/api/job-positions`, { data: requestDto }),
+	updateJobPositionLevels: (dtos: JobPositionRequestDto[]) => axiosConfig.post(`/api/job-positions/update-levels`, dtos),
 
-	// 직책 목록 조회
-	getJobTitle: () => axiosConfig.get<JobTitleResponseDto[]>(`/api/job-title`),
+	// 직책
+	getJobTitles: () => axiosConfig.get<JobTitleResponseDto[]>(`/api/job-titles`),
+	saveJobTitleTemplates: (dtos: JobTitleRequestDto[]) => axiosConfig.post(`/api/job-titles/from-template`, dtos),
+	deleteJobTitles: (requestDto: BulkDeleteRequestDto) => axiosConfig.delete(`/api/job-titles`, { data: requestDto }),
+	updateJobTitleLevels: (dtos: JobTitleRequestDto[]) => axiosConfig.post(`/api/job-titles/update-levels`, dtos),
 
-	// 직급 목록 조회
-	getJobGrade: () => axiosConfig.get<JobGradeResponseDto[]>(`/api/job-grade`),
+	// 직급
+	getJobGrades: () => axiosConfig.get<JobGradeResponseDto[]>(`/api/job-grades`),
+	saveJobGradeTemplates: (dtos: JobGradeRequestDto[]) => axiosConfig.post(`/api/job-grades/from-template`, dtos),
+	deleteJobGrades: (requestDto: BulkDeleteRequestDto) => axiosConfig.delete(`/api/job-grades`, { data: requestDto }),
+	updateJobGradeLevels: (dtos: JobGradeRequestDto[]) => axiosConfig.post(`/api/job-grades/update-levels`, dtos),
 };

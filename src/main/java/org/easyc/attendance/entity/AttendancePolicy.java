@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.easyc.attendance.constant.AttendanceType;
 import org.easyc.attendance.constant.SettlementPeriod;
 import org.easyc.attendance.constant.WorktimeRule;
+import org.easyc.common.entity.BaseEntity;
 
 import java.time.LocalTime;
 
@@ -16,7 +17,7 @@ import java.time.LocalTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendancePolicy {
+public class AttendancePolicy extends BaseEntity {
 
     @Id
     @SequenceGenerator(name="attendance_policy_seq", sequenceName="attendance_policy_seq", allocationSize=1)

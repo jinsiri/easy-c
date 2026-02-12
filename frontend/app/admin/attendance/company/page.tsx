@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 
 /** MUI */
-import { Box, Grid, IconButton, Typography } from '@mui/material';
+import { Box, Grid, IconButton, Typography, TextField, Select, MenuItem } from '@mui/material';
 import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 
 /** Ag Grid */
@@ -14,20 +14,39 @@ import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
+import { WORKSTATUS } from '@/constant/attendanceConst';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
-import { getTimelineInnerData } from '@/utils/commonFunc';
 import axiosConfig from '@/app/_lib/axiosConfig';
 
 export default function AttendanceCompanyPage() {
 	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
-	const [rowData, setRowData] = useState<Record<string, any>[]>();
+	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
+	const [searchCategory, setSearchCategory] = useState<string>('memberNm');
 
 	const colDefs: ColDef<Record<string, any>>[] = [
 		{ field: 'workDate', headerName: '근무일' },
-		{ field: 'dept', headerName: '부서/직급' },
-		{ field: 'name', headerName: '근무자' },
-		{ field: 'workStatus', headerName: '근로 상태' },
+		{
+			field: 'dept',
+			headerName: '부서/직급',
+			valueFormatter: (param) => {
+				return param.data ? (param.data.deptNm ? param.data.deptNm + '/' : '') + (param.data.jobGrade ? param.data.jobGrade : '') : '';
+			},
+		},
+		{
+			field: 'name',
+			headerName: '근무자',
+			valueFormatter: (param) => {
+				return param.data ? param.data.registerUser.memberNm : '';
+			},
+		},
+		{
+			field: 'workStatus',
+			headerName: '근로 상태',
+			valueFormatter: (param) => {
+				return param.value ? WORKSTATUS[param.value] : '';
+			},
+		},
 		{
 			field: 'time',
 			headerName: '근로 시간',
@@ -48,7 +67,6 @@ export default function AttendanceCompanyPage() {
 
 	const getAttendanceCompanyOnedayData = () => {
 		axiosConfig.post('/api/attendance/company/oneday', { workDate: calendarDate.format('YYYY-MM-DD') }).then((res) => {
-			console.log(res);
 			setRowData(res);
 		});
 	};
@@ -59,13 +77,15 @@ export default function AttendanceCompanyPage() {
 		}
 	};
 
+	const handleChangeSearchCategory = () => {};
+
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
 			<Box sx={{ padding: '0 1.5rem' }}>
 				<PathBreadcrumbs />
 			</Box>
 			<Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
-				<Grid size={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem', paddingBottom: '1rem' }}>
+				<Grid size={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem' }}>
 					<IconButton
 						sx={{
 							display: 'flex',
@@ -105,14 +125,15 @@ export default function AttendanceCompanyPage() {
 						<ArrowRightRounded sx={{ fontSize: '1.5rem' }} />
 					</IconButton>
 				</Grid>
-				<Grid sx={{ display: 'flex', flexDirection: 'row', padding: '0 1.5rem' }}>
-					<Box sx={{ flex: 1 }}>ssaqew</Box>
-					<Box sx={{ flex: 1 }}>ssaqew</Box>
-					<Box sx={{ flex: 1 }}>ssaqew</Box>
-					<Box sx={{ flex: 1 }}>ssaqew</Box>
+				<Grid sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', padding: '0.5rem 1.5rem' }}>
+					<Select id='demo-simple-select' value={searchCategory} onChange={handleChangeSearchCategory} size='small' sx={{ marginRight: '0.5rem' }}>
+						<MenuItem value={'depthNm'}>부서명</MenuItem>
+						<MenuItem value={'memberNm'}>근무자</MenuItem>
+					</Select>
+					<TextField id='outlined-basic' variant='outlined' size='small' />
 				</Grid>
 				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='single' />
+					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='single' rowHeight={60} />
 				</Grid>
 			</Grid>
 		</Box>

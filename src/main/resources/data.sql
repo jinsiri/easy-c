@@ -8,6 +8,8 @@ SELECT setval('dept_seq', COALESCE((SELECT MAX(dept_id) FROM dept), 1));
 
 --근태 정책 초기
 INSERT INTO attendance_policy (
+    deleted,
+    active,
     attendance_policy_id,
     attendance_policy_name,
     attendance_policy_desc,
@@ -25,6 +27,8 @@ INSERT INTO attendance_policy (
     allow_margin_minute
 )
 VALUES (
+    false,
+    true,
     1,
     '기본 정책',
     null,
@@ -51,8 +55,8 @@ SELECT setval(
 );
 
 --근태 맵핑 데이터 세팅
-INSERT INTO mapping_attendance_policy ( mapping_id, attendance_policy_id, member_id)
-VALUES ( 1,1,1)
+INSERT INTO mapping_attendance_policy ( mapping_id, attendance_policy_id, member_id, login_id)
+VALUES (1,1,1,'admin')
     ON CONFLICT (mapping_id) DO NOTHING;
 
 -- 시퀀스 설정 수정

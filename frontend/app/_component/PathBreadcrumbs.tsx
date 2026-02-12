@@ -13,6 +13,7 @@ import AdminMenuItem from './menuItem/AdminMenuItem';
 
 /** interface */
 interface PathBreadcrumbsProps {
+	sx?: any;
 	children?: ReactNode;
 }
 
@@ -29,7 +30,7 @@ const findMenuById = (menuList: menuType[], targetId: string): any | null => {
 	return null;
 };
 
-export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
+export default function PathBreadcrumbs({ sx, children }: PathBreadcrumbsProps) {
 	const pathname = usePathname();
 	const [currentPathName, setCurrentPathName] = useState<string>('');
 	const [breadcrumbs, setBreadcrumbs] = useState<menuType[]>([]);
@@ -71,7 +72,7 @@ export default function PathBreadcrumbs({ children }: PathBreadcrumbsProps) {
 	};
 
 	return (
-		<Box component={'section'} sx={{ width: '100%', mb: '1.5rem' }}>
+		<Box component={'section'} sx={{ width: '100%', mb: '1.5rem', ...sx }}>
 			<Box component={'article'} sx={{ width: '100%', padding: '1rem 0 0.25rem 0 ' }}>
 				<Breadcrumbs aria-label='breadcrumb'>
 					{breadcrumbs.length > 0 &&

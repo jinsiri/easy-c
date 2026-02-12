@@ -6,8 +6,22 @@ import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { Box, useTheme } from '@mui/material';
 
 /** Ag Grid */
-import { AllCommunityModule, ModuleRegistry, ColDef, themeQuartz, iconSetQuartzLight, GridReadyEvent, RowSelectionOptions } from 'ag-grid-community';
+<<<<<<< Updated upstream
+import {
+	AllCommunityModule,
+	ModuleRegistry,
+	ColDef,
+	themeQuartz,
+	iconSetQuartzLight,
+	GridReadyEvent,
+	RowSelectionOptions,
+	RowDragEndEvent,
+} from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
+=======
+import { AllCommunityModule, ModuleRegistry, ColDef, themeQuartz, iconSetQuartzLight, GridReadyEvent, RowSelectionOptions } from 'ag-grid-community';
+import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
+>>>>>>> Stashed changes
 
 // Ag-grid Row selection 옵션 추가
 export type RowSelectionMode = 'single' | 'multiple' | 'none';
@@ -26,15 +40,41 @@ export const createRowSelection = (mode: RowSelectionMode) => {
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-interface propsType {
+interface propsType extends AgGridReactProps {
 	rowData: Record<string, any>[];
 	colDefs: ColDef<Record<string, any>>[];
 	pagination?: boolean;
 	onGridReady?: (params: GridReadyEvent) => void;
 	rowSelectionMode?: 'single' | 'multiple' | 'none';
+	onRowDragEnd?: (params: RowDragEndEvent) => void;
+	animateRows?: boolean;
+	isReorderMode?: boolean;
 }
 
-const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination = true, rowSelectionMode = 'none' }: propsType, ref) => {
+<<<<<<< Updated upstream
+const CustomAgGridComp = forwardRef(
+	({ rowData, colDefs, onGridReady, pagination = true, rowSelectionMode = 'none', onRowDragEnd, animateRows, isReorderMode = false }: propsType, ref) => {
+		const gridRef = useRef<AgGridReact>(null);
+		const theme = useTheme();
+		const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
+			accentColor: theme.palette.primary.main,
+			backgroundColor: '#ffffff',
+			borderColor: theme.palette.grey[200],
+			browserColorScheme: 'light',
+			columnBorder: false,
+			foregroundColor: theme.palette.grey[500],
+			headerBackgroundColor: theme.palette.grey[50],
+			headerFontSize: 14,
+			headerFontWeight: 600,
+			headerTextColor: theme.palette.grey[700],
+			rowBorder: true,
+			sidePanelBorder: false,
+			spacing: 6,
+			wrapperBorder: false,
+			wrapperBorderRadius: 0,
+		});
+=======
+const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination = true, rowSelectionMode = 'none', ...props }: propsType, ref) => {
 	const gridRef = useRef<AgGridReact>(null);
 	const theme = useTheme();
 	const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
@@ -54,24 +94,70 @@ const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination
 		wrapperBorder: false,
 		wrapperBorderRadius: 0,
 	});
+>>>>>>> Stashed changes
 
-	const rowSelection = useMemo(() => {
-		return createRowSelection(rowSelectionMode);
-	}, [rowSelectionMode]);
+		const finalColDefs: ColDef<Record<string, any>>[] = useMemo(() => {
+			const baseCols = [...colDefs];
 
-	// 부모에서 ref.current.api 등 바로 사용 가능
-	useImperativeHandle(ref, () => gridRef.current);
+			if (isReorderMode) {
+				return [
+					{
+						headerName: '',
+						width: 80,
+						rowDrag: isReorderMode,
+						cellClass: 'cursor-move',
+					},
+					...baseCols,
+				];
+			}
 
-	const onGridReadyEvent = (params: GridReadyEvent) => {
-		params.api.sizeColumnsToFit();
-		if (onGridReady) {
-			onGridReady(params);
-		}
-	};
+			if (rowSelectionMode === 'multiple') {
+				return [...baseCols];
+			}
 
+<<<<<<< Updated upstream
+			return baseCols;
+		}, [colDefs, isReorderMode, rowSelectionMode]);
+
+		const rowSelection = useMemo(() => {
+			if (isReorderMode) return undefined;
+			return createRowSelection(rowSelectionMode);
+		}, [rowSelectionMode, isReorderMode]);
+
+		// 부모에서 ref.current.api 등 바로 사용 가능
+		useImperativeHandle(ref, () => gridRef.current);
+
+		const onGridReadyEvent = (params: GridReadyEvent) => {
+			params.api.sizeColumnsToFit();
+			if (onGridReady) {
+				onGridReady(params);
+			}
+		};
+
+		return (
+			<Box sx={{ width: '100%', height: '100%' }}>
+				<AgGridReact
+					ref={gridRef}
+					theme={gridTheme}
+					rowData={rowData}
+					columnDefs={finalColDefs}
+					rowSelection={rowSelection}
+					pagination={pagination}
+					onGridReady={onGridReadyEvent}
+					rowDragManaged={isReorderMode}
+					suppressRowDrag={!isReorderMode}
+					onRowDragEnd={onRowDragEnd}
+					animateRows={animateRows}
+				/>
+			</Box>
+		);
+	},
+);
+=======
 	return (
 		<Box sx={{ width: '100%', height: '100%' }}>
 			<AgGridReact
+				{...props}
 				ref={gridRef}
 				theme={gridTheme}
 				rowData={rowData}
@@ -83,6 +169,7 @@ const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination
 		</Box>
 	);
 });
+>>>>>>> Stashed changes
 
 CustomAgGridComp.displayName = 'CustomAgGridComp';
 export default CustomAgGridComp;
