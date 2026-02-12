@@ -29,4 +29,9 @@ public class JobPosition extends BaseEntity {
 
     @Column(name="job_position_level")
     private int jobPositionLevel;
+
+
+    public void delete() {
+        super.delete();
+    }
 }

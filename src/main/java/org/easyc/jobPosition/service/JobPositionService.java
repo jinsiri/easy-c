@@ -1,5 +1,6 @@
 package org.easyc.jobPosition.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
@@ -12,17 +13,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class JobPositionService {
     private final JobPositionRepository jobPositionRepository;
     private final JobPositionRepositoryCustom jobPositionRepositoryCustom;
-    
+
     public List<JobPositionResponseDto> findAll() {
         return jobPositionRepositoryCustom.findAllWithMemberCountOrderByLevel();
     }
 
+    @Transactional
     public void save(JobPositionRequestDto jobPositionRequestDto) {
         if (jobPositionRepository.existsByJobPositionNm(jobPositionRequestDto.getJobPositionNm())) {
             throw new CustomException(CustomExceptionCode.MEMBER_JOB_DUPLICATE_NM);
@@ -36,6 +39,7 @@ public class JobPositionService {
         jobPositionRepository.save(jobPosition);
     }
 
+    @Transactional
     public void saveList(List<JobPositionRequestDto> selectedTemplates) {
         int currentMaxLevel = jobPositionRepository.findMaxLevel().orElse(0);
 
@@ -55,5 +59,18 @@ public class JobPositionService {
         }
 
         jobPositionRepository.saveAll(newPositions);
+    }
+
+    @Transactional
+    public void delete(Set<Long> positionIds) {
+        List<JobPosition> positions = jobPositionRepository.findAllById(positionIds);
+
+        if(positions.size() != positionIds.size()) {
+            throw new CustomException(CustomExceptionCode.MEMBER_JOB_NOT_FOUND);
+        }
+
+        for(JobPosition position : positions) {
+            position.delete();
+        }
     }
 }

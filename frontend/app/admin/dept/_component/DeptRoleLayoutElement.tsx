@@ -3,76 +3,108 @@
 import { Button, FormControl, Grid, IconButton, MenuItem, Select, SelectChangeEvent, Stack, Typography, useTheme } from '@mui/material';
 import { Add, ArrowBack, Remove, Reorder } from '@mui/icons-material';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
-import { RANK_TEMPLATES, RANK_CATEGORY_INFO, RankCategory } from '@/constant/deptConst';
+import { RANK_TEMPLATES, RANK_CATEGORY_INFO, RoleCategory } from '@/constant/deptConst';
 import { ColDef } from 'ag-grid-community';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { deptService } from '@/app/services/deptService';
 import { useRouter } from 'next/navigation';
+import { AgGridReact } from 'ag-grid-react';
+import { useDialogStore } from '@/store/useDialogStore';
 
 const templateColDefs: ColDef<Record<string, any>>[] = [
-	{ field: 'deptRankNm', headerName: '명칭', editable: false },
-	{ field: 'deptRankCode', headerName: '코드', editable: false },
+	{ field: 'deptRoleNm', headerName: '명칭', editable: false },
+	{ field: 'deptRoleCode', headerName: '코드', editable: false },
 ];
 
-const deptRankColDefs: ColDef<Record<string, any>>[] = [
-	{ field: 'deptRankNm', headerName: '명칭', editable: false },
-	{ field: 'deptRankCode', headerName: '코드', editable: false },
+const deptRoleColDefs: ColDef<Record<string, any>>[] = [
+	{ field: 'deptRoleNm', headerName: '명칭', editable: false },
+	{ field: 'deptRoleCode', headerName: '코드', editable: false },
 	{ field: 'userCount', headerName: '사용멤버(명)', editable: false },
 ];
 
 type SubCategoryType = string;
 
-interface DeptRankLayoutElementProps {
-	rankType: RankCategory;
+interface DeptRoleLayoutElementProps {
+	category: RoleCategory;
 }
 
-export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElementProps) {
+export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElementProps) {
+	const { alert } = useDialogStore();
 	const router = useRouter();
 	const theme = useTheme();
-	const categoryName = RANK_CATEGORY_INFO[rankType];
-	const subCategories = RANK_TEMPLATES[rankType].subTypes;
+	const categoryName = RANK_CATEGORY_INFO[category];
+	const subCategories = RANK_TEMPLATES[category].subTypes;
+	const gridRef = useRef<AgGridReact>(null);
 	const [activeSubCategory, setActiveSubCategory] = useState<SubCategoryType>('OFFICE');
 	const [activeCategoryData, setActiveCategoryData] = useState<any[]>([]);
 
-	const getRankTypeData = useCallback(async (rankType: RankCategory) => {
-		const serviceMap = {
-			POSITION: deptService.getJobPosition,
-			TITLE: deptService.getJobTitle,
-			GRADE: deptService.getJobGrade,
+	const getCategoryData = useCallback(async (category: RoleCategory) => {
+		const categoryConfig = {
+			POSITION: {
+				api: deptService.getJobPositions,
+				nameKey: 'jobPositionNm',
+				codeKey: 'jobPositionCode',
+			},
+			TITLE: {
+				api: deptService.getJobTitles,
+				nameKey: 'jobTitleNm',
+				codeKey: 'jobTitleCode',
+			},
+			GRADE: {
+				api: deptService.getJobGrades,
+				nameKey: 'jobGradeNm',
+				codeKey: 'jobGradeCode',
+			},
 		} as const;
 
-		try {
-			const res = await serviceMap[rankType]();
-			setActiveCategoryData(
-				res.map((el) => ({
-					...el,
-					deptRankNm: el.jobPositionNm,
-					deptRankCode: el.jobPositionCode,
-					userCount: el.userCount ?? 0,
-				})),
-			);
-		} catch (err) {
-			console.error('정보 조회 실패:', err);
-		}
+		const config = categoryConfig[category];
+		const res = await config.api();
+
+		setActiveCategoryData(
+			res.map((el: any) => ({
+				...el,
+				deptRoleNm: el[config.nameKey],
+				deptRoleCode: el[config.codeKey],
+				userCount: el.userCount ?? 0,
+			})),
+		);
 	}, []);
 
 	useEffect(() => {
-		const firstSubKey = Object.keys(RANK_TEMPLATES[rankType].subTypes)[0];
+		const firstSubKey = Object.keys(RANK_TEMPLATES[category].subTypes)[0];
 		setActiveSubCategory(firstSubKey);
-		getRankTypeData(rankType).catch(console.error);
-	}, [rankType, getRankTypeData]);
+		getCategoryData(category);
+	}, [category, getCategoryData]);
 
 	const handleChange = (event: SelectChangeEvent) => {
 		setActiveSubCategory(event.target.value as SubCategoryType);
 	};
 
-	const goToAddRolePage = (categoryName: RankCategory) => {
+	const goToAddRolePage = (categoryName: RoleCategory) => {
 		router.push(`/admin/dept/role/${categoryName.toLowerCase()}/add`);
 	};
 
+	const deleteRoles = async (category: RoleCategory) => {
+		const selectedRows = gridRef.current?.api.getSelectedRows() || [];
+		if (selectedRows.length === 0) return alert('삭제할 항목을 선택해주세요.');
+
+		const deleteConfig = {
+			POSITION: { api: deptService.deleteJobPositions, idKey: 'jobPositionId' },
+			TITLE: { api: deptService.deleteJobTitles, idKey: 'jobTitleId' },
+			GRADE: { api: deptService.deleteJobGrades, idKey: 'jobGradeId' },
+		} as const;
+
+		const { api, idKey } = deleteConfig[category];
+		const ids = selectedRows.map((row: any) => row[idKey]);
+
+		await api({ ids });
+		alert('삭제되었습니다.');
+		getCategoryData(category);
+	};
+
 	const currentData = useMemo(() => {
-		return RANK_TEMPLATES[rankType].subTypes[activeSubCategory]?.list || [];
-	}, [rankType, activeSubCategory]);
+		return RANK_TEMPLATES[category].subTypes[activeSubCategory]?.list || [];
+	}, [category, activeSubCategory]);
 
 	return (
 		<Grid container direction={'row'} spacing={2} sx={{ flexGrow: 1, width: '100%', p: 2 }}>
@@ -100,12 +132,12 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 							}}
 						>
 							<Stack>
-								<Button variant='outlined' size='small' startIcon={<Add />} onClick={() => goToAddRolePage(rankType)}>
+								<Button variant='outlined' size='small' startIcon={<Add />} onClick={() => goToAddRolePage(category)}>
 									추가
 								</Button>
 							</Stack>
 							<Stack>
-								<Button variant='outlined' size='small' startIcon={<Remove />}>
+								<Button variant='outlined' size='small' startIcon={<Remove />} onClick={() => deleteRoles(category)}>
 									삭제
 								</Button>
 							</Stack>
@@ -117,7 +149,7 @@ export default function DeptRankLayoutElement({ rankType }: DeptRankLayoutElemen
 						</Stack>
 					</Grid>
 				</Grid>
-				<CustomAgGridComp rowData={activeCategoryData} colDefs={deptRankColDefs} rowSelectionMode={'multiple'} pagination={false} />
+				<CustomAgGridComp ref={gridRef} rowData={activeCategoryData} colDefs={deptRoleColDefs} rowSelectionMode={'multiple'} pagination={false} />
 			</Grid>
 			<Grid
 				size={{
