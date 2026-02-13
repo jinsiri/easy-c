@@ -4,7 +4,7 @@ import { JobPositionResponseDto } from '@/type/dept';
 
 export type JobPositionAddFormValues = Omit<JobPositionResponseDto, 'jobPositionId'>;
 
-export default function JobPositionAddForm({ control, errors }: FormProps<JobPositionAddFormValues>) {
+export default function JobPositionForm({ control, errors }: FormProps<JobPositionAddFormValues>) {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', py: 2 }}>
 			<FormItem name='jobPositionNm' label='직위명' required control={control} error={errors.jobPositionNm?.message} />

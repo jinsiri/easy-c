@@ -3,10 +3,10 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import axiosConfig from '@/app/_lib/axiosConfig';
 import { useDialogStore } from '@/store/useDialogStore';
-import { JobPositionAddFormValues } from '@/app/admin/dept/_component/JobPositionAddForm';
+import { JobPositionAddFormValues } from '@/app/admin/dept/_component/JobPositionForm';
 import useRefreshStore from '@/store/useRefreshStore';
 
-export default function useJobPositionAdd(onSuccess?: () => void) {
+export default function useJobPositionForm(onSuccess?: () => void) {
 	const router = useRouter();
 	const { alert } = useDialogStore();
 	const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);

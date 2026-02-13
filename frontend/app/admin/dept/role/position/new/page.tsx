@@ -2,8 +2,8 @@
 
 import { Box, Paper, Typography, Button, Container } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
-import JobPositionAddForm from '@/app/admin/dept/_component/JobPositionAddForm';
-import useJobPositionAdd from '@/app/admin/dept/_component/hooks/useJobPositionAdd';
+import JobPositionForm from '@/app/admin/dept/_component/JobPositionForm';
+import useJobPositionForm from '@/app/admin/dept/_component/hooks/useJobPositionForm';
 
 export default function AddJobPositionPage() {
 	const {
@@ -12,7 +12,7 @@ export default function AddJobPositionPage() {
 		loading,
 		onSubmit,
 		router,
-	} = useJobPositionAdd(() => router.back());
+	} = useJobPositionForm(() => router.back());
 
 	return (
 		<Container maxWidth='md' sx={{ py: 4 }}>
@@ -26,7 +26,7 @@ export default function AddJobPositionPage() {
 			</Box>
 
 			<Paper sx={{ p: 4 }}>
-				<JobPositionAddForm control={control} errors={errors} />
+				<JobPositionForm control={control} errors={errors} />
 				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
 					<Button onClick={() => router.back()} disabled={loading}>
 						취소

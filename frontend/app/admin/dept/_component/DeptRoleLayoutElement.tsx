@@ -142,7 +142,7 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 	};
 
 	const goToAddRolePage = (categoryName: RoleCategory) => {
-		router.push(`/admin/dept/role/${categoryName.toLowerCase()}/add`);
+		router.push(`/admin/dept/role/${categoryName.toLowerCase()}/new`);
 	};
 
 	const deleteRoles = async (category: RoleCategory) => {
