@@ -6,22 +6,8 @@ import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { Box, useTheme } from '@mui/material';
 
 /** Ag Grid */
-<<<<<<< Updated upstream
-import {
-	AllCommunityModule,
-	ModuleRegistry,
-	ColDef,
-	themeQuartz,
-	iconSetQuartzLight,
-	GridReadyEvent,
-	RowSelectionOptions,
-	RowDragEndEvent,
-} from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
-=======
-import { AllCommunityModule, ModuleRegistry, ColDef, themeQuartz, iconSetQuartzLight, GridReadyEvent, RowSelectionOptions } from 'ag-grid-community';
+import { AllCommunityModule, ModuleRegistry, ColDef, themeQuartz, iconSetQuartzLight, GridReadyEvent, RowSelectionOptions, RowDragEndEvent, } from 'ag-grid-community';
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
->>>>>>> Stashed changes
 
 // Ag-grid Row selection 옵션 추가
 export type RowSelectionMode = 'single' | 'multiple' | 'none';
@@ -51,30 +37,7 @@ interface propsType extends AgGridReactProps {
 	isReorderMode?: boolean;
 }
 
-<<<<<<< Updated upstream
-const CustomAgGridComp = forwardRef(
-	({ rowData, colDefs, onGridReady, pagination = true, rowSelectionMode = 'none', onRowDragEnd, animateRows, isReorderMode = false }: propsType, ref) => {
-		const gridRef = useRef<AgGridReact>(null);
-		const theme = useTheme();
-		const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
-			accentColor: theme.palette.primary.main,
-			backgroundColor: '#ffffff',
-			borderColor: theme.palette.grey[200],
-			browserColorScheme: 'light',
-			columnBorder: false,
-			foregroundColor: theme.palette.grey[500],
-			headerBackgroundColor: theme.palette.grey[50],
-			headerFontSize: 14,
-			headerFontWeight: 600,
-			headerTextColor: theme.palette.grey[700],
-			rowBorder: true,
-			sidePanelBorder: false,
-			spacing: 6,
-			wrapperBorder: false,
-			wrapperBorderRadius: 0,
-		});
-=======
-const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination = true, rowSelectionMode = 'none', ...props }: propsType, ref) => {
+const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination = true, rowSelectionMode = 'none', onRowDragEnd, animateRows, isReorderMode = false, ...props }: propsType, ref) => {
 	const gridRef = useRef<AgGridReact>(null);
 	const theme = useTheme();
 	const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
@@ -94,7 +57,6 @@ const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination
 		wrapperBorder: false,
 		wrapperBorderRadius: 0,
 	});
->>>>>>> Stashed changes
 
 		const finalColDefs: ColDef<Record<string, any>>[] = useMemo(() => {
 			const baseCols = [...colDefs];
@@ -115,7 +77,6 @@ const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination
 				return [...baseCols];
 			}
 
-<<<<<<< Updated upstream
 			return baseCols;
 		}, [colDefs, isReorderMode, rowSelectionMode]);
 
@@ -137,6 +98,7 @@ const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination
 		return (
 			<Box sx={{ width: '100%', height: '100%' }}>
 				<AgGridReact
+					{...props}
 					ref={gridRef}
 					theme={gridTheme}
 					rowData={rowData}
@@ -153,23 +115,6 @@ const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination
 		);
 	},
 );
-=======
-	return (
-		<Box sx={{ width: '100%', height: '100%' }}>
-			<AgGridReact
-				{...props}
-				ref={gridRef}
-				theme={gridTheme}
-				rowData={rowData}
-				columnDefs={colDefs}
-				rowSelection={rowSelection}
-				pagination={pagination}
-				onGridReady={onGridReadyEvent}
-			/>
-		</Box>
-	);
-});
->>>>>>> Stashed changes
 
 CustomAgGridComp.displayName = 'CustomAgGridComp';
 export default CustomAgGridComp;
