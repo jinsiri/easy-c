@@ -1,14 +1,12 @@
 package org.easyc.attendance.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.attendance.dto.AttendanceChangeDataDto;
-import org.easyc.attendance.entity.AttendanceChangeRequest;
+import org.easyc.attendance.dto.AttendancePolicyDto;
 import org.easyc.attendance.entity.AttendancePolicy;
-import org.easyc.attendance.service.AttendanceChangeRequestService;
 import org.easyc.attendance.service.AttendancePolicyService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -19,7 +17,22 @@ public class AttendancePolicyController {
     private final AttendancePolicyService attendancePolicyService;
 
     @GetMapping("/all")
-    public List<AttendancePolicy> getAllPolicy() {
+    public List<AttendancePolicyDto> getAllPolicy() {
         return attendancePolicyService.getAllPolicy();
+    }
+
+    @PostMapping("/save")
+    public void savePolicyData(@RequestBody AttendancePolicyDto request) {
+        attendancePolicyService.savePolicyData(request);
+    }
+
+    @DeleteMapping("/delete")
+    public void deletePolicyData(@RequestParam("target") String encodedId) {
+        // Base64 디코딩
+        byte[] decodedBytes = Base64.getDecoder().decode(encodedId);
+        String idStr = new String(decodedBytes);
+        Long id = Long.parseLong(idStr);
+
+        attendancePolicyService.deletePolicyData(id);
     }
 }

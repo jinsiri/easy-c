@@ -203,7 +203,7 @@ public class AttendanceService {
             WorkType workType = WorkType.NORMAL;
             if (dayOfWeek >= 6) {
                 workType = WorkType.WEEKEND;
-            } else if (!targetPolicy.getWorkingDay().contains(String.valueOf(dayOfWeek))) {
+            } else if (!targetPolicy.getWorkDayOfWeek().contains(String.valueOf(dayOfWeek))) {
                 workType = WorkType.HOLIDAY;
             }
 
@@ -264,7 +264,7 @@ public class AttendanceService {
                 .settlementPeriod(SettlementPeriod.WEEK)
                 .worktimeRule(WorktimeRule.ALWAYS_40)
                 .workingTimeDay( 8 * 60)
-                .workingDay("1,2,3,4,5")
+                .workDayOfWeek("1,2,3,4,5")
                 .startTime(LocalTime.of(9,0))
                 .endTime(LocalTime.of(18,0))
                 .halfLeaveStartTime(LocalTime.of(13,0))
@@ -277,7 +277,7 @@ public class AttendanceService {
 
     private AttendanceResponseDto findStatData (String loginId, LocalDate workDate, AttendancePolicy targetPolicy) {
         //근무시간 정산 기준 가져오기
-        Set<Integer> dayOfWeekSet =  Arrays.stream(targetPolicy.getWorkingDay().trim().split(",")).map(Integer::valueOf).collect(Collectors.toSet());
+        Set<Integer> dayOfWeekSet =  Arrays.stream(targetPolicy.getWorkDayOfWeek().trim().split(",")).map(Integer::valueOf).collect(Collectors.toSet());
 
         SettlementPeriod settlementPeriod = targetPolicy.getSettlementPeriod(); // 정산 기준 단위
         Integer defaultTotalWorkDay = dayOfWeekSet.size() * settlementPeriod.getWeekNumber(); // 단위 근로일

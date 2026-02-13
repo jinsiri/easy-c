@@ -17,7 +17,7 @@ INSERT INTO attendance_policy (
     settlement_period,
     worktime_rule,
     working_time_day,
-    working_day,
+    working_day_of_week,
     start_time,
     end_time,
     half_leave_start_time,
