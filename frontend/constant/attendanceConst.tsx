@@ -1,4 +1,14 @@
-import { workStatus, vacationType } from '@/type/types';
+import { attendanceType, workStatus, vacationType, settlementPeriod } from '@/type/types';
+
+export const WORKDAYOFWEEKNUMBER: Record<string, string> = {
+	'1': '월',
+	'2': '화',
+	'3': '수',
+	'4': '목',
+	'5': '금',
+	'6': '토',
+	'7': '일',
+};
 
 export const WORKSTATUS: Record<workStatus, string> = {
 	PRESENT: '정상 출근',
@@ -24,7 +34,7 @@ export const CURRENTSTATE: Record<string, string> = {
 	AFTER_WORK: '근무 종료',
 };
 
-export const ATTENDANCETYPE: Record<string, string> = {
+export const ATTENDANCETYPE: Record<attendanceType, string> = {
 	FIXED: '고정근로',
 	FLEXTIME: '시차출퇴근',
 	SELECTIVE: '선택근로',
@@ -32,7 +42,7 @@ export const ATTENDANCETYPE: Record<string, string> = {
 	SHIFT: '교대근무',
 };
 
-export const SETTLEMENTPERIOD: Record<string, string> = {
+export const SETTLEMENTPERIOD: Record<settlementPeriod, string> = {
 	WEEK: '1주',
 	WEEK_2: '2주',
 	MONTH: '1개월',
@@ -41,9 +51,9 @@ export const SETTLEMENTPERIOD: Record<string, string> = {
 };
 
 export const WORKTIMERULE: Record<string, string> = {
-	CAP_AT_40: '주 40시간 제한',
-	ALWAYS_40: '주 40시간 기준',
-	BY_WORK_DAYS: '근무일 기준',
+	ALWAYS_40: '법정근로시간 적용',
+	CAP_AT_40: '법정근로시간까지 제한',
+	BY_WORK_DAYS: '근무일x1일 소정근로시간',
 };
 
 export const BASICSTATUS: Record<string, string> = {
