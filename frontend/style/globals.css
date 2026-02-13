@@ -23,7 +23,6 @@
 		'Segoe UI Emoji',
 		'Segoe UI Symbol',
 		sans-serif;
-	color: var(--mui-palette-grey-900);
 }
 
 html,
@@ -130,6 +129,7 @@ section {
 
 body {
 	line-height: 1;
+	color: var(--mui-palette-grey-900);
 }
 
 ol,
