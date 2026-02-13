@@ -6,7 +6,16 @@ import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { Box, useTheme } from '@mui/material';
 
 /** Ag Grid */
-import { AllCommunityModule, ModuleRegistry, ColDef, themeQuartz, iconSetQuartzLight, GridReadyEvent, RowSelectionOptions, RowDragEndEvent, } from 'ag-grid-community';
+import {
+	AllCommunityModule,
+	ModuleRegistry,
+	ColDef,
+	themeQuartz,
+	iconSetQuartzLight,
+	GridReadyEvent,
+	RowSelectionOptions,
+	RowDragEndEvent,
+} from 'ag-grid-community';
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
 
 // Ag-grid Row selection 옵션 추가
@@ -37,26 +46,31 @@ interface propsType extends AgGridReactProps {
 	isReorderMode?: boolean;
 }
 
-const CustomAgGridComp = forwardRef(({ rowData, colDefs, onGridReady, pagination = true, rowSelectionMode = 'none', onRowDragEnd, animateRows, isReorderMode = false, ...props }: propsType, ref) => {
-	const gridRef = useRef<AgGridReact>(null);
-	const theme = useTheme();
-	const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
-		accentColor: theme.palette.primary.main,
-		backgroundColor: '#ffffff',
-		borderColor: theme.palette.grey[200],
-		browserColorScheme: 'light',
-		columnBorder: false,
-		foregroundColor: theme.palette.grey[500],
-		headerBackgroundColor: theme.palette.grey[50],
-		headerFontSize: 14,
-		headerFontWeight: 600,
-		headerTextColor: theme.palette.grey[700],
-		rowBorder: true,
-		sidePanelBorder: false,
-		spacing: 6,
-		wrapperBorder: false,
-		wrapperBorderRadius: 0,
-	});
+const CustomAgGridComp = forwardRef(
+	(
+		{ rowData, colDefs, onGridReady, pagination = true, rowSelectionMode = 'none', onRowDragEnd, animateRows, isReorderMode = false, ...props }: propsType,
+		ref,
+	) => {
+		const gridRef = useRef<AgGridReact>(null);
+		const theme = useTheme();
+		const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
+			accentColor: theme.palette.primary.main,
+			backgroundColor: '#ffffff',
+			borderColor: theme.palette.grey[200],
+			browserColorScheme: 'light',
+			columnBorder: false,
+			cellTextColor: theme.palette.grey[900],
+			foregroundColor: theme.palette.grey[500],
+			headerBackgroundColor: theme.palette.grey[50],
+			headerFontSize: 14,
+			headerFontWeight: 600,
+			headerTextColor: theme.palette.grey[700],
+			rowBorder: true,
+			sidePanelBorder: false,
+			spacing: 6,
+			wrapperBorder: false,
+			wrapperBorderRadius: 0,
+		});
 
 		const finalColDefs: ColDef<Record<string, any>>[] = useMemo(() => {
 			const baseCols = [...colDefs];
