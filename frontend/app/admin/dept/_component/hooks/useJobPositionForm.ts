@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import axiosConfig from '@/app/_lib/axiosConfig';
@@ -22,6 +22,19 @@ export default function useJobPositionForm(id?: string, onSuccess?: () => void) 
 		},
 	});
 
+	const { reset } = formMethods;
+
+	useEffect(() => {
+		const fetchDetail = async () => {
+			if (isEditMode && id) {
+				const response = await axiosConfig.get(`/api/job-positions/${id}`);
+				reset(response);
+			}
+		};
+
+		fetchDetail();
+	}, [id, isEditMode, reset, alert]);
+
 	const onSubmit = formMethods.handleSubmit(async (data) => {
 		setLoading(true);
 		try {
@@ -31,7 +44,12 @@ export default function useJobPositionForm(id?: string, onSuccess?: () => void) 
 				await axiosConfig.post('/api/job-positions', data);
 			}
 			triggerRefresh();
-			onSuccess?.();
+
+			if (onSuccess) {
+				onSuccess();
+			} else {
+				router.back();
+			}
 		} catch (error) {
 			console.error(error);
 			await alert('저장 중 오류가 발생했습니다.');
