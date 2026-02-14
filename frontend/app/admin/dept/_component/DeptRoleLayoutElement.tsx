@@ -4,7 +4,7 @@ import { Button, FormControl, Grid, IconButton, MenuItem, Select, SelectChangeEv
 import { Add, ArrowBack, Remove, Reorder, SaveAlt } from '@mui/icons-material';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import { RANK_TEMPLATES, RANK_CATEGORY_INFO, RoleCategory } from '@/constant/deptConst';
-import { ColDef, RowDragEndEvent } from 'ag-grid-community';
+import { CellClickedEvent, ColDef } from 'ag-grid-community';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { deptService } from '@/app/services/deptService';
 import { useRouter } from 'next/navigation';
@@ -145,6 +145,17 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 		router.push(`/admin/dept/role/${categoryName.toLowerCase()}/new`);
 	};
 
+	const goToUpdateRolePage = (params: CellClickedEvent, categoryName: RoleCategory) => {
+		const updateConfig = {
+			POSITION: { id: 'jobPositionId' },
+			TITLE: { id: 'jobTitleId' },
+			GRADE: { id: 'jobGradeId' },
+		} as const;
+
+		const { id } = updateConfig[category];
+		router.push(`/admin/dept/role/${categoryName.toLowerCase()}/${params.data[id]}`);
+	};
+
 	const deleteRoles = async (category: RoleCategory) => {
 		const selectedRows = gridRef.current?.api.getSelectedRows() || [];
 		if (selectedRows.length === 0) return alert('삭제할 항목을 선택해주세요.');
@@ -245,6 +256,7 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 					pagination={false}
 					isReorderMode={isReorderMode}
 					animateRows={true}
+					onCellClicked={(params) => goToUpdateRolePage(params, category)}
 				/>
 			</Grid>
 			<Grid

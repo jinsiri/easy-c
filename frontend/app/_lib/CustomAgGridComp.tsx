@@ -15,6 +15,7 @@ import {
 	GridReadyEvent,
 	RowSelectionOptions,
 	RowDragEndEvent,
+	CellClickedEvent,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 
@@ -26,7 +27,7 @@ export const createRowSelection = (mode: RowSelectionMode) => {
 
 	const options: RowSelectionOptions = {
 		mode: mode === 'single' ? 'singleRow' : 'multiRow',
-		enableClickSelection: true,
+		enableClickSelection: false,
 		enableSelectionWithoutKeys: true, // ctrl 키 없이 여러개 선택
 	};
 
@@ -39,15 +40,29 @@ interface propsType {
 	rowData: Record<string, any>[];
 	colDefs: ColDef<Record<string, any>>[];
 	pagination?: boolean;
-	onGridReady?: (params: GridReadyEvent) => void;
 	rowSelectionMode?: 'single' | 'multiple' | 'none';
-	onRowDragEnd?: (params: RowDragEndEvent) => void;
 	animateRows?: boolean;
 	isReorderMode?: boolean;
+	onGridReady?: (params: GridReadyEvent) => void;
+	onRowDragEnd?: (params: RowDragEndEvent) => void;
+	onCellClicked?: (params: CellClickedEvent) => void;
 }
 
 const CustomAgGridComp = forwardRef(
-	({ rowData, colDefs, onGridReady, pagination = true, rowSelectionMode = 'none', onRowDragEnd, animateRows, isReorderMode = false }: propsType, ref) => {
+	(
+		{
+			rowData,
+			colDefs,
+			pagination = true,
+			rowSelectionMode = 'none',
+			animateRows,
+			isReorderMode = false,
+			onGridReady,
+			onRowDragEnd,
+			onCellClicked,
+		}: propsType,
+		ref,
+	) => {
 		const gridRef = useRef<AgGridReact>(null);
 		const theme = useTheme();
 		const gridTheme = themeQuartz.withPart(iconSetQuartzLight).withParams({
@@ -114,11 +129,12 @@ const CustomAgGridComp = forwardRef(
 					columnDefs={finalColDefs}
 					rowSelection={rowSelection}
 					pagination={pagination}
-					onGridReady={onGridReadyEvent}
 					rowDragManaged={isReorderMode}
 					suppressRowDrag={!isReorderMode}
-					onRowDragEnd={onRowDragEnd}
 					animateRows={animateRows}
+					onGridReady={onGridReadyEvent}
+					onRowDragEnd={onRowDragEnd}
+					onCellClicked={onCellClicked}
 				/>
 			</Box>
 		);

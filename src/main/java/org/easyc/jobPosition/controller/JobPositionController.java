@@ -23,6 +23,11 @@ public class JobPositionController {
         return jobPositionService.findAll();
     }
 
+    @GetMapping("/{id}")
+    public JobPositionResponseDto findById(@PathVariable Long id) {
+        return jobPositionService.findById(id);
+    }
+
     @PostMapping
     public void saveJobPosition(@RequestBody JobPositionRequestDto dto) {
         jobPositionService.save(dto);
@@ -31,6 +36,11 @@ public class JobPositionController {
     @PostMapping("/from-template")
     public void saveJobPositions(@RequestBody List<JobPositionRequestDto> dtos) {
         jobPositionService.saveList(dtos);
+    }
+
+    @PutMapping("/{id}")
+    public void updateJobPosition(@PathVariable Long id, @RequestBody JobPositionRequestDto dto) {
+        jobPositionService.update(id, dto);
     }
 
     @DeleteMapping
