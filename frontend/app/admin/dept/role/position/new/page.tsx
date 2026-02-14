@@ -3,8 +3,6 @@ import { ArrowBack } from '@mui/icons-material';
 import JobPositionForm from '@/app/admin/dept/_component/JobPositionForm';
 import useJobPositionForm from '@/app/admin/dept/_component/hooks/useJobPositionForm';
 
-// TODO: 20260214 수정 페이지 목록에 바인딩, 수정 백 로직 추가
-
 export default function AddJobPositionPage() {
 	const {
 		control,

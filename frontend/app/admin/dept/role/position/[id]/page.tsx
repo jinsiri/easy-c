@@ -4,8 +4,6 @@ import JobPositionForm from '@/app/admin/dept/_component/JobPositionForm';
 import useJobPositionForm from '@/app/admin/dept/_component/hooks/useJobPositionForm';
 import { use } from 'react';
 
-// TODO: 20260214 수정페이지/모달 추가, 수정 페이지 목록에 바인딩, 수정 백 로직 추가
-
 export default function UpdateJobPositionPage({ params }: { params: Promise<{ id: string }> }) {
 	const resolvedParams = use(params);
 	const id = resolvedParams.id;
