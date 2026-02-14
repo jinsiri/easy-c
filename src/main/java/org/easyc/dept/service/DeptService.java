@@ -1,6 +1,6 @@
 package org.easyc.dept.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.easyc.dept.dto.DeptRequestDto;
 import org.easyc.dept.dto.DeptResponseDto;
