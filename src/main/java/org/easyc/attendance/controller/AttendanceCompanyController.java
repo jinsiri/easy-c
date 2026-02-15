@@ -26,8 +26,8 @@ public class AttendanceCompanyController {
     private AttendanceCompanyService attendanceCompanyService;
 
     @PostMapping("/oneday")
-    public List<Attendance> getAttendanceCompanyOnedayData(@RequestBody AttendanceCompanyRequestDto request) {
-        List<Attendance> result = attendanceCompanyService.getAttendanceCompanyOnedayData(request);
+    public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData(@RequestBody AttendanceCompanyRequestDto request) {
+        AttendanceCompanyResponseDto result = attendanceCompanyService.getAttendanceCompanyOnedayData(request);
         return result;
     }
 }

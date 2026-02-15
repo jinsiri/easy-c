@@ -3,14 +3,8 @@ package org.easyc.attendance.service;
 import lombok.RequiredArgsConstructor;
 import org.easyc.attendance.constant.*;
 import org.easyc.attendance.dto.*;
-import org.easyc.attendance.entity.Attendance;
-import org.easyc.attendance.entity.AttendancePolicy;
-import org.easyc.attendance.entity.HolidayCalendar;
-import org.easyc.attendance.entity.MappingAttendancePolicy;
-import org.easyc.attendance.repository.AttendancePolicyRepository;
-import org.easyc.attendance.repository.AttendanceRepository;
-import org.easyc.attendance.repository.HolidayCalendarRepository;
-import org.easyc.attendance.repository.MappingAttendancePolicyRepository;
+import org.easyc.attendance.entity.*;
+import org.easyc.attendance.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -26,13 +20,39 @@ import static org.easyc.common.util.utilFunc.parseDateTime;
 public class AttendanceCompanyService {
 
     private final AttendanceRepository attendanceRepository;
+    private final AttendanceChangeRequestRepository attendanceChangeRequestRepository;
 
-    public List<Attendance> getAttendanceCompanyOnedayData (AttendanceCompanyRequestDto request){
-        List<Attendance> attendance = attendanceRepository.findAllByWorkDate(request.getWorkDate());
+    public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData (AttendanceCompanyRequestDto request){
+        List<Attendance> attendance = new ArrayList<>();
+        attendance = attendanceRepository.findAllByWorkDate(request.getWorkDate());
 
+        List<AttendanceChangeRequest> requestList = attendanceChangeRequestRepository.findAllByWorkDateAndActiveTrueOrderByWorkRequestIdAsc(request.getWorkDate());
 
+        Integer lateCount = 0;
+        Integer earlyLeaveCount = 0;
+        Integer absentCount = 0;
+        List<AttendanceDayResponseDto> data = new ArrayList<>();
+        for(Attendance attendanceItem : attendance){
+            if(attendanceItem.getWorkStatus().equals(WorkStatus.LATE.name())){
+                lateCount++;
+            }else if(attendanceItem.getWorkStatus().equals(WorkStatus.EARLY_LEAVE.name())){
+                earlyLeaveCount++;
+            } else if (attendanceItem.getWorkStatus().equals(WorkStatus.ABSENT.name())) {
+                absentCount++;
+            }
 
-        return attendance;
+            data.add(new AttendanceDayResponseDto(attendanceItem));
+        }
+
+        AttendanceCompanyResponseDto result = new AttendanceCompanyResponseDto();
+        result.setAllCount(attendance.size());
+        result.setLateCount(lateCount);
+        result.setEarlyLeaveCount(earlyLeaveCount);
+        result.setAbsentCount(absentCount);
+        result.setChangeRequestCount(requestList.size());
+        result.setDayData(data);
+
+        return result;
     }
 
 }

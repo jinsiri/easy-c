@@ -16,6 +16,13 @@ export interface AttendanceSaveReqDto {
 
 export interface AttendanceDayResDto {
 	attendanceId: number | null;
+	registerUser: {
+		loginId: string;
+		memberNm: string;
+		memberRole: string;
+	};
+	deptNm?: string | null;
+	jobGrade?: string | null;
 	workDate: string | null;
 	startTime?: string | null;
 	endTime?: string | null;

@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class AttendanceCompanyRequestDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate workDate;
+    private String searchCategory;
 }
 
 

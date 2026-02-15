@@ -12,9 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class AttendanceRequestDto {
     private Long memberId;
-
     private String loginId;
-
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate workDate;
 }

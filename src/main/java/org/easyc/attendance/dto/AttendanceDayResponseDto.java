@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 public class AttendanceDayResponseDto {
     private Long attendanceId;
     private AuditUser registerUser;
+    private String deptNm;
+    private String jobGrade;
+
     private LocalDate workDate;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -31,6 +34,8 @@ public class AttendanceDayResponseDto {
     public AttendanceDayResponseDto(Attendance entity) {
         this.attendanceId = entity.getAttendanceId();
         this.registerUser = entity.getRegisterUser();
+        this.deptNm = entity.getDeptNm();
+        this.jobGrade = entity.getJobGrade();
         this.workDate = entity.getWorkDate();
         this.startTime = entity.getStartTime();
         this.endTime = entity.getEndTime();
