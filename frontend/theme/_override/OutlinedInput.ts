@@ -10,7 +10,9 @@ const OutlinedInput = (theme: Theme) => ({
 				},
 			},
 			input: {
+				boxSizing: 'border-box',
 				padding: '0.625rem 1rem',
+				minHeight: '2.25rem',
 			},
 		},
 		variants: [
