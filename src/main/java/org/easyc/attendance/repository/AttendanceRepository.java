@@ -15,4 +15,5 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
     List<Attendance> findAllByWorkDate(LocalDate workDate);
 
+    Optional<Attendance> findByRegisterUser_LoginIdAndAttendanceId(String loginId, Long attendanceId);
 }

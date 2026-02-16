@@ -5,6 +5,8 @@ import org.easyc.attendance.constant.*;
 import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.*;
 import org.easyc.attendance.repository.*;
+import org.easyc.common.exception.CustomException;
+import org.easyc.common.exception.CustomExceptionCode;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -12,25 +14,45 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.easyc.common.util.utilFunc.parseDate;
-import static org.easyc.common.util.utilFunc.parseDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final AttendancePolicyRepository attendancePolicyRepository;
-    private final MappingAttendancePolicyRepository mappingAttendancePolicyRepository;
+    private final AttendancePolicyMapRepository attendancePolicyMapRepository;
     private final HolidayCalendarRepository holidayCalendarRepository;
 
     public AttendanceResponseDto getAttendanceTodayData (AttendanceRequestDto req){
-        //데이터 조회
-        Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), req.getWorkDate()).orElseGet(() -> Attendance.builder()
-                .workDate(req.getWorkDate())
-                .build());
+        //데이터 조회 - 해당 일자 및 전날 데이터 불러와서 전날 데이터가 미완인 경우 전날 데이터
+        LocalDate workDate = req.getWorkDate().toLocalDate();
+        LocalTime workTime = req.getWorkDate().toLocalTime();
+        Attendance targetAttendance = null;
+
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getLoginId());
 
-        AttendanceResponseDto findStatData = findStatData(req.getLoginId(), req.getWorkDate(), targetPolicy);
+        if(workTime.isBefore(LocalTime.of(7, 0))){
+            Attendance beforeAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate.minus(1, ChronoUnit.DAYS)).orElse(null);
+
+            if(beforeAttendance != null && beforeAttendance.getStartTime() != null && beforeAttendance.getEndTime() == null){
+                targetAttendance = beforeAttendance;
+            }
+        }
+
+        if(targetAttendance == null){
+            targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate).orElse(null);
+
+            if(targetAttendance == null){
+                targetAttendance = attendanceRepository.saveAndFlush(
+                        Attendance.builder()
+                        .workDate(workDate)
+                        .attendancePolicyName(targetPolicy.getAttendancePolicyName())
+                        .deptNm("인사팀")
+                        .jobGrade("사원")
+                        .build());
+            }
+        }
+
+        AttendanceResponseDto findStatData = findStatData(req.getLoginId(), workDate, targetPolicy);
         AttendanceResponseDto result = new AttendanceResponseDto(targetAttendance);
         result.applyWeekData(findStatData);
 
@@ -107,66 +129,39 @@ public class AttendanceService {
         return calendarList;
     }
 
-    public Map<String, Object> startAttendanceData (AttendanceSaveRequestDto req, String ipAddress) {
-        LocalDateTime startTime = parseDateTime(req.getStartTime());
+    public void startAttendanceData (AttendanceSaveRequestDto req) {
+        LocalDateTime startTime = req.getStartTime();
         LocalDate workDate = startTime.toLocalDate();
 
-        /** ip Address가 등록한 IP와 같은지 확인하는 로직 추가 필요 */
+        // 유관 데이터 조회
+        AttendancePolicy targetPolicy = findAttendancePolicy(req.getLoginId());
+        /** 멤버 조회해서 부서 및 직급 확인 로직 필요 **/
 
         // 데이터 조회
         Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate)
                 .orElseGet(() -> Attendance.builder()
                         .workDate(workDate)
+                        .attendancePolicyName(targetPolicy.getAttendancePolicyName())
+                        .deptNm("인사팀")
+                        .jobGrade("사원")
                         .build());
 
-        AttendancePolicy targetPolicy = findAttendancePolicy(req.getLoginId());
-
-        // 상태업데이트 해서 save
-        Attendance saveTargetAttendance = attendanceRepository.saveAndFlush(updateAttendanceByStartTime(req, targetAttendance, targetPolicy, startTime));
-
-       // 주단위 데이터 생성
-        AttendanceResponseDto findStatData = findStatData(req.getLoginId(), workDate, targetPolicy);
-        AttendanceResponseDto result = new AttendanceResponseDto(saveTargetAttendance);
-        result.applyWeekData(findStatData);
-
-        Map<String, Object> res = new HashMap<>();
-        res.put("status", "success");
-        res.put("message", "출근 시간이 등록되었습니다.");
-        res.put("attendanceData", result);
-
-        return res;
+        attendanceRepository.save(updateAttendanceByStartTime(req, targetAttendance, targetPolicy, startTime));
     }
 
-    public Map<String, Object> finishAttendanceCalendar (AttendanceSaveRequestDto req, String ipAddress) {
-        LocalDateTime endTime = parseDateTime(req.getEndTime());
-        LocalTime time = endTime.toLocalTime();
+    public void finishAttendanceData (AttendanceSaveRequestDto req) {
+        if(req.getAttendanceId() == null){
+            throw new CustomException(CustomExceptionCode.ATTENDANCE_NOT_FOUND);
+        }
 
-        // 새벽 07:00:00 이전 퇴근일 경우에만 전날(어제) 업무로 간주
-        LocalDate workDate = (time.isBefore(LocalTime.of(7, 0)))
-                ? endTime.toLocalDate().minusDays(1)
-                : endTime.toLocalDate();
-
-
-        /** ip Address가 등록한 IP와 같은지 확인하는 로직 추가 필요 */
-
-        // 데이터 조회
-        Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate).orElseThrow(() -> new RuntimeException(workDate + " 날짜의 출근 기록을 찾을 수 없습니다."));
+        // 유관 데이터 조회
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getLoginId());
 
+        // 데이터 조회
+        Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndAttendanceId(req.getLoginId(), req.getAttendanceId()).orElseThrow();
+
         // 상태업데이트 해서 save
-        Attendance saveTargetAttendance = attendanceRepository.saveAndFlush(updateAttendanceByEndTime(req, targetAttendance, targetPolicy, endTime));
-
-        // 주단위 데이터 생성
-        AttendanceResponseDto findStatData = findStatData(req.getLoginId(), workDate, targetPolicy);
-        AttendanceResponseDto result = new AttendanceResponseDto(saveTargetAttendance);
-        result.applyWeekData(findStatData);
-
-        Map<String, Object> res = new HashMap<>();
-        res.put("status", "success");
-        res.put("message", "퇴근 시간이 등록되었습니다.");
-        res.put("attendanceData", result);
-
-        return res;
+        attendanceRepository.saveAndFlush(updateAttendanceByEndTime(targetAttendance, targetPolicy, req.getEndTime()));
     }
 
     private AttendanceCalendarResponseDto createResDto(LocalDate date, Attendance attendance, boolean isCurrentMonth) {
@@ -188,63 +183,80 @@ public class AttendanceService {
     }
 
     private Attendance updateAttendanceByStartTime(AttendanceSaveRequestDto req, Attendance targetAttendance, AttendancePolicy targetPolicy, LocalDateTime startTime) {
-        if(targetAttendance != null){
+        if(targetAttendance != null && targetPolicy != null) {
             int dayOfWeek = startTime.getDayOfWeek().getValue();
-            LocalTime currentTime = startTime.toLocalTime();
+            LocalTime currentStartTime = startTime.toLocalTime();
 
-            // 지각 여부 판별
+            // 근무 타입 판별
+            WorkType workType = WorkType.NORMAL;
+            Optional<HolidayCalendar> holidayData = holidayCalendarRepository.findByStartDate(startTime.toLocalDate());
+
+            if(holidayData.isPresent()){
+                workType = WorkType.HOLIDAY;
+            } else if(!targetPolicy.getWorkDayOfWeek().contains(String.valueOf(dayOfWeek))){
+                workType = WorkType.HOLIDAY;
+            } else if (dayOfWeek >= 6) {
+                workType = WorkType.WEEKEND;
+            }
+
+            //근무 상태 판별 - 비정상출근(근로시간 외 출근) / 지각
+            LocalTime policyEndTime = targetPolicy.getEndTime();
+            LocalTime policyCoreEndTime = targetPolicy.getCoreEndTime();
             LocalTime limitTime = (targetAttendance.isVacationed() && VacationType.HALF_AM.equals(targetAttendance.getVacationType()))
                     ? targetPolicy.getHalfLeaveStartTime().plus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES)
                     : targetPolicy.getStartTime().plus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES);
 
-            WorkStatus status = currentTime.isAfter(limitTime) ? WorkStatus.LATE : WorkStatus.PRESENT;
+            WorkStatus status = WorkStatus.PRESENT;
 
-            // 근무 타입 판별
-            WorkType workType = WorkType.NORMAL;
-            if (dayOfWeek >= 6) {
-                workType = WorkType.WEEKEND;
-            } else if (!targetPolicy.getWorkDayOfWeek().contains(String.valueOf(dayOfWeek))) {
-                workType = WorkType.HOLIDAY;
+            if(policyCoreEndTime != null && currentStartTime.isAfter(policyEndTime)){
+                status = WorkStatus.UNNORMAL_START;    //코어타임이 있는 경우 코어타임 이후 출근 비정상 처리
+            } else if(currentStartTime.isAfter(policyEndTime)) {
+                status = WorkStatus.UNNORMAL_START;    //코어타임이 없는 경우 고정 퇴근시간 이후 출근 비정상 처리
+            }else if(currentStartTime.isAfter(limitTime)){
+                status = WorkStatus.LATE;
             }
 
+            targetAttendance.setNormalized(status == WorkStatus.PRESENT);
             targetAttendance.setStartTime(startTime);
-            targetAttendance.setNormalized(status != WorkStatus.LATE);
-            targetAttendance.setWorkStatus(status);
             targetAttendance.setWorkType(workType);
-            targetAttendance.setRegisterLatitude(req.getRegisterLatitude());
-            targetAttendance.setRegisterLongitude(req.getRegisterLongitude());
-
+            targetAttendance.setWorkStatus(status);
+            //targetAttendance.setRegisterLatitude(req.getRegisterLatitude());
+            //targetAttendance.setRegisterLongitude(req.getRegisterLongitude());
         }
+
         return targetAttendance;
     }
 
-    private Attendance updateAttendanceByEndTime(AttendanceSaveRequestDto req, Attendance targetAttendance, AttendancePolicy targetPolicy, LocalDateTime endTime) {
-        if(targetAttendance != null){
+    private Attendance updateAttendanceByEndTime(Attendance targetAttendance, AttendancePolicy targetPolicy, LocalDateTime endTime) {
+        if(targetAttendance != null && targetPolicy != null) {
+            LocalTime currentEndTime = endTime.toLocalTime();
 
-            // 조퇴 여부 판별
-            // 날짜가 바뀌지 않았고(당일 퇴근), 정책의 퇴근 시간보다 일찍 나갔을 때
+            //근무 상태 판별 - 비정상퇴근(7시까지 미퇴근) / 조퇴
             LocalTime limitTime = (targetAttendance.isVacationed() && VacationType.HALF_PM.equals(targetAttendance.getVacationType()))
                     ? targetPolicy.getHalfLeaveEndTime().minus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES)
                     : targetPolicy.getEndTime().minus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES);
 
             boolean normalized = targetAttendance.isNormalized();
             WorkStatus status = targetAttendance.getWorkStatus();
-
-            // 출근일과 퇴근일이 같을 때만 조퇴
-            if (targetAttendance.getWorkDate().equals(endTime.toLocalDate())) {
-                if (endTime.toLocalTime().isBefore(limitTime)) {
-                    status = WorkStatus.EARLY_LEAVE;
-                    normalized = false;
-                }
+            if(currentEndTime.isBefore(LocalTime.of(7,0))){
+                status = WorkStatus.UNNORMAL_END;    //오전 7시 이전 퇴근 비정상퇴근 처리
+                normalized = false;
+            }else if(currentEndTime.isBefore(limitTime)){
+                status = WorkStatus.EARLY_LEAVE;
+                normalized = false;
             }
 
-            // 총 근무 / 초과 근무 시간
+            // 총 근무 / 초과 근무 시간 계산
             Duration duration = Duration.between(targetAttendance.getStartTime(), endTime);
             long totalMinutes = duration.toMinutes();
             long overtimeMinutes = 0;
 
-            // 10시간 이상 근무 시
-            if (totalMinutes >= 600) { overtimeMinutes = totalMinutes - 600; }
+            // 총근무 시간이 1일 근무 시간 + 1시간(법정휴게시간) 보다 30분 이상인 경우 초과 근무 처리
+            Integer workingTimeDay = targetPolicy.getWorkingTimeDay();
+            Integer overStandardTime = workingTimeDay + 60 + 30;
+            if (totalMinutes >= overStandardTime) {
+                overtimeMinutes = totalMinutes - overStandardTime;
+            }
 
             targetAttendance.setEndTime(endTime);
             targetAttendance.setNormalized(normalized);
@@ -257,21 +269,8 @@ public class AttendanceService {
     }
 
     private AttendancePolicy findAttendancePolicy(String loginId) {
-        MappingAttendancePolicy mappingAttendancePolicy = mappingAttendancePolicyRepository.findTopByLoginIdOrderByAttendancePolicyIdDesc(loginId).orElse(null);
-        AttendancePolicy attendancePolicy = attendancePolicyRepository.findByAttendancePolicyId(mappingAttendancePolicy != null ? mappingAttendancePolicy.getAttendancePolicyId() : 1).orElseGet(() -> AttendancePolicy.builder()
-                .attendancePolicyName("기본 정책")
-                .attendanceType(AttendanceType.FIXED)
-                .settlementPeriod(SettlementPeriod.WEEK)
-                .worktimeRule(WorktimeRule.ALWAYS_40)
-                .workingTimeDay( 8 * 60)
-                .workDayOfWeek("1,2,3,4,5")
-                .startTime(LocalTime.of(9,0))
-                .endTime(LocalTime.of(18,0))
-                .halfLeaveStartTime(LocalTime.of(13,0))
-                .halfLeaveEndTime(LocalTime.of(13,0))
-                .allowMarginMinute(Long.valueOf(5))
-                .build());
-
+        AttendancePolicyMap attendancePolicyMap = attendancePolicyMapRepository.findTopByLoginIdAndDeletedFalseOrderByMappingIdDesc(loginId).orElse(null);
+        AttendancePolicy attendancePolicy = attendancePolicyRepository.findByAttendancePolicyId(attendancePolicyMap != null ? attendancePolicyMap.getAttendancePolicyId() : 1).orElseThrow();
         return attendancePolicy;
     }
 

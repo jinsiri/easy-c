@@ -52,6 +52,9 @@ public enum CustomExceptionCode {
     MEMBER_JOB_DUPLICATE_CODE(HttpStatus.BAD_REQUEST, "이미 존재하는 코드입니다."),
     MEMBER_JOB_NOT_FOUND(HttpStatus.NOT_FOUND, "관련 정보를 찾을 수 없습니다."),
 
+    // ========== Attendance (근태) ==========
+    ATTENDANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "근태 정보를 찾을 수 없습니다."),
+
     // ========== System (시스템) ==========
     SYSTEM_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다."),
     SYSTEM_DB_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 연결에 실패했습니다."),

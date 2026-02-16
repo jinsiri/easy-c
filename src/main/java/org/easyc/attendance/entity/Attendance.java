@@ -46,6 +46,9 @@ public class Attendance extends BaseEntity {
 
 
     /** 근로 시간 관련 */
+    @Column(name="attendance_policy_name")
+    private String attendancePolicyName;
+
     @Column(name = "work_date")
     private LocalDate workDate;
 
@@ -79,7 +82,7 @@ public class Attendance extends BaseEntity {
     private String detail;
 
 
-    /** 휴가 관련 */
+    /** 외근 / 휴가 관련 */
     @Column(name = "remoted", columnDefinition = "boolean default false")
     @Builder.Default
     private boolean remoted = false;

@@ -5,14 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class AttendanceRequestDto {
-    private Long memberId;
     private String loginId;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate workDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime workDate;
 }

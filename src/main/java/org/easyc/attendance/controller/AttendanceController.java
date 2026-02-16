@@ -37,19 +37,13 @@ public class AttendanceController {
     }
 
     @PostMapping("/start")
-    public Map<String, Object> startAttendanceData(HttpServletRequest httpRequest, @RequestBody AttendanceSaveRequestDto request) {
-       String ipAddress = getClientIp(httpRequest);
-
-        Map<String, Object> result = attendanceService.startAttendanceData(request, ipAddress);
-        return result;
+    public void startAttendanceData( @RequestBody AttendanceSaveRequestDto request) {
+       attendanceService.startAttendanceData(request);
     }
 
     @PostMapping("/finish")
-    public Map<String, Object> finishAttendanceCalendar(HttpServletRequest httpRequest, @RequestBody AttendanceSaveRequestDto request) {
-        String ipAddress = getClientIp(httpRequest);
-
-        Map<String, Object> result = attendanceService.finishAttendanceCalendar(request, ipAddress);
-        return result;
+    public void finishAttendanceData(@RequestBody AttendanceSaveRequestDto request) {
+        attendanceService.finishAttendanceData(request);
     }
 
 }

@@ -55,13 +55,15 @@ SELECT setval(
 );
 
 --근태 맵핑 데이터 세팅
-INSERT INTO mapping_attendance_policy ( mapping_id, attendance_policy_id, member_id, login_id)
-VALUES (1,1,1,'admin')
-    ON CONFLICT (mapping_id) DO NOTHING;
+INSERT INTO attendance_policy_map (mapping_id, attendance_policy_id, member_id, login_id, deleted)
+SELECT 1, 1, 1, 'admin', false
+WHERE NOT EXISTS (
+    SELECT 1 FROM attendance_policy_map
+);
 
 -- 시퀀스 설정 수정
 SELECT setval(
-    'mapping_attendance_policy_seq',
-    COALESCE((SELECT MAX(mapping_id) FROM mapping_attendance_policy), 1),
+    'attendance_policy_map_seq',
+    COALESCE((SELECT MAX(mapping_id) FROM attendance_policy_map), 1),
     true
 );

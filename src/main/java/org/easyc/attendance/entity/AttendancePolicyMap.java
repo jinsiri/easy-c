@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MappingAttendancePolicy {
+public class AttendancePolicyMap {
     @Id
-    @SequenceGenerator(name="mapping_attendance_policy_seq", sequenceName="mapping_attendance_policy_seq", allocationSize=1)
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="mapping_attendance_policy_seq")
+    @SequenceGenerator(name="attendance_policy_map_seq", sequenceName="attendance_policy_map_seq", allocationSize=1)
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="attendance_policy_map_seq")
     private Long mappingId;
 
     @Column(name = "attendance_policy_id")
@@ -25,5 +25,8 @@ public class MappingAttendancePolicy {
 
     @Column(name = "login_id")
     private String loginId;
+
+    @Builder.Default
+    private boolean deleted = false;
 
 }
