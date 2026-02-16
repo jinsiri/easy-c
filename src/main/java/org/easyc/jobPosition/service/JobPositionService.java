@@ -1,6 +1,6 @@
 package org.easyc.jobPosition.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
@@ -25,6 +25,13 @@ public class JobPositionService {
 
     public List<JobPositionResponseDto> findAll() {
         return jobPositionRepositoryCustom.findAllWithMemberCountOrderByLevel();
+    }
+
+    @Transactional(readOnly = true)
+    public JobPositionResponseDto findById(Long id) {
+        JobPosition position = jobPositionRepository.findById(id)
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_JOB_NOT_FOUND));
+        return JobPositionResponseDto.fromEntity(position);
     }
 
     /**
@@ -70,6 +77,17 @@ public class JobPositionService {
         }
 
         jobPositionRepository.saveAll(entities);
+    }
+
+    /**
+     *  직위 수정
+     * */
+    @Transactional
+    public void update(Long id, JobPositionRequestDto dto) {
+        JobPosition position = jobPositionRepository.findById(id)
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_JOB_NOT_FOUND));
+
+        position.updateInfo(dto.getJobPositionNm(), dto.getJobPositionCode());
     }
 
     /**

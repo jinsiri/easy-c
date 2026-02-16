@@ -30,6 +30,11 @@ public class JobPosition extends BaseEntity {
     @Column(name="job_position_level")
     private int jobPositionLevel;
 
+    public void updateInfo(String nm, String code) {
+        if (nm != null && !nm.isBlank()) this.jobPositionNm = nm;
+        if (code != null && !code.isBlank()) this.jobPositionCode = code;
+    }
+
     public void delete() {
         super.delete();
     }

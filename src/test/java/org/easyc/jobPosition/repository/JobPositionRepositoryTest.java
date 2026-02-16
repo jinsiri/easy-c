@@ -1,6 +1,6 @@
 package org.easyc.jobPosition.repository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.easyc.jobPosition.entity.JobPosition;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

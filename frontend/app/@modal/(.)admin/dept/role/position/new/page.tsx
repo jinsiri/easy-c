@@ -2,8 +2,8 @@
 
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import { startTransition } from 'react';
-import useJobPositionAdd from '@/app/admin/dept/_component/hooks/useJobPositionAdd';
-import JobPositionAddForm from '@/app/admin/dept/_component/JobPositionAddForm';
+import useJobPositionForm from '@/app/admin/dept/_component/hooks/useJobPositionForm';
+import JobPositionForm from '@/app/admin/dept/_component/JobPositionForm';
 
 export default function AddJobPositionModal() {
 	const {
@@ -11,11 +11,11 @@ export default function AddJobPositionModal() {
 		formState: { errors },
 		loading,
 		onSubmit,
-	} = useJobPositionAdd();
+	} = useJobPositionForm();
 
 	return (
 		<BaseDialog title={'직위 추가'} loading={loading} onConfirm={onSubmit}>
-			<JobPositionAddForm control={control} errors={errors} />
+			<JobPositionForm control={control} errors={errors} />
 		</BaseDialog>
 	);
 }

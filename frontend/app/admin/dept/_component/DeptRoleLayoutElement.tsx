@@ -4,7 +4,7 @@ import { Button, FormControl, Grid, IconButton, MenuItem, Select, SelectChangeEv
 import { Add, ArrowBack, Remove, Reorder, SaveAlt } from '@mui/icons-material';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import { RANK_TEMPLATES, RANK_CATEGORY_INFO, RoleCategory } from '@/constant/deptConst';
-import { ColDef, RowDragEndEvent } from 'ag-grid-community';
+import { CellClickedEvent, ColDef } from 'ag-grid-community';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { deptService } from '@/app/services/deptService';
 import { useRouter } from 'next/navigation';
@@ -87,14 +87,24 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 		}
 	}, [refreshTicket, category]);
 
-	const toggleReorderMode = () => {
-		if (isReorderMode) {
-			handleSaveOrder();
+	const toggleReorderMode = (category: RoleCategory) => {
+		if (!isReorderMode) {
+			const reorderConfig = {
+				POSITION: { domain: 'jobPosition' },
+				TITLE: { domain: 'jobTitle' },
+				GRADE: { domain: 'jobGrade' },
+			} as const;
+
+			const { domain } = reorderConfig[category];
+			const ids = activeCategoryData.map((row) => row[`${domain}Id`]);
+			setInitialOrder(ids);
+			setIsReorderMode(true);
+		} else {
+			handleSaveOrder(category);
 		}
-		setIsReorderMode(!isReorderMode);
 	};
 
-	const handleSaveOrder = async () => {
+	const handleSaveOrder = async (category: RoleCategory) => {
 		if (!gridRef.current?.api) return;
 
 		const updatedRows: any[] = [];
@@ -108,8 +118,10 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 
 		const { api, domain } = reorderConfig[category];
 		const currentOrderIds = updatedRows.map((row) => row[`${domain}Id`]);
+		const isNotChanged = JSON.stringify(initialOrder) === JSON.stringify(currentOrderIds);
 
-		if (JSON.stringify(initialOrder) === JSON.stringify(currentOrderIds)) {
+		if (isNotChanged) {
+			console.log('변경된 순서가 없어 API를 호출하지 않습니다.');
 			setIsReorderMode(false);
 			return;
 		}
@@ -130,7 +142,18 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 	};
 
 	const goToAddRolePage = (categoryName: RoleCategory) => {
-		router.push(`/admin/dept/role/${categoryName.toLowerCase()}/add`);
+		router.push(`/admin/dept/role/${categoryName.toLowerCase()}/new`);
+	};
+
+	const goToUpdateRolePage = (params: CellClickedEvent, categoryName: RoleCategory) => {
+		const updateConfig = {
+			POSITION: { id: 'jobPositionId' },
+			TITLE: { id: 'jobTitleId' },
+			GRADE: { id: 'jobGradeId' },
+		} as const;
+
+		const { id } = updateConfig[category];
+		router.push(`/admin/dept/role/${categoryName.toLowerCase()}/${params.data[id]}`);
 	};
 
 	const deleteRoles = async (category: RoleCategory) => {
@@ -213,7 +236,12 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 								</Button>
 							</Stack>
 							<Stack>
-								<Button variant='outlined' size='small' startIcon={isReorderMode ? <SaveAlt /> : <Reorder />} onClick={toggleReorderMode}>
+								<Button
+									variant='outlined'
+									size='small'
+									startIcon={isReorderMode ? <SaveAlt /> : <Reorder />}
+									onClick={() => toggleReorderMode(category)}
+								>
 									{isReorderMode ? '순서바꾸기 완료' : '순서바꾸기'}
 								</Button>
 							</Stack>
@@ -228,6 +256,7 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 					pagination={false}
 					isReorderMode={isReorderMode}
 					animateRows={true}
+					onCellClicked={(params) => goToUpdateRolePage(params, category)}
 				/>
 			</Grid>
 			<Grid
