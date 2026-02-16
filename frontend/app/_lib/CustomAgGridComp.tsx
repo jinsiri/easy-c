@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useCallback, useRef } from 'react';
 
 /** MUI */
 import { Box, useTheme } from '@mui/material';
@@ -60,7 +60,7 @@ const CustomAgGridComp = forwardRef(
 			onGridReady,
 			onRowDragEnd,
 			onCellClicked,
-            ...props
+			...props
 		}: propsType,
 		ref,
 	) => {
@@ -122,6 +122,10 @@ const CustomAgGridComp = forwardRef(
 			}
 		};
 
+		const onGridSizeChanged = useCallback((params) => {
+			params.api.sizeColumnsToFit();
+		}, []);
+
 		return (
 			<Box sx={{ width: '100%', height: '100%' }}>
 				<AgGridReact
@@ -136,6 +140,7 @@ const CustomAgGridComp = forwardRef(
 					suppressRowDrag={!isReorderMode}
 					animateRows={animateRows}
 					onGridReady={onGridReadyEvent}
+					onGridSizeChanged={onGridSizeChanged}
 					onRowDragEnd={onRowDragEnd}
 					onCellClicked={onCellClicked}
 				/>
