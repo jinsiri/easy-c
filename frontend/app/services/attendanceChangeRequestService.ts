@@ -1,21 +1,25 @@
 import { Dayjs } from 'dayjs';
 import axiosConfig from '../_lib/axiosConfig';
+import { workStatus } from '@/type/types';
 
 export interface AttendanceRequestController {
 	workDate: Dayjs | null;
-	startTime: Dayjs | null;
-	endTime: Dayjs | null;
+	isStartTime: boolean;
+	isEndTime: boolean;
+	startTime?: Dayjs | null;
+	endTime?: Dayjs | null;
+	workStatus: workStatus;
 	violationReason: string;
-	documentsAddress: string;
+	documentsAddress?: string | null;
 }
 
 interface SaveAttendanceChangeRequestDto {
-	memberId: number;
+	loginId: string;
 	workDate: string;
 	startTime?: string | null;
 	endTime?: string | null;
 	violationReason: string;
-	documentsAddress?: string;
+	documentsAddress?: string | null;
 }
 
 interface AttendanceChangeRequestResponseDto {
