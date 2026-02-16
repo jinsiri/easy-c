@@ -7,6 +7,7 @@ export interface AttendanceReqDto {
 }
 
 export interface AttendanceSaveReqDto {
+	attendanceId?: number | null | undefined;
 	loginId: string;
 	startTime?: string;
 	endTime?: string;
@@ -58,17 +59,17 @@ export interface CalendarData {
 	month: number;
 	day: number;
 	isCurrentMonth: boolean;
-	isHoliday?: boolean;
+	isHoliday: boolean;
 	holidaySubject?: string;
 	defaultStartTime?: string | null;
 	defaultEndTime?: string | null;
-	detailData: Pick<AttendanceDayResDto, 'startTime' | 'endTime' | 'fullTime' | 'overTime'>;
+	detailData: AttendanceDayResDto;
 }
 
 // API 정의
 export const attendanceService = {
 	getAttendanceTodayData: (req: AttendanceReqDto) => axiosConfig.post<AttendanceResDto>('/api/attendance/today', req),
 	getAttendanceCalendarData: (req: AttendanceReqDto) => axiosConfig.post<Record<dayName, CalendarData>[]>('/api/attendance/calendar', req),
-	startTimeAttendanceData: (req: AttendanceSaveReqDto) => axiosConfig.post<Record<dayName, CalendarData>>('/api/attendance/start', req),
-	finishTimeAttendanceData: (req: AttendanceSaveReqDto) => axiosConfig.post<Record<dayName, CalendarData>>('/api/attendance/finish', req),
+	startTimeAttendanceData: (req: AttendanceSaveReqDto) => axiosConfig.post<void>('/api/attendance/start', req),
+	finishTimeAttendanceData: (req: AttendanceSaveReqDto) => axiosConfig.post<void>('/api/attendance/finish', req),
 };

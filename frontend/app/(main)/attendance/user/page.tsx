@@ -52,8 +52,8 @@ export default function AttendanceUserPage() {
 		try {
 			const today = dayjs();
 			const res = await attendanceService.getAttendanceTodayData({
-				loginId: secureLocalStorage.getItem('loginId'),
-				workDate: today.format('YYYY-MM-DD'),
+				loginId: secureLocalStorage.getItem('loginId') as string,
+				workDate: today.format('YYYY-MM-DD HH:mm'),
 			});
 
 			if (res) {
@@ -71,8 +71,8 @@ export default function AttendanceUserPage() {
 
 		try {
 			const res = await attendanceService.getAttendanceCalendarData({
-				loginId: secureLocalStorage.getItem('loginId'),
-				workDate: calendarDate.format('YYYY-MM-DD'),
+				loginId: secureLocalStorage.getItem('loginId') as string,
+				workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
 			});
 
 			if (Object.keys(res).length > 0) {
@@ -197,7 +197,6 @@ export default function AttendanceUserPage() {
 						borderWidth: '1px',
 						borderStyle: 'solid',
 						borderColor: 'grey.300',
-						gap: '1rem',
 					}}
 				>
 					<Box sx={{ width: { sm: '100%', md: '50%' } }}>

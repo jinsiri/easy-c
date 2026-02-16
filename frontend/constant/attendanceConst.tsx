@@ -1,4 +1,4 @@
-import { attendanceType, workStatus, vacationType, settlementPeriod } from '@/type/types';
+import { attendanceType, workStatus, vacationType, settlementPeriod, workType } from '@/type/types';
 
 export const WORKDAYOFWEEKNUMBER: Record<string, string> = {
 	'1': '월',
@@ -10,6 +10,12 @@ export const WORKDAYOFWEEKNUMBER: Record<string, string> = {
 	'7': '일',
 };
 
+export const WORKTYPE: Record<workType, string> = {
+	NORMAL: '평일 근무',
+	WEEKEND: '주말 출근',
+	HOLIDAY: '휴일 근로',
+};
+
 export const WORKSTATUS: Record<workStatus, string> = {
 	PRESENT: '정상 출근',
 	LATE: '지각',
@@ -18,6 +24,8 @@ export const WORKSTATUS: Record<workStatus, string> = {
 	VACATION: '휴가',
 	OUTSIDE: '외근',
 	BUSINESS_TRIP: '출장',
+	UNNORMAL_START: '비정상 출근',
+	UNNORMAL_END: '비정상 퇴근',
 };
 
 export const VACATIONTYPE: Record<vacationType, string> = {

@@ -72,6 +72,9 @@ const CustomAgGridComp = forwardRef(
 			wrapperBorderRadius: 0,
 		});
 
+		// 부모에서 ref.current.api 등 바로 사용 가능
+		useImperativeHandle(ref, () => gridRef.current);
+
 		const finalColDefs: ColDef<Record<string, any>>[] = useMemo(() => {
 			const baseCols = [...colDefs];
 
@@ -98,9 +101,6 @@ const CustomAgGridComp = forwardRef(
 			if (isReorderMode) return undefined;
 			return createRowSelection(rowSelectionMode);
 		}, [rowSelectionMode, isReorderMode]);
-
-		// 부모에서 ref.current.api 등 바로 사용 가능
-		useImperativeHandle(ref, () => gridRef.current);
 
 		const onGridReadyEvent = (params: GridReadyEvent) => {
 			params.api.sizeColumnsToFit();

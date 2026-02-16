@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import secureLocalStorage from 'react-secure-storage';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -19,6 +20,7 @@ import { CURRENTSTATE, ATTENDANCETYPE } from '@/constant/attendanceConst';
 
 /** Type / Interface */
 import { attendanceService, AttendanceResDto } from '@/app/services/attendanceService';
+import { attendanceType } from '@/type/types';
 
 export default function AttendanceComp({ attendanceData, onSuccess }: { attendanceData?: AttendanceResDto; onSuccess?: () => void }) {
 	const router = useRouter();
@@ -52,12 +54,9 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			if (activated) {
 				finishTimeAttendanceData();
 			} else {
-				const locate = await findUserLocate();
-				startTimeAttendanceData(locate);
+				startTimeAttendanceData();
 			}
 		} catch (error) {
-			console.error('위치 획득 실패:', error);
-			alert('위치 정보 권한을 허용해주세요.');
 		} finally {
 			setLoader(false);
 		}
@@ -78,18 +77,16 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 		});
 	};
 
-	const startTimeAttendanceData = async (locate: GeolocationCoordinates) => {
+	const startTimeAttendanceData = async () => {
 		try {
 			const currentTime = dayjs();
-			const res = await attendanceService.startTimeAttendanceData({
-				memberId: 1,
-				startTime: currentTime.format('YYYY-MM-DD HH:mm:ss'),
-				registerLatitude: locate ? locate.latitude : null,
-				registerLongitude: locate ? locate.longitude : null,
+			await attendanceService.startTimeAttendanceData({
+				attendanceId: attendanceData?.dayData.attendanceId,
+				loginId: secureLocalStorage.getItem('loginId') as string,
+				startTime: currentTime.format('YYYY-MM-DD HH:mm'),
 			});
 
-			console.log(res);
-			if (res) {
+			if (confirm('출근이 정상적으로 등록되었습니다.')) {
 				setActived(true);
 				if (onSuccess) onSuccess();
 			}
@@ -102,13 +99,13 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 	const finishTimeAttendanceData = async () => {
 		try {
 			const currentTime = dayjs();
-			const res = await attendanceService.finishTimeAttendanceData({
-				memberId: 1,
-				endTime: currentTime.format('YYYY-MM-DD HH:mm:ss'),
+			await attendanceService.finishTimeAttendanceData({
+				attendanceId: attendanceData?.dayData.attendanceId,
+				loginId: secureLocalStorage.getItem('loginId') as string,
+				endTime: currentTime.format('YYYY-MM-DD HH:mm'),
 			});
 
-			console.log(res);
-			if (res) {
+			if (confirm('퇴근이 정상적으로 등록되었습니다.')) {
 				setActived(true);
 				if (onSuccess) onSuccess();
 			}
@@ -124,7 +121,14 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 				<LiveClock />
 				<Typography variant={'subtitle2'} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 					<AccessTimeRounded sx={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} />
-					{Object.keys(workData).length > 0 ? `${ATTENDANCETYPE[workData?.attendanceType]} (${workData.startTime} ~ ${workData.endTime})` : ''}
+					{Object.keys(workData).length > 0
+						? `${ATTENDANCETYPE[workData?.attendanceType as attendanceType]} 
+							(
+							${workData.startTime ? dayjs(workData.startTime, 'HH:mm:ss').format('HH:mm') : '-'} 
+							~ 
+							${workData.endTime ? dayjs(workData.endTime, 'HH::mm:ss').format('HH:mm') : '-'}
+							)`
+						: ''}
 				</Typography>
 			</Box>
 
