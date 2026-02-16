@@ -20,14 +20,23 @@ export default function AdminSidebar(props: propsType) {
 			elevation={3}
 			component='nav'
 			sx={{
-				width: drawerOpen ? '19rem' : '4.5rem',
+				width: drawerOpen ? '19rem' : '4rem',
 				height: '100%',
-				transition: 'all easeInOut 0.4s',
+				transition: 'all easeInOut 0.5s',
 				zIndex: 500,
 			}}
 		>
 			<Box sx={{ width: '100%', height: headerHeight }}></Box>
-			<Box className='w-100' sx={{ overflowX: 'hidden', overscrollBehaviorY: 'auto', height: `calc(100% - ${headerHeight})` }}>
+			<Box
+				className='w-100'
+				sx={{
+					position: 'relative',
+					overflowX: drawerOpen ? 'hidden' : 'visible',
+					overflowY: drawerOpen ? 'auto' : 'visible',
+					overscrollBehaviorY: 'auto',
+					height: `calc(100% - ${headerHeight})`,
+				}}
+			>
 				<List className='w-100' component='div' disablePadding>
 					{menuList.map((value) => {
 						return value.type === '1depth' && <Menu1Depth key={value.id} item={value} drawerOpen={drawerOpen} prevUrl={'/admin'} />;

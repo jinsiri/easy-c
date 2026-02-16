@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 
 /** MUI */
-import { Box } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 
 /** Custom */
 import Sidebar from '@/app/_component/Sidebar';
@@ -11,7 +11,18 @@ import Footer from '@/app/_component/Footer';
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
 	const headerHeight = '4rem';
+	const theme = useTheme();
+	const isDownLg = useMediaQuery(theme.breakpoints.down('lg'));
+
 	const [drawerOpen, setDrawerOpen] = useState(true);
+
+	useEffect(() => {
+		if (isDownLg) {
+			setDrawerOpen(false);
+		} else {
+			setDrawerOpen(true);
+		}
+	}, [isDownLg]);
 
 	return (
 		<Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100vw', height: '100vh' }}>
@@ -23,7 +34,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 					display: 'flex',
 					flexDirection: 'column',
 					position: 'relative',
-					width: drawerOpen ? 'calc(100vw - 19rem)' : 'calc(100vw - 4.5rem)',
+					width: drawerOpen ? 'calc(100vw - 19rem)' : 'calc(100vw - 4rem)',
 					transition: 'all ease 0.3s',
 				}}
 			>

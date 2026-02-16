@@ -74,7 +74,6 @@ export default function Home() {
 						}}
 					></Box>
 				</Box>
-				<AttendanceComp attendanceData={{}} onSuccess={() => {}} />
 			</Grid>
 		</Grid>
 	);
