@@ -1,4 +1,6 @@
-import { Dispatch, SetStateAction } from 'react';
+'use client';
+
+import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import Link from 'next/link';
 import secureLocalStorage from 'react-secure-storage';
 
@@ -17,9 +19,15 @@ interface propsType {
 
 export default function Header(props: propsType) {
 	const router = useRouter();
-	const loginId = secureLocalStorage.getItem('loginId');
-	const memberRole = secureLocalStorage.getItem('memberRole');
+
 	const { drawerOpen, setDrawerOpen, headerHeight } = props;
+	const [loginId, setLoginId] = useState<string | null>(null);
+	const [memberRole, setMemberRole] = useState<string | null>(null);
+
+	useEffect(() => {
+		setLoginId(secureLocalStorage.getItem('loginId') as string | null);
+		setMemberRole(secureLocalStorage.getItem('memberRole') as string | null);
+	}, []);
 
 	const onClickDrawerButton = () => {
 		setDrawerOpen(!drawerOpen);
@@ -76,7 +84,7 @@ export default function Header(props: propsType) {
 					<IconButton className='contained-primary'>
 						<FormatIndentIncrease className='svg-small' />
 					</IconButton>*/}
-					{memberRole === 'ROLE_ADMIN' && (
+					{memberRole && memberRole === 'ROLE_ADMIN' && (
 						<Button component={Link} href='/admin/normal/setting' variant='outlined' startIcon={<ManageAccountsRounded />}>
 							관리자 모드
 						</Button>
