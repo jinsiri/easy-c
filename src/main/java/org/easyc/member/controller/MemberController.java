@@ -119,6 +119,22 @@ public class MemberController {
     }
 
     /**
+     * 멤버 등록
+     */
+    @PostMapping
+    public void createMember(@RequestBody MemberCreateRequestDto dto) {
+        memberService.createMember(
+                dto.toJoinDto(),
+                dto.toProfileDto(),
+                dto.toPersonalDto(),
+                dto.getCareerListOrEmpty(),
+                dto.getRewardDisciplineListOrEmpty(),
+                dto.getQualificationListOrEmpty(),
+                dto.getLanguageListOrEmpty()
+        );
+    }
+
+    /**
      * 멤버 삭제 - 단일
      *
      * @param memberId 삭제할 멤버 ID

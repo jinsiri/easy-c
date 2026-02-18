@@ -23,7 +23,7 @@ public class MemberLanguage extends BaseEntity { //회원정보_어학
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    private String languageType;   // 구분
+    private String languageType;   // 구분 todo
     private String languageName;   // 어학명
     private LocalDate evaluationDate; // 평가일
     private String evaluationAgency; // 평가기관

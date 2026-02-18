@@ -70,6 +70,9 @@ export const memberService = {
 	// 어학 탭 조회
 	getMemberLanguageInfo: (memberId: number) => axiosConfig.get<MemberLanguageResponseDto[]>(`/api/members/${memberId}/languages`),
 
+	// 멤버 등록
+	createMember: (data: Record<string, any>) => axiosConfig.post<void>(`/api/members`, data),
+
 	// 멤버 삭제
 	deleteMember: (memberId: number) => axiosConfig.delete(`/api/members/${memberId}`),
 	deleteMembers: (requestDto: BulkDeleteRequestDto) => axiosConfig.delete(`/api/members`, { data: requestDto }),

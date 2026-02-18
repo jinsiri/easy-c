@@ -116,7 +116,7 @@ export default function AdminDeptRolePage() {
 									}}
 								>
 									<Stack>
-										<Button variant='outlined' size='small' startIcon={<Add />}>
+										<Button variant='outlined' size='small' startIcon={<Add />} onClick={() => router.push('/admin/member/new')}>
 											추가
 										</Button>
 									</Stack>
