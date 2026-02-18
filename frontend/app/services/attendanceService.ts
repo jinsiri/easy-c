@@ -24,6 +24,8 @@ export interface AttendanceDayResDto {
 	};
 	deptNm?: string | null;
 	jobGrade?: string | null;
+	attendancePolicyName?: string;
+
 	workDate: string | null;
 	startTime?: string | null;
 	endTime?: string | null;

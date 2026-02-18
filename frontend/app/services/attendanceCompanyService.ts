@@ -1,12 +1,10 @@
-import { workStatus } from '@/type/types';
 import axiosConfig from '../_lib/axiosConfig';
 import { AttendanceDayResDto } from './attendanceService';
 
 export interface AttendanceCompanyRequestDto {
 	workDate: string | null;
 	searchCategory?: string;
-	searchText?: string;
-	workStatus?: workStatus | null;
+	searchValue?: string;
 }
 
 export interface AttendanceCompanyResponseDto {
@@ -21,4 +19,5 @@ export interface AttendanceCompanyResponseDto {
 // API 정의
 export const attendancePolicyService = {
 	getAttendanceCompanyOnedayData: (req: AttendanceCompanyRequestDto) => axiosConfig.post<AttendanceCompanyResponseDto>('/api/attendance/company/oneday', req),
+	getAttendanceCompanySearch: (req: AttendanceCompanyRequestDto) => axiosConfig.post<AttendanceDayResDto[]>('/api/attendance/company/search', req),
 };

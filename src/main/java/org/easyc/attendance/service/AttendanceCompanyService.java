@@ -5,6 +5,8 @@ import org.easyc.attendance.constant.*;
 import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.*;
 import org.easyc.attendance.repository.*;
+import org.easyc.common.exception.CustomException;
+import org.easyc.common.exception.CustomExceptionCode;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -23,9 +25,13 @@ public class AttendanceCompanyService {
     private final AttendanceChangeRequestRepository attendanceChangeRequestRepository;
 
     public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData (AttendanceCompanyRequestDto request){
-        List<Attendance> attendance = new ArrayList<>();
-        attendance = attendanceRepository.findAllByWorkDate(request.getWorkDate());
+        LocalDate workDate = request.getWorkDate();
 
+        if(workDate == null){
+            throw new CustomException(CustomExceptionCode.ATTENDANCE_NOT_FOUND);
+        }
+
+        List<Attendance> attendance = attendanceRepository.findAllByWorkDate(workDate);
         List<AttendanceChangeRequest> requestList = attendanceChangeRequestRepository.findAllByWorkDateAndActiveTrueOrderByWorkRequestIdAsc(request.getWorkDate());
 
         Integer lateCount = 0;
@@ -53,6 +59,39 @@ public class AttendanceCompanyService {
         result.setDayData(data);
 
         return result;
+    }
+
+    public List<AttendanceDayResponseDto> getAttendanceCompanySearch(AttendanceCompanyRequestDto request){
+        LocalDate workDate = request.getWorkDate();
+        String searchCategory = request.getSearchCategory();
+        String searchValue = request.getSearchValue();
+
+        List<Attendance> attendance = new ArrayList<>();
+        if(searchValue== null || searchValue.equals("")){
+            attendance = attendanceRepository.findAllByWorkDate(workDate);
+        }else{
+            switch (searchCategory){
+                case "workStatus":
+                    try{
+                        WorkStatus targetSearchValue = WorkStatus.valueOf(searchValue);
+                        attendance = attendanceRepository.findAllByWorkDateAndWorkStatus(workDate, targetSearchValue);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+
+                case "depthNm":
+                    attendance = attendanceRepository.findAllByWorkDateAndDeptNm(workDate, searchValue);
+                    break;
+
+                default:
+                    attendance = attendanceRepository.findAllByWorkDateAndRegisterUser_MemberNm(workDate, searchValue);
+                    break;
+            }
+        }
+
+        List<AttendanceDayResponseDto> resultList = attendance.stream().map(entity -> new AttendanceDayResponseDto(entity)).collect(Collectors.toList());
+        return resultList;
     }
 
 }
