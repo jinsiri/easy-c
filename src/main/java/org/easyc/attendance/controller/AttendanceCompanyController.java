@@ -30,4 +30,10 @@ public class AttendanceCompanyController {
         AttendanceCompanyResponseDto result = attendanceCompanyService.getAttendanceCompanyOnedayData(request);
         return result;
     }
+
+    @PostMapping("/search")
+    public List<AttendanceDayResponseDto>  getAttendanceCompanySearch(@RequestBody AttendanceCompanyRequestDto request) {
+        List<AttendanceDayResponseDto>  result = attendanceCompanyService.getAttendanceCompanySearch(request);
+        return result;
+    }
 }

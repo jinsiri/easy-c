@@ -20,6 +20,7 @@ public class AttendanceDayResponseDto {
     private AuditUser registerUser;
     private String deptNm;
     private String jobGrade;
+    private String attendancePolicyName;
 
     private LocalDate workDate;
     private LocalDateTime startTime;
@@ -36,6 +37,7 @@ public class AttendanceDayResponseDto {
         this.registerUser = entity.getRegisterUser();
         this.deptNm = entity.getDeptNm();
         this.jobGrade = entity.getJobGrade();
+        this.attendancePolicyName =  entity.getAttendancePolicyName();
         this.workDate = entity.getWorkDate();
         this.startTime = entity.getStartTime();
         this.endTime = entity.getEndTime();
