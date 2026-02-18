@@ -3,6 +3,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, CircularProgress, DialogActions, DialogContent } from '@mui/material';
+import { SxProps, Theme } from '@mui/material/styles';
 
 export interface BaseDialogProps {
 	title: string;
@@ -10,12 +11,13 @@ export interface BaseDialogProps {
 	loading?: boolean;
 	onConfirm?: () => void;
 	confirmLabel?: string;
-	maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+	maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
 	fullWidth?: boolean;
+	paperSx?: SxProps<Theme>;
 }
 
 export default function BaseDialog(props: BaseDialogProps) {
-	const { title, children, loading, onConfirm, confirmLabel = '저장', maxWidth = 'sm', fullWidth = false } = props;
+	const { title, children, loading, onConfirm, confirmLabel = '저장', maxWidth = 'sm', fullWidth = false, paperSx } = props;
 	const router = useRouter();
 
 	const handleClose = () => {
@@ -23,7 +25,7 @@ export default function BaseDialog(props: BaseDialogProps) {
 	};
 
 	return (
-		<Dialog onClose={handleClose} open={true} maxWidth={maxWidth} fullWidth={fullWidth}>
+		<Dialog onClose={handleClose} open={true} maxWidth={maxWidth} fullWidth={fullWidth} PaperProps={paperSx ? { sx: paperSx } : undefined}>
 			<DialogTitle>{title}</DialogTitle>
 			<DialogContent>{children}</DialogContent>
 			<DialogActions className='base-dialog'>

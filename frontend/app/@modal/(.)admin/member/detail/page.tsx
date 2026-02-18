@@ -10,7 +10,7 @@ export default function MemberDetailModal() {
 	const memberId = searchParams.get('memberId');
 
 	return (
-		<BaseDialog title='멤버 상세' confirmLabel='수정' onConfirm={() => router.push(`/admin/member/edit?memberId=${memberId}`)} maxWidth='lg' fullWidth>
+		<BaseDialog title='멤버 상세' confirmLabel='수정' onConfirm={() => router.push(`/admin/member/edit?memberId=${memberId}`)} maxWidth={false} fullWidth paperSx={{ width: '90vw', maxWidth: '90vw' }}>
 			<MemberDetailPage />
 		</BaseDialog>
 	);
