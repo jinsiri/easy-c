@@ -73,6 +73,7 @@ const CustomAgGridComp = forwardRef(
 			browserColorScheme: 'light',
 			columnBorder: false,
 			cellTextColor: theme.palette.grey[900],
+			fontSize: '0.875rem',
 			foregroundColor: theme.palette.grey[500],
 			headerBackgroundColor: theme.palette.grey[50],
 			headerFontSize: 14,

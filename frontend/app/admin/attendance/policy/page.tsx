@@ -53,6 +53,11 @@ const list: listCollector[] = [
 		key: 'allowMarginMinute',
 		valueFormatter: (data) => <Box>{data.allowMarginMinute}분</Box>,
 	},
+	{
+		name: '근로자 수(명)',
+		key: 'mappingUserCount',
+		valueFormatter: (data) => <Box>{data.mappingUserCount ?? '-'}명</Box>,
+	},
 ];
 
 export default function AttendancePolicyPage() {
