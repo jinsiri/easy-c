@@ -1,20 +1,22 @@
 'use client';
 
-import { useState, useImperativeHandle, forwardRef } from 'react';
+import { useImperativeHandle, forwardRef } from 'react';
 import secureLocalStorage from 'react-secure-storage';
 import { useRouter } from 'next/navigation';
 
 /** MUI */
-import { Box, TextField, Typography, Checkbox, FormControl, FormControlLabel, Select, MenuItem, Button, SelectChangeEvent } from '@mui/material';
+import { Box, Checkbox, FormControlLabel, Select, MenuItem } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 /** Lib */
+import dayjs from 'dayjs';
 import { useForm, Controller } from 'react-hook-form';
+import useLoaderStore from '@/store/useLoaderStore';
 
 /** Type / Interface */
 import { AttendanceRequestController, attendanceChangeRequestService } from '@/app/services/attendanceChangeRequestService';
-import dayjs from 'dayjs';
+import { FormWrapper, FormItem } from '@/app/_component/baseElement/FormComp';
 
 export interface RequestCorrectionRef {
 	submit: () => void;
@@ -22,33 +24,39 @@ export interface RequestCorrectionRef {
 
 const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 	const router = useRouter();
-
-	const [modifyStatus, setModifyStatus] = useState<string>('PRESENT');
-	const [isStartTime, setIsStartTime] = useState<boolean>(false);
-	const [isEndTime, setIsEndTime] = useState<boolean>(false);
-	const [modifyDocument, setModifyDocument] = useState<string>('');
+	const { setLoader } = useLoaderStore();
 
 	const {
 		control,
+		watch,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<AttendanceRequestController>({
 		defaultValues: {
 			workDate: null,
+			isStartTime: false,
+			isEndTime: false,
 			startTime: null,
 			endTime: null,
-			documentsAddress: '',
+			workStatus: 'PRESENT',
+			documentsAddress: null,
 			violationReason: '',
 		},
 	});
 
+	const watchIsStartTime = watch('isStartTime');
+	const watchIsEndTime = watch('isEndTime');
+
 	useImperativeHandle(ref, () => ({
 		submit: () => {
 			handleSubmit(async (data) => {
+				setLoader(true);
 				try {
+					console.log(data);
+
 					await attendanceChangeRequestService.submitWorkRequest({
 						...data,
-						memberId: Number(secureLocalStorage.getItem('memberId')) ?? 1,
+						loginId: secureLocalStorage.getItem('loginId') as string,
 						workDate: dayjs(data.workDate).format('YYYY-MM-DD'),
 						startTime: data.startTime ? dayjs(data.startTime).format('HH:mm') : null,
 						endTime: data.endTime ? dayjs(data.endTime).format('HH:mm') : null,
@@ -59,29 +67,30 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 					}
 				} catch (error: any) {
 				} finally {
+					setLoader(false);
 				}
 			})();
 		},
 	}));
 
-	const handleChangeModifyStatus = (event: SelectChangeEvent<string>) => {
-		setModifyStatus(event.target.value);
-	};
-
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '28rem', gap: 3, py: 2 }}>
-			<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-				<Typography sx={{ width: '100%', marginBottom: '0.5rem', fontWeight: 500 }}>
-					<span style={{ color: '#ff4d4f' }}>*</span> 수정 근무 일자
-				</Typography>
+		<Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '28rem', py: 2 }}>
+			<FormWrapper label='수정 근무 일자' required>
 				<Controller
 					name='workDate'
 					control={control}
-					rules={{ required: '수정 근무일은 필수 입력사항입니다.' }}
+					rules={{
+						validate: (value) => {
+							if (!value) {
+								return '수정 근무일은 필수 입력사항입니다.';
+							}
+							return true;
+						},
+					}}
 					render={({ field }) => (
 						<DatePicker
 							{...field}
-							sx={{ width: '100%' }}
+							sx={{ minWidth: '19.5rem' }}
 							slotProps={{
 								textField: {
 									error: !!errors.workDate,
@@ -91,153 +100,152 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 						/>
 					)}
 				/>
-			</Box>
+			</FormWrapper>
 
-			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
-				<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-					<Typography sx={{ width: '100%', marginBottom: '0.5rem', fontWeight: 500 }}>
-						<span style={{ color: '#ff4d4f' }}>*</span> 수정 내용
-					</Typography>
-				</Box>
-				<Box sx={{ width: '100%', py: 3, px: 2, borderRadius: '1rem', backgroundColor: 'grey.50' }}>
-					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-						<Box sx={{ display: 'flex', flexDirection: 'column' }}>
-							<Typography sx={{ width: '100%', marginBottom: '0.5rem', fontWeight: 500 }}>수정 근무 시간</Typography>
-							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-								<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-									<Box sx={{ minWidth: 130, display: 'flex', alignItems: 'center' }}>
-										<FormControlLabel
-											control={<Checkbox size='small' checked={isStartTime} onChange={() => setIsStartTime((prev) => !prev)} />}
-											color='primary'
-											label='출근시간'
-										/>
-									</Box>
-									<Controller
-										name='startTime'
-										control={control}
-										rules={{
-											validate: (value) => {
-												if (isStartTime && !value) {
-													return '수정할 출근시간을 입력해주세요.';
-												}
-												return true;
-											},
-										}}
-										render={({ field }) => (
-											<TimePicker
-												{...field}
-												slotProps={{
-													textField: {
-														disabled: !isStartTime,
-														error: !!errors.startTime,
-														helperText: errors.startTime?.message,
-													},
-												}}
-											/>
-										)}
-									/>
-								</Box>
-								<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-									<Box sx={{ minWidth: 130, display: 'flex', alignItems: 'center' }}>
-										<FormControlLabel
-											control={<Checkbox size='small' checked={isEndTime} onChange={() => setIsEndTime((prev) => !prev)} />}
-											color='primary'
-											label='퇴근시간'
-										/>
-									</Box>
-									<Controller
-										name='endTime'
-										control={control}
-										rules={{
-											validate: (value) => {
-												if (isEndTime && !value) {
-													return '수정할 퇴근시간을 입력해주세요.';
-												}
-												return true;
-											},
-										}}
-										render={({ field }) => (
-											<TimePicker
-												{...field}
-												slotProps={{
-													textField: {
-														disabled: !isEndTime,
-														error: !!errors.endTime,
-														helperText: errors.endTime?.message,
-													},
-												}}
-											/>
-										)}
-									/>
-								</Box>
-							</Box>
-						</Box>
+			<FormItem
+				name='violationReason'
+				label='수정 사유'
+				placeholder='수정 사유를 입력해주세요'
+				required
+				control={control}
+				error={errors.violationReason?.message}
+			/>
 
-						<Box sx={{ display: 'flex', flexDirection: 'column' }}>
-							<Typography sx={{ width: '100%', marginBottom: '0.5rem', fontWeight: 500 }}>수정 근무 상태</Typography>
-							<FormControl sx={{ minWidth: 168 }} size='small'>
-								<Select id='demo-select-small' value={modifyStatus} onChange={handleChangeModifyStatus}>
-									<MenuItem value='PRESENT'>정상 출근</MenuItem>
-									<MenuItem value='ABSENT'>결근</MenuItem>
-									<MenuItem value='VACATION'>휴가</MenuItem>
-									<MenuItem value='OUTSIDE'>외근</MenuItem>
-									<MenuItem value='BUSINESS_TRIP'>출장</MenuItem>
-								</Select>
-							</FormControl>
-						</Box>
-						<Box sx={{ display: 'flex', flexDirection: 'column' }}>
-							<Typography sx={{ width: '100%', marginBottom: '0.5rem', fontWeight: 500 }}>첨부 파일</Typography>
+			<FormWrapper label='수정 근무상태' required>
+				<Controller
+					name='workStatus'
+					control={control}
+					render={({ field: { onChange, value } }) => (
+						<Select value={value} onChange={onChange} size='small' fullWidth>
+							<MenuItem value='PRESENT'>정상 출근</MenuItem>
+							<MenuItem value='ABSENT'>결근</MenuItem>
+							<MenuItem value='VACATION'>휴가</MenuItem>
+							<MenuItem value='OUTSIDE'>외근</MenuItem>
+							<MenuItem value='BUSINESS_TRIP'>출장</MenuItem>
+						</Select>
+					)}
+				/>
+			</FormWrapper>
+
+			<FormWrapper label='수정 근무시간'>
+				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: '0.5rem' }}>
+					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+						<Box sx={{ minWidth: 120, paddingLeft: '0.5rem' }}>
 							<Controller
-								name='documentsAddress'
+								name='isStartTime'
 								control={control}
-								render={({ field }) => (
-									<Box sx={{ display: 'flex', gap: 1 }}>
-										<input
-											accept='.pdf, .jpg, .png'
-											id='contained-button-file'
-											type='file'
-											style={{ display: 'none' }}
-											onChange={() => {} /*handleFileChange*/}
-										/>
-										<label htmlFor='contained-button-file'>
-											<Button variant='contained' component='span'>
-												파일 선택
-											</Button>
-										</label>
-										<Box sx={{ flex: 1 }}>
-											<TextField value={modifyDocument} placeholder='선택된 파일' variant='outlined' fullWidth size='small' />
-										</Box>
-									</Box>
+								render={({ field: { onChange, value } }) => (
+									<FormControlLabel
+										control={<Checkbox size='small' checked={value} onChange={onChange} />}
+										color='primary'
+										label='출근시간'
+									/>
 								)}
 							/>
 						</Box>
+						<Controller
+							name='startTime'
+							control={control}
+							rules={{
+								validate: (value) => {
+									if (watchIsStartTime && !value) {
+										return '근무 시작 시간을 입력해주세요.';
+									}
+									return true;
+								},
+							}}
+							render={({ field }) => (
+								<TimePicker
+									{...field}
+									sx={{ maxWidth: '11rem' }}
+									slotProps={{
+										textField: {
+											error: !!errors.startTime,
+											helperText: errors.startTime?.message,
+										},
+									}}
+								/>
+							)}
+						/>
+					</Box>
+					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+						<Box sx={{ minWidth: 120, paddingLeft: '0.5rem' }}>
+							<Controller
+								name='isEndTime'
+								control={control}
+								render={({ field: { onChange, value } }) => (
+									<FormControlLabel
+										control={<Checkbox size='small' checked={value} onChange={onChange} />}
+										color='primary'
+										label='퇴근시간'
+									/>
+								)}
+							/>
+						</Box>
+						<Controller
+							name='endTime'
+							control={control}
+							rules={{
+								validate: (value) => {
+									if (watchIsEndTime && !value) {
+										return '근무 종료 시간을 입력해주세요.';
+									}
+									return true;
+								},
+							}}
+							render={({ field }) => (
+								<TimePicker
+									{...field}
+									sx={{ maxWidth: '11rem' }}
+									slotProps={{
+										textField: {
+											error: !!errors.endTime,
+											helperText: errors.endTime?.message,
+										},
+									}}
+								/>
+							)}
+						/>
 					</Box>
 				</Box>
-			</Box>
-
-			<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-				<Box sx={{ display: 'flex', alignItems: 'center' }}>
-					<Typography sx={{ width: '100%', marginBottom: '0.5rem', fontWeight: 500 }}>
-						<span style={{ color: '#ff4d4f' }}>*</span> 수정 신청 사유
-					</Typography>
-				</Box>
+			</FormWrapper>
+			{/*<FormWrapper label='첨부 파일'>
 				<Controller
-					name='violationReason'
+					name='documentsAddress'
 					control={control}
-					rules={{ required: '신청사유는 필수 입력사항입니다.' }}
 					render={({ field }) => (
-						<TextField
-							{...field}
-							fullWidth
-							size='small'
-							multiline
-							maxRows={5}
-							error={!!errors.violationReason}
-							helperText={errors.violationReason?.message}
-						/>
+						<Box sx={{ display: 'flex', gap: 1 }}>
+							<input
+								accept='.pdf, .jpg, .png'
+								id='contained-button-file'
+								type='file'
+								style={{ display: 'none' }}
+								onChange={(e) => {
+									const file = e.target.files?.[0];
+									field.onChange(file); // File 객체만 전달
+								}}
+							/>
+							<label htmlFor='contained-button-file'>
+								<Button variant='contained' component='span'>
+									파일 선택
+								</Button>
+							</label>
+							<TextField
+								placeholder='선택된 파일'
+								variant='outlined'
+								size='small'
+								value={field.value?.name ?? ''}
+								fullWidth
+								slotProps={{
+									input: {
+										readOnly: true,
+									},
+								}}
+							/>
+						</Box>
 					)}
 				/>
-			</Box>
+			</FormWrapper>*/}
 		</Box>
 	);
 });

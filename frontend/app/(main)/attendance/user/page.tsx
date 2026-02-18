@@ -17,6 +17,7 @@ import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
 import Calendar from '@/app/(main)/attendance/Calendar';
 import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
+import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
 import { formatMinutes } from '@/utils/commonFunc';
 
 /** Type / Interface */
@@ -51,8 +52,8 @@ export default function AttendanceUserPage() {
 		try {
 			const today = dayjs();
 			const res = await attendanceService.getAttendanceTodayData({
-				memberId: Number(secureLocalStorage.getItem('memberId')) ?? 1,
-				workDate: today.format('YYYY-MM-DD'),
+				loginId: secureLocalStorage.getItem('loginId') as string,
+				workDate: today.format('YYYY-MM-DD HH:mm'),
 			});
 
 			if (res) {
@@ -70,8 +71,8 @@ export default function AttendanceUserPage() {
 
 		try {
 			const res = await attendanceService.getAttendanceCalendarData({
-				memberId: Number(secureLocalStorage.getItem('memberId')) ?? 1,
-				workDate: calendarDate.format('YYYY-MM-DD'),
+				loginId: secureLocalStorage.getItem('loginId') as string,
+				workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
 			});
 
 			if (Object.keys(res).length > 0) {
@@ -178,6 +179,12 @@ export default function AttendanceUserPage() {
 		}
 	};
 
+	const onChangeDatePicker = (value) => {
+		if (value != null) {
+			setCalendarDate(value);
+		}
+	};
+
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
 			<PathBreadcrumbs />
@@ -190,7 +197,6 @@ export default function AttendanceUserPage() {
 						borderWidth: '1px',
 						borderStyle: 'solid',
 						borderColor: 'grey.300',
-						gap: '1rem',
 					}}
 				>
 					<Box sx={{ width: { sm: '100%', md: '50%' } }}>
@@ -281,9 +287,13 @@ export default function AttendanceUserPage() {
 					>
 						<ArrowLeftRounded sx={{ fontSize: '1.5rem', strokeWidth: 5 }} />
 					</IconButton>
-					<Typography variant='h5' sx={{ margin: '0 2rem' }}>
-						{calendarDate.format('YYYY-MM')}
-					</Typography>
+
+					<Box sx={{ display: 'flex', alignItems: 'center', margin: '0 2rem' }}>
+						<Typography variant='h5' sx={{ marginRight: 0.5 }}>
+							{calendarDate.format('YYYY-MM')}
+						</Typography>
+						<ButtonFieldDatePicker value={calendarDate} views={['month', 'year']} onChange={onChangeDatePicker} />
+					</Box>
 					<IconButton
 						sx={{
 							display: 'flex',

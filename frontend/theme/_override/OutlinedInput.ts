@@ -5,9 +5,15 @@ const OutlinedInput = (theme: Theme) => ({
 		styleOverrides: {
 			root: {
 				padding: 0,
+				'& .MuiInputAdornment-positionStart': {
+					marginLeft: '0.75rem',
+				},
 			},
 			input: {
+				height: 'auto',
+				boxSizing: 'border-box',
 				padding: '0.625rem 1rem',
+				minHeight: '2.25rem',
 			},
 		},
 		variants: [
@@ -15,7 +21,7 @@ const OutlinedInput = (theme: Theme) => ({
 				props: { size: 'small' as const },
 				style: {
 					'& .MuiOutlinedInput-input': {
-						padding: '0.625rem 0.75rem',
+						padding: '0.5rem 0.75rem',
 					},
 				},
 			},

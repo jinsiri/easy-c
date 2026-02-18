@@ -1,6 +1,7 @@
 'use client';
 
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 /** MUI */
 import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
@@ -11,13 +12,12 @@ import CustomReactCalendarTimeline from '../../_lib/CustomReactCalendarTimeline'
 import { TimelineItemBase } from 'react-calendar-timeline';
 
 /** Custom */
-import { formatMinutes } from '@/utils/commonFunc';
+import { formatMinutes, getTimelineInnerData } from '@/utils/commonFunc';
 
 /** type / interface */
 import { AttendanceDayResDto, CalendarData } from '@/app/services/attendanceService';
-import { VACATIONTYPE, WORKSTATUS } from '@/constant/attendanceConst';
-import { vacationType, workStatus, dayName } from '@/type/types';
-import { useRouter } from 'next/navigation';
+import { VACATIONTYPE, WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
+import { vacationType, workStatus, dayName, workType } from '@/type/types';
 
 export interface CalendarColData {
 	key: dayName;
@@ -63,6 +63,13 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 			key: 'endTime',
 			formatter: (value, row) => {
 				return <Typography>{value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}</Typography>;
+			},
+		},
+		{
+			header: '근로 타입',
+			key: 'workType',
+			formatter: (value, row) => {
+				return <Typography>{WORKTYPE[value as workType]}</Typography>;
 			},
 		},
 		{
@@ -195,14 +202,6 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 		}
 	};
 
-	const getTimelineInnerData = (target: any): ReactNode => {
-		if (target instanceof Date) {
-			return target ? dayjs(target).format('YYYY-MM-DD HH:mm') : '-';
-		} else {
-			return target;
-		}
-	};
-
 	return (
 		<Grid container sx={{ flexDirection: 'column', border: `1px solid`, borderColor: 'grey.300', borderRadius: '1rem' }}>
 			{targetCalendarRow.map((item: Record<dayName, CalendarData>, idx: number) => {
@@ -224,6 +223,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 									<Box
 										key={`${idx}_${subIdx}`}
 										sx={{
+											overflow: 'hidden',
 											display: 'flex',
 											justifyContent: 'center',
 											alignItems: 'center',
@@ -236,7 +236,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 											...(activeCell === idx + '_' + subIdx && {
 												outline: `2px solid`,
 												outlineColor: 'primary.main',
-												zIndex: 2,
+												zIndex: 15,
 											}),
 											cursor: 'pointer',
 										}}
@@ -264,108 +264,118 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 												<Typography
 													sx={{
 														display: { xs: 'none', md: 'block' },
+														textWrap: 'nowrap',
+														textOverflow: 'ellipsis',
+														whiteSpace: 'nowrap',
 														color: getDayColor(item[subItem.key].isCurrentMonth, item[subItem.key].isHoliday, subItem.key),
 													}}
 												>
 													{subItem.header}
 												</Typography>
 											</Box>
-											<Box sx={{ height: '6rem', padding: '0.5rem' }}>
-												<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center' }}>
-													{item[subItem.key].isHoliday && (
-														<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-															<Typography sx={{ color: 'error.500' }}>{item[subItem.key]?.holidaySubject ?? ''}</Typography>
+											<Box sx={{ display: 'flex', flexDirection: 'column', height: '6rem' }}>
+												<Box
+													sx={{
+														width: '100%',
+														zIndex: 10,
+													}}
+												>
+													{item[subItem.key].detailData.workStatus === 'VACATION' &&
+														item[subItem.key].detailData.vacationType === 'FULL' && (
+															<Box
+																sx={{
+																	padding: '0.125rem 0.5rem',
+																	bgcolor: 'primary.50',
+																	color: 'primary.500',
+																}}
+															>
+																휴가
+															</Box>
+														)}
+													{item[subItem.key].detailData.workStatus === 'OUTSIDE' && (
+														<Box
+															sx={{
+																padding: '0.125rem 0.5rem',
+																bgcolor: 'secondary.50',
+																color: 'secondary.500',
+															}}
+														>
+															외근
 														</Box>
 													)}
-													{item[subItem.key].detailData.workStatus === 'VACATION' && (
-														<Typography
+													{item[subItem.key].detailData.workStatus === 'BUSINESS_TRIP' && (
+														<Box
 															sx={{
-																display: 'flex',
-																justifyContent: 'center',
-																alignItems: 'center',
-																marginBottom: '0.5rem',
 																padding: '0.125rem 0.5rem',
-																fontSize: '0.75rem',
-																fontWeight: 600,
-																backgroundColor: 'secondary.main',
-																borderRadius: '1rem',
-																color: 'grey.50',
+																bgcolor: 'info.50',
+																color: 'info.500',
 															}}
 														>
-															{VACATIONTYPE[item[subItem.key].detailData.vacationType as vacationType]}
-														</Typography>
-													)}
-													{item[subItem.key].detailData.workStatus === 'OUTSIDE' && (
-														<Typography
-															sx={{
-																display: 'flex',
-																justifyContent: 'center',
-																alignItems: 'center',
-																marginBottom: '0.5rem',
-																padding: '0.125rem 0.5rem',
-																fontSize: '0.75rem',
-																fontWeight: 600,
-																backgroundColor: 'secondary.main',
-																borderRadius: '1rem',
-																color: 'grey.50',
-															}}
-														>
-															{WORKSTATUS[item[subItem.key].detailData.workStatus as workStatus]}
-														</Typography>
+															출장
+														</Box>
 													)}
 												</Box>
 
-												{item[subItem.key].detailData.startTime && (
-													<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-														<Typography
-															variant={'caption'}
-															sx={{
-																display: 'flex',
-																justifyContent: 'center',
-																alignItems: 'center',
-																width: '1.125rem',
-																height: '1.125rem',
-																marginRight: '0.25rem',
-																borderRadius: '100%',
-																fontSize: '0.625rem',
-																backgroundColor: 'primary.100',
-																color: 'primary.600',
-															}}
-														>
-															출
-														</Typography>
-														<Typography>
-															{item[subItem.key]?.detailData.startTime
-																? dayjs(item[subItem.key].detailData.startTime).format('HH:mm')
-																: ''}
-														</Typography>
-													</Box>
-												)}
-												{item[subItem.key].detailData.endTime && (
-													<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-														<Typography
-															sx={{
-																display: 'flex',
-																justifyContent: 'center',
-																alignItems: 'center',
-																width: '1.125rem',
-																height: '1.125rem',
-																marginRight: '0.25rem',
-																borderRadius: '100%',
-																fontSize: '0.625rem',
-																backgroundColor: 'primary.main',
-																color: 'grey.50',
-															}}
-														>
-															퇴
-														</Typography>
-														<Typography>
-															{item[subItem.key]?.detailData.endTime
-																? dayjs(item[subItem.key].detailData.endTime).format('HH:mm')
-																: ''}
-														</Typography>
-													</Box>
-												)}
+												<Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', padding: '0.5rem 0.5rem' }}>
+													{item[subItem.key].isHoliday && (
+														<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '0.5rem' }}>
+															<Typography sx={{ color: 'error.500' }}>{item[subItem.key]?.holidaySubject ?? ''}</Typography>
+														</Box>
+													)}
+
+													{item[subItem.key].detailData.startTime && (
+														<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+															<Typography
+																variant={'caption'}
+																sx={{
+																	display: 'flex',
+																	justifyContent: 'center',
+																	alignItems: 'center',
+																	width: '1.125rem',
+																	height: '1.125rem',
+																	marginRight: '0.25rem',
+																	borderRadius: '100%',
+																	fontSize: '0.625rem',
+																	backgroundColor: 'primary.100',
+																	color: 'primary.600',
+																}}
+															>
+																출
+															</Typography>
+															<Typography>
+																{item[subItem.key]?.detailData.startTime
+																	? dayjs(item[subItem.key].detailData.startTime).format('HH:mm')
+																	: ''}
+															</Typography>
+														</Box>
+													)}
+
+													{item[subItem.key].detailData.endTime && (
+														<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+															<Typography
+																sx={{
+																	display: 'flex',
+																	justifyContent: 'center',
+																	alignItems: 'center',
+																	width: '1.125rem',
+																	height: '1.125rem',
+																	marginRight: '0.25rem',
+																	borderRadius: '100%',
+																	fontSize: '0.625rem',
+																	backgroundColor: 'primary.main',
+																	color: 'grey.50',
+																}}
+															>
+																퇴
+															</Typography>
+															<Typography>
+																{item[subItem.key]?.detailData.endTime
+																	? dayjs(item[subItem.key].detailData.endTime).format('HH:mm')
+																	: ''}
+															</Typography>
+														</Box>
+													)}
+												</Box>
 											</Box>
 										</Box>
 									</Box>

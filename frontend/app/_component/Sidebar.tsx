@@ -20,9 +20,9 @@ export default function Sidebar(props: propsType) {
 			elevation={3}
 			component='nav'
 			sx={{
-				width: drawerOpen ? '19rem' : '4.5rem',
+				width: drawerOpen ? '19rem' : '4rem',
 				height: '100%',
-				transition: 'all easeInOut 0.4s',
+				transition: 'all easeInOut 0.5s',
 				zIndex: 100,
 			}}
 		>

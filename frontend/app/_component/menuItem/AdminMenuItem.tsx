@@ -2,7 +2,7 @@
 import { AccountTree, WorkHistoryRounded, CalendarMonthRounded } from '@mui/icons-material';
 
 /** Custom */
-import {menuType} from '@/type/types';
+import { menuType } from '@/type/types';
 
 const AdminMenuItem: menuType[] = [
 	{
@@ -97,10 +97,10 @@ const AdminMenuItem: menuType[] = [
 						url: '/company',
 					},
 					{
-						id: 'admin-attendance-modify',
-						title: '근태 신청 관리',
+						id: 'admin-attendance-policy',
+						title: '근태 정책 관리',
 						type: '2depth',
-						url: '/modify',
+						url: '/policy',
 					},
 				],
 			},

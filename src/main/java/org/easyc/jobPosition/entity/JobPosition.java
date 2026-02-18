@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.entity.BaseEntity;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
@@ -13,6 +14,7 @@ import org.easyc.common.entity.BaseEntity;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Table(name="job_position")
+@SQLRestriction("deleted = false")
 public class JobPosition extends BaseEntity {
     @Id
     @SequenceGenerator(name="job_position_seq", sequenceName="job_position_seq", allocationSize=1)
@@ -27,4 +29,20 @@ public class JobPosition extends BaseEntity {
 
     @Column(name="job_position_level")
     private int jobPositionLevel;
+
+    public void updateInfo(String nm, String code) {
+        if (nm != null && !nm.isBlank()) this.jobPositionNm = nm;
+        if (code != null && !code.isBlank()) this.jobPositionCode = code;
+    }
+
+    public void delete() {
+        super.delete();
+    }
+
+    public void changeLevel(Integer newLevel) {
+        if (newLevel == null || newLevel < 1) {
+            throw new IllegalArgumentException("유효하지 않은 레벨입니다.");
+        }
+        this.jobPositionLevel = newLevel;
+    }
 }

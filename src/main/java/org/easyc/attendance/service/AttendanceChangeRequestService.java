@@ -34,6 +34,8 @@ public class AttendanceChangeRequestService {
             type = "근무시간 수정";
         }
 
+        /** login id로 depthNm, RoleGrade추가 **/
+
         AttendanceChangeRequest attendanceChangeRequest = req.returnAttendanceChangeEntity();
         attendanceChangeRequest.setType(type);
         attendanceChangeRequestRepository.save(attendanceChangeRequest);

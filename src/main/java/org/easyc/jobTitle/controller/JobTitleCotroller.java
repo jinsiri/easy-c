@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/job-title")
+@RequestMapping("/api/job-titles")
 public class JobTitleCotroller {
     private final JobTitleService jobTitleService;
 

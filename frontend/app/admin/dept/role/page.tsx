@@ -6,7 +6,7 @@ import { Box, useTheme } from '@mui/material';
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import CommonTabs from '@/app/_component/CommonTabs';
-import DeptRankLayoutElement from '@/app/admin/dept/_component/DeptRankLayoutElement';
+import DeptRoleLayoutElement from '@/app/admin/dept/_component/DeptRoleLayoutElement';
 
 export default function AdminDeptRolePage() {
 	const theme = useTheme();
@@ -15,17 +15,17 @@ export default function AdminDeptRolePage() {
 		{
 			label: '직위',
 			type: 'grid',
-			content: <DeptRankLayoutElement rankType={'POSITION'} />,
+			content: <DeptRoleLayoutElement category={'POSITION'} />,
 		},
 		{
 			label: '직책',
 			type: 'grid',
-			content: <DeptRankLayoutElement rankType={'TITLE'} />,
+			content: <DeptRoleLayoutElement category={'TITLE'} />,
 		},
 		{
 			label: '직급',
 			type: 'grid',
-			content: <DeptRankLayoutElement rankType={'GRADE'} />,
+			content: <DeptRoleLayoutElement category={'GRADE'} />,
 		},
 	];
 

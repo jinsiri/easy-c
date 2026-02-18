@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import { useDialogStore } from '@/store/useDialogStore';
 
 // 인터셉터가 response.data를 반환하므로 타입 오버라이드
 export interface ApiClient {
@@ -14,6 +15,7 @@ const getBaseURL = () => {
 		return 'http://localhost:8081';
 	}
 
+	console.log();
 	return `${window.location.protocol}//${window.location.hostname}:8081`;
 };
 
@@ -107,6 +109,7 @@ axiosConfig.interceptors.response.use(
 		return response.data;
 	},
 	async (error) => {
+		const { alert } = useDialogStore.getState();
 		const originalRequest = error.config;
 		const status = error.response?.status;
 		const apiResponse = error.response?.data;
@@ -137,6 +140,7 @@ axiosConfig.interceptors.response.use(
 				processQueue(refreshError);
 				// 로그아웃 처리
 				if (typeof window !== 'undefined') {
+				    await alert('세션이 만료되어 로그인 페이지로 이동합니다.'); //인증 만료
 					window.location.href = '/login';
 				}
 
@@ -148,6 +152,8 @@ axiosConfig.interceptors.response.use(
 
 		// 서버가 ApiResponse 내려준 경우
 		if (apiResponse?.message) {
+			await alert(apiResponse.message); // 오류 발생
+
 			return Promise.reject({
 				message: apiResponse.message,
 				status,
@@ -156,8 +162,11 @@ axiosConfig.interceptors.response.use(
 		}
 
 		// 그 외 (네트워크, 서버 다운 등)
+		const fallbackMsg = error.message ?? '서버 오류가 발생했습니다.';
+		await alert(fallbackMsg); // 시스템 오류
+
 		return Promise.reject({
-			message: error.message ?? '서버 오류가 발생했습니다.',
+			message: fallbackMsg,
 			status,
 		});
 

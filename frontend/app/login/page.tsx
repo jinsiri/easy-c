@@ -31,7 +31,6 @@ const LoginPage = () => {
 				encryptedPassword: encryptedPw,
 			});
 
-			console.log(res);
 			secureLocalStorage.setItem('loginId', res.loginId);
 			secureLocalStorage.setItem('memberId', res.memberId);
 			secureLocalStorage.setItem('memberRole', res.memberRole);
@@ -52,33 +51,33 @@ const LoginPage = () => {
 			justifyContent={'center'}
 			sx={{ bgcolor: 'primary.50' }}
 		>
-			<Box sx={{ maxWidth: '560px', padding: '88px 56px', borderRadius: '32px', bgcolor: '#fff' }}>
-				<Box
-					sx={{
-						'& .MuiOutlinedInput-notchedOutline': { borderColor: 'grey.500' },
-						'& .MuiInputLabel-root': { color: 'grey.900' },
-						'& input::placeholder': { color: 'grey.500', fontWeight: 400 },
-					}}
-				>
-					<Box
-						display='flex'
-						flexDirection='column'
-						alignItems='center'
-						justifyContent={'center'}
-						sx={{ bgcolor: 'grey.500', mb: 6, minHeight: '72px' }}
-					>
+			<Box
+				sx={{
+					width: {
+						sm: 'calc(100% - 4rem)',
+						md: '560px',
+					},
+					margin: '0 2rem',
+					maxWidth: '560px',
+					padding: '88px 56px',
+					borderRadius: '32px',
+					bgcolor: '#fff',
+				}}
+			>
+				<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 4 }}>
+					<Box display='flex' flexDirection='column' alignItems='center' justifyContent={'center'} sx={{ bgcolor: 'grey.500', minHeight: '72px' }}>
 						로고
 					</Box>
-					<form onSubmit={handleLogin} style={{ width: '100%' }}>
+					<Box component={'form'} onSubmit={handleLogin} sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 1 }}>
 						<TextField
 							label='ID'
 							type='text'
 							value={memberId}
 							onChange={(e) => setMemberId(e.target.value)}
 							fullWidth
-							margin='normal'
+							margin='dense'
 							required
-							placeholder={'Enter your ID'}
+							placeholder={'ID를 입력해주세요.'}
 							slotProps={{
 								inputLabel: {
 									shrink: true,
@@ -91,15 +90,14 @@ const LoginPage = () => {
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
 							fullWidth
-							margin='normal'
+							margin='dense'
 							required
-							placeholder={'Enter your Password'}
+							placeholder={'비밀번호를 입력해주세요.'}
 							slotProps={{
 								inputLabel: {
 									shrink: true,
 								},
 							}}
-							sx={{ mt: 4 }}
 						/>
 						<FormControlLabel
 							control={<Checkbox />}
@@ -116,12 +114,12 @@ const LoginPage = () => {
 							variant='contained'
 							color='primary'
 							fullWidth
-							sx={{ mt: 5, py: '1.125rem', fontSize: '1.063rem', fontWeight: 600, lineHeight: 1 }}
+							sx={{ py: '1.125rem', fontSize: '1rem', fontWeight: 600, lineHeight: 1, mt: '1rem' }}
 						>
 							로그인
 						</Button>
-					</form>
-					<Typography textAlign={'center'} sx={{ fontSize: '.75rem', color: 'grey.700' }} mt={3}>
+					</Box>
+					<Typography textAlign={'center'} sx={{ fontSize: '.75rem', color: 'grey.700' }}>
 						비밀번호를 잊어버리셨나요?
 						<a href={'#'}>
 							<Typography component={'strong'} sx={{ font: 'inherit', color: 'primary.400' }} ml={1}>

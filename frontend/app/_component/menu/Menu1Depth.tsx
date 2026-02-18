@@ -38,7 +38,7 @@ export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 				href={item.children ? undefined : item.url}
 				sx={{
 					position: 'relative',
-					height: drawerOpen ? 'auto' : '3rem',
+					height: '3rem',
 					backgroundColor: isActive ? 'primary.100' : 'transparent',
 					borderRadius: '1rem 0 0 1rem',
 				}}
@@ -46,7 +46,9 @@ export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 				onMouseEnter={() => !drawerOpen && setIsHovered(true)}
 				onMouseLeave={() => !drawerOpen && setIsHovered(false)}
 			>
-				<Box sx={{ padding: '0.5rem' }}>{IconComponent && <IconComponent fontSize={'small'} />}</Box>
+				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0.25rem' }}>
+					{IconComponent && <IconComponent fontSize={'small'} />}
+				</Box>
 				<Fade in={drawerOpen} easing={'easeInOut'} timeout={200}>
 					<ListItemText primary={item.title} className={'transition-3'} sx={{ marginLeft: '0.25rem' }} />
 				</Fade>
@@ -55,7 +57,16 @@ export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 						<ExpandMoreRounded sx={{ color: 'grey.700' }} />
 					</Fade>
 				)}
-				<Box sx={{ position: 'absolute', bottom: 0, width: '100%', height: '1px', backgroundColor: isActive ? 'transparent' : 'grey.100' }} />
+				<Box
+					sx={{
+						position: 'absolute',
+						right: 0,
+						bottom: 0,
+						width: 'calc(100% - 1rem)',
+						height: '1px',
+						backgroundColor: isActive ? 'transparent' : 'grey.100',
+					}}
+				/>
 
 				{/* --- [추가] 사이드바가 닫혔을 때 호버 시 나타날 메뉴 --- */}
 				{!drawerOpen && item.children && isHovered && (
@@ -64,7 +75,7 @@ export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 						sx={{
 							overflow: 'hidden',
 							position: 'absolute',
-							left: 'calc(100% + 0.25rem)',
+							left: 'calc(100% + 0.125rem)',
 							top: '-1rem',
 							minWidth: '160px',
 							padding: '1rem 0',

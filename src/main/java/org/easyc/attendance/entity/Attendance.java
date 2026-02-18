@@ -2,11 +2,10 @@ package org.easyc.attendance.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.easyc.common.constant.WorkType;
-import org.easyc.common.constant.WorkStatus;
-import org.easyc.common.constant.VacationType;
+import org.easyc.attendance.constant.WorkType;
+import org.easyc.attendance.constant.WorkStatus;
+import org.easyc.attendance.constant.VacationType;
 import org.easyc.common.entity.BaseEntity;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,9 +26,9 @@ public class Attendance extends BaseEntity {
     private Long attendanceId;
 
     /** 정상근로 처리 */
-    @Column(name = "normalized", columnDefinition = "boolean default false")
+    @Column(name = "normalized", columnDefinition = "boolean default true")
     @Builder.Default
-    private boolean normalized = false;
+    private boolean normalized = true;
 
 
     /** 등록자 정보 추가 */
@@ -47,6 +46,9 @@ public class Attendance extends BaseEntity {
 
 
     /** 근로 시간 관련 */
+    @Column(name="attendance_policy_name")
+    private String attendancePolicyName;
+
     @Column(name = "work_date")
     private LocalDate workDate;
 
@@ -80,7 +82,7 @@ public class Attendance extends BaseEntity {
     private String detail;
 
 
-    /** 휴가 관련 */
+    /** 외근 / 휴가 관련 */
     @Column(name = "remoted", columnDefinition = "boolean default false")
     @Builder.Default
     private boolean remoted = false;

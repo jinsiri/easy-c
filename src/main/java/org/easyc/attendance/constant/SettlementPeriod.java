@@ -1,4 +1,4 @@
-package org.easyc.common.constant;
+package org.easyc.attendance.constant;
 
 public enum SettlementPeriod {
     WEEK,

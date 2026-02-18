@@ -11,7 +11,7 @@ const Button = (theme: Theme) => ({
 				padding: '0.125rem 0.25rem',
 			},
 			sizeMedium: {
-				minHeight: '2.5rem',
+				minHeight: '2.25rem',
 			},
 			sizeLarge: {
 				padding: '0.625rem 1.5rem',
