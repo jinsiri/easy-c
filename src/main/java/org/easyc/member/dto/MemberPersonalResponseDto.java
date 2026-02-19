@@ -5,6 +5,7 @@ import lombok.experimental.SuperBuilder;
 import org.easyc.common.dto.BaseDto;
 import org.easyc.common.dto.EnumOption;
 import org.easyc.common.support.EnumOptionMapper;
+import org.easyc.member.constant.VeteranType;
 import org.easyc.member.entity.MemberPersonal;
 
 import java.time.LocalDate;
@@ -33,7 +34,7 @@ public class MemberPersonalResponseDto extends BaseDto {
 
     // 보훈 정보
     // 보훈 구분
-    private String veteranType; //to enum
+    private VeteranType veteranType; //to enum
     // 보훈번호
     private String veteranNumber;
     // 보훈 가족 여부

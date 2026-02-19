@@ -37,7 +37,7 @@ public class MemberUpdateRequestDto {
     private Nationality nationality;
     private String address;
     private String faxNumber;
-    private String veteranType;
+    private VeteranType veteranType;
     private String veteranNumber;
     private Boolean veteranFamily;
     private String disabilityRegistrationNumber;
