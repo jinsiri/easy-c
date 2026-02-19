@@ -78,7 +78,7 @@ public class MemberController {
      * @param memberId 조회할 멤버 ID
      * @return 멤버의 경력 정보 리스트 (MemberCareerResponseDto)
      */
-    @GetMapping("/{memberId}/career")
+    @GetMapping("/{memberId}/careers")
     public List<MemberCareerResponseDto> getMemberCareerInfo(@PathVariable Long memberId) {
         return memberService.getMemberCareers(memberId);
     }
@@ -89,7 +89,7 @@ public class MemberController {
      * @param memberId 조회할 멤버 ID
      * @return 멤버의 포상/징계 정보 리스트 (MemberRewardDisciplineResponseDto)
      */
-    @GetMapping("/{memberId}/reward-discipline")
+    @GetMapping("/{memberId}/reward-disciplines")
     public List<MemberRewardDisciplineResponseDto> getMemberRewardDisciplineInfo(@PathVariable Long memberId) {
         return memberService.getMemberRewardAndDisciplines(memberId);
     }
@@ -100,7 +100,7 @@ public class MemberController {
      * @param memberId 조회할 멤버 ID
      * @return 멤버의 자격 정보 리스트 (MemberQualificationResponseDto)
      */
-    @GetMapping("/{memberId}/qualification")
+    @GetMapping("/{memberId}/qualifications")
     public List<MemberQualificationResponseDto> getMemberQualificationInfo(
             @PathVariable Long memberId) {
         return memberService.getMemberQualifications(memberId);
