@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
 	Box,
 	Button,
+	Checkbox,
 	Grid,
 	IconButton,
 	InputBase,
@@ -31,7 +32,7 @@ type FieldDef = {
 	label: string;
 	wide?: boolean;
 	required?: boolean;
-	type?: 'text' | 'password' | 'date' | 'number' | 'select';
+	type?: 'text' | 'password' | 'date' | 'number' | 'select' | 'checkbox';
 	options?: { label: string; value: string }[];
 };
 
@@ -165,7 +166,7 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 					{ label: '해당없음', value: 'NONE' },
 				],
 			},
-			{ key: 'veteranFamily', label: '보훈 가족' },
+			{ key: 'veteranFamily', label: '보훈 가족', type: 'checkbox' },
 		],
 	},
 	{
@@ -393,6 +394,10 @@ export default function MemberNewPage() {
 		(field: FieldDef) => {
 			const value = formData[field.key] ?? '';
 			const onChange = (val: string) => setFormData((prev) => ({ ...prev, [field.key]: val }));
+
+			if (field.type === 'checkbox') {
+				return <Checkbox checked={value === 'true'} onChange={(e) => onChange(e.target.checked ? 'true' : '')} size='small' />;
+			}
 
 			if (field.type === 'select' && field.options) {
 				return (

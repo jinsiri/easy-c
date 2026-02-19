@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
 	Box,
 	Button,
+	Checkbox,
 	Grid,
 	IconButton,
 	InputBase,
@@ -33,7 +34,7 @@ type FieldDef = {
 	wide?: boolean;
 	required?: boolean;
 	readOnly?: boolean;
-	type?: 'text' | 'password' | 'date' | 'number' | 'select';
+	type?: 'text' | 'password' | 'date' | 'number' | 'select' | 'checkbox';
 	options?: { label: string; value: string }[];
 };
 
@@ -165,7 +166,7 @@ const editInfoSections: { title: string; fields: FieldDef[] }[] = [
 					{ label: '해당없음', value: 'NONE' },
 				],
 			},
-			{ key: 'veteranFamily', label: '보훈 가족' },
+			{ key: 'veteranFamily', label: '보훈 가족', type: 'checkbox' },
 		],
 	},
 	{
@@ -502,6 +503,10 @@ export default function MemberEditPage() {
 
 			if (field.readOnly) {
 				return <OutlinedInput size='small' value={value} readOnly sx={{ width: '100%', minWidth: '10rem', backgroundColor: 'action.hover' }} />;
+			}
+
+			if (field.type === 'checkbox') {
+				return <Checkbox checked={value === 'true'} onChange={(e) => onChange(e.target.checked ? 'true' : '')} size='small' />;
 			}
 
 			if (field.type === 'select' && field.options) {
