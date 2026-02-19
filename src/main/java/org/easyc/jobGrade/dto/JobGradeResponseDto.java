@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Getter
 @SuperBuilder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class JobGradeResponseDto extends BaseDto {
     private Long jobGradeId;

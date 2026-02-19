@@ -27,4 +27,20 @@ public class JobTitle extends BaseEntity {
 
     @Column(name="job_title_level")
     private int jobTitleLevel;
+
+    public void updateInfo(String nm, String code) {
+        if (nm != null && !nm.isBlank()) this.jobTitleNm = nm;
+        if (code != null && !code.isBlank()) this.jobTitleCode = code;
+    }
+
+    public void delete() {
+        super.delete();
+    }
+
+    public void changeLevel(Integer newLevel) {
+        if (newLevel == null || newLevel < 1) {
+            throw new IllegalArgumentException("유효하지 않은 레벨입니다.");
+        }
+        this.jobTitleLevel = newLevel;
+    }
 }

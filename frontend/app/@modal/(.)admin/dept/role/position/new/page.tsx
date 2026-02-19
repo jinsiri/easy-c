@@ -1,7 +1,6 @@
 'use client';
 
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
-import { startTransition } from 'react';
 import useJobPositionForm from '@/app/admin/dept/_component/hooks/useJobPositionForm';
 import JobPositionForm from '@/app/admin/dept/_component/JobPositionForm';
 
