@@ -30,6 +30,7 @@ type FieldDef = {
 	key: string;
 	label: string;
 	wide?: boolean;
+	required?: boolean;
 	type?: 'text' | 'password' | 'date' | 'number' | 'select';
 	options?: { label: string; value: string }[];
 };
@@ -47,10 +48,11 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 	{
 		title: '기본 정보',
 		fields: [
-			{ key: 'loginId', label: '로그인아이디' },
-			{ key: 'password', label: '비밀번호', type: 'password' }, //todo
-			{ key: 'memberNm', label: '이름' },
-			{ key: 'employeeId', label: '사번' },
+			{ key: 'loginId', label: '로그인아이디', required: true },
+			{ key: 'password', label: '비밀번호', required: true, type: 'password' }, //todo
+			{ key: 'passwordCheck', label: '비밀번호 확인', required: true, type: 'password' },
+			{ key: 'memberNm', label: '이름', required: true },
+			{ key: 'employeeId', label: '사번', required: true },
 			{ key: 'extensionNumber', label: '대표전화' },
 			{ key: 'departmentPosition', label: '부서/직책' },
 			{ key: 'positionTitle', label: '직위' },
@@ -70,6 +72,7 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 			{
 				key: 'employmentType',
 				label: '직원 구분',
+				required: true,
 				type: 'select',
 				options: [
 					{ label: '정규직', value: 'REGULAR' },
@@ -82,6 +85,7 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 			{
 				key: 'recruitmentType',
 				label: '채용 구분',
+				required: true,
 				type: 'select',
 				options: [
 					{ label: '신입', value: 'NEW' },
@@ -95,6 +99,7 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 			{
 				key: 'salaryType',
 				label: '급여 구분',
+				required: true,
 				type: 'select',
 				options: [
 					{ label: '연봉', value: 'ANNUAL' },
@@ -103,7 +108,7 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 				],
 			},
 			{ key: 'referredBy', label: '추천자' },
-			{ key: 'hireDate', label: '입사일', type: 'date' },
+			{ key: 'hireDate', label: '입사일', type: 'date', required: true },
 			{ key: 'resignationDate', label: '퇴사일', type: 'date' },
 		],
 	},
@@ -116,6 +121,7 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 			{
 				key: 'gender',
 				label: '성별',
+				required: true,
 				type: 'select',
 				options: [
 					{ label: '남성', value: 'MALE' },
@@ -276,6 +282,9 @@ export default function MemberNewPage() {
 	// totalInfoSections의 모든 필드를 하나의 state로 관리
 	const [formData, setFormData] = useState<Record<string, string>>({
 		// 기본 정보
+		loginId: '',
+		password: '',
+		passwordCheck: '',
 		memberNm: '',
 		employeeId: '',
 		extensionNumber: '',
@@ -325,10 +334,32 @@ export default function MemberNewPage() {
 		[],
 	);
 
+	const validate = (): string | null => {
+		const { loginId, password, passwordCheck, memberNm, employeeId, email, hireDate, employmentType, recruitmentType, salaryType, gender } = formData;
+
+		if (!loginId.trim()) return '로그인 아이디는 필수입니다.';
+		if (loginId.length < 4) return '로그인 아이디는 4자 이상이어야 합니다.';
+		if (!password.trim()) return '비밀번호는 필수입니다.';
+		if (password.length < 8) return '비밀번호는 8자 이상이어야 합니다.';
+		if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) return '비밀번호는 영문과 숫자를 포함해야 합니다.';
+		if (password !== passwordCheck) return '비밀번호가 일치하지 않습니다.';
+		if (!memberNm?.trim()) return '직원 이름은 필수입니다.';
+		if (!employeeId?.trim()) return '사번은 필수입니다.';
+		if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return '이메일 형식이 올바르지 않습니다.';
+		if (!hireDate) return '입사일은 필수입니다.';
+		if (!employmentType) return '직원구분은 필수입니다.';
+		if (!recruitmentType) return '채용 구분은 필수입니다.';
+		if (!salaryType) return '급여 구분 필수입니다.';
+		if (!gender) return '성별은 필수입니다.';
+
+		return null;
+	};
+
 	// ===== handleSave: 단일 API 호출 =====
 	const handleSave = async () => {
-		if (!formData.memberNm.trim()) {
-			await alert('직원 이름은 필수입니다.');
+		const errorMsg = validate();
+		if (errorMsg) {
+			await alert(errorMsg);
 			return;
 		}
 		setSaving(true);
@@ -338,15 +369,16 @@ export default function MemberNewPage() {
 				return rest;
 			};
 
-			// 백엔드 createMember 트랜잭션 메서드에 맞게 하나의 payload로 전송
+			// passwordCheck는 서버로 보내지 않음
+			const { passwordCheck: _, ...sendData } = formData;
+
 			const payload = {
-				...formData, // MemberJoinRequestDto + MemberProfileRequestDto + MemberPersonalRequestDto 필드
+				...sendData, // MemberJoinRequestDto + MemberProfileRequestDto + MemberPersonalRequestDto 필드
 				careerList: careerList.map(strip),
 				rewardDisciplineList: rewardList.map(strip),
 				qualificationList: qualificationList.map(strip),
 				languageList: languageList.map(strip),
 			};
-			console.log(payload);
 
 			await memberService.createMember(payload);
 			await success('멤버가 등록되었습니다.');
@@ -422,7 +454,14 @@ export default function MemberNewPage() {
 										whiteSpace: 'nowrap',
 									}}
 								>
-									<Box sx={{ width: '8rem', flexShrink: 0 }}>{field.label}</Box>
+									<Box sx={{ width: '8rem', flexShrink: 0 }}>
+										{field.label}
+										{field.required && (
+											<Box component='span' sx={{ color: 'error.main', ml: '2px' }}>
+												*
+											</Box>
+										)}
+									</Box>
 									<Box sx={{ width: 'calc(100% - 8rem)' }}>{renderField(field)}</Box>
 								</Box>
 							))}
