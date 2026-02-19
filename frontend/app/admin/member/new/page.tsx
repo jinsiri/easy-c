@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
 	Box,
 	Button,
+	Checkbox,
 	Grid,
 	IconButton,
 	InputBase,
@@ -31,7 +32,7 @@ type FieldDef = {
 	label: string;
 	wide?: boolean;
 	required?: boolean;
-	type?: 'text' | 'password' | 'date' | 'number' | 'select';
+	type?: 'text' | 'password' | 'date' | 'number' | 'select' | 'checkbox';
 	options?: { label: string; value: string }[];
 };
 
@@ -165,7 +166,7 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 					{ label: '해당없음', value: 'NONE' },
 				],
 			},
-			{ key: 'veteranFamily', label: '보훈 가족' },
+			{ key: 'veteranFamily', label: '보훈 가족', type: 'checkbox' },
 		],
 	},
 	{
@@ -394,6 +395,10 @@ export default function MemberNewPage() {
 			const value = formData[field.key] ?? '';
 			const onChange = (val: string) => setFormData((prev) => ({ ...prev, [field.key]: val }));
 
+			if (field.type === 'checkbox') {
+				return <Checkbox checked={value === 'true'} onChange={(e) => onChange(e.target.checked ? 'true' : '')} size='small' />;
+			}
+
 			if (field.type === 'select' && field.options) {
 				return (
 					<Select size='small' displayEmpty value={value} onChange={(e) => onChange(e.target.value)} sx={{ width: '100%', minWidth: '10rem' }}>
@@ -602,8 +607,8 @@ export default function MemberNewPage() {
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-			<Box sx={{ flexShrink: 0, width: '100%', padding: '0 1.5rem', mb: '1rem' }}>
-				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: '0.75rem' }}>
+			<Box sx={{ flexShrink: 0, width: '100%', padding: '0 1.5rem', my: '1rem' }}>
+				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
 					<Button startIcon={<ArrowBack />} onClick={() => router.back()} disabled={saving}>
 						뒤로가기
 					</Button>

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface MemberLanguageRepository extends JpaRepository<MemberLanguage, Long> {
-    List<MemberLanguage> findAllByMember_memberId(Long memberId);
+    List<MemberLanguage> findAllByMember_memberIdAndDeletedFalse(Long memberId);
 
     @Modifying
     @Query("update MemberLanguage set deleted = true, active = false, lastUpdateDate = CURRENT_TIMESTAMP where member.memberId = ?1")

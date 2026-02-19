@@ -73,6 +73,12 @@ export const memberService = {
 	// 멤버 등록
 	createMember: (data: Record<string, any>) => axiosConfig.post<void>(`/api/members`, data),
 
+	// 멤버 수정
+	updateMember: (memberId: number, data: Record<string, any>) => axiosConfig.put<void>(`/api/members/${memberId}`, data),
+
+	// 비밀번호 변경
+	updatePassword: (memberId: number, password: string) => axiosConfig.put<void>(`/api/members/${memberId}/password`, { password }),
+
 	// 멤버 삭제
 	deleteMember: (memberId: number) => axiosConfig.delete(`/api/members/${memberId}`),
 	deleteMembers: (requestDto: BulkDeleteRequestDto) => axiosConfig.delete(`/api/members`, { data: requestDto }),

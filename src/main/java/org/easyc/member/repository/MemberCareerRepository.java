@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface MemberCareerRepository extends JpaRepository<MemberCareer, Long> {
-    List<MemberCareer> findAllByMember_memberId(Long memberId);
+    List<MemberCareer> findAllByMember_memberIdAndDeletedFalse(Long memberId);
 
     @Modifying
     @Query("update MemberCareer set deleted = true, active = false, lastUpdateDate = CURRENT_TIMESTAMP where member.memberId = ?1")

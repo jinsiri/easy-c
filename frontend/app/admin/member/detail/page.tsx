@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 /** MUI */
-import { Box, Grid, List, ListItem, OutlinedInput, Typography, useTheme } from '@mui/material';
+import { Box, Checkbox, Grid, List, ListItem, OutlinedInput, Typography, useTheme } from '@mui/material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
@@ -68,7 +68,7 @@ const personalInfoSections = [
 		fields: [
 			{ key: 'veteranNumber', label: '보훈번호' },
 			{ key: 'veteranType', label: '보훈 구분' },
-			{ key: 'veteranFamily', label: '보훈 가족' },
+			{ key: 'veteranFamily', label: '보훈 가족', type: 'checkbox' },
 		],
 	},
 	{
@@ -259,7 +259,8 @@ export default function MemberDetailPage() {
 									borderRadius: '1rem',
 								}}
 							>
-								{section.fields.map(({ key, label }, idx) => {
+								{section.fields.map((field, idx) => {
+									const { key, label } = field as any;
 									const value = combinedInfo[key];
 									const displayValue = getDisplayValue(value);
 
@@ -277,12 +278,16 @@ export default function MemberDetailPage() {
 										>
 											<Box sx={{ width: '8rem' }}>{label}</Box>
 											<Box sx={{ width: 'calc(100% - 8rem)' }}>
-												<OutlinedInput
-													size='small'
-													value={displayValue}
-													sx={{ width: '100%', minWidth: '10rem' }}
-													readOnly
-												></OutlinedInput>
+												{(field as any).type === 'checkbox' ? (
+													<Checkbox checked={!!value} disabled size='small' />
+												) : (
+													<OutlinedInput
+														size='small'
+														value={displayValue}
+														sx={{ width: '100%', minWidth: '10rem' }}
+														readOnly
+													></OutlinedInput>
+												)}
 											</Box>
 										</Box>
 									);
