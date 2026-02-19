@@ -37,7 +37,7 @@ export interface AttendancePolicyDto {
 	halfLeaveStartTime: string | null;
 	halfLeaveEndTime: string | null;
 	allowMarginMinute: number;
-	mappingUserCount: number;
+	mappingUserCount?: number;
 }
 
 // API 정의
