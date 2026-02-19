@@ -10,6 +10,7 @@ export interface BaseDialogProps {
 	children: React.ReactNode;
 	loading?: boolean;
 	onConfirm?: () => void;
+	onClose?: () => void;
 	confirmLabel?: string;
 	maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
 	fullWidth?: boolean;
@@ -17,11 +18,15 @@ export interface BaseDialogProps {
 }
 
 export default function BaseDialog(props: BaseDialogProps) {
-	const { title, children, loading, onConfirm, confirmLabel = '저장', maxWidth = 'sm', fullWidth = false, paperSx } = props;
+	const { title, children, loading, onConfirm, onClose, confirmLabel = '저장', maxWidth = 'sm', fullWidth = false, paperSx } = props;
 	const router = useRouter();
 
 	const handleClose = () => {
-		router.back();
+		if (onClose) {
+			onClose();
+		} else {
+			router.back();
+		}
 	};
 
 	return (
@@ -33,7 +38,7 @@ export default function BaseDialog(props: BaseDialogProps) {
 					닫기
 				</Button>
 				{onConfirm && (
-					<Button variant='contained' onClick={onConfirm} disabled={loading}>
+					<Button variant='contained' onClick={() => onConfirm?.()} disabled={loading}>
 						{loading ? <CircularProgress size={24} /> : confirmLabel}
 					</Button>
 				)}
