@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface MemberQualificationRepository extends JpaRepository<MemberQualification, Long> {
-    List<MemberQualification> findAllByMember_memberId(Long memberId);
+    List<MemberQualification> findAllByMember_memberIdAndDeletedFalse(Long memberId);
 
     @Modifying
     @Query("update MemberQualification set deleted = true, active = false, lastUpdateDate = CURRENT_TIMESTAMP where member.memberId = ?1")

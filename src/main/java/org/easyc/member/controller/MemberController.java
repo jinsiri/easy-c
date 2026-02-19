@@ -135,6 +135,28 @@ public class MemberController {
     }
 
     /**
+     * 멤버 수정
+     *
+     * @param memberId 수정할 멤버 ID
+     * @param dto      수정 데이터
+     */
+    @PutMapping("/{memberId}")
+    public void updateMember(@PathVariable Long memberId, @RequestBody MemberUpdateRequestDto dto) {
+        memberService.updateMember(memberId, dto);
+    }
+
+    /**
+     * 비밀번호 변경
+     *
+     * @param memberId 변경할 멤버 ID
+     * @param dto      새 비밀번호
+     */
+    @PutMapping("/{memberId}/password")
+    public void updatePassword(@PathVariable Long memberId, @RequestBody MemberPasswordUpdateRequestDto dto) {
+        memberService.updatePassword(memberId, dto.getPassword());
+    }
+
+    /**
      * 멤버 삭제 - 단일
      *
      * @param memberId 삭제할 멤버 ID

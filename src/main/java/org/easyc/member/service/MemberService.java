@@ -110,7 +110,7 @@ public class MemberService {
         Optional<Member> optionalUser = memberRepository.findById(memberId);
         optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
-        List<MemberCareer> memberCareerList = memberCareerRepository.findAllByMember_memberId(memberId);
+        List<MemberCareer> memberCareerList = memberCareerRepository.findAllByMember_memberIdAndDeletedFalse(memberId);
         return MemberCareerResponseDto.fromEntityList(memberCareerList);
     }
 
@@ -121,7 +121,7 @@ public class MemberService {
         Optional<Member> optionalUser = memberRepository.findById(memberId);
         optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
-        List<MemberRewardDiscipline> memberRewardDisciplines = memberRewardDisciplineRepository.findAllByMember_memberId(memberId);
+        List<MemberRewardDiscipline> memberRewardDisciplines = memberRewardDisciplineRepository.findAllByMember_memberIdAndDeletedFalse(memberId);
         return MemberRewardDisciplineResponseDto.fromEntityList(memberRewardDisciplines);
     }
 
@@ -131,7 +131,7 @@ public class MemberService {
         Optional<Member> optionalUser = memberRepository.findById(memberId);
         optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
-        List<MemberQualification> memberRewardDisciplines = memberQualificationRepository.findAllByMember_memberId(memberId);
+        List<MemberQualification> memberRewardDisciplines = memberQualificationRepository.findAllByMember_memberIdAndDeletedFalse(memberId);
         return MemberQualificationResponseDto.fromEntityList(memberRewardDisciplines);
     }
 
@@ -141,7 +141,7 @@ public class MemberService {
         Optional<Member> optionalUser = memberRepository.findById(memberId);
         optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
-        List<MemberLanguage> memberLanguages = memberLanguageRepository.findAllByMember_memberId(memberId);
+        List<MemberLanguage> memberLanguages = memberLanguageRepository.findAllByMember_memberIdAndDeletedFalse(memberId);
         return MemberLanguageResponseDto.fromEntityList(memberLanguages);
     }
 
@@ -182,6 +182,46 @@ public class MemberService {
         languageDtos.forEach(dto ->
                 memberLanguageRepository.save(MemberLanguage.of(member, dto))
         );
+    }
+
+    @Transactional
+    public void updatePassword(Long memberId, String newPassword) {
+        Member member = memberRepository.findByDeletedFalseAndMemberId(memberId)
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
+        member.changePassword(encoder.encode(newPassword));
+    }
+
+    @Transactional
+    public void updateMember(Long memberId, MemberUpdateRequestDto dto) {
+        Member member = memberRepository.findByDeletedFalseAndMemberId(memberId)
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
+
+        member.update(dto.getMemberNm(), dto.getMemberNmEn());
+        if (dto.hasNewPassword()) {
+            member.changePassword(encoder.encode(dto.getPassword()));
+        }
+
+        MemberProfile profile = memberProfileRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
+        profile.update(dto.toProfileDto());
+
+        MemberPersonal personal = memberPersonalRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
+        personal.update(dto.toPersonalDto());
+
+        memberCareerRepository.deleteByMemberId(memberId);
+        memberRewardDisciplineRepository.deleteByMemberId(memberId);
+        memberQualificationRepository.deleteByMemberId(memberId);
+        memberLanguageRepository.deleteByMemberId(memberId);
+
+        dto.getCareerListOrEmpty().forEach(careerDto ->
+                memberCareerRepository.save(MemberCareer.of(member, careerDto)));
+        dto.getRewardDisciplineListOrEmpty().forEach(rewardDto ->
+                memberRewardDisciplineRepository.save(MemberRewardDiscipline.of(member, rewardDto)));
+        dto.getQualificationListOrEmpty().forEach(qualDto ->
+                memberQualificationRepository.save(MemberQualification.of(member, qualDto)));
+        dto.getLanguageListOrEmpty().forEach(langDto ->
+                memberLanguageRepository.save(MemberLanguage.of(member, langDto)));
     }
 
     @Transactional

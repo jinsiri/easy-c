@@ -96,6 +96,26 @@ public class MemberPersonal extends BaseEntity { //회원정보_개인정보
         this.accountType = dto.getAccountType();
     }
 
+    public void update(MemberPersonalRequestDto dto) {
+        this.dateOfBirth = dto.getDateOfBirth();
+        this.gender = dto.getGender();
+        this.phoneNumber = dto.getPhoneNumber();
+        this.externalEmail = dto.getExternalEmail();
+        this.nationality = dto.getNationality();
+        this.address = dto.getAddress();
+        this.faxNumber = dto.getFaxNumber();
+        this.veteranType = dto.getVeteranType();
+        this.veteranNumber = dto.getVeteranNumber();
+        this.veteranFamily = dto.getVeteranFamily();
+        this.disabilityRegistrationNumber = dto.getDisabilityRegistrationNumber();
+        this.disabilityType = dto.getDisabilityType();
+        this.disabilityGrade = dto.getDisabilityGrade();
+        this.disabilityRecognition = dto.getDisabilityRecognition();
+        this.bankName = dto.getBankName();
+        this.accountNumber = dto.getAccountNumber();
+        this.accountHolderName = dto.getAccountHolderName();
+    }
+
     public boolean isVeteranFamily() {
         return Boolean.TRUE.equals(veteranFamily);
     }

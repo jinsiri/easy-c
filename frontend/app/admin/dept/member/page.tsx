@@ -125,11 +125,6 @@ export default function AdminDeptRolePage() {
 											삭제
 										</Button>
 									</Stack>
-									<Stack>
-										<Button variant='outlined' size='small' startIcon={<Reorder />}>
-											순서바꾸기
-										</Button>
-									</Stack>
 								</Stack>
 							</Grid>
 						</Grid>

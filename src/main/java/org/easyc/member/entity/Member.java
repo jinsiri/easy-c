@@ -38,6 +38,15 @@ public class Member extends BaseEntity {
     @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
     private MemberPersonal personal;
 
+    public void update(String memberNm, String memberNmEn) {
+        this.memberNm = memberNm;
+        this.memberNmEn = memberNmEn;
+    }
+
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
     public void delete() {
         super.delete();
         if(profile != null) {

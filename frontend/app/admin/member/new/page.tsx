@@ -602,8 +602,8 @@ export default function MemberNewPage() {
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-			<Box sx={{ flexShrink: 0, width: '100%', padding: '0 1.5rem', mb: '1rem' }}>
-				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: '0.75rem' }}>
+			<Box sx={{ flexShrink: 0, width: '100%', padding: '0 1.5rem', my: '1rem' }}>
+				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
 					<Button startIcon={<ArrowBack />} onClick={() => router.back()} disabled={saving}>
 						뒤로가기
 					</Button>
