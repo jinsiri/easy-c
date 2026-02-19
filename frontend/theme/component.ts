@@ -1,5 +1,6 @@
 import { Theme } from '@mui/material/styles';
 
+import Accordion from './_override/Accordion';
 import Button from './_override/Button';
 import Dialog from './_override/Dialog';
 import IconButton from './_override/IconButton';
@@ -10,6 +11,7 @@ import PickersTextField from './_override/PickersTextField';
 import Tab from './_override/Tab';
 
 const component = (theme: Theme) => ({
+	...Accordion(theme),
 	...Button(theme),
 	...Dialog(theme),
 	...IconButton(theme),

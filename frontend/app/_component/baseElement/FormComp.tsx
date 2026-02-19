@@ -29,11 +29,11 @@ export interface FormProps<T extends FieldValues> {
 
 export const FormWrapper = ({ required, label, direction = 'row', children }: FieldWrapperProps) => (
 	<Box sx={{ display: 'flex', flexDirection: direction, alignItems: direction === 'row' ? 'flex-start' : '', mb: 2 }}>
-		<Typography sx={{ minWidth: direction === 'row' ? 140 : '100%', mt: 1, fontWeight: 500 }}>
+		<Typography sx={{ width: direction === 'row' ? '20%' : '100%', minWidth: direction === 'row' ? 140 : '100%', mt: 1, fontWeight: 500 }}>
 			{label}
 			{required && <span style={{ color: '#ff4d4f', marginLeft: 4 }}>*</span>}
 		</Typography>
-		{children}
+		<Box sx={{ flexGrow: 1 }}>{children}</Box>
 	</Box>
 );
 
