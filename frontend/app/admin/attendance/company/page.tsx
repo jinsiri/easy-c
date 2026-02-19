@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 /** Lib */
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 
 /** MUI */
 import { Box, Button, Grid, IconButton, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
@@ -12,15 +13,20 @@ import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
+import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
-import { WORKSTATUS } from '@/constant/attendanceConst';
+import { WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
+import { formatMinutes } from '@/utils/commonFunc';
 
 /** Type / Interface */
-import { workStatus } from '@/type/types';
+import { workStatus, workType } from '@/type/types';
+import { AttendanceDayResDto } from '@/app/services/attendanceService';
 import { AttendanceCompanyRequestDto, AttendanceCompanyResponseDto, attendancePolicyService } from '@/app/services/attendanceCompanyService';
+
+dayjs.extend(duration);
 
 const unNomalList = [
 	{ key: 'allCount', label: '전체' },
@@ -31,7 +37,13 @@ const unNomalList = [
 ];
 
 export default function AttendanceCompanyPage() {
+	const { setLoader } = useLoaderStore();
+
+	const [searchCategory, setSearchCategory] = useState<string>('memberNm');
+	const [searchValue, setSearchValue] = useState<string>('');
+
 	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
+	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
 	const [countData, setCountData] = useState<Record<string, number>>({
 		allCount: 0,
 		lateCount: 0,
@@ -39,38 +51,46 @@ export default function AttendanceCompanyPage() {
 		absentCount: 0,
 		changeRequestCount: 0,
 	});
-	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
-	const [searchCategory, setSearchCategory] = useState<string>('memberNm');
-	const [searchText, setSearchText] = useState<string>('');
-	const [workStatus, setWorkStatus] = useState<workStatus>('PRESENT');
 
 	const colDefs: ColDef<Record<string, any>>[] = [
-		{ field: 'workDate', headerName: '근무일' },
+		{ field: 'workDate', headerName: '근무일', flex: 1 },
 		{
-			field: 'dept',
-			headerName: '부서/직급',
-			valueFormatter: (param) => {
+			field: 'registerUser',
+			headerName: '근무자',
+			flex: 1,
+			cellRenderer: (param) => {
 				const depthNm = param.data?.depthNm;
 				const jobGrade = param.data?.jobGrade;
 
-				return depthNm && jobGrade ? depthNm + ' / ' + jobGrade : '-';
+				return (
+					<Box sx={{ py: '6px' }}>
+						<Typography>{param.data.registerUser.memberNm}</Typography>
+						<Typography variant='body2'>{depthNm && jobGrade ? depthNm + ' / ' + jobGrade : '-'}</Typography>
+						<Typography>{param.data.attendancePolicyName}</Typography>
+					</Box>
+				);
 			},
 		},
 		{
-			field: 'name',
-			headerName: '근무자',
-			valueFormatter: (param) => (param.data ? param.data.registerUser.memberNm : '-'),
+			field: 'workType',
+			headerName: '근로타입',
+			flex: 1,
+			valueFormatter: (param) => (param.data ? WORKTYPE[param.data.workType as workType] : '-'),
 		},
 		{
 			field: 'workStatus',
-			headerName: '근로 상태',
+			headerName: '근로상태',
+			flex: 1,
 			valueFormatter: (param) => (param.data ? WORKSTATUS[param.data.workStatus as workStatus] : '-'),
 		},
 		{
 			field: 'time',
-			headerName: '근로 시간',
+			headerName: '근로시간',
+			flex: 3,
 			cellRenderer: (param) => (
-				<Box>
+				<Box sx={{ py: '6px' }}>
+					<Typography>총 근로시간(분): {formatMinutes(param.data.fullTime)}</Typography>
+
 					<Typography>출근시간: {param.data.startTime ? dayjs(param.data.startTime).format('HH:mm') : '-'}</Typography>
 					<Typography>퇴근시간: {param.data.endTime ? dayjs(param.data.endTime).format('HH:mm') : '-'}</Typography>
 				</Box>
@@ -80,15 +100,15 @@ export default function AttendanceCompanyPage() {
 
 	useEffect(() => {
 		getAttendanceCompanyOnedayData();
-	}, []);
+	}, [calendarDate]);
 
 	const getAttendanceCompanyOnedayData = async () => {
-		try {
-			const req: AttendanceCompanyRequestDto = {
-				workDate: calendarDate.format('YYYY-MM-DD'),
-			};
+		setLoader(true);
 
-			const res: AttendanceCompanyResponseDto = await attendancePolicyService.getAttendanceCompanyOnedayData(req);
+		try {
+			const res: AttendanceCompanyResponseDto = await attendancePolicyService.getAttendanceCompanyOnedayData({
+				workDate: calendarDate.format('YYYY-MM-DD'),
+			});
 
 			setCountData({
 				allCount: res.allCount,
@@ -99,8 +119,29 @@ export default function AttendanceCompanyPage() {
 			});
 
 			setRowData(res.dayData);
+			setSearchCategory('memberNm');
+			setSearchValue('');
 		} catch (error: any) {
 		} finally {
+			setLoader(false);
+		}
+	};
+
+	const onClickSearch = async () => {
+		setLoader(true);
+
+		try {
+			const req: AttendanceCompanyRequestDto = {
+				workDate: calendarDate.format('YYYY-MM-DD'),
+				searchCategory: searchCategory,
+				searchValue: searchValue,
+			};
+
+			const res: AttendanceDayResDto[] = await attendancePolicyService.getAttendanceCompanySearch(req);
+			setRowData(res);
+		} catch (error: any) {
+		} finally {
+			setLoader(false);
 		}
 	};
 
@@ -113,19 +154,34 @@ export default function AttendanceCompanyPage() {
 		[calendarDate],
 	);
 
-	const handleChangeSearchCategory = (event: SelectChangeEvent) => {
-		setSearchCategory(event.target.value);
-	};
+	const handleChangeSearchCategory = useCallback(
+		(event: SelectChangeEvent) => {
+			const targetValue = event.target.value;
 
-	const onChangeWorkStatus = (event: SelectChangeEvent) => {
-		setWorkStatus(event.target.value as workStatus);
-	};
+			if (searchCategory !== targetValue) {
+				switch (targetValue) {
+					case 'workStatus':
+						setSearchValue('PRESENT');
+						break;
+					default:
+						setSearchValue('');
+				}
+
+				setSearchCategory(targetValue);
+			}
+		},
+		[searchCategory],
+	);
+
+	const onChangeValue = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
+		setSearchValue(event.target.value);
+	}, []);
 
 	const changeSearchCategoryContents = useMemo(() => {
 		switch (searchCategory) {
 			case 'workStatus':
 				return (
-					<Select name={'workStatus'} value={workStatus} onChange={onChangeWorkStatus} size='small' sx={{ minWidth: '10rem', marginRight: '0.5rem' }}>
+					<Select name={'workStatus'} value={searchValue} onChange={onChangeValue} size='small' sx={{ minWidth: '10rem', marginRight: '0.5rem' }}>
 						{Object.entries(WORKSTATUS).map(([key, value]) => (
 							<MenuItem key={key} value={key}>
 								{value}
@@ -134,9 +190,9 @@ export default function AttendanceCompanyPage() {
 					</Select>
 				);
 			default:
-				return <TextField variant='outlined' size='small' value={searchText} />;
+				return <TextField variant='outlined' size='small' value={searchValue} onChange={onChangeValue} />;
 		}
-	}, [searchCategory, workStatus, searchText]);
+	}, [searchCategory, searchValue]);
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
@@ -201,10 +257,12 @@ export default function AttendanceCompanyPage() {
 						<MenuItem value={'workStatus'}>근로상태</MenuItem>
 					</Select>
 					{changeSearchCategoryContents}
-					<Button variant='contained'>검색</Button>
+					<Button variant='contained' onClick={onClickSearch}>
+						검색
+					</Button>
 				</Grid>
 				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='single' rowHeight={60} />
+					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='single' rowHeight={80} />
 				</Grid>
 			</Grid>
 		</Box>

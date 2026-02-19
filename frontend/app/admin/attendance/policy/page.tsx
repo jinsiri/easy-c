@@ -53,6 +53,11 @@ const list: listCollector[] = [
 		key: 'allowMarginMinute',
 		valueFormatter: (data) => <Box>{data.allowMarginMinute}분</Box>,
 	},
+	{
+		name: '적용 근로자(명)',
+		key: 'mappingUserCount',
+		valueFormatter: (data) => <Box>{data.mappingUserCount ?? '-'}명</Box>,
+	},
 ];
 
 export default function AttendancePolicyPage() {
@@ -82,7 +87,7 @@ export default function AttendancePolicyPage() {
 		async (event: React.MouseEventHandler<HTMLButtonElement>, item: AttendancePolicyDto) => {
 			if (item.attendancePolicyId) {
 				setModalData(item);
-				router.push(`/admin/attendance/policy/modal?target=${btoa(item.attendancePolicyId.toString())}`);
+				router.push(`/admin/attendance/policy/data?target=${btoa(item.attendancePolicyId.toString())}`);
 			}
 		},
 		[policyData],
@@ -112,7 +117,7 @@ export default function AttendancePolicyPage() {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
 			<PathBreadcrumbs sx={{ padding: '0 1.5rem' }}>
-				<Button variant='contained' sx={{ height: 'auto' }} onClick={() => router.push('/admin/attendance/policy/modal')}>
+				<Button variant='contained' sx={{ height: 'auto' }} onClick={() => router.push('/admin/attendance/policy/data')}>
 					정책 추가
 				</Button>
 			</PathBreadcrumbs>

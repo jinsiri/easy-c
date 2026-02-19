@@ -58,7 +58,7 @@ public class AttendancePolicyDto {
 
     private Long allowMarginMinute;
 
-
+    private Long mappingUserCount;
 
     public AttendancePolicyDto(AttendancePolicy entity) {
         this.attendancePolicyId = entity.getAttendancePolicyId();

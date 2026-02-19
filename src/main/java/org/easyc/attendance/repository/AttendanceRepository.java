@@ -1,5 +1,6 @@
 package org.easyc.attendance.repository;
 
+import org.easyc.attendance.constant.WorkStatus;
 import org.easyc.attendance.entity.Attendance;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,4 +17,12 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findAllByWorkDate(LocalDate workDate);
 
     Optional<Attendance> findByRegisterUser_LoginIdAndAttendanceId(String loginId, Long attendanceId);
+
+    List<Attendance> findAllByWorkDateAndDeptNm(LocalDate workDate, String deptNm);
+
+    List<Attendance> findAllByWorkDateAndRegisterUser_MemberNm(LocalDate workDate, String memberNm);
+
+    List<Attendance> findAllByWorkDateAndWorkStatus(LocalDate workDate, WorkStatus workStatus);
+
+
 }
