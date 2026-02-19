@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Grid, Stack, IconButton, Button, useTheme, List, ListItem } from '@mui/material';
+import { Box, Button, Grid, IconButton, List, ListItem, Stack, Typography, useTheme } from '@mui/material';
 import { AddCircleOutline, Edit, RemoveCircleOutline } from '@mui/icons-material';
 import { DeptResponseDto } from '@/type/dept';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -92,18 +92,14 @@ export default function AdminDeptListView({ dbData }: Props) {
 		const isConfirmed = await danger('정말 이 부서를 삭제하시겠습니까? 삭제 시 하위부서도 삭제됩니다.');
 
 		if (isConfirmed) {
-			try {
-				await deleteDept(deptId);
-				await success('부서가 정상적으로 삭제되었습니다.');
+			await deleteDept(deptId);
+			await success('부서가 정상적으로 삭제되었습니다.');
 
-				const selectedDept = dbData.find((dept) => dept.deptId === selectedDeptId);
-				const nextId = selectedDept?.treeParentId ?? 1;
-				setSelectedDeptId(nextId);
+			const selectedDept = dbData.find((dept) => dept.deptId === selectedDeptId);
+			const nextId = selectedDept?.treeParentId ?? 1;
+			setSelectedDeptId(nextId);
 
-				router.refresh();
-			} catch (error) {
-				await alert('삭제 중 문제가 발생했습니다.');
-			}
+			router.refresh();
 		}
 	};
 

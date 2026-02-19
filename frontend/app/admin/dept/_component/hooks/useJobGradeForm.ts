@@ -50,9 +50,6 @@ export default function useJobGradeForm(id?: string, onSuccess?: () => void) {
 			} else {
 				router.back();
 			}
-		} catch (error) {
-			console.error(error);
-			await alert('저장 중 오류가 발생했습니다.');
 		} finally {
 			setLoading(false);
 		}

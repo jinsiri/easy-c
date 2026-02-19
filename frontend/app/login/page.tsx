@@ -21,25 +21,21 @@ const LoginPage = () => {
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		try {
-			const publicKey = await authService.getPublicKey();
+		const publicKey = await authService.getPublicKey();
 
-			const encryptedPw = encryptRSA(password, publicKey);
+		const encryptedPw = encryptRSA(password, publicKey);
 
-			const res = await authService.login({
-				loginId: memberId,
-				encryptedPassword: encryptedPw,
-			});
+		const res = await authService.login({
+			loginId: memberId,
+			encryptedPassword: encryptedPw,
+		});
 
-			secureLocalStorage.setItem('loginId', res.loginId);
-			secureLocalStorage.setItem('memberId', res.memberId);
-			secureLocalStorage.setItem('memberRole', res.memberRole);
+		secureLocalStorage.setItem('loginId', res.loginId);
+		secureLocalStorage.setItem('memberId', res.memberId);
+		secureLocalStorage.setItem('memberRole', res.memberRole);
 
-			await alert('로그인 성공!');
-			router.push('/'); // 메인 페이지 이동
-		} catch (error: any) {
-			await alert('로그인 실패!' + error.message);
-		}
+		await alert('로그인 성공!');
+		router.push('/'); // 메인 페이지 이동
 	};
 
 	return (

@@ -114,7 +114,6 @@ export default function AttendancePolicyDataPage() {
 				resetModalData();
 				router.back();
 			}
-		} catch (error: any) {
 		} finally {
 			setLoader(false);
 		}

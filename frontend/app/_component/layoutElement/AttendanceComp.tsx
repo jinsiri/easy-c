@@ -56,7 +56,6 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			} else {
 				startTimeAttendanceData();
 			}
-		} catch (error) {
 		} finally {
 			setLoader(false);
 		}
@@ -90,8 +89,6 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 				setActived(true);
 				if (onSuccess) onSuccess();
 			}
-		} catch (error: any) {
-			alert(error.message);
 		} finally {
 		}
 	};
@@ -109,8 +106,6 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 				setActived(true);
 				if (onSuccess) onSuccess();
 			}
-		} catch (error: any) {
-			alert(error.message);
 		} finally {
 		}
 	};

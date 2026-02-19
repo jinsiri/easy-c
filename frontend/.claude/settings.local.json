@@ -3,7 +3,10 @@
     "allow": [
       "Read(/C:\\workspace\\easy-c/**)",
       "Read(/C:\\workspace\\easy-c\\src\\main\\java\\org\\easyc/**)",
-      "Read(/C:\\workspace\\easy-c\\src\\main\\java\\org\\easyc/**)"
+      "Read(/C:\\workspace\\easy-c\\src\\main\\java\\org\\easyc/**)",
+      "Bash(dir:*)",
+      "Bash(python3:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

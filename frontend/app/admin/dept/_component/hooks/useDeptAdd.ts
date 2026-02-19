@@ -33,9 +33,6 @@ export function useDeptAdd(onSuccess?: () => void) {
 			} else {
 				router.push('/admin/dept/list');
 			}
-		} catch (error) {
-			console.error(error);
-			await alert('저장 중 오류가 발생했습니다.');
 		} finally {
 			setLoading(false);
 		}

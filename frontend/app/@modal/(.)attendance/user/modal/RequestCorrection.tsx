@@ -65,7 +65,6 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 					if (confirm('요청이 성공적으로 등록되었습니다.')) {
 						router.back();
 					}
-				} catch (error: any) {
 				} finally {
 					setLoader(false);
 				}
