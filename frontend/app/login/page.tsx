@@ -11,8 +11,6 @@ import { encryptRSA } from '@/utils/crypto';
 import { useDialogStore } from '@/store/useDialogStore';
 
 const LoginPage = () => {
-	const { alert } = useDialogStore();
-
 	const router = useRouter();
 
 	const [memberId, setMemberId] = useState('');
@@ -34,7 +32,6 @@ const LoginPage = () => {
 		secureLocalStorage.setItem('memberId', res.memberId);
 		secureLocalStorage.setItem('memberRole', res.memberRole);
 
-		await alert('로그인 성공!');
 		router.push('/'); // 메인 페이지 이동
 	};
 
