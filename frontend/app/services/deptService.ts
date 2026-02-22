@@ -1,5 +1,6 @@
 import axiosConfig from '../_lib/axiosConfig';
 import { BulkDeleteRequestDto } from '@/app/services/memberService';
+import { DeptResponseDto } from '@/type/dept';
 
 export interface JobPositionResponseDto {
 	[key: string]: any;
@@ -26,6 +27,8 @@ export interface JobGradeRequestDto {
 }
 
 export const deptService = {
+	getDeptList: () => axiosConfig.get<DeptResponseDto[]>(`/api/dept/tree`),
+
 	// 직위
 	getJobPositions: () => axiosConfig.get<JobPositionResponseDto[]>(`/api/job-positions`),
 	saveJobPositionTemplates: (dtos: JobPositionRequestDto[]) => axiosConfig.post(`/api/job-positions/from-template`, dtos),

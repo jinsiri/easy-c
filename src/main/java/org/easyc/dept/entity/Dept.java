@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.entity.BaseTreeEntity;
+import org.easyc.dept.dto.DeptRequestDto;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -36,6 +37,13 @@ public class Dept extends BaseTreeEntity {
 
     public void addChild() {
         this.treeChildCount++;
+    }
+
+    public void updateInfo(DeptRequestDto dto) {
+        if (dto.getDeptNm() != null && !dto.getDeptNm().isBlank()) this.deptNm = dto.getDeptNm();
+        if (dto.getDeptShortNm() != null && !dto.getDeptShortNm().isBlank()) this.deptShortNm = dto.getDeptShortNm();
+        if (dto.getDeptCode() != null && !dto.getDeptCode().isBlank()) this.deptCode = dto.getDeptCode();
+        if (dto.getDeptEmail() != null && !dto.getDeptEmail().isBlank()) this.deptEmail = dto.getDeptEmail();
     }
 
     public void removeChild() {

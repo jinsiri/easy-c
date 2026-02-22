@@ -58,6 +58,9 @@ public enum CustomExceptionCode {
     // ========== System (시스템) ==========
     SYSTEM_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다."),
     SYSTEM_DB_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 연결에 실패했습니다."),
+
+    // TODO: 정보 없을 때 세분화할 지 아래 코드 하나로 묶을지 얘기해보기 (MEMBER_JOB_NOT_FOUND, ATTENDANCE_NOT_FOUND, ...)
+    SYSTEM_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "관련 정보를 찾을 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

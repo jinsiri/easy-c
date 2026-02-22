@@ -33,11 +33,21 @@ public class DeptController {
         }
     }
 
+    @GetMapping("/{id}")
+    public DeptResponseDto findById(@PathVariable Long id) {
+        return deptService.findById(id);
+    }
+
     @PostMapping
     public ResponseEntity<Dept> saveChildDept(@RequestBody DeptRequestDto deptRequestDto) {
         Dept savedDept = deptService.saveChildDept(deptRequestDto);
 
         return ResponseEntity.ok(savedDept);
+    }
+
+    @PutMapping("/{id}")
+    public void updateDept(@PathVariable Long id, @RequestBody DeptRequestDto dto) {
+        deptService.update(id, dto);
     }
 
     @DeleteMapping("/{deptId}")

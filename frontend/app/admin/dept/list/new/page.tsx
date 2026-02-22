@@ -1,9 +1,9 @@
 'use client';
 
 import { Box, Paper, Typography, Button, Container } from '@mui/material';
-import DeptAddForm from '@/app/admin/dept/_component/DeptAddForm';
+import DeptForm from '@/app/admin/dept/_component/DeptForm';
 import { ArrowBack } from '@mui/icons-material';
-import { useDeptAdd } from '@/app/admin/dept/_component/hooks/useDeptAdd';
+import { useDeptForm } from '@/app/admin/dept/_component/hooks/useDeptForm';
 
 export default function AddDeptPage() {
 	const {
@@ -12,7 +12,7 @@ export default function AddDeptPage() {
 		loading,
 		onSubmit,
 		router,
-	} = useDeptAdd(() => router.back());
+	} = useDeptForm(() => router.back());
 
 	return (
 		<Container maxWidth='md' sx={{ py: 4 }}>
@@ -26,7 +26,7 @@ export default function AddDeptPage() {
 			</Box>
 
 			<Paper sx={{ p: 4 }}>
-				<DeptAddForm control={control} errors={errors} />
+				<DeptForm control={control} errors={errors} />
 				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
 					<Button onClick={() => router.back()} disabled={loading}>
 						취소

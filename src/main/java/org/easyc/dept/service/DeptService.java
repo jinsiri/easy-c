@@ -1,7 +1,8 @@
 package org.easyc.dept.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.exception.CustomException;
+import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.dept.dto.DeptRequestDto;
 import org.easyc.dept.dto.DeptResponseDto;
 import org.easyc.dept.entity.Dept;
@@ -9,6 +10,7 @@ import org.easyc.dept.repository.DeptRepository;
 import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
 import org.easyc.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,6 +33,13 @@ public class DeptService {
 //        Map<String, DeptResponseDto> nodes = new HashMap<>();
 
         return DeptResponseDto.fromEntityList(depts);
+    }
+
+    public DeptResponseDto findById (Long id) {
+        Dept dept = deptRepository.findById(id)
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND));
+
+        return DeptResponseDto.fromEntity(dept);
     }
 
     public Dept saveChildDept(DeptRequestDto deptRequestDto) {
@@ -73,6 +82,15 @@ public class DeptService {
 
         return savedDept;
     }
+
+    @Transactional
+    public void update(Long id, DeptRequestDto dto) {
+        Dept dept = deptRepository.findById(id)
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND));
+
+        dept.updateInfo(dto);
+    }
+
 
     public void softDeleteDept(Long deptId) {
         // 1. 삭제 대상 조회

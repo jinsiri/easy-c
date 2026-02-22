@@ -4,7 +4,7 @@ import { FormItem, FormProps } from '@/app/_component/baseElement/FormComp';
 
 export type DeptAddFormValues = Omit<DeptResponseDto, 'deptId'>;
 
-export default function DeptAddForm({ control, errors }: FormProps<DeptAddFormValues>) {
+export default function DeptForm({ control, errors }: FormProps<DeptAddFormValues>) {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, py: 2 }}>
 			<FormItem name='deptNm' label='부서명' placeholder='부서명을 입력해주세요' required control={control} error={errors.deptNm?.message} />

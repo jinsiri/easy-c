@@ -11,6 +11,9 @@ import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
 import { useEffect, useState } from 'react';
 import axiosConfig from '@/app/_lib/axiosConfig';
 import { useDialogStore } from '@/store/useDialogStore';
+import { useDeptForm } from '@/app/admin/dept/_component/hooks/useDeptForm';
+import DeptForm from '@/app/admin/dept/_component/DeptForm';
+import useRefreshStore from '@/store/useRefreshStore';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -21,11 +24,34 @@ type InfoItem = {
 	value: React.ReactNode;
 };
 
-function InfoList({ items }: { items: InfoItem[] }) {
+function EditDeptForm({ deptId, handleEdit }: { deptId: number; handleEdit: () => void }) {
+	const {
+		control,
+		formState: { errors },
+		loading,
+		onSubmit,
+	} = useDeptForm(deptId, handleEdit);
+
+	return (
+		<>
+			<DeptForm control={control} errors={errors} />
+			<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+				<Button onClick={handleEdit} disabled={loading}>
+					취소
+				</Button>
+				<Button variant='contained' onClick={onSubmit} disabled={loading}>
+					{loading ? '저장 중...' : '저장'}
+				</Button>
+			</Box>
+		</>
+	);
+}
+
+function InfoList({ items, handleEdit }: { items: InfoItem[]; handleEdit: () => void }) {
 	return (
 		<List disablePadding>
 			{items.map(({ label, value }) => (
-				<ListItem key={label} disableGutters disablePadding>
+				<ListItem key={label} disableGutters disablePadding sx={{ mb: 1 }}>
 					<Stack direction='row' spacing={2} alignItems='center' width='100%'>
 						<Typography variant='body2' color='text.primary' sx={{ minWidth: 216 }}>
 							{label}
@@ -33,7 +59,7 @@ function InfoList({ items }: { items: InfoItem[] }) {
 
 						<Typography variant='body2'>
 							{value}
-							<IconButton sx={{ ml: 1 }}>
+							<IconButton sx={{ ml: 1 }} onClick={handleEdit}>
 								<Edit fontSize={'small'} />
 							</IconButton>
 						</Typography>
@@ -42,6 +68,16 @@ function InfoList({ items }: { items: InfoItem[] }) {
 			))}
 		</List>
 	);
+}
+
+function DeptManageComp({ deptId, items }: { deptId: number; items: InfoItem[] }) {
+	const [isEdit, setIsEdit] = useState(false);
+
+	const handleEdit = () => {
+		setIsEdit(!isEdit);
+	};
+
+	return isEdit ? <EditDeptForm deptId={deptId} handleEdit={handleEdit} /> : <InfoList items={items} handleEdit={handleEdit} />;
 }
 
 const mapDeptToTree = (dept: DeptResponseDto) => ({
@@ -53,29 +89,24 @@ const mapDeptToTree = (dept: DeptResponseDto) => ({
 export default function AdminDeptListView({ dbData }: Props) {
 	const router = useRouter();
 	const theme = useTheme();
+	const refreshTicket = useRefreshStore((state) => state.refreshTicket);
 	const rootId = dbData?.[0]?.deptId ? String(dbData[0].deptId) : null;
-	const { alert, success, danger } = useDialogStore();
-	const [selectedDeptId, setSelectedDeptId] = useState<number | null>(dbData?.[0]?.deptId || null);
+	const { success, danger } = useDialogStore();
+	const [selectedDept, setSelectedDept] = useState<DeptResponseDto>(dbData?.[0]);
 	const [expandedIds, setExpandedIds] = useState<string[]>(rootId ? [rootId] : []);
-
-	const dummyDept = {
-		deptNm: dbData?.[0]?.deptNm || '부서 선택 안됨',
-		deptEmail: dbData?.[0]?.deptEmail || '-',
-		deptCode: dbData?.[0]?.deptCode || '-',
-		deptShortNm: dbData?.[0]?.deptShortNm || '-',
-	};
 
 	const deptTabs = [
 		{
 			label: '부서 정보',
 			content: (
 				<Box sx={{ p: '1rem 1.5rem' }}>
-					<InfoList
+					<DeptManageComp
+						deptId={selectedDept?.deptId}
 						items={[
-							{ label: '부서명(한글)', value: dummyDept.deptNm },
-							{ label: '부서메일아이디', value: dummyDept.deptEmail },
-							{ label: '부서코드', value: dummyDept.deptCode },
-							{ label: '부서 약어', value: dummyDept.deptShortNm },
+							{ label: '부서명(한글)', value: selectedDept?.deptNm ?? '부서 미선택' },
+							{ label: '부서메일아이디', value: selectedDept?.deptEmail ?? '-' },
+							{ label: '부서코드', value: selectedDept?.deptCode ?? '-' },
+							{ label: '부서 약어', value: selectedDept?.deptShortNm ?? '-' },
 						]}
 					/>
 				</Box>
@@ -95,9 +126,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 			await deleteDept(deptId);
 			await success('부서가 정상적으로 삭제되었습니다.');
 
-			const selectedDept = dbData.find((dept) => dept.deptId === selectedDeptId);
-			const nextId = selectedDept?.treeParentId ?? 1;
-			setSelectedDeptId(nextId);
+			setSelectedDept(dbData.find((dept) => dept.deptId === selectedDept.deptId) ?? dbData[0]);
 
 			router.refresh();
 		}
@@ -106,9 +135,21 @@ export default function AdminDeptListView({ dbData }: Props) {
 	useEffect(() => {
 		if (dbData?.length > 0 && expandedIds.length === 0) {
 			setExpandedIds([String(dbData[0].deptId)]);
-			setSelectedDeptId(dbData[0].deptId);
+		}
+
+		const updatedDept = dbData.find((d) => d.deptId === selectedDept?.deptId);
+		if (updatedDept) {
+			setSelectedDept(updatedDept);
+		} else {
+			setSelectedDept(dbData[0]);
 		}
 	}, [dbData]);
+
+	useEffect(() => {
+		if (refreshTicket > 0) {
+			router.refresh();
+		}
+	}, [refreshTicket]);
 
 	return (
 		<Box
@@ -139,11 +180,11 @@ export default function AdminDeptListView({ dbData }: Props) {
 
 					<Box sx={{ mb: 1 }}>
 						<Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-							<IconButton className='contained-primary light' onClick={() => router.push(`/admin/dept/list/add?parentId=${selectedDeptId}`)}>
+							<IconButton className='contained-primary light' onClick={() => router.push(`/admin/dept/list/new?parentId=${selectedDept.deptId}`)}>
 								<AddCircleOutline className='svg-small' />
 							</IconButton>
-							{selectedDeptId && selectedDeptId !== 1 && (
-								<IconButton className='contained-primary light' onClick={() => handleDelete(selectedDeptId)}>
+							{selectedDept.deptId && selectedDept.deptId !== 1 && (
+								<IconButton className='contained-primary light' onClick={() => handleDelete(selectedDept.deptId)}>
 									<RemoveCircleOutline className='svg-small' />
 								</IconButton>
 							)}
@@ -156,10 +197,11 @@ export default function AdminDeptListView({ dbData }: Props) {
 							mapEntityToTree={mapDeptToTree}
 							expandedIds={expandedIds}
 							onExpandedItemsChange={(ids) => setExpandedIds(ids)}
-							selectedId={String(selectedDeptId)}
+							selectedId={String(selectedDept.deptId)}
 							placeholder='부서명을 검색하세요.'
 							onNodeClick={(node) => {
-								setSelectedDeptId(Number(node.id));
+								setSelectedDept(node);
+								console.log(node);
 							}}
 						/>
 					</Box>
@@ -174,7 +216,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 					sx={{ display: 'flex', flexDirection: 'column' }}
 				>
 					<Box sx={{ display: 'flex', alignItems: 'center', mb: '1rem' }}>
-						<Typography sx={{ mr: '1.5rem', fontSize: '1.125rem', fontWeight: 'bold' }}>{dummyDept.deptNm}</Typography>
+						<Typography sx={{ mr: '1.5rem', fontSize: '1.125rem', fontWeight: 'bold' }}>{selectedDept?.deptNm ?? '부서 미선택'}</Typography>
 						<Box sx={{ flexGrow: 1, height: '1px', bgcolor: theme.palette.grey[300] }} />
 					</Box>
 
