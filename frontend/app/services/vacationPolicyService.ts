@@ -11,7 +11,7 @@ export interface vacationPolicyRequestController {
 	nextYearLeaveUsed: boolean;
 }
 
-export interface vacationPolicyDto {
+export interface VacationPolicyDto {
 	vacationPolicyName: string;
 	vacationPolicyDesc: string;
 	vacationPolicyType: vacationPolicyType;
@@ -23,7 +23,7 @@ export interface vacationPolicyDto {
 
 // API 정의
 export const vacationPolicyService = {
-	//getAttendancePolicyData: () => axiosConfig.get<AttendancePolicyDto[]>('/api/attendance/policy/all'),
-	//saveAttendancePolicyData: (req: AttendancePolicyDto) => axiosConfig.post<AttendancePolicyDto[]>('/api/attendance/policy/save', req),
-	//delteAttendancePolicyData: (id: string) => axiosConfig.delete<AttendancePolicyDto[]>(`/api/attendance/policy/delete?target=${id}`),
+	getVacationPolicyData: () => axiosConfig.get<VacationPolicyDto[]>('/api/vacation/policy/all'),
+	saveVacationPolicyData: (req: VacationPolicyDto) => axiosConfig.post<void>('/api/vacation/policy/save', req),
+	delteAttendancePolicyData: (id: string) => axiosConfig.delete<void>(`/api/vacation/policy/delete?target=${id}`),
 };

@@ -1,5 +1,5 @@
 /** MUI */
-import { AccountTree, WorkHistoryRounded, CalendarMonthRounded } from '@mui/icons-material';
+import { AccountTree, WorkHistoryRounded, CalendarMonthRounded, BeachAccessRounded } from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '@/type/types';
@@ -99,6 +99,27 @@ const AdminMenuItem: menuType[] = [
 					{
 						id: 'admin-attendance-policy',
 						title: '근태 정책 관리',
+						type: '2depth',
+						url: '/policy',
+					},
+				],
+			},
+			{
+				id: 'admin-vacation',
+				title: '휴가 관리',
+				type: '1depth',
+				url: '/vacation',
+				icon: BeachAccessRounded,
+				children: [
+					{
+						id: 'admin-vacation-company',
+						title: '전사 휴가 관리',
+						type: '2depth',
+						url: '/company',
+					},
+					{
+						id: 'admin-vacation-policy',
+						title: '휴가 정책 관리',
 						type: '2depth',
 						url: '/policy',
 					},
