@@ -30,6 +30,7 @@ public class AttendanceDayResponseDto {
     private WorkType workType;
     private WorkStatus workStatus;
     private VacationType vacationType;
+    private Long changeRequestId;
     private String detail;
 
     public AttendanceDayResponseDto(Attendance entity) {
@@ -47,6 +48,7 @@ public class AttendanceDayResponseDto {
         this.workStatus = entity.getWorkStatus();
         this.vacationType = entity.getVacationType();
     }
+
 }
 
 

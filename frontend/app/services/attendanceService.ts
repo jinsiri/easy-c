@@ -34,6 +34,7 @@ export interface AttendanceDayResDto {
 	workType?: workType;
 	workStatus?: workStatus;
 	vacationType?: vacationType;
+	changeRequestId?: number;
 	detail?: string;
 }
 

@@ -36,8 +36,14 @@ public class AttendanceChangeRequestService {
 
         /** login id로 depthNm, RoleGrade추가 **/
 
+        AttendanceChangeRequest prevRequest = attendanceChangeRequestRepository.findTopByWorkDateAndRegisterUser_LoginId(req.getWorkDate(), req.getLoginId()).orElse(null);
         AttendanceChangeRequest attendanceChangeRequest = req.returnAttendanceChangeEntity();
         attendanceChangeRequest.setType(type);
+
+        if(prevRequest != null){
+            attendanceChangeRequest.setWorkRequestId(prevRequest.getWorkRequestId());
+        }
+
         attendanceChangeRequestRepository.save(attendanceChangeRequest);
     }
 
