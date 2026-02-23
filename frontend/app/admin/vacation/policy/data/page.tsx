@@ -33,17 +33,10 @@ import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import { FormWrapper, FormItem } from '@/app/_component/baseElement/FormComp';
 
 /** Type / Interface */
-import { VACATIONPOLICYTYPE } from '@/constant/vacationConst';
-import { AttendancePolicyDto, attendancePolicyService } from '@/app/services/attendancePolicyService';
-import { vacationPolicyRequestController } from '@/app/services/vacationPolicyService';
+import { VACATIONPOLICYTYPE, VACATIONPOLICYUNIT } from '@/constant/vacationConst';
+import { vacationPolicyRequestController, VacationPolicyDto, vacationPolicyService } from '@/app/services/vacationPolicyService';
 
-const unit = [
-	{ key: '0.5', label: '반차(0.5일)' },
-	{
-		key: '1',
-		label: '1일',
-	},
-];
+const unit = ['0.5', '1'];
 
 export default function VacationPolicyDataPage() {
 	const router = useRouter();
@@ -73,15 +66,8 @@ export default function VacationPolicyDataPage() {
 
 	useEffect(() => {
 		if (modalData) {
-			console.log(modalData);
 			reset({
 				...modalData,
-				startTime: modalData.startTime ? dayjs(modalData.startTime, 'HH:mm') : null,
-				endTime: modalData.endTime ? dayjs(modalData.endTime, 'HH:mm') : null,
-				coreStartTime: modalData.coreStartTime ? dayjs(modalData.coreStartTime, 'HH:mm') : null,
-				coreEndTime: modalData.coreEndTime ? dayjs(modalData.coreEndTime, 'HH:mm') : null,
-				halfLeaveStartTime: modalData.halfLeaveStartTime ? dayjs(modalData.halfLeaveStartTime, 'HH:mm') : null,
-				halfLeaveEndTime: modalData.halfLeaveEndTime ? dayjs(modalData.halfLeaveEndTime, 'HH:mm') : null,
 			});
 		}
 	}, [modalData, reset]);
@@ -89,19 +75,11 @@ export default function VacationPolicyDataPage() {
 	const handleSave = handleSubmit(async (data) => {
 		setLoader(true);
 		try {
-			const request: AttendancePolicyDto = {
+			const request: VacationPolicyDto = {
 				...data,
-				attendancePolicyId: modalData?.attendancePolicyId,
-				startTime: data.startTime ? data.startTime?.format('HH:mm') : null,
-				endTime: data.endTime ? data.endTime.format('HH:mm') : null,
-				coreStartTime: data.coreStartTime ? data.coreStartTime.format('HH:mm') : null,
-				coreEndTime: data.coreEndTime ? data.coreEndTime.format('HH:mm') : null,
-				halfLeaveStartTime: data.halfLeaveStartTime ? data.halfLeaveStartTime.format('HH:mm') : null,
-				halfLeaveEndTime: data.halfLeaveEndTime ? data.halfLeaveEndTime.format('HH:mm') : null,
-				allowMarginMinute: Number(data.allowMarginMinute),
 			};
 
-			await attendancePolicyService.saveAttendancePolicyData(request);
+			await vacationPolicyService.saveVacationPolicyData(request);
 			if (confirm('요청이 성공적으로 등록되었습니다.')) {
 				resetModalData();
 				router.back();
@@ -155,7 +133,7 @@ export default function VacationPolicyDataPage() {
 							control={control}
 							error={errors.vacationPolicyDesc?.message}
 						/>
-						<FormWrapper label='휴가생성기준' required>
+						<FormWrapper label='휴가생성 기준' required>
 							<Controller
 								name='vacationPolicyType'
 								control={control}
@@ -176,7 +154,7 @@ export default function VacationPolicyDataPage() {
 								)}
 							/>
 						</FormWrapper>
-						<FormWrapper label='휴가사용단위' required>
+						<FormWrapper label='휴가사용 단위' required>
 							<Controller
 								name='vacationPolicyUnit'
 								control={control}
@@ -189,8 +167,8 @@ export default function VacationPolicyDataPage() {
 										sx={{ minWidth: '10rem', marginRight: '0.5rem' }}
 									>
 										{unit.map((item, idx) => (
-											<MenuItem key={idx} value={item.key}>
-												{item.label}
+											<MenuItem key={idx} value={item}>
+												{VACATIONPOLICYUNIT[item]}
 											</MenuItem>
 										))}
 									</Select>

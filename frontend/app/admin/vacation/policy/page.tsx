@@ -10,28 +10,30 @@ import useModalStore from '@/store/useModalStore';
 
 /** MUI */
 import { Box, Button, Grid, IconButton, Typography, Chip } from '@mui/material';
-import { DeleteRounded, BorderColorRounded } from '@mui/icons-material';
+import { DeleteRounded, BorderColorRounded, CloseRounded, CheckRounded } from '@mui/icons-material';
 import { grey } from '@mui/material/colors';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 
 /** Type / Interface */
-import { AttendancePolicyDto } from '@/app/services/attendancePolicyService';
 import { VacationPolicyDto, vacationPolicyService } from '@/app/services/vacationPolicyService';
-import { ATTENDANCETYPE, SETTLEMENTPERIOD, WORKTIMERULE } from '@/constant/attendanceConst';
-import { attendanceType, settlementPeriod } from '@/type/types';
+import { VACATIONPOLICYTYPE, VACATIONPOLICYUNIT } from '@/constant/vacationConst';
 
 interface listCollector {
 	name: string;
 	key: string;
-	valueFormatter?: (data: AttendancePolicyDto) => ReactNode;
+	valueFormatter?: (data: VacationPolicyDto) => ReactNode;
 }
 
 const list: listCollector[] = [
-	{ name: '기준타입', key: 'attendanceType', valueFormatter: (data) => <Box>{ATTENDANCETYPE[data.attendanceType as attendanceType]}</Box> },
-	{ name: '정산기간', key: 'settlementPeriod', valueFormatter: (data) => <Box>{SETTLEMENTPERIOD[data.settlementPeriod as settlementPeriod]}</Box> },
-	{ name: '근로규칙', key: 'worktimeRule', valueFormatter: (data) => <Box>{WORKTIMERULE[data.worktimeRule]}</Box> },
+	{ name: '휴가생성 기준', key: 'vacationPolicyType', valueFormatter: (data) => <Box>{VACATIONPOLICYTYPE[data.vacationPolicyType] + ' 기준'}</Box> },
+	{ name: '휴가사용 단위', key: 'vacationPolicyUnit', valueFormatter: (data) => <Box>{VACATIONPOLICYUNIT[data.vacationPolicyUnit]}</Box> },
+	{
+		name: '내년연차 사용',
+		key: 'nextYearLeaveUsed',
+		valueFormatter: (data) => <Box>{data.nextYearLeaveUsed ? <CheckRounded fontSize='small' /> : <CloseRounded fontSize='small' />}</Box>,
+	},
 
 	{
 		name: '적용 근로자(명)',
@@ -48,10 +50,10 @@ export default function VacationPolicyPage() {
 	const [policyData, setPolicyData] = useState<VacationPolicyDto[]>([]);
 
 	useEffect(() => {
-		getAttendancePolicyData();
+		getVacationPolicyData();
 	}, []);
 
-	const getAttendancePolicyData = async () => {
+	const getVacationPolicyData = async () => {
 		if (!loader) setLoader(true);
 
 		try {
@@ -64,26 +66,26 @@ export default function VacationPolicyPage() {
 	};
 
 	const onClickUpdateButton = useCallback(
-		async (event: React.MouseEventHandler<HTMLButtonElement>, item: AttendancePolicyDto) => {
-			if (item.attendancePolicyId) {
+		async (event: React.MouseEventHandler<HTMLButtonElement>, item: VacationPolicyDto) => {
+			if (item.vacationPolicyId) {
 				setModalData(item);
-				router.push(`/admin/vacation/policy/data?target=${btoa(item.attendancePolicyId.toString())}`);
+				router.push(`/admin/vacation/policy/data?target=${btoa(item.vacationPolicyId.toString())}`);
 			}
 		},
 		[policyData],
 	);
 
 	const onClickDeleteButton = useCallback(
-		async (event: React.MouseEventHandler<HTMLButtonElement>, item: AttendancePolicyDto) => {
+		async (event: React.MouseEventHandler<HTMLButtonElement>, item: VacationPolicyDto) => {
 			try {
-				if (item.attendancePolicyId && confirm('정말 해당 정책을 삭제하시겠습니까?')) {
+				if (item.vacationPolicyId && confirm('정말 해당 정책을 삭제하시겠습니까?')) {
 					setLoader(true);
 
-					const encodedId = btoa(item.attendancePolicyId.toString());
-					await vacationPolicyService.delteAttendancePolicyData(encodedId);
+					const encodedId = btoa(item.vacationPolicyId.toString());
+					await vacationPolicyService.delteVacationPolicyData(encodedId);
 
 					if (confirm('정책이 성공적으로 삭제되었습니다.')) {
-						getAttendancePolicyData();
+						getVacationPolicyData();
 					}
 				}
 			} catch (error: any) {
