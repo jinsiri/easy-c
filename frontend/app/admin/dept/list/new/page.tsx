@@ -12,7 +12,7 @@ export default function AddDeptPage() {
 		loading,
 		onSubmit,
 		router,
-	} = useDeptForm(() => router.back());
+	} = useDeptForm(null, () => router.back());
 
 	return (
 		<Container maxWidth='md' sx={{ py: 4 }}>

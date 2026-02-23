@@ -14,6 +14,7 @@ import { useDialogStore } from '@/store/useDialogStore';
 import { useDeptForm } from '@/app/admin/dept/_component/hooks/useDeptForm';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
 import useRefreshStore from '@/store/useRefreshStore';
+import { useDeptTreeStore } from '@/store/useDeptTreeStore';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -22,6 +23,7 @@ interface Props {
 type InfoItem = {
 	label: string;
 	value: React.ReactNode;
+	field?: string;
 };
 
 function EditDeptForm({ deptId, handleEdit }: { deptId: number; handleEdit: () => void }) {
@@ -47,10 +49,10 @@ function EditDeptForm({ deptId, handleEdit }: { deptId: number; handleEdit: () =
 	);
 }
 
-function InfoList({ items, handleEdit }: { items: InfoItem[]; handleEdit: () => void }) {
+function InfoList({ deptId, items, handleEdit }: { deptId: number; items: InfoItem[]; handleEdit: () => void }) {
 	return (
 		<List disablePadding>
-			{items.map(({ label, value }) => (
+			{items.map(({ label, value, field }) => (
 				<ListItem key={label} disableGutters disablePadding sx={{ mb: 1 }}>
 					<Stack direction='row' spacing={2} alignItems='center' width='100%'>
 						<Typography variant='body2' color='text.primary' sx={{ minWidth: 216 }}>
@@ -59,9 +61,11 @@ function InfoList({ items, handleEdit }: { items: InfoItem[]; handleEdit: () => 
 
 						<Typography variant='body2'>
 							{value}
-							<IconButton sx={{ ml: 1 }} onClick={handleEdit}>
-								<Edit fontSize={'small'} />
-							</IconButton>
+							{(deptId === 1 && field === 'deptNm') || (
+								<IconButton sx={{ ml: 1 }} onClick={handleEdit}>
+									<Edit fontSize={'small'} />
+								</IconButton>
+							)}
 						</Typography>
 					</Stack>
 				</ListItem>
@@ -77,7 +81,7 @@ function DeptManageComp({ deptId, items }: { deptId: number; items: InfoItem[] }
 		setIsEdit(!isEdit);
 	};
 
-	return isEdit ? <EditDeptForm deptId={deptId} handleEdit={handleEdit} /> : <InfoList items={items} handleEdit={handleEdit} />;
+	return isEdit ? <EditDeptForm deptId={deptId} handleEdit={handleEdit} /> : <InfoList deptId={deptId} items={items} handleEdit={handleEdit} />;
 }
 
 const mapDeptToTree = (dept: DeptResponseDto) => ({
@@ -89,11 +93,10 @@ const mapDeptToTree = (dept: DeptResponseDto) => ({
 export default function AdminDeptListView({ dbData }: Props) {
 	const router = useRouter();
 	const theme = useTheme();
-	const refreshTicket = useRefreshStore((state) => state.refreshTicket);
-	const rootId = dbData?.[0]?.deptId ? String(dbData[0].deptId) : null;
 	const { success, danger } = useDialogStore();
-	const [selectedDept, setSelectedDept] = useState<DeptResponseDto>(dbData?.[0]);
-	const [expandedIds, setExpandedIds] = useState<string[]>(rootId ? [rootId] : []);
+	const { expandedIds, setExpandedIds, selectedId, setSelectedId, _hasHydrated } = useDeptTreeStore();
+	const rootId = dbData?.[0]?.deptId ? String(dbData[0].deptId) : null;
+	const selectedDept = dbData.find((d) => d.deptId === Number(selectedId)) ?? dbData[0];
 
 	const deptTabs = [
 		{
@@ -103,7 +106,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 					<DeptManageComp
 						deptId={selectedDept?.deptId}
 						items={[
-							{ label: '부서명(한글)', value: selectedDept?.deptNm ?? '부서 미선택' },
+							{ label: '부서명(한글)', value: selectedDept?.deptNm ?? '부서 미선택', field: 'deptNm' },
 							{ label: '부서메일아이디', value: selectedDept?.deptEmail ?? '-' },
 							{ label: '부서코드', value: selectedDept?.deptCode ?? '-' },
 							{ label: '부서 약어', value: selectedDept?.deptShortNm ?? '-' },
@@ -122,34 +125,41 @@ export default function AdminDeptListView({ dbData }: Props) {
 	const handleDelete = async (deptId: number) => {
 		const isConfirmed = await danger('정말 이 부서를 삭제하시겠습니까? 삭제 시 하위부서도 삭제됩니다.');
 
-		if (isConfirmed) {
-			await deleteDept(deptId);
-			await success('부서가 정상적으로 삭제되었습니다.');
+		if (!isConfirmed) return;
 
-			setSelectedDept(dbData.find((dept) => dept.deptId === selectedDept.deptId) ?? dbData[0]);
+		const targetDept = dbData.find((d) => d.deptId === deptId);
+		if (!targetDept) return;
 
-			router.refresh();
-		}
+		const parentId = targetDept.treeParentId ?? dbData[0].deptId;
+
+		await deleteDept(deptId);
+		await success('부서가 정상적으로 삭제되었습니다.');
+
+		setSelectedId(String(parentId));
+		router.refresh();
 	};
+
+	useEffect(() => {
+		if (!_hasHydrated) return;
+
+		if (!selectedId && rootId) {
+			setSelectedId(rootId);
+		}
+	}, [_hasHydrated, selectedId, rootId]);
 
 	useEffect(() => {
 		if (dbData?.length > 0 && expandedIds.length === 0) {
 			setExpandedIds([String(dbData[0].deptId)]);
 		}
 
-		const updatedDept = dbData.find((d) => d.deptId === selectedDept?.deptId);
-		if (updatedDept) {
-			setSelectedDept(updatedDept);
-		} else {
-			setSelectedDept(dbData[0]);
+		if (selectedId) {
+			const exists = dbData.some((d) => d.deptId === Number(selectedId));
+
+			if (!exists && dbData[0]) {
+				setSelectedId(String(dbData[0].deptId));
+			}
 		}
 	}, [dbData]);
-
-	useEffect(() => {
-		if (refreshTicket > 0) {
-			router.refresh();
-		}
-	}, [refreshTicket]);
 
 	return (
 		<Box
@@ -197,11 +207,10 @@ export default function AdminDeptListView({ dbData }: Props) {
 							mapEntityToTree={mapDeptToTree}
 							expandedIds={expandedIds}
 							onExpandedItemsChange={(ids) => setExpandedIds(ids)}
-							selectedId={String(selectedDept.deptId)}
+							selectedId={String(selectedId)}
 							placeholder='부서명을 검색하세요.'
 							onNodeClick={(node) => {
-								setSelectedDept(node);
-								console.log(node);
+								setSelectedId(String(node.deptId));
 							}}
 						/>
 					</Box>

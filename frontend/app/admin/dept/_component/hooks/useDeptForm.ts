@@ -5,10 +5,7 @@ import axiosConfig from '@/app/_lib/axiosConfig';
 import { DeptAddFormValues } from '@/app/admin/dept/_component/DeptForm';
 import useRefreshStore from '@/store/useRefreshStore';
 
-// todo:
-//  1. 수정 로직 전면 개편, 부서아이디 필요함
-//  2. 코드 지저분함
-export function useDeptForm(id?: number, onSuccess?: () => void) {
+export function useDeptForm(id?: number | null, onSuccess?: () => void) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const parentIdStr = searchParams.get('parentId');
@@ -34,12 +31,11 @@ export function useDeptForm(id?: number, onSuccess?: () => void) {
 			if (isEditMode && id) {
 				const response = await axiosConfig.get(`/api/dept/${id}`);
 				reset(response);
-				console.log('데이터 로드');
-				console.log(response);
 			}
 		};
+
 		fetchDetail();
-	}, [id, isEditMode, reset, alert]);
+	}, [id, isEditMode, reset]);
 
 	const onSubmit = formMethods.handleSubmit(async (data) => {
 		setLoading(true);
@@ -49,13 +45,16 @@ export function useDeptForm(id?: number, onSuccess?: () => void) {
 			} else {
 				await axiosConfig.post('/api/dept', data);
 			}
-			triggerRefresh();
 
-			if (onSuccess) {
-				onSuccess();
-			} else {
-				router.back();
-			}
+			router.refresh();
+
+			setTimeout(() => {
+				if (onSuccess) {
+					onSuccess();
+				} else {
+					router.back();
+				}
+			}, 300);
 		} finally {
 			setLoading(false);
 		}

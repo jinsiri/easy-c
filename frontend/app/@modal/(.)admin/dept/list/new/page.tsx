@@ -10,7 +10,6 @@ export default function AddDeptModal() {
 		formState: { errors },
 		loading,
 		onSubmit,
-		router,
 	} = useDeptForm();
 
 	return (
