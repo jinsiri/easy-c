@@ -67,3 +67,51 @@ SELECT setval(
     COALESCE((SELECT MAX(mapping_id) FROM attendance_policy_map), 1),
     true
 );
+
+--휴가 정책 초기
+INSERT INTO vacation_policy (
+    deleted,
+    active,
+    vacation_policy_id,
+    vacation_policy_name,
+    vacation_policy_desc,
+    vacation_policy_type,
+    vacation_policy_unit,
+    annual_leave_expired,
+    month_leave_expired,
+    next_year_leave_used
+)
+VALUES (
+    false,
+    true,
+    1,
+    '기본 휴가 정책',
+    null,
+    'WORKING_DAY',
+    '0.5',
+    true,
+    true,
+    true
+)
+ON CONFLICT (vacation_policy_id) DO NOTHING;
+
+-- 시퀀스 설정 수정
+SELECT setval(
+    'vacation_policy_seq',
+    COALESCE((SELECT MAX(vacation_policy_id) FROM vacation_policy), 1),
+    true -- 차후 NEXTVAL 호출 시 MAX+1이 나오도록 설정
+);
+
+--휴가정책 맵핑 데이터 세팅
+INSERT INTO vacation_policy_map (mapping_id, vacation_policy_id, member_id, deleted)
+SELECT 1, 1, 1, false
+WHERE NOT EXISTS (
+    SELECT 1 FROM vacation_policy_map
+);
+
+-- 시퀀스 설정 수정
+SELECT setval(
+    'vacation_policy_map_seq',
+    COALESCE((SELECT MAX(mapping_id) FROM vacation_policy_map), 1),
+    true
+);

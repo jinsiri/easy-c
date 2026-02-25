@@ -23,9 +23,6 @@ public class VacationPolicyMap {
     @Column(name = "member_id")
     private Long memberId;
 
-    @Column(name = "login_id")
-    private String loginId;
-
     @Builder.Default
     private boolean deleted = false;
 

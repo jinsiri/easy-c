@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface VacationPolicyMapRepository extends JpaRepository<VacationPolicyMap, Long> {
-    Optional<VacationPolicyMap> findTopByLoginIdAndDeletedFalseOrderByMappingIdDesc(String loginId);
+    Optional<VacationPolicyMap> findTopByMemberIdAndDeletedFalseOrderByMappingIdDesc(Long memberId);
 
     @Query("SELECT a.vacationPolicyId, count(a) FROM VacationPolicyMap a GROUP BY a.vacationPolicyId")
     List<Object[]> countGroupByVacationPolicyId();

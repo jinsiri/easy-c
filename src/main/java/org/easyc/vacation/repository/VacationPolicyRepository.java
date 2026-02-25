@@ -13,4 +13,5 @@ public interface VacationPolicyRepository extends JpaRepository<VacationPolicy, 
     Optional<VacationPolicy> findByVacationPolicyId(Long vacationPolicyId);
     List<VacationPolicy> findAllByActiveTrueOrderByVacationPolicyIdAsc();
 
+    VacationPolicy findAllByVacationPolicyId(Long vacationPolicyId);
 }
