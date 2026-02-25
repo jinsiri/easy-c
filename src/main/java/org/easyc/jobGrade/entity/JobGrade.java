@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.entity.BaseEntity;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
@@ -13,6 +14,7 @@ import org.easyc.common.entity.BaseEntity;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Table(name="job_grade")
+@SQLRestriction("deleted = false")
 public class JobGrade extends BaseEntity {
     @Id
     @SequenceGenerator(name="job_grade_seq", sequenceName="job_grade_seq", allocationSize=1)
