@@ -77,7 +77,6 @@ export default function AttendancePolicyPage() {
 		try {
 			const res = await attendancePolicyService.getAttendancePolicyData();
 			setPolicyData(res);
-		} catch (error: any) {
 		} finally {
 			setLoader(false);
 		}
@@ -106,7 +105,6 @@ export default function AttendancePolicyPage() {
 						getAttendancePolicyData();
 					}
 				}
-			} catch (error: any) {
 			} finally {
 				setLoader(false);
 			}

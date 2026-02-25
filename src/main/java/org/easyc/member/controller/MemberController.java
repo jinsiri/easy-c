@@ -78,7 +78,7 @@ public class MemberController {
      * @param memberId 조회할 멤버 ID
      * @return 멤버의 경력 정보 리스트 (MemberCareerResponseDto)
      */
-    @GetMapping("/{memberId}/career")
+    @GetMapping("/{memberId}/careers")
     public List<MemberCareerResponseDto> getMemberCareerInfo(@PathVariable Long memberId) {
         return memberService.getMemberCareers(memberId);
     }
@@ -89,7 +89,7 @@ public class MemberController {
      * @param memberId 조회할 멤버 ID
      * @return 멤버의 포상/징계 정보 리스트 (MemberRewardDisciplineResponseDto)
      */
-    @GetMapping("/{memberId}/reward-discipline")
+    @GetMapping("/{memberId}/reward-disciplines")
     public List<MemberRewardDisciplineResponseDto> getMemberRewardDisciplineInfo(@PathVariable Long memberId) {
         return memberService.getMemberRewardAndDisciplines(memberId);
     }
@@ -100,7 +100,7 @@ public class MemberController {
      * @param memberId 조회할 멤버 ID
      * @return 멤버의 자격 정보 리스트 (MemberQualificationResponseDto)
      */
-    @GetMapping("/{memberId}/qualification")
+    @GetMapping("/{memberId}/qualifications")
     public List<MemberQualificationResponseDto> getMemberQualificationInfo(
             @PathVariable Long memberId) {
         return memberService.getMemberQualifications(memberId);
@@ -116,6 +116,44 @@ public class MemberController {
     public List<MemberLanguageResponseDto> getMemberLanguageInfo(
             @PathVariable Long memberId) {
         return memberService.getMemberLanguages(memberId);
+    }
+
+    /**
+     * 멤버 등록
+     */
+    @PostMapping
+    public void createMember(@RequestBody MemberCreateRequestDto dto) {
+        memberService.createMember(
+                dto.toJoinDto(),
+                dto.toProfileDto(),
+                dto.toPersonalDto(),
+                dto.getCareerListOrEmpty(),
+                dto.getRewardDisciplineListOrEmpty(),
+                dto.getQualificationListOrEmpty(),
+                dto.getLanguageListOrEmpty()
+        );
+    }
+
+    /**
+     * 멤버 수정
+     *
+     * @param memberId 수정할 멤버 ID
+     * @param dto      수정 데이터
+     */
+    @PutMapping("/{memberId}")
+    public void updateMember(@PathVariable Long memberId, @RequestBody MemberUpdateRequestDto dto) {
+        memberService.updateMember(memberId, dto);
+    }
+
+    /**
+     * 비밀번호 변경
+     *
+     * @param memberId 변경할 멤버 ID
+     * @param dto      새 비밀번호
+     */
+    @PutMapping("/{memberId}/password")
+    public void updatePassword(@PathVariable Long memberId, @RequestBody MemberPasswordUpdateRequestDto dto) {
+        memberService.updatePassword(memberId, dto.getPassword());
     }
 
     /**

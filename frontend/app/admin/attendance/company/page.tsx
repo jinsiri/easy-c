@@ -121,7 +121,6 @@ export default function AttendanceCompanyPage() {
 			setRowData(res.dayData);
 			setSearchCategory('memberNm');
 			setSearchValue('');
-		} catch (error: any) {
 		} finally {
 			setLoader(false);
 		}
@@ -139,7 +138,6 @@ export default function AttendanceCompanyPage() {
 
 			const res: AttendanceDayResDto[] = await attendancePolicyService.getAttendanceCompanySearch(req);
 			setRowData(res);
-		} catch (error: any) {
 		} finally {
 			setLoader(false);
 		}

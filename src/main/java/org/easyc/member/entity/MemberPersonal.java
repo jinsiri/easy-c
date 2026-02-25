@@ -3,10 +3,7 @@ package org.easyc.member.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.easyc.common.entity.BaseEntity;
-import org.easyc.member.constant.DisabilityRecognition;
-import org.easyc.member.constant.DisabilityType;
-import org.easyc.member.constant.Gender;
-import org.easyc.member.constant.Nationality;
+import org.easyc.member.constant.*;
 import org.easyc.member.dto.MemberPersonalRequestDto;
 
 import java.time.LocalDate;
@@ -45,7 +42,8 @@ public class MemberPersonal extends BaseEntity { //회원정보_개인정보
 
     // 보훈 정보
     // 보훈 구분
-    private String veteranType; //to enum
+    @Enumerated(EnumType.STRING)
+    private VeteranType veteranType; //to enum
     // 보훈번호
     private String veteranNumber;
     // 보훈 가족 여부
@@ -94,6 +92,26 @@ public class MemberPersonal extends BaseEntity { //회원정보_개인정보
         this.accountNumber = dto.getAccountNumber();
         this.accountHolderName = dto.getAccountHolderName();
         this.accountType = dto.getAccountType();
+    }
+
+    public void update(MemberPersonalRequestDto dto) {
+        this.dateOfBirth = dto.getDateOfBirth();
+        this.gender = dto.getGender();
+        this.phoneNumber = dto.getPhoneNumber();
+        this.externalEmail = dto.getExternalEmail();
+        this.nationality = dto.getNationality();
+        this.address = dto.getAddress();
+        this.faxNumber = dto.getFaxNumber();
+        this.veteranType = dto.getVeteranType();
+        this.veteranNumber = dto.getVeteranNumber();
+        this.veteranFamily = dto.getVeteranFamily();
+        this.disabilityRegistrationNumber = dto.getDisabilityRegistrationNumber();
+        this.disabilityType = dto.getDisabilityType();
+        this.disabilityGrade = dto.getDisabilityGrade();
+        this.disabilityRecognition = dto.getDisabilityRecognition();
+        this.bankName = dto.getBankName();
+        this.accountNumber = dto.getAccountNumber();
+        this.accountHolderName = dto.getAccountHolderName();
     }
 
     public boolean isVeteranFamily() {

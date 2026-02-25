@@ -59,16 +59,25 @@ export const memberService = {
 	getMemberPersonalInfo: (memberId: number) => axiosConfig.get<MemberPersonalResponseDto>(`/api/members/${memberId}/personal`),
 
 	// 경력 탭 조회
-	getMemberCareerInfo: (memberId: number) => axiosConfig.get<MemberCareerResponseDto[]>(`/api/members/${memberId}/career`),
+	getMemberCareerInfo: (memberId: number) => axiosConfig.get<MemberCareerResponseDto[]>(`/api/members/${memberId}/careers`),
 
 	// 포상/징계 탭 조회
-	getMemberRewardDisciplineInfo: (memberId: number) => axiosConfig.get<MemberRewardDisciplineResponseDto[]>(`/api/members/${memberId}/reward-discipline`),
+	getMemberRewardDisciplineInfo: (memberId: number) => axiosConfig.get<MemberRewardDisciplineResponseDto[]>(`/api/members/${memberId}/reward-disciplines`),
 
 	// 자격 탭 조회
-	getMemberQualificationInfo: (memberId: number) => axiosConfig.get<MemberQualificationResponseDto[]>(`/api/members/${memberId}/qualification`),
+	getMemberQualificationInfo: (memberId: number) => axiosConfig.get<MemberQualificationResponseDto[]>(`/api/members/${memberId}/qualifications`),
 
 	// 어학 탭 조회
 	getMemberLanguageInfo: (memberId: number) => axiosConfig.get<MemberLanguageResponseDto[]>(`/api/members/${memberId}/languages`),
+
+	// 멤버 등록
+	createMember: (data: Record<string, any>) => axiosConfig.post<void>(`/api/members`, data),
+
+	// 멤버 수정
+	updateMember: (memberId: number, data: Record<string, any>) => axiosConfig.put<void>(`/api/members/${memberId}`, data),
+
+	// 비밀번호 변경
+	updatePassword: (memberId: number, password: string) => axiosConfig.put<void>(`/api/members/${memberId}/password`, { password }),
 
 	// 멤버 삭제
 	deleteMember: (memberId: number) => axiosConfig.delete(`/api/members/${memberId}`),

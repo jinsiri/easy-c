@@ -60,7 +60,6 @@ export default function AttendanceUserPage() {
 				setAttenceData(res);
 				makeChartOption(res);
 			}
-		} catch (error: any) {
 		} finally {
 			setLoader(false);
 		}
@@ -78,7 +77,6 @@ export default function AttendanceUserPage() {
 			if (Object.keys(res).length > 0) {
 				setCalendarData(res);
 			}
-		} catch (error: any) {
 		} finally {
 			setLoader(false);
 		}

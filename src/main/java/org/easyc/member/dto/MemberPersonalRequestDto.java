@@ -2,10 +2,7 @@ package org.easyc.member.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.easyc.member.constant.DisabilityRecognition;
-import org.easyc.member.constant.DisabilityType;
-import org.easyc.member.constant.Gender;
-import org.easyc.member.constant.Nationality;
+import org.easyc.member.constant.*;
 
 import java.time.LocalDate;
 
@@ -31,7 +28,7 @@ public class MemberPersonalRequestDto {
 
     // 보훈 정보
     // 보훈 구분
-    private String veteranType; //to enum
+    private VeteranType veteranType; //to enum
     // 보훈번호
     private String veteranNumber;
     // 보훈 가족 여부
@@ -66,7 +63,7 @@ public class MemberPersonalRequestDto {
             Nationality nationality,
             String address,
             String faxNumber,
-            String veteranType,
+            VeteranType veteranType,
             String veteranNumber,
             Boolean veteranFamily,
             String disabilityRegistrationNumber,

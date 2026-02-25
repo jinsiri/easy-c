@@ -87,7 +87,7 @@ public class EasycApplication {
 						"서울특별시",                       // address
 
 						"000",                             // faxNumber
-						"-",                               // veteranType
+						VeteranType.NONE,                  // veteranType
 						"-",                               // veteranNumber
 						false,                             // veteranFamily
 

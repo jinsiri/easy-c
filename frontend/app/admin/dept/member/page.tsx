@@ -6,12 +6,13 @@ import { Box, Button, Grid, Stack, Typography, useTheme } from '@mui/material';
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
-import { ColDef } from 'ag-grid-community';
+import { CellDoubleClickedEvent, ColDef } from 'ag-grid-community';
 import { Add, Remove, Reorder } from '@mui/icons-material';
 import { useEffect, useRef, useState } from 'react';
 import { MemberResponseDto, memberService } from '@/app/services/memberService';
 import { AgGridReact } from 'ag-grid-react';
 import { useDialogStore } from '@/store/useDialogStore';
+import { useRouter } from 'next/navigation';
 
 const memberColDefs: ColDef<Record<string, any>>[] = [
 	{ field: 'employeeId', headerName: '사번', editable: false },
@@ -29,6 +30,8 @@ const memberColDefs: ColDef<Record<string, any>>[] = [
 
 export default function AdminDeptRolePage() {
 	const theme = useTheme();
+	const router = useRouter();
+
 	const { alert } = useDialogStore();
 
 	const gridRef = useRef<AgGridReact>(null);
@@ -78,6 +81,13 @@ export default function AdminDeptRolePage() {
 			});
 	};
 
+	const handleCellDoubleClicked = (e: CellDoubleClickedEvent) => {
+		const memberId = (e.data as any)?.memberId;
+		if (!memberId) return;
+
+		router.push(`/admin/member/detail?memberId=${memberId}`);
+	};
+
 	return (
 		<>
 			<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem', bgcolor: theme.palette.grey[50] }}>
@@ -106,7 +116,7 @@ export default function AdminDeptRolePage() {
 									}}
 								>
 									<Stack>
-										<Button variant='outlined' size='small' startIcon={<Add />}>
+										<Button variant='outlined' size='small' startIcon={<Add />} onClick={() => router.push('/admin/member/new')}>
 											추가
 										</Button>
 									</Stack>
@@ -115,15 +125,16 @@ export default function AdminDeptRolePage() {
 											삭제
 										</Button>
 									</Stack>
-									<Stack>
-										<Button variant='outlined' size='small' startIcon={<Reorder />}>
-											순서바꾸기
-										</Button>
-									</Stack>
 								</Stack>
 							</Grid>
 						</Grid>
-						<CustomAgGridComp ref={gridRef} rowData={members} colDefs={memberColDefs} rowSelectionMode={'multiple'} />
+						<CustomAgGridComp
+							ref={gridRef}
+							rowData={members}
+							colDefs={memberColDefs}
+							rowSelectionMode={'multiple'}
+							onCellDoubleClicked={handleCellDoubleClicked}
+						/>
 					</Grid>
 				</Grid>
 			</Box>

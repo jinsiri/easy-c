@@ -81,6 +81,19 @@ public class MemberProfile extends BaseEntity { //회원정보_회사 관련
         this.hireDate = dto.getHireDate();
     }
 
+    public void update(MemberProfileRequestDto dto) {
+        this.recruitmentType = dto.getRecruitmentType();
+        this.employmentType = dto.getEmploymentType();
+        this.salaryType = dto.getSalaryType();
+        this.employmentStatus = dto.getEmploymentStatus();
+        this.employeeId = dto.getEmployeeId();
+        this.email = dto.getEmail();
+        this.extensionNumber = dto.getExtensionNumber();
+        this.referredBy = dto.getReferredBy();
+        this.resignationDate = dto.getResignationDate();
+        this.hireDate = dto.getHireDate();
+    }
+
     public static MemberProfile of(Member member, MemberProfileRequestDto dto) {
         return new MemberProfile(member, dto);
     }

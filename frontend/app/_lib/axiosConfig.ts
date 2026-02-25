@@ -56,18 +56,9 @@ axiosConfig.interceptors.request.use(
 					config.headers.Cookie = `ACCESS_TOKEN=${token}`;
 				}
 			} catch (error) {
+				//todo
 				console.error('서버 사이드 쿠키 주입 실패:', error);
 			}
-			// } else {
-			// 	//todo
-			// 	// 브라우저: Authorization 헤더 추가
-			// 	const token = document.cookie
-			// 		.split('; ')
-			// 		.find((row) => row.startsWith('ACCESS_TOKEN='))
-			// 		?.split('=')[1];
-			// 	if (token) {
-			// 		config.headers.Authorization = `Bearer ${token}`;
-			// 	}
 		}
 		return config;
 	},
@@ -115,7 +106,13 @@ axiosConfig.interceptors.response.use(
 		const apiResponse = error.response?.data;
 
 		// AccessToken 만료 처리
-		if ((status === 401 || status === 403) && originalRequest && !originalRequest._retry && !originalRequest.url?.includes('/api/auth/refresh')) {
+		if (
+			(status === 401 || status === 403) &&
+			originalRequest &&
+			!originalRequest._retry &&
+			!originalRequest.url?.includes('/api/auth/refresh') &&
+			!originalRequest.url?.includes('/api/auth/login')
+		) {
 			// 동시호출 방지
 			// refresh 중이면 나머지 요청 대기
 			if (isRefreshing) {
@@ -140,7 +137,7 @@ axiosConfig.interceptors.response.use(
 				processQueue(refreshError);
 				// 로그아웃 처리
 				if (typeof window !== 'undefined') {
-				    await alert('세션이 만료되어 로그인 페이지로 이동합니다.'); //인증 만료
+					await alert('세션이 만료되어 로그인 페이지로 이동합니다.'); //인증 만료
 					window.location.href = '/login';
 				}
 
@@ -152,6 +149,7 @@ axiosConfig.interceptors.response.use(
 
 		// 서버가 ApiResponse 내려준 경우
 		if (apiResponse?.message) {
+			console.log(error);
 			await alert(apiResponse.message); // 오류 발생
 
 			return Promise.reject({

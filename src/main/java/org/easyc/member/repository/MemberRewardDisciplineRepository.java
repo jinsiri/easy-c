@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface MemberRewardDisciplineRepository extends JpaRepository<MemberRewardDiscipline, Long> {
 
-    List<MemberRewardDiscipline> findAllByMember_memberId(Long memberId);
+    List<MemberRewardDiscipline> findAllByMember_memberIdAndDeletedFalse(Long memberId);
 
     @Modifying
     @Query("update MemberRewardDiscipline set deleted = true, active = false, lastUpdateDate = CURRENT_TIMESTAMP where member.memberId = ?1")

@@ -16,6 +16,7 @@ import {
 	RowSelectionOptions,
 	RowDragEndEvent,
 	CellClickedEvent,
+	CellDoubleClickedEvent,
 } from 'ag-grid-community';
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
 
@@ -46,6 +47,7 @@ interface propsType extends AgGridReactProps {
 	onGridReady?: (params: GridReadyEvent) => void;
 	onRowDragEnd?: (params: RowDragEndEvent) => void;
 	onCellClicked?: (params: CellClickedEvent) => void;
+	onCellDoubleClicked?: (params: CellDoubleClickedEvent) => void;
 }
 
 const CustomAgGridComp = forwardRef(
@@ -60,6 +62,7 @@ const CustomAgGridComp = forwardRef(
 			onGridReady,
 			onRowDragEnd,
 			onCellClicked,
+			onCellDoubleClicked,
 			...props
 		}: propsType,
 		ref,
@@ -144,6 +147,7 @@ const CustomAgGridComp = forwardRef(
 					onGridSizeChanged={onGridSizeChanged}
 					onRowDragEnd={onRowDragEnd}
 					onCellClicked={onCellClicked}
+					onCellDoubleClicked={onCellDoubleClicked}
 				/>
 			</Box>
 		);
