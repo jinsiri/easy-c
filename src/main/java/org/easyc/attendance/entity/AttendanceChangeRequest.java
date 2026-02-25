@@ -21,15 +21,18 @@ public class AttendanceChangeRequest extends BaseEntity {
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="attendance_change_request_seq")
     private Long workRequestId;
 
-    /** 등록자 정보 추가 */
-    @Column(name = "register_dept_nm")
+    /** 근로자 정보 추가 */
+    @Column(name = "member_id")
+    private Long memberId;
+
+    @Column(name = "dept_nm")
     private String deptNm;
 
-    @Column(name = "register_job_grade")
+    @Column(name = "job_grade")
     private String jobGrade;
 
 
-    //요청서 내용
+    /** 요청서 내용 */
     @Column(name = "work_date")
     private LocalDate workDate;
 

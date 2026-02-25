@@ -115,9 +115,24 @@ export default function VacationPolicyPage() {
 								borderRadius: '1.5rem',
 							}}
 						>
-							<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', height: '3rem', padding: '0.5rem', gap: 0.5 }}>
+							<Box
+								sx={{
+									display: 'flex',
+									flexDirection: 'row',
+									justifyContent: idx === 0 ? 'space-between' : 'end',
+									alignItems: 'center',
+									height: '3rem',
+									padding: '0.5rem',
+									gap: 0.5,
+								}}
+							>
 								{idx === 0 ? (
-									<Chip label='기본정책' variant='outlined' color='primary' />
+									<>
+										<Chip label='기본정책' variant='outlined' color='primary' size='small' />
+										<IconButton sx={{ color: grey[500] }} onClick={(e) => onClickUpdateButton(e, item)}>
+											<BorderColorRounded sx={{ fontSize: '1rem' }} />
+										</IconButton>
+									</>
 								) : (
 									<>
 										<IconButton sx={{ color: grey[500] }} onClick={(e) => onClickUpdateButton(e, item)}>

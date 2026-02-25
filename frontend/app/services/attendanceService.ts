@@ -11,17 +11,12 @@ export interface AttendanceSaveReqDto {
 	loginId: string;
 	startTime?: string;
 	endTime?: string;
-	registerLatitude?: number | null;
-	registerLongitude?: number | null;
 }
 
 export interface AttendanceDayResDto {
 	attendanceId: number | null;
-	registerUser: {
-		loginId: string;
-		memberNm: string;
-		memberRole: string;
-	};
+	memberId?: number;
+	memberNm?: string;
 	deptNm?: string | null;
 	jobGrade?: string | null;
 	attendancePolicyName?: string;

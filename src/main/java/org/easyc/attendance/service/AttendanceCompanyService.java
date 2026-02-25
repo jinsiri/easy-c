@@ -5,8 +5,10 @@ import org.easyc.attendance.constant.*;
 import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.*;
 import org.easyc.attendance.repository.*;
+import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
+import org.easyc.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -23,8 +25,9 @@ public class AttendanceCompanyService {
 
     private final AttendanceRepository attendanceRepository;
     private final AttendanceChangeRequestRepository attendanceChangeRequestRepository;
+    private final MemberRepository memberRepository;
 
-    public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData (AttendanceCompanyRequestDto request){
+    public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData (SearchRequestDto request){
         LocalDate workDate = request.getWorkDate();
 
         if(workDate == null){
@@ -61,7 +64,7 @@ public class AttendanceCompanyService {
         return result;
     }
 
-    public List<AttendanceDayResponseDto> getAttendanceCompanySearch(AttendanceCompanyRequestDto request){
+    public List<AttendanceDayResponseDto> getAttendanceCompanySearch(SearchRequestDto request){
         LocalDate workDate = request.getWorkDate();
         String searchCategory = request.getSearchCategory();
         String searchValue = request.getSearchValue();
@@ -85,7 +88,7 @@ public class AttendanceCompanyService {
                     break;
 
                 default:
-                    attendance = attendanceRepository.findAllByWorkDateAndRegisterUser_MemberNm(workDate, searchValue);
+                    attendance = attendanceRepository.findAllByWorkDateAndMemberNmContains(workDate, searchValue);
                     break;
             }
         }

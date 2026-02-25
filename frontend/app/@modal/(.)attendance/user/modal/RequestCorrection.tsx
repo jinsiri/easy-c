@@ -209,43 +209,6 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 					</Box>
 				</Box>
 			</FormWrapper>
-			{/*<FormWrapper label='첨부 파일'>
-				<Controller
-					name='documentsAddress'
-					control={control}
-					render={({ field }) => (
-						<Box sx={{ display: 'flex', gap: 1 }}>
-							<input
-								accept='.pdf, .jpg, .png'
-								id='contained-button-file'
-								type='file'
-								style={{ display: 'none' }}
-								onChange={(e) => {
-									const file = e.target.files?.[0];
-									field.onChange(file); // File 객체만 전달
-								}}
-							/>
-							<label htmlFor='contained-button-file'>
-								<Button variant='contained' component='span'>
-									파일 선택
-								</Button>
-							</label>
-							<TextField
-								placeholder='선택된 파일'
-								variant='outlined'
-								size='small'
-								value={field.value?.name ?? ''}
-								fullWidth
-								slotProps={{
-									input: {
-										readOnly: true,
-									},
-								}}
-							/>
-						</Box>
-					)}
-				/>
-			</FormWrapper>*/}
 		</Box>
 	);
 });

@@ -34,6 +34,7 @@ export const VACATIONTYPE: Record<vacationType, string> = {
 	HALF_PM: '오후 반차',
 	SICK_LEAVE: '병가',
 	SPECIAL_LEAVE: '특별휴가',
+	HOLIDAY: '휴일 대체 휴가',
 };
 
 export const CURRENTSTATE: Record<string, string> = {
