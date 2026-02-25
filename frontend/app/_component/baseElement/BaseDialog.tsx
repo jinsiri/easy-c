@@ -30,7 +30,17 @@ export default function BaseDialog(props: BaseDialogProps) {
 	};
 
 	return (
-		<Dialog onClose={handleClose} open={true} maxWidth={maxWidth} fullWidth={fullWidth} PaperProps={paperSx ? { sx: paperSx } : undefined}>
+		<Dialog
+			onClose={handleClose}
+			open={true}
+			maxWidth={maxWidth}
+			fullWidth={fullWidth}
+			slotProps={{
+				paper: {
+					sx: paperSx,
+				},
+			}}
+		>
 			<DialogTitle>{title}</DialogTitle>
 			<DialogContent>{children}</DialogContent>
 			<DialogActions className='base-dialog'>
