@@ -1,16 +1,28 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import secureLocalStorage from 'react-secure-storage';
+
+/** Lib */
+import dayjs from 'dayjs';
+import useLoaderStore from '@/store/useLoaderStore';
+
 /** MUI */
-import { Box, Button, Typography, Grid, useTheme } from '@mui/material';
+import { Box, Button, Typography, Grid } from '@mui/material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
-import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import VacationComp from '@/app/_component/layoutElement/VacationComp';
+
+/** Type / Interface */
+import { vacationService, VacationDataDto } from '@/app/services/vacationService';
+import { vacationApplicationDto, vacationApplicationService } from '@/app/services/vacationApplicationService';
+import { VACATIONTYPE, BASICSTATUS } from '@/constant/attendanceConst';
+import { vacationType } from '@/type/types';
 
 const vacationTypeList = [
 	{ key: 'planVacation', label: '예정 휴가' },
@@ -18,17 +30,26 @@ const vacationTypeList = [
 ];
 
 export default function VacationUserPage() {
-	const theme = useTheme();
+	const { loader, setLoader } = useLoaderStore();
+	const [vacationData, setVacationData] = useState<VacationDataDto>(null);
+	const [planVacationList, setPlanVacationList] = useState<vacationApplicationDto[]>([]);
+	const [endVacationList, setEndVacationList] = useState<vacationApplicationDto[]>([]);
 
 	const colDefs: ColDef<Record<string, any>>[] = [
-		{ field: 'workDate', headerName: '휴가상태', flex: 1 },
 		{
-			field: 'workType',
-			headerName: '휴가종류',
+			field: 'status',
+			headerName: '상태',
 			flex: 1,
+			valueFormatter: (data) => (data.value ? BASICSTATUS[data.value] : '-'),
 		},
 		{
-			field: 'workStatus',
+			field: 'vacationType',
+			headerName: '휴가종류',
+			flex: 1,
+			valueFormatter: (data) => (data.value ? VACATIONTYPE[data.value as vacationType] : '-'),
+		},
+		{
+			field: 'vacationDuration',
 			headerName: '휴가일수',
 			flex: 1,
 		},
@@ -36,8 +57,57 @@ export default function VacationUserPage() {
 			field: 'time',
 			headerName: '휴가기간',
 			flex: 3,
+			cellRenderer: (param) => (
+				<Box sx={{ display: 'flex', flexDirection: 'row', py: '6px' }}>
+					<Typography>{param.data.startDate ? dayjs(param.data.startDate).format('YYYY-MM-DD') : '-'}</Typography>
+					{param.data.endDate && (
+						<>
+							<Typography>~</Typography>
+							<Typography>{dayjs(param.data.endDate).format('YYYY-MM-DD')}</Typography>
+						</>
+					)}
+				</Box>
+			),
 		},
 	];
+
+	useEffect(() => {
+		getVacationData();
+		getvacationApplicationList();
+	}, []);
+
+	const getVacationData = async () => {
+		if (!loader) setLoader(true);
+
+		try {
+			const encodedMemberId = btoa(String(secureLocalStorage.getItem('memberId')));
+			const res = await vacationService.getVacationData(encodedMemberId);
+
+			if (res) {
+				setVacationData(res);
+			}
+		} catch (error: any) {
+		} finally {
+			setLoader(false);
+		}
+	};
+
+	const getvacationApplicationList = async () => {
+		if (!loader) setLoader(true);
+
+		try {
+			const encodedMemberId = btoa(String(secureLocalStorage.getItem('memberId')));
+			const res = await vacationApplicationService.getUserVacationApplicationData(encodedMemberId);
+
+			if (res) {
+				setPlanVacationList(res.planVacation);
+				setEndVacationList(res.endVacation);
+			}
+		} catch (error: any) {
+		} finally {
+			setLoader(false);
+		}
+	};
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
@@ -55,7 +125,7 @@ export default function VacationUserPage() {
 					}}
 				>
 					<Box sx={{ width: { sm: '100%', md: '50%' } }}>
-						<VacationComp />
+						<VacationComp vacationData={vacationData} />
 					</Box>
 					<Box
 						sx={{
@@ -87,7 +157,11 @@ export default function VacationUserPage() {
 								<Button>더보기</Button>
 							</Box>
 							<Box sx={{ height: '15rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
-								<CustomAgGridComp rowData={[]} colDefs={colDefs} rowSelectionMode='none' rowHeight={80} />
+								<CustomAgGridComp
+									rowData={item.key === 'planVacation' ? planVacationList : endVacationList}
+									colDefs={colDefs}
+									rowSelectionMode='none'
+								/>
 							</Box>
 						</Box>
 					))}
