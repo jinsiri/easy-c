@@ -1,24 +1,12 @@
 import axiosConfig from '../_lib/axiosConfig';
 import { BulkDeleteRequestDto } from '@/app/services/memberService';
-import { DeptResponseDto } from '@/type/dept';
-
-export interface JobPositionResponseDto {
-	[key: string]: any;
-}
+import { DeptResponseDto, JobGradeResponseDto, JobPositionResponseDto, JobTitleResponseDto } from '@/type/dept';
 
 export interface JobPositionRequestDto {
 	[key: string]: any;
 }
 
-export interface JobTitleResponseDto {
-	[key: string]: any;
-}
-
 export interface JobTitleRequestDto {
-	[key: string]: any;
-}
-
-export interface JobGradeResponseDto {
 	[key: string]: any;
 }
 
