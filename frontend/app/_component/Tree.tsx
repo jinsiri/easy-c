@@ -119,7 +119,7 @@ const RecursiveTreeItem = <T,>({ nodes, searchTerm }: { nodes: TreeNode<T>[]; se
 					label={
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
 							<Box sx={{ display: 'flex', mr: 1, '& svg': { fontSize: '1.125rem' } }}>{getIconByDataType((node as any).dataType)}</Box>
-							<HighlightText text={`${node.label}(${node.treeChildCount})`} highlight={searchTerm} />
+							<HighlightText text={`${node.label}${node.treeChildCount ? `(${node.treeChildCount})` : ''}`} highlight={searchTerm} />
 						</Box>
 					}
 				>
