@@ -19,11 +19,14 @@ public class DeptMemberMap extends BaseEntity {
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="dept_member_map_seq")
     private Long deptMemberMapId;
 
-    @Column(name="dept_id")
+    @Column(name="dept_id", nullable = false)
     private Long deptId;
 
-    @Column(name="member_id")
+    @Column(name="member_id", nullable = false)
     private Long memberId;
+
+    @Column(name="job_title_id")
+    private Long jobTitleId;
 
     @Enumerated(EnumType.STRING)
     private DeptRole deptRole;
