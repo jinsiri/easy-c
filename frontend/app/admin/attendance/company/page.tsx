@@ -55,17 +55,17 @@ export default function AttendanceCompanyPage() {
 	const colDefs: ColDef<Record<string, any>>[] = [
 		{ field: 'workDate', headerName: '근무일', flex: 1 },
 		{
-			field: 'registerUser',
+			field: 'member',
 			headerName: '근무자',
 			flex: 1,
 			cellRenderer: (param) => {
-				const depthNm = param.data?.depthNm;
+				const deptNm = param.data?.deptNm;
 				const jobGrade = param.data?.jobGrade;
 
 				return (
 					<Box sx={{ py: '6px' }}>
-						<Typography>{param.data.registerUser.memberNm}</Typography>
-						<Typography variant='body2'>{depthNm && jobGrade ? depthNm + ' / ' + jobGrade : '-'}</Typography>
+						<Typography>{param.data.memberNm}</Typography>
+						<Typography variant='body2'>{deptNm && jobGrade ? deptNm + ' / ' + jobGrade : '-'}</Typography>
 						<Typography>{param.data.attendancePolicyName}</Typography>
 					</Box>
 				);
@@ -260,7 +260,7 @@ export default function AttendanceCompanyPage() {
 					</Button>
 				</Grid>
 				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='single' rowHeight={80} />
+					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='none' rowHeight={80} />
 				</Grid>
 			</Grid>
 		</Box>

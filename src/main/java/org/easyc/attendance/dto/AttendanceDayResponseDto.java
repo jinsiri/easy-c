@@ -17,7 +17,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AttendanceDayResponseDto {
     private Long attendanceId;
-    private AuditUser registerUser;
+    private Long memberId;
+    private String memberNm;
     private String deptNm;
     private String jobGrade;
     private String attendancePolicyName;
@@ -30,11 +31,13 @@ public class AttendanceDayResponseDto {
     private WorkType workType;
     private WorkStatus workStatus;
     private VacationType vacationType;
+    private Long changeRequestId;
     private String detail;
 
     public AttendanceDayResponseDto(Attendance entity) {
         this.attendanceId = entity.getAttendanceId();
-        this.registerUser = entity.getRegisterUser();
+        this.memberId = entity.getMemberId();
+        this.memberNm = entity.getMemberNm();
         this.deptNm = entity.getDeptNm();
         this.jobGrade = entity.getJobGrade();
         this.attendancePolicyName =  entity.getAttendancePolicyName();
@@ -47,6 +50,7 @@ public class AttendanceDayResponseDto {
         this.workStatus = entity.getWorkStatus();
         this.vacationType = entity.getVacationType();
     }
+
 }
 
 

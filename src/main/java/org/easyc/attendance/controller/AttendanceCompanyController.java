@@ -6,6 +6,7 @@ import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.service.AttendanceCompanyService;
 import org.easyc.attendance.service.AttendanceService;
+import org.easyc.common.dto.SearchRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,14 +27,12 @@ public class AttendanceCompanyController {
     private AttendanceCompanyService attendanceCompanyService;
 
     @PostMapping("/oneday")
-    public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData(@RequestBody AttendanceCompanyRequestDto request) {
-        AttendanceCompanyResponseDto result = attendanceCompanyService.getAttendanceCompanyOnedayData(request);
-        return result;
+    public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData(@RequestBody SearchRequestDto request) {
+        return attendanceCompanyService.getAttendanceCompanyOnedayData(request);
     }
 
     @PostMapping("/search")
-    public List<AttendanceDayResponseDto>  getAttendanceCompanySearch(@RequestBody AttendanceCompanyRequestDto request) {
-        List<AttendanceDayResponseDto>  result = attendanceCompanyService.getAttendanceCompanySearch(request);
-        return result;
+    public List<AttendanceDayResponseDto>  getAttendanceCompanySearch(@RequestBody SearchRequestDto request) {
+        return attendanceCompanyService.getAttendanceCompanySearch(request);
     }
 }

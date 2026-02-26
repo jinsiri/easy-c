@@ -52,7 +52,7 @@ export default function AttendanceUserPage() {
 		try {
 			const today = dayjs();
 			const res = await attendanceService.getAttendanceTodayData({
-				loginId: secureLocalStorage.getItem('loginId') as string,
+				memberId: secureLocalStorage.getItem('memberId') as number,
 				workDate: today.format('YYYY-MM-DD HH:mm'),
 			});
 
@@ -70,7 +70,7 @@ export default function AttendanceUserPage() {
 
 		try {
 			const res = await attendanceService.getAttendanceCalendarData({
-				loginId: secureLocalStorage.getItem('loginId') as string,
+				memberId: secureLocalStorage.getItem('memberId') as number,
 				workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
 			});
 
@@ -243,7 +243,10 @@ export default function AttendanceUserPage() {
 							<ColTitleAndText subtitle={'잔여 근무일'} sx={{ flex: '1' }}>
 								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6' sx={{ color: 'primary.main' }}>
-										{attendanceData.effectiveWorkDay ? attendanceData.effectiveWorkDay - attendanceData.workDay : 0}d
+										{attendanceData.effectiveWorkDay && attendanceData.effectiveWorkDay >= attendanceData.workDay
+											? attendanceData.effectiveWorkDay - attendanceData.workDay
+											: 0}
+										d
 									</Typography>
 									<Typography sx={{ marginLeft: '0.25rem' }}>/ {attendanceData.effectiveWorkDay}d</Typography>
 								</Box>
@@ -251,7 +254,11 @@ export default function AttendanceUserPage() {
 							<ColTitleAndText subtitle={'잔여 근로시간'} sx={{ flex: '1' }}>
 								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6' sx={{ color: 'primary.main' }}>
-										{formatMinutes(attendanceData.effectiveWorkTime ? attendanceData.effectiveWorkTime - attendanceData.workTime : 0)}
+										{formatMinutes(
+											attendanceData.effectiveWorkTime && attendanceData.effectiveWorkDay >= attendanceData.workDay
+												? attendanceData.effectiveWorkTime - attendanceData.workTime
+												: 0,
+										)}
 									</Typography>
 									<Typography sx={{ marginLeft: '0.25rem' }}>/ {formatMinutes(attendanceData.effectiveWorkTime)}</Typography>
 								</Box>

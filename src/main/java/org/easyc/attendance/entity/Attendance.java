@@ -31,18 +31,18 @@ public class Attendance extends BaseEntity {
     private boolean normalized = true;
 
 
-    /** 등록자 정보 추가 */
-    @Column(name = "register_dept_nm")
+    /** 근로자 정보 추가 */
+    @Column(name="member_id")
+    private Long memberId;
+
+    @Column(name="member_nm")
+    private String memberNm;
+
+    @Column(name ="dept_nm")
     private String deptNm;
 
-    @Column(name = "register_job_grade")
+    @Column(name = "job_grade")
     private String jobGrade;
-
-    @Column(name = "register_latitude")
-    private BigDecimal registerLatitude;
-
-    @Column(name = "register_longitude")
-    private BigDecimal registerLongitude;
 
 
     /** 근로 시간 관련 */
