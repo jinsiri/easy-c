@@ -33,20 +33,20 @@ public class MemberController {
     @GetMapping
     public List<MemberLightResponseDto> getAllMembers(
             @RequestParam(required = false) Boolean unassigned,
-            @RequestParam(name = "exclude-dept-id", required = false) Long excludeDeptId,
-            @RequestParam(name = "target-dept-id", required = false) Long targetDeptId
+            @RequestParam(name = "exclude-deptId", required = false) Long excludeDeptId,
+            @RequestParam(name = "target-deptId", required = false) Long targetDeptId
     ) {
         // 1. 아예 미배정인 경우 (?unassigned=true)
         if (Boolean.TRUE.equals(unassigned)) {
             return memberService.getPureUnassignedMembers();
         }
 
-        // 2. 특정 부서 기준 미배정인 경우 (?exclude-dept-id=deptId)
+        // 2. 특정 부서 기준 미배정인 경우 (?exclude-deptId=)
         if (excludeDeptId != null) {
             return memberService.getMembersExcludingDept(excludeDeptId);
         }
 
-        // 3. 특정 부서의 부서원만 조회할 경우
+        // 3. 특정 부서의 부서원만 조회할 경우(?target-deptId=)
         if(targetDeptId != null) {
              return memberService.getMembersByDept(targetDeptId);
         }
