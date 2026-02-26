@@ -58,7 +58,7 @@ const AdminMenuItem: menuType[] = [
 						id: 'admin-normal-accesslogs',
 						title: '접근 이력',
 						type: '2depth',
-						url: '/access-logs',
+						url: '/accesslogs',
 					},
 				],
 			},
