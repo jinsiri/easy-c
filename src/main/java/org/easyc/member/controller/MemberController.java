@@ -29,12 +29,12 @@ public class MemberController {
      *
      * @return 모든 멤버의 간략 정보 리스트
      *         (MemberLightResponseDto)
-     *         TODO: 부서 정보, 직위/직무 등 추가 필요
      */
     @GetMapping
     public List<MemberLightResponseDto> getAllMembers(
             @RequestParam(required = false) Boolean unassigned,
-            @RequestParam(name = "exclude-dept-id", required = false) Long excludeDeptId
+            @RequestParam(name = "exclude-dept-id", required = false) Long excludeDeptId,
+            @RequestParam(name = "target-dept-id", required = false) Long targetDeptId
     ) {
         // 1. 아예 미배정인 경우 (?unassigned=true)
         if (Boolean.TRUE.equals(unassigned)) {
@@ -46,7 +46,12 @@ public class MemberController {
             return memberService.getMembersExcludingDept(excludeDeptId);
         }
 
-        // 3. 조건 없으면 전체 조회
+        // 3. 특정 부서의 부서원만 조회할 경우
+        if(targetDeptId != null) {
+             return memberService.getMembersByDept(targetDeptId);
+        }
+
+        // 4. 조건 없으면 전체 조회
         return memberService.getAllMembers();
     }
     

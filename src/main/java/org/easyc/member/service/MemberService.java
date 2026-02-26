@@ -71,6 +71,12 @@ public class MemberService {
         return members;
     }
 
+    public List<MemberLightResponseDto> getMembersByDept(Long targetDeptId) {
+        List<MemberLightResponseDto> members = memberRepositoryCustom.findLightMembersByDeptId(targetDeptId);
+
+        return members;
+    }
+
     public MemberResponseDto getLoginUserByLoginId(String loginId) {
         if (loginId == null) return null;
 
