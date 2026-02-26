@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.easyc.attendance.entity.AttendanceChangeRequest;
+import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.attendance.constant.WorkStatus;
 
 import java.time.LocalDate;
@@ -13,9 +13,9 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AttendanceChangeDataDto {
+public class AttendanceApplicationDto {
     private Long memberId;
-    private String loginId;
+    //private String loginId;
     private String requestType;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -29,8 +29,10 @@ public class AttendanceChangeDataDto {
     private String violationReason;
     private String documentsAddress;
 
-    public AttendanceChangeRequest returnAttendanceChangeEntity () {
-        AttendanceChangeRequest entity = new AttendanceChangeRequest();
+    public AttendanceApplication returnAttendanceApplicationEntity () {
+        AttendanceApplication entity = new AttendanceApplication();
+
+        entity.setMemberId(memberId);
         entity.setWorkDate(this.workDate);
         entity.setStartTime(this.startTime);
         entity.setEndTime(this.endTime);

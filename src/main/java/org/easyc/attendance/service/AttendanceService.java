@@ -21,7 +21,7 @@ public class AttendanceService {
     private final AttendancePolicyRepository attendancePolicyRepository;
     private final AttendancePolicyMapRepository attendancePolicyMapRepository;
     private final HolidayCalendarRepository holidayCalendarRepository;
-    private final AttendanceChangeRequestRepository attendanceChangeRequestRepository;
+    private final AttendanceApplicationRepository attendanceApplicationRepository;
 
     public AttendanceResponseDto getAttendanceTodayData (AttendanceRequestDto req){
         //데이터 조회 - 해당 일자 및 전날 데이터 불러와서 전날 데이터가 미완인 경우 전날 데이터
@@ -29,10 +29,11 @@ public class AttendanceService {
         LocalTime workTime = req.getWorkDate().toLocalTime();
         Attendance targetAttendance = null;
 
-        AttendancePolicy targetPolicy = findAttendancePolicy(req.getLoginId());
+        AttendancePolicy targetPolicy = findAttendancePolicy(req.getMemberId());
 
         if(workTime.isBefore(LocalTime.of(7, 0))){
-            Attendance beforeAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate.minus(1, ChronoUnit.DAYS)).orElse(null);
+            Attendance beforeAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate.minus(1, ChronoUnit.DAYS)).orElse(null);
+
 
             if(beforeAttendance != null && beforeAttendance.getStartTime() != null && beforeAttendance.getEndTime() == null){
                 targetAttendance = beforeAttendance;
@@ -40,7 +41,7 @@ public class AttendanceService {
         }
 
         if(targetAttendance == null){
-            targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate).orElse(null);
+            targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate).orElse(null);
 
             if(targetAttendance == null){
                 targetAttendance = attendanceRepository.saveAndFlush(
@@ -53,7 +54,7 @@ public class AttendanceService {
             }
         }
 
-        AttendanceResponseDto findStatData = findStatData(req.getLoginId(), workDate, targetPolicy);
+        AttendanceResponseDto findStatData = findStatData(req.getMemberId(), workDate, targetPolicy);
         AttendanceResponseDto result = new AttendanceResponseDto(targetAttendance);
         result.applyWeekData(findStatData);
 
@@ -61,7 +62,7 @@ public class AttendanceService {
     }
 
     public List<Map<String, AttendanceCalendarResponseDto>> getAttendanceCalendarData(AttendanceRequestDto req) {
-        String loginId = req.getLoginId();
+        Long memberId = req.getMemberId();
 
         Integer targetYear = req.getWorkDate().getYear();
         Integer targetMonth = req.getWorkDate().getMonthValue();
@@ -70,15 +71,15 @@ public class AttendanceService {
         LocalDate firstDay = yearMonth.atDay(1);
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
-        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByRegisterUser_LoginIdAndWorkDateBetween(loginId, firstDay, lastDay);
+        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetween(memberId, firstDay, lastDay);
         Map<Integer, Attendance> attendanceMap = targetMonthAttendanceList.stream()
                 .collect(Collectors.toMap(a -> a.getWorkDate().getDayOfMonth(), a -> a));
 
         List<HolidayCalendar> holidayCalendarList = holidayCalendarRepository.findByYearEquals(targetYear.toString());
         Map<LocalDate,String> holidayMap = holidayCalendarList.stream().collect(Collectors.toMap(a -> a.getStartDate() , a -> a.getSubject()));
 
-        List<AttendanceChangeRequest> targetAttendanceChangeRequestList = attendanceChangeRequestRepository.findAllByRegisterUser_LoginIdAndWorkDateBetween(loginId, firstDay, lastDay);
-        Map<Integer, AttendanceChangeRequest> changeRequestMap = targetAttendanceChangeRequestList.stream()
+        List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdAndActiveTrueAndWorkDateBetween(memberId, firstDay, lastDay);
+        Map<Integer, AttendanceApplication> changeRequestMap = targetAttendanceChangeRequestList.stream()
                 .collect(Collectors.toMap(a -> a.getWorkDate().getDayOfMonth(), a -> a));
 
         String[] weekKeys = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
@@ -103,8 +104,8 @@ public class AttendanceService {
             String key = weekKeys[dayOfWeek.getValue() - 1];
 
             Attendance targetAttendance = attendanceMap.get(cursor.getDayOfMonth());
-            AttendanceChangeRequest targetAttendanceChangeRequest = changeRequestMap.get(cursor.getDayOfMonth());
-            AttendanceCalendarResponseDto dto = createResDto(cursor, targetAttendance, true, targetAttendanceChangeRequest );
+            AttendanceApplication targetAttendanceApplication = changeRequestMap.get(cursor.getDayOfMonth());
+            AttendanceCalendarResponseDto dto = createResDto(cursor, targetAttendance, true, targetAttendanceApplication );
 
             if(holidayMap.containsKey(cursor)){
                 dto.setIsHoliday(true);
@@ -139,11 +140,11 @@ public class AttendanceService {
         LocalDate workDate = startTime.toLocalDate();
 
         // 유관 데이터 조회
-        AttendancePolicy targetPolicy = findAttendancePolicy(req.getLoginId());
+        AttendancePolicy targetPolicy = findAttendancePolicy(req.getMemberId());
         /** 멤버 조회해서 부서 및 직급 확인 로직 필요 **/
 
         // 데이터 조회
-        Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndWorkDate(req.getLoginId(), workDate)
+        Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate)
                 .orElseGet(() -> Attendance.builder()
                         .workDate(workDate)
                         .attendancePolicyName(targetPolicy.getAttendancePolicyName())
@@ -160,22 +161,22 @@ public class AttendanceService {
         }
 
         // 유관 데이터 조회
-        AttendancePolicy targetPolicy = findAttendancePolicy(req.getLoginId());
+        AttendancePolicy targetPolicy = findAttendancePolicy(req.getMemberId());
 
         // 데이터 조회
-        Attendance targetAttendance = attendanceRepository.findByRegisterUser_LoginIdAndAttendanceId(req.getLoginId(), req.getAttendanceId()).orElseThrow();
+        Attendance targetAttendance = attendanceRepository.findByMemberIdAndAttendanceId(req.getMemberId(), req.getAttendanceId()).orElseThrow();
 
         // 상태업데이트 해서 save
         attendanceRepository.saveAndFlush(updateAttendanceByEndTime(targetAttendance, targetPolicy, req.getEndTime()));
     }
 
-    private AttendanceCalendarResponseDto createResDto(LocalDate date, Attendance attendance, boolean isCurrentMonth, AttendanceChangeRequest changeRequest) {
+    private AttendanceCalendarResponseDto createResDto(LocalDate date, Attendance attendance, boolean isCurrentMonth, AttendanceApplication changeRequest) {
         AttendanceCalendarResponseDto dto = new AttendanceCalendarResponseDto();
 
         if (attendance != null) {
             dto = new AttendanceCalendarResponseDto(attendance, changeRequest);
 
-            AttendancePolicy targetPolicy = findAttendancePolicy(attendance.getRegisterUser().getLoginId());
+            AttendancePolicy targetPolicy = findAttendancePolicy(attendance.getMemberId());
             dto.setDefaultStartTime(targetPolicy.getStartTime());
             dto.setDefaultEndTime(targetPolicy.getEndTime());
         }
@@ -273,13 +274,13 @@ public class AttendanceService {
         return targetAttendance;
     }
 
-    private AttendancePolicy findAttendancePolicy(String loginId) {
-        AttendancePolicyMap attendancePolicyMap = attendancePolicyMapRepository.findTopByLoginIdAndDeletedFalseOrderByMappingIdDesc(loginId).orElse(null);
+    private AttendancePolicy findAttendancePolicy(Long memberId) {
+        AttendancePolicyMap attendancePolicyMap = attendancePolicyMapRepository.findTopByMemberIdAndDeletedFalseOrderByMappingIdDesc(memberId).orElse(null);
         AttendancePolicy attendancePolicy = attendancePolicyRepository.findByAttendancePolicyId(attendancePolicyMap != null ? attendancePolicyMap.getAttendancePolicyId() : 1).orElseThrow();
         return attendancePolicy;
     }
 
-    private AttendanceResponseDto findStatData (String loginId, LocalDate workDate, AttendancePolicy targetPolicy) {
+    private AttendanceResponseDto findStatData (Long memberId, LocalDate workDate, AttendancePolicy targetPolicy) {
         //휴일 데이터
         List<HolidayCalendar> holidayCalendarList = holidayCalendarRepository.findByYearEquals(String.valueOf(workDate.getYear()));
         Map<LocalDate,String> holidayMap = holidayCalendarList.stream().collect(Collectors.toMap(a -> a.getStartDate() , a -> a.getSubject()));
@@ -299,7 +300,7 @@ public class AttendanceService {
         Integer defaultDayWorkTime = targetPolicy.getWorkingTimeDay(); // 일일 기준 근로시간(분)
         Long defaultTotalWorkTime = defaultTotalWorkDay * defaultDayWorkTime; // 단위 근로시간(분)
 
-        List<Attendance> weekAttendanceData = attendanceRepository.findAllByRegisterUser_LoginIdAndWorkDateBetween(loginId, start, end);
+        List<Attendance> weekAttendanceData = attendanceRepository.findAllByMemberIdAndWorkDateBetween(memberId, start, end);
 
         Long effectiveWorkDay = defaultTotalWorkDay;
         Long effectiveWorkTime = defaultTotalWorkTime;

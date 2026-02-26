@@ -15,15 +15,18 @@ import java.time.LocalTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendanceChangeRequest extends BaseEntity {
+public class AttendanceApplication extends BaseEntity {
     @Id
-    @SequenceGenerator(name="attendance_change_request_seq", sequenceName="attendance_change_request_seq", allocationSize=1)
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="attendance_change_request_seq")
-    private Long workRequestId;
+    @SequenceGenerator(name="attendance_application_seq", sequenceName="attendance_application_seq", allocationSize=1)
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="attendance_application_seq")
+    private Long attendanceApplicationId;
 
     /** 근로자 정보 추가 */
     @Column(name = "member_id")
     private Long memberId;
+
+    @Column(name = "member_nm")
+    private String memberNm;
 
     @Column(name = "dept_nm")
     private String deptNm;
@@ -56,9 +59,6 @@ public class AttendanceChangeRequest extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private BasicStatus status = BasicStatus.PENDING;
-
-    @Column(name="type")
-    private String type;
 
     @Column(name="summary")
     private String summary;

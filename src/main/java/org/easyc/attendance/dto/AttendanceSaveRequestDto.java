@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class AttendanceSaveRequestDto {
-    private String loginId;
+    //private String loginId;
+    private Long memberId;
     private Long attendanceId;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")

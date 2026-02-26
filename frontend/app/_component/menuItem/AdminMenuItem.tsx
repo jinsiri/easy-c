@@ -91,16 +91,22 @@ const AdminMenuItem: menuType[] = [
 				icon: WorkHistoryRounded,
 				children: [
 					{
+						id: 'admin-attendance-policy',
+						title: '근태 정책 관리',
+						type: '2depth',
+						url: '/policy',
+					},
+					{
 						id: 'admin-attendance-company',
 						title: '전사 근태 관리',
 						type: '2depth',
 						url: '/company',
 					},
 					{
-						id: 'admin-attendance-policy',
-						title: '근태 정책 관리',
+						id: 'admin-attendance-application',
+						title: '근태 요청 관리',
 						type: '2depth',
-						url: '/policy',
+						url: '/application',
 					},
 				],
 			},
@@ -112,16 +118,22 @@ const AdminMenuItem: menuType[] = [
 				icon: BeachAccessRounded,
 				children: [
 					{
+						id: 'admin-vacation-policy',
+						title: '휴가 정책 관리',
+						type: '2depth',
+						url: '/policy',
+					},
+					{
 						id: 'admin-vacation-company',
 						title: '전사 휴가 관리',
 						type: '2depth',
 						url: '/company',
 					},
 					{
-						id: 'admin-vacation-policy',
-						title: '휴가 정책 관리',
+						id: 'admin-vacation-application',
+						title: '휴가 요청 관리',
 						type: '2depth',
-						url: '/policy',
+						url: '/application',
 					},
 				],
 			},

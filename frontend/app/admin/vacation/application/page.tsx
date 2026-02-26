@@ -8,7 +8,6 @@ import duration from 'dayjs/plugin/duration';
 
 /** MUI */
 import { Box, Button, Grid, IconButton, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
-import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
@@ -17,8 +16,8 @@ import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
 import { WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
+import { BASICSTATUS } from '@/constant/commonConst';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
-import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
 import { formatMinutes } from '@/utils/commonFunc';
 
 /** Type / Interface */
@@ -28,7 +27,7 @@ import { AttendanceCompanyRequestDto, attendancePolicyService } from '@/app/serv
 
 dayjs.extend(duration);
 
-export default function VacationCompanyPage() {
+export default function VacationApplicationPage() {
 	const { setLoader } = useLoaderStore();
 
 	const [searchCategory, setSearchCategory] = useState<string>('memberNm');
@@ -38,6 +37,15 @@ export default function VacationCompanyPage() {
 	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
 
 	const colDefs: ColDef<Record<string, any>>[] = [
+		{
+			field: 'status',
+			headerName: '처리상태',
+			flex: 1,
+			cellStyle: {
+				textAlign: 'center',
+			},
+			valueFormatter: (data) => (data.value ? BASICSTATUS[data.value] : '-'),
+		},
 		{
 			field: 'member',
 			headerName: '근무자',
@@ -154,46 +162,6 @@ export default function VacationCompanyPage() {
 				<PathBreadcrumbs />
 			</Box>
 			<Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
-				<Grid size={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-					<IconButton
-						sx={{
-							display: 'flex',
-							justifyContent: 'center',
-							alignItems: 'center',
-							width: '1.25rem',
-							height: '1.25rem',
-							borderRadius: '100%',
-							border: '2px solid',
-							borderColor: 'grey.900',
-						}}
-						onClick={(e) => setCalendarDate((prev) => prev.subtract(1, 'day'))}
-					>
-						<ArrowLeftRounded sx={{ fontSize: '1.5rem', strokeWidth: 5 }} />
-					</IconButton>
-
-					<Box sx={{ display: 'flex', alignItems: 'center', margin: '0 2rem' }}>
-						<Typography variant='h5' sx={{ marginRight: 0.5 }}>
-							{calendarDate.format('YYYY-MM-DD')}
-						</Typography>
-						<ButtonFieldDatePicker value={calendarDate} onChange={onChangeDatePicker} />
-					</Box>
-
-					<IconButton
-						sx={{
-							display: 'flex',
-							justifyContent: 'center',
-							alignItems: 'center',
-							width: '1.25rem',
-							height: '1.25rem',
-							borderRadius: '100%',
-							border: '2px solid',
-							borderColor: 'grey.900',
-						}}
-						onClick={(e) => setCalendarDate((prev) => prev.add(1, 'day'))}
-					>
-						<ArrowRightRounded sx={{ fontSize: '1.5rem' }} />
-					</IconButton>
-				</Grid>
 				<Grid sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', alignItems: 'center', padding: '0.5rem 1.5rem', gap: '0.5rem' }}>
 					<Select id='demo-simple-select' value={searchCategory} onChange={handleChangeSearchCategory} size='small'>
 						<MenuItem value={'depthNm'}>부서명</MenuItem>

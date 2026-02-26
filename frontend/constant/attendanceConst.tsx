@@ -64,9 +64,3 @@ export const WORKTIMERULE: Record<string, string> = {
 	CAP_AT_40: '법정근로시간까지 제한',
 	BY_WORK_DAYS: '근무일x1일 소정근로시간',
 };
-
-export const BASICSTATUS: Record<string, string> = {
-	PENDING: '대기',
-	APPROVED: '승인',
-	REJECTED: '거절',
-};

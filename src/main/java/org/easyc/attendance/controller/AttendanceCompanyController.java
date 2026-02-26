@@ -28,13 +28,11 @@ public class AttendanceCompanyController {
 
     @PostMapping("/oneday")
     public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData(@RequestBody SearchRequestDto request) {
-        AttendanceCompanyResponseDto result = attendanceCompanyService.getAttendanceCompanyOnedayData(request);
-        return result;
+        return attendanceCompanyService.getAttendanceCompanyOnedayData(request);
     }
 
     @PostMapping("/search")
     public List<AttendanceDayResponseDto>  getAttendanceCompanySearch(@RequestBody SearchRequestDto request) {
-        List<AttendanceDayResponseDto>  result = attendanceCompanyService.getAttendanceCompanySearch(request);
-        return result;
+        return attendanceCompanyService.getAttendanceCompanySearch(request);
     }
 }

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface AttendancePolicyMapRepository extends JpaRepository<AttendancePolicyMap, Long> {
-    Optional<AttendancePolicyMap> findTopByLoginIdAndDeletedFalseOrderByMappingIdDesc(String loginId);
+    Optional<AttendancePolicyMap> findTopByMemberIdAndDeletedFalseOrderByMappingIdDesc(Long memberId);
 
     @Query("SELECT a.attendancePolicyId, count(a) FROM AttendancePolicyMap a GROUP BY a.attendancePolicyId")
     List<Object[]> countGroupByAttendancePolicyId();

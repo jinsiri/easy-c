@@ -2,13 +2,15 @@ import axiosConfig from '../_lib/axiosConfig';
 import { workType, workStatus, vacationType, dayName } from '@/type/types';
 
 export interface AttendanceReqDto {
-	loginId: string;
+	//loginId: string;
+	memberId: number;
 	workDate: string;
 }
 
 export interface AttendanceSaveReqDto {
 	attendanceId?: number | null | undefined;
-	loginId: string;
+	memberId: number;
+	//loginId: string;
 	startTime?: string;
 	endTime?: string;
 }

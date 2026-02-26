@@ -7,8 +7,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
 /** MUI */
-import { Box, Button, Grid, IconButton, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
-import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
+import { Box, Button, Grid, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
@@ -16,14 +15,11 @@ import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
-import { WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
+import { WORKSTATUS } from '@/constant/attendanceConst';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
-import { formatMinutes } from '@/utils/commonFunc';
 
 /** Type / Interface */
 import { workStatus, workType } from '@/type/types';
-import { AttendanceDayResDto } from '@/app/services/attendanceService';
-import { AttendanceCompanyRequestDto, attendancePolicyService } from '@/app/services/attendanceCompanyService';
 import { VacationDataDto, vacationService } from '@/app/services/vacationService';
 import { SearchRequestDto } from '@/type/interface';
 
@@ -40,6 +36,7 @@ export default function VacationCompanyPage() {
 		{
 			field: 'member',
 			headerName: '근무자',
+			flex: 2,
 			cellRenderer: (param) => {
 				const deptNm = param.data?.deptNm;
 				const jobGrade = param.data?.jobGrade;
@@ -48,13 +45,10 @@ export default function VacationCompanyPage() {
 					<Box sx={{ py: '6px' }}>
 						<Typography>{param.data.memberNm}</Typography>
 						<Typography variant='body2'>{deptNm && jobGrade ? deptNm + ' / ' + jobGrade : '-'}</Typography>
+						<Typography variant='body2'>{param.data ? param.data.vacationPolicyName : '-'}</Typography>
 					</Box>
 				);
 			},
-		},
-		{
-			field: 'vacationPolicyName',
-			headerName: '휴가정책',
 		},
 		{
 			field: 'accrualDate',
@@ -172,7 +166,7 @@ export default function VacationCompanyPage() {
 					</Button>
 				</Grid>
 				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='none' rowHeight={56} />
+					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='none' rowHeight={80} />
 				</Grid>
 			</Grid>
 		</Box>

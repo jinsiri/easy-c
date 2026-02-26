@@ -52,7 +52,7 @@ export default function AttendanceUserPage() {
 		try {
 			const today = dayjs();
 			const res = await attendanceService.getAttendanceTodayData({
-				loginId: secureLocalStorage.getItem('loginId') as string,
+				memberId: secureLocalStorage.getItem('memberId') as number,
 				workDate: today.format('YYYY-MM-DD HH:mm'),
 			});
 
@@ -70,7 +70,7 @@ export default function AttendanceUserPage() {
 
 		try {
 			const res = await attendanceService.getAttendanceCalendarData({
-				loginId: secureLocalStorage.getItem('loginId') as string,
+				memberId: secureLocalStorage.getItem('memberId') as number,
 				workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
 			});
 

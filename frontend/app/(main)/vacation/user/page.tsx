@@ -21,7 +21,8 @@ import VacationComp from '@/app/_component/layoutElement/VacationComp';
 /** Type / Interface */
 import { vacationService, VacationDataDto } from '@/app/services/vacationService';
 import { vacationApplicationDto, vacationApplicationService } from '@/app/services/vacationApplicationService';
-import { VACATIONTYPE, BASICSTATUS } from '@/constant/attendanceConst';
+import { VACATIONTYPE } from '@/constant/attendanceConst';
+import { BASICSTATUS } from '@/constant/commonConst';
 import { vacationType } from '@/type/types';
 
 const vacationTypeList = [

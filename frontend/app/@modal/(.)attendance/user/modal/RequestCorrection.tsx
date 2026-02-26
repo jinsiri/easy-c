@@ -15,7 +15,7 @@ import { useForm, Controller } from 'react-hook-form';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** Type / Interface */
-import { AttendanceRequestController, attendanceChangeRequestService } from '@/app/services/attendanceChangeRequestService';
+import { AttendanceApplicationController, attendanceApplicationService } from '@/app/services/attendanceApplicationService';
 import { FormWrapper, FormItem } from '@/app/_component/baseElement/FormComp';
 
 export interface RequestCorrectionRef {
@@ -31,7 +31,7 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 		watch,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<AttendanceRequestController>({
+	} = useForm<AttendanceApplicationController>({
 		defaultValues: {
 			workDate: null,
 			isStartTime: false,
@@ -54,9 +54,9 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 				try {
 					console.log(data);
 
-					await attendanceChangeRequestService.submitWorkRequest({
+					await attendanceApplicationService.submitAttendanceApplication({
 						...data,
-						loginId: secureLocalStorage.getItem('loginId') as string,
+						memberId: secureLocalStorage.getItem('memberId') as number,
 						workDate: dayjs(data.workDate).format('YYYY-MM-DD'),
 						startTime: data.startTime ? dayjs(data.startTime).format('HH:mm') : null,
 						endTime: data.endTime ? dayjs(data.endTime).format('HH:mm') : null,

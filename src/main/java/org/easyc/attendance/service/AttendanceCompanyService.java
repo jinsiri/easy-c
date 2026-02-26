@@ -16,16 +16,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.easyc.common.util.utilFunc.parseDate;
-import static org.easyc.common.util.utilFunc.parseDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class AttendanceCompanyService {
 
     private final AttendanceRepository attendanceRepository;
-    private final AttendanceChangeRequestRepository attendanceChangeRequestRepository;
-    private final MemberRepository memberRepository;
+    private final AttendanceApplicationRepository attendanceApplicationRepository;
 
     public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData (SearchRequestDto request){
         LocalDate workDate = request.getWorkDate();
@@ -35,7 +32,7 @@ public class AttendanceCompanyService {
         }
 
         List<Attendance> attendance = attendanceRepository.findAllByWorkDate(workDate);
-        List<AttendanceChangeRequest> requestList = attendanceChangeRequestRepository.findAllByWorkDateAndActiveTrueOrderByWorkRequestIdAsc(request.getWorkDate());
+        List<AttendanceApplication> requestList = attendanceApplicationRepository.findAllByWorkDateAndActiveTrueOrderByAttendanceApplicationIdAsc(request.getWorkDate());
 
         Integer lateCount = 0;
         Integer earlyLeaveCount = 0;
