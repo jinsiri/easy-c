@@ -13,7 +13,6 @@ import axiosConfig from '@/app/_lib/axiosConfig';
 import { useDialogStore } from '@/store/useDialogStore';
 import { useDeptForm } from '@/app/admin/dept/_component/hooks/useDeptForm';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
-import useRefreshStore from '@/store/useRefreshStore';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
 
 interface Props {
@@ -104,18 +103,18 @@ export default function AdminDeptListView({ dbData }: Props) {
 			content: (
 				<Box sx={{ p: '1rem 1.5rem' }}>
 					<DeptManageComp
-						deptId={selectedDept?.deptId}
+						deptId={selectedDept.deptId}
 						items={[
-							{ label: '부서명(한글)', value: selectedDept?.deptNm ?? '부서 미선택', field: 'deptNm' },
-							{ label: '부서메일아이디', value: selectedDept?.deptEmail ?? '-' },
-							{ label: '부서코드', value: selectedDept?.deptCode ?? '-' },
-							{ label: '부서 약어', value: selectedDept?.deptShortNm ?? '-' },
+							{ label: '부서명(한글)', value: selectedDept.deptNm ?? '부서 미선택', field: 'deptNm' },
+							{ label: '부서메일아이디', value: selectedDept.deptEmail ?? '-' },
+							{ label: '부서코드', value: selectedDept.deptCode ?? '-' },
+							{ label: '부서 약어', value: selectedDept.deptShortNm ?? '-' },
 						]}
 					/>
 				</Box>
 			),
 		},
-		{ label: '부서원 목록', content: <AdminDeptDetailView deptId={1} /> },
+		{ label: '부서원 목록', content: <AdminDeptDetailView deptId={selectedDept.deptId} /> },
 	];
 
 	const deleteDept = async (deptId: number) => {
@@ -232,7 +231,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 					<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
 						<Stack alignItems={'flex-end'} sx={{ mb: 2 }}>
 							<Stack direction={'row'} spacing={1}>
-								<Button variant='outlined' onClick={() => router.push('/admin/dept/list/assign')}>
+								<Button variant='outlined' onClick={() => router.push(`/admin/dept/list/assign?deptId=${selectedDept.deptId}`)}>
 									부서원 추가
 								</Button>
 								<Button variant='outlined'>일괄 등록</Button>
