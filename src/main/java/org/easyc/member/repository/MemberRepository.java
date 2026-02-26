@@ -1,9 +1,7 @@
 package org.easyc.member.repository;
 
-import org.easyc.member.dto.MemberLightResponseDto;
 import org.easyc.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -12,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    @Query("SELECT new org.easyc.member.dto.MemberLightResponseDto(m.memberId, m.memberNm, m.loginId, m.memberRole, m.accountStatus, " +
+/*    @Query("SELECT new org.easyc.member.dto.MemberLightResponseDto(m.memberId, m.memberNm, m.loginId, m.memberRole, m.accountStatus, " +
             "mp.employeeId, mp.email, mp.employmentType, mp.employmentStatus, " +
             "mp2.phoneNumber, " +
 //            todo deptnm positiontitle
@@ -22,7 +20,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "left join MemberProfile mp on m.memberId = mp.memberId " +
             "left join MemberPersonal mp2 on m.memberId = mp2.memberId " +
             "where m.deleted = false")
-    List<MemberLightResponseDto> findLightMembers();
+    List<MemberLightResponseDto> findLightMembers();*/
 
     List<Member> findAllByDeletedFalseAndMemberIdIn(Collection<Long> memberIds);
     Optional<Member> findByMemberId(Long memberId);

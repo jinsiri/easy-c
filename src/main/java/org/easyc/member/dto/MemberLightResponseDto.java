@@ -1,10 +1,11 @@
 package org.easyc.member.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.easyc.common.dto.BaseDto;
 import org.easyc.common.dto.AuditUser;
+import org.easyc.common.dto.BaseDto;
 import org.easyc.common.support.EnumOptionMapper;
 import org.easyc.member.constant.AccountStatus;
 import org.easyc.member.constant.EmploymentStatus;
@@ -12,6 +13,8 @@ import org.easyc.member.constant.EmploymentType;
 import org.easyc.member.constant.MemberRole;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -31,16 +34,18 @@ public class MemberLightResponseDto extends BaseDto {
     private String employmentStatus;
     // personal
     private String phoneNumber;
-    //
-    private String positionTitle;
+    // dept
     private String deptNm;
+    private Set<String> deptNms = new LinkedHashSet<>();
+    private String jobTitle;
+    private String jobPosition;
 
-
+    @QueryProjection
     public MemberLightResponseDto(
             Long memberId, String memberNm, String loginId, MemberRole memberRole, AccountStatus accountStatus,
             String employeeId, String email, EmploymentType employmentType, EmploymentStatus employmentStatus,
             String phoneNumber,
-//            String positionTitle, String deptNm,
+            String deptNm, String jobTitle, String jobPosition,
             boolean deleted, boolean active,
             LocalDateTime registerDate, String registerIp, AuditUser registerUser, //String registerId, String registerNm,
             LocalDateTime lastUpdateDate, String lastUpdateIp, AuditUser lastUpdateUser //String lastUpdateId, String lastUpdateNm
@@ -57,7 +62,8 @@ public class MemberLightResponseDto extends BaseDto {
         this.employmentType = EnumOptionMapper.getLabel(employmentType, "employment.type");
         this.employmentStatus = EnumOptionMapper.getLabel(employmentStatus, "employment.status");
         this.phoneNumber = phoneNumber;
-//        this.positionTitle = positionTitle;
-//        this.deptNm = deptNm;
+        this.deptNm = deptNm;
+        this.jobTitle = jobTitle;
+        this.jobPosition = jobPosition;
     }
 }

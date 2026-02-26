@@ -15,8 +15,11 @@ import org.easyc.common.entity.BaseEntity;
 @Table(
     name="member_job_position_map",
     indexes = {
-        @Index(name = "idx_member_job_position_map_pos_del", columnList = "jobPositionId, deleted")
+        @Index(name = "idx_member_pos_map_member", columnList = "memberId, deleted"),
+        @Index(name = "idx_member_pos_map_pos", columnList = "jobPositionId, deleted")
     }
+
+
 )
 public class MemberJobPositionMap extends BaseEntity {
     @Id

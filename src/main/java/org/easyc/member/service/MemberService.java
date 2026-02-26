@@ -24,6 +24,7 @@ public class MemberService {
 
 
     private final MemberRepository memberRepository;
+    private final MemberRepositoryCustom memberRepositoryCustom;
     private final MemberProfileRepository memberProfileRepository;
     private final MemberPersonalRepository memberPersonalRepository;
     private final MemberCareerRepository memberCareerRepository;
@@ -52,7 +53,20 @@ public class MemberService {
     }
 
     public List<MemberLightResponseDto> getAllMembers() {
-        List<MemberLightResponseDto> members = memberRepository.findLightMembers();
+        List<MemberLightResponseDto> members = memberRepositoryCustom.findLightMembers();
+
+
+        return members;
+    }
+
+    public List<MemberLightResponseDto> getPureUnassignedMembers() {
+        List<MemberLightResponseDto> members = memberRepositoryCustom.findLightMembersByDeptIsNull();
+
+        return members;
+    }
+
+    public List<MemberLightResponseDto> getMembersExcludingDept(Long excludeDeptId) {
+        List<MemberLightResponseDto> members = memberRepositoryCustom.findLightMembersNotInDept(excludeDeptId);
 
         return members;
     }

@@ -49,6 +49,12 @@ export const memberService = {
 	// 전체 멤버 조회
 	getAllMembers: () => axiosConfig.get<MemberLightResponseDto[]>(`/api/members`),
 
+	// 부서 미지정 멤버 조회
+	getMembersNotMapped: () => axiosConfig.get(`/api/members?unassigned=true`),
+
+	// 기준 부서와 매핑되지 않은 멤버 조회
+	getMembersNotMappedToDeptId: (deptId: number) => axiosConfig.get(`/api/members?exclude-dept-id=${deptId}`),
+
 	// 기본 인사정보 조회
 	getMember: (memberId: number) => axiosConfig.get<MemberResponseDto>(`/api/members/${memberId}`),
 

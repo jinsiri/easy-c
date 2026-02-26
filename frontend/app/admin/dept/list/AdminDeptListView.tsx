@@ -232,7 +232,9 @@ export default function AdminDeptListView({ dbData }: Props) {
 					<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
 						<Stack alignItems={'flex-end'} sx={{ mb: 2 }}>
 							<Stack direction={'row'} spacing={1}>
-								<Button variant='outlined'>부서원 추가</Button>
+								<Button variant='outlined' onClick={() => router.push('/admin/dept/list/assign')}>
+									부서원 추가
+								</Button>
 								<Button variant='outlined'>일괄 등록</Button>
 							</Stack>
 						</Stack>
