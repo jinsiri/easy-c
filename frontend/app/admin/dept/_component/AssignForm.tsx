@@ -7,13 +7,33 @@ import { MemberResponseDto, memberService } from '@/app/services/memberService';
 import { memberColDefs } from '@/type/ colDef';
 import { Box } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
+import { Control, useController } from 'react-hook-form';
+import { IDeptMemberForm } from '@/app/@modal/(.)admin/dept/list/assign/page';
 
-export default function AssignForm(props: {}) {
+interface AssignFormProps {
+	control: Control<IDeptMemberForm>;
+}
+
+export default function AssignForm({ control }: AssignFormProps) {
 	const searchParams = useSearchParams();
 	const deptIdStr = searchParams.get('deptId');
 	const deptId = deptIdStr ? parseInt(deptIdStr) : null;
 	const gridRef = useRef<AgGridReact>(null);
 	const [unassignedMembers, setUnassignedMembers] = useState<MemberResponseDto[]>([]);
+	const {
+		field: { onChange },
+	} = useController({
+		name: 'selectedMemberIds',
+		control,
+		defaultValue: [],
+	});
+
+	const onSelectionChanged = () => {
+		const selectedRows = gridRef.current?.api.getSelectedRows() || [];
+		const ids = selectedRows.map((row: any) => row.memberId);
+
+		onChange(ids);
+	};
 
 	const fetchUnassignedMembers = async () => {
 		if (deptId === null) {
@@ -31,7 +51,13 @@ export default function AssignForm(props: {}) {
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '70vh', padding: '0 1.5rem' }}>
-			<CustomAgGridComp ref={gridRef} rowData={unassignedMembers} colDefs={memberColDefs} rowSelectionMode={'multiple'} />
+			<CustomAgGridComp
+				ref={gridRef}
+				rowData={unassignedMembers}
+				colDefs={memberColDefs}
+				rowSelectionMode={'multiple'}
+				onSelectionChanged={onSelectionChanged}
+			/>
 		</Box>
 	);
 }

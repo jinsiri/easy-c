@@ -1,5 +1,5 @@
 import axiosConfig from '../_lib/axiosConfig';
-import { BulkDeleteRequestDto } from '@/app/services/memberService';
+import { BulkDeleteRequestDto, MemberResponseDto } from '@/app/services/memberService';
 import { DeptResponseDto, JobGradeResponseDto, JobPositionResponseDto, JobTitleResponseDto } from '@/type/dept';
 
 export interface JobPositionRequestDto {
@@ -14,8 +14,15 @@ export interface JobGradeRequestDto {
 	[key: string]: any;
 }
 
+export interface DeptMemberMapRequestDto {
+	[key: string]: any;
+}
+
 export const deptService = {
 	getDeptList: () => axiosConfig.get<DeptResponseDto[]>(`/api/dept/tree`),
+
+	// 부서원 일괄 추가
+	assignMembersToDept: (dto: DeptMemberMapRequestDto) => axiosConfig.post(`/api/dept-member-map/assign`, dto),
 
 	// 직위
 	getJobPositions: () => axiosConfig.get<JobPositionResponseDto[]>(`/api/job-positions`),
