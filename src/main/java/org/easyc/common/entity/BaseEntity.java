@@ -71,9 +71,12 @@ public abstract class BaseEntity {
     @LastModifiedBy
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "loginId", column = @Column(name = "last_update_id", updatable = false)),
-            @AttributeOverride(name = "memberNm", column = @Column(name = "last_update_nm", updatable = false)),
-            @AttributeOverride(name = "memberRole", column = @Column(name = "last_update_role", updatable = false))
+            @AttributeOverride(name = "loginId", column = @Column(name = "last_update_id")),
+            @AttributeOverride(name = "memberNm", column = @Column(name = "last_update_nm")),
+            @AttributeOverride(name = "memberRole", column = @Column(name = "last_update_role"))
+//            @AttributeOverride(name = "loginId", column = @Column(name = "last_update_id", updatable = false)),
+//            @AttributeOverride(name = "memberNm", column = @Column(name = "last_update_nm", updatable = false)),
+//            @AttributeOverride(name = "memberRole", column = @Column(name = "last_update_role", updatable = false))
     })
     private AuditUser lastUpdateUser;
 

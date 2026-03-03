@@ -37,6 +37,12 @@ public class ApiResponseAdvisor implements ResponseBodyAdvice<Object> {
 //        auditService.log(request, body);
 //        notificationService.notify(body);
 
+
+        // 조회(GET)는 이력 제외
+//        if (!HttpMethod.GET.matches(request.getMethodValue())) {
+//            auditService.log(request, returnType, body);
+//        }
+
         // String 응답은 그대로 반환 (절대 래핑 금지)
         if (body instanceof String) {
             return body;

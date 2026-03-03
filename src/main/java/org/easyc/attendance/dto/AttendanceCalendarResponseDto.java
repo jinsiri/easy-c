@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.easyc.attendance.entity.Attendance;
+import org.easyc.attendance.entity.AttendanceApplication;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,6 +25,13 @@ public class AttendanceCalendarResponseDto {
 
     public AttendanceCalendarResponseDto(Attendance entity) {
         this.detailData = new AttendanceDayResponseDto(entity);
+    }
+
+    public AttendanceCalendarResponseDto(Attendance entity, AttendanceApplication requestEntity) {
+        AttendanceDayResponseDto dto = new AttendanceDayResponseDto(entity);
+        if( requestEntity != null ) dto.setChangeRequestId(requestEntity.getAttendanceApplicationId());
+
+        this.detailData = dto;
     }
 }
 

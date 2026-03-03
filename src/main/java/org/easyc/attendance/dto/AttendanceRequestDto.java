@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class AttendanceRequestDto {
-    private String loginId;
+    private Long memberId;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime workDate;

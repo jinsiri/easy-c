@@ -15,6 +15,6 @@ export type workType = 'NORMAL' | 'WEEKEND' | 'HOLIDAY';
 export type workStatus = 'PRESENT' | 'LATE' | 'EARLY_LEAVE' | 'ABSENT' | 'VACATION' | 'OUTSIDE' | 'BUSINESS_TRIP' | 'UNNORMAL_START' | 'UNNORMAL_END';
 
 export type vacationPolicyType = 'WORKING_DAY' | 'FINANCIAL_DAY';
-export type vacationType = 'FULL' | 'HALF_AM' | 'HALF_PM' | 'SICK_LEAVE' | 'SPECIAL_LEAVE';
+export type vacationType = 'FULL' | 'HALF_AM' | 'HALF_PM' | 'SICK_LEAVE' | 'SPECIAL_LEAVE' | 'HOLIDAY';
 
 export type dayName = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';

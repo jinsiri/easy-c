@@ -30,4 +30,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByLoginId(String loginId);
 
     Member findAllByLoginId(String loginId);
+
+    @Query("select m.memberNm from Member m where m.memberId =?1")
+    Optional<String> findMemberNmByMemberId(Long memberId);
 }

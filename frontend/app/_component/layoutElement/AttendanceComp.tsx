@@ -81,7 +81,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			const currentTime = dayjs();
 			await attendanceService.startTimeAttendanceData({
 				attendanceId: attendanceData?.dayData.attendanceId,
-				loginId: secureLocalStorage.getItem('loginId') as string,
+				memberId: secureLocalStorage.getItem('memberId') as number,
 				startTime: currentTime.format('YYYY-MM-DD HH:mm'),
 			});
 
@@ -98,7 +98,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 			const currentTime = dayjs();
 			await attendanceService.finishTimeAttendanceData({
 				attendanceId: attendanceData?.dayData.attendanceId,
-				loginId: secureLocalStorage.getItem('loginId') as string,
+				memberId: secureLocalStorage.getItem('memberId') as number,
 				endTime: currentTime.format('YYYY-MM-DD HH:mm'),
 			});
 

@@ -317,7 +317,6 @@ export default function AttendancePolicyDataPage() {
 											render={({ field }) => (
 												<TimePicker
 													{...field}
-													sx={{ maxWidth: '9rem' }}
 													slotProps={{
 														textField: {
 															error: !!errors.startTime,
@@ -342,7 +341,6 @@ export default function AttendancePolicyDataPage() {
 											render={({ field }) => (
 												<TimePicker
 													{...field}
-													sx={{ maxWidth: '9rem' }}
 													slotProps={{
 														textField: {
 															error: !!errors.endTime,
@@ -363,7 +361,6 @@ export default function AttendancePolicyDataPage() {
 												render={({ field }) => (
 													<TimePicker
 														{...field}
-														sx={{ maxWidth: '9rem' }}
 														slotProps={{
 															textField: {
 																error: !!errors.coreStartTime,
@@ -380,7 +377,6 @@ export default function AttendancePolicyDataPage() {
 												render={({ field }) => (
 													<TimePicker
 														{...field}
-														sx={{ maxWidth: '9rem' }}
 														slotProps={{
 															textField: {
 																error: !!errors.coreEndTime,
@@ -409,7 +405,6 @@ export default function AttendancePolicyDataPage() {
 											render={({ field }) => (
 												<TimePicker
 													{...field}
-													sx={{ maxWidth: '9rem' }}
 													slotProps={{
 														textField: {
 															error: !!errors.halfLeaveStartTime,
@@ -437,7 +432,6 @@ export default function AttendancePolicyDataPage() {
 											render={({ field }) => (
 												<TimePicker
 													{...field}
-													sx={{ maxWidth: '9rem' }}
 													slotProps={{
 														textField: {
 															error: !!errors.halfLeaveEndTime,
@@ -454,13 +448,7 @@ export default function AttendancePolicyDataPage() {
 										name='allowMarginMinute'
 										control={control}
 										render={({ field: { onChange, value } }) => (
-											<Select
-												name={'allowMarginMinute'}
-												value={value}
-												onChange={onChange}
-												size='small'
-												sx={{ minWidth: '9rem', marginRight: '0.5rem' }}
-											>
+											<Select name={'allowMarginMinute'} value={value} onChange={onChange} size='small' sx={{ marginRight: '0.5rem' }}>
 												{allowMarginMinuteList.map((item) => (
 													<MenuItem key={item} value={item}>
 														{item}

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity // @PreAuthorize, @PostAuthorize 등 메서드 레벨 보안 활성화
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -49,8 +51,8 @@ public class SecurityConfig {
                 // URL별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/error").permitAll()  // 이거 추가!
-                        .anyRequest().authenticated() // 그 외 인증 필요
+                        .requestMatchers("/error").permitAll()
+                        .anyRequest().authenticated() // 그 외 인증 필요 (세부 권한은 @PreAuthorize로 처리)
 //                       .anyRequest().permitAll() // 테스트용
                 )
 

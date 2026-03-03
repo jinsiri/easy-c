@@ -100,15 +100,17 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 			},
 		},
 		{
-			header: '상세',
-			key: 'detail',
-			formatter: () => {
+			header: '수정 요청 상세',
+			key: 'changeRequestId',
+			formatter: (value, row) => {
 				return (
-					<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-						<Button size='small' onClick={() => router.push('/attendance/user/modal?type=detail')}>
-							수정
-						</Button>
-					</Box>
+					value && (
+						<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+							<Button size='small' variant='outlined' onClick={() => router.push('/attendance/user/modal?type=detail')}>
+								상세 보기
+							</Button>
+						</Box>
+					)
 				);
 			},
 		},

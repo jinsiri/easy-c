@@ -1,5 +1,5 @@
 /** MUI */
-import { AccountTree, WorkHistoryRounded, CalendarMonthRounded } from '@mui/icons-material';
+import { AccountTree, WorkHistoryRounded, CalendarMonthRounded, BeachAccessRounded } from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '@/type/types';
@@ -54,6 +54,12 @@ const AdminMenuItem: menuType[] = [
 						type: '2depth',
 						url: '/popup',
 					},
+					{
+						id: 'admin-normal-accesslogs',
+						title: '접근 이력',
+						type: '2depth',
+						url: '/access-logs',
+					},
 				],
 			},
 			{
@@ -91,16 +97,49 @@ const AdminMenuItem: menuType[] = [
 				icon: WorkHistoryRounded,
 				children: [
 					{
+						id: 'admin-attendance-policy',
+						title: '근태 정책 관리',
+						type: '2depth',
+						url: '/policy',
+					},
+					{
 						id: 'admin-attendance-company',
 						title: '전사 근태 관리',
 						type: '2depth',
 						url: '/company',
 					},
 					{
-						id: 'admin-attendance-policy',
-						title: '근태 정책 관리',
+						id: 'admin-attendance-application',
+						title: '근태 요청 관리',
+						type: '2depth',
+						url: '/application',
+					},
+				],
+			},
+			{
+				id: 'admin-vacation',
+				title: '휴가 관리',
+				type: '1depth',
+				url: '/vacation',
+				icon: BeachAccessRounded,
+				children: [
+					{
+						id: 'admin-vacation-policy',
+						title: '휴가 정책 관리',
 						type: '2depth',
 						url: '/policy',
+					},
+					{
+						id: 'admin-vacation-company',
+						title: '전사 휴가 관리',
+						type: '2depth',
+						url: '/company',
+					},
+					{
+						id: 'admin-vacation-application',
+						title: '휴가 요청 관리',
+						type: '2depth',
+						url: '/application',
 					},
 				],
 			},

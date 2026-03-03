@@ -5,8 +5,10 @@ import org.easyc.attendance.constant.*;
 import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.*;
 import org.easyc.attendance.repository.*;
+import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
+import org.easyc.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -14,17 +16,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.easyc.common.util.utilFunc.parseDate;
-import static org.easyc.common.util.utilFunc.parseDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class AttendanceCompanyService {
 
     private final AttendanceRepository attendanceRepository;
-    private final AttendanceChangeRequestRepository attendanceChangeRequestRepository;
+    private final AttendanceApplicationRepository attendanceApplicationRepository;
 
-    public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData (AttendanceCompanyRequestDto request){
+    public AttendanceCompanyResponseDto getAttendanceCompanyOnedayData (SearchRequestDto request){
         LocalDate workDate = request.getWorkDate();
 
         if(workDate == null){
@@ -32,7 +32,7 @@ public class AttendanceCompanyService {
         }
 
         List<Attendance> attendance = attendanceRepository.findAllByWorkDate(workDate);
-        List<AttendanceChangeRequest> requestList = attendanceChangeRequestRepository.findAllByWorkDateAndActiveTrueOrderByWorkRequestIdAsc(request.getWorkDate());
+        List<AttendanceApplication> requestList = attendanceApplicationRepository.findAllByWorkDateAndActiveTrueOrderByAttendanceApplicationIdAsc(request.getWorkDate());
 
         Integer lateCount = 0;
         Integer earlyLeaveCount = 0;
@@ -61,7 +61,7 @@ public class AttendanceCompanyService {
         return result;
     }
 
-    public List<AttendanceDayResponseDto> getAttendanceCompanySearch(AttendanceCompanyRequestDto request){
+    public List<AttendanceDayResponseDto> getAttendanceCompanySearch(SearchRequestDto request){
         LocalDate workDate = request.getWorkDate();
         String searchCategory = request.getSearchCategory();
         String searchValue = request.getSearchValue();
@@ -85,7 +85,7 @@ public class AttendanceCompanyService {
                     break;
 
                 default:
-                    attendance = attendanceRepository.findAllByWorkDateAndRegisterUser_MemberNm(workDate, searchValue);
+                    attendance = attendanceRepository.findAllByWorkDateAndMemberNmContains(workDate, searchValue);
                     break;
             }
         }

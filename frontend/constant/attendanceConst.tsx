@@ -34,6 +34,7 @@ export const VACATIONTYPE: Record<vacationType, string> = {
 	HALF_PM: '오후 반차',
 	SICK_LEAVE: '병가',
 	SPECIAL_LEAVE: '특별휴가',
+	HOLIDAY: '휴일 대체 휴가',
 };
 
 export const CURRENTSTATE: Record<string, string> = {
@@ -62,10 +63,4 @@ export const WORKTIMERULE: Record<string, string> = {
 	ALWAYS_40: '법정근로시간 적용',
 	CAP_AT_40: '법정근로시간까지 제한',
 	BY_WORK_DAYS: '근무일x1일 소정근로시간',
-};
-
-export const BASICSTATUS: Record<string, string> = {
-	PENDING: '대기',
-	APPROVED: '승인',
-	REJECTED: '거절',
 };
