@@ -126,7 +126,7 @@ const CustomAgGridComp = forwardRef(
 			}
 		};
 
-		const onGridSizeChanged = useCallback((params) => {
+		const onGridSizeChanged = useCallback((params: { api: { sizeColumnsToFit: () => void } }) => {
 			params.api.sizeColumnsToFit();
 		}, []);
 

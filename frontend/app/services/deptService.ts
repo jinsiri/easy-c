@@ -1,5 +1,5 @@
 import axiosConfig from '../_lib/axiosConfig';
-import { BulkDeleteRequestDto, MemberResponseDto } from '@/app/services/memberService';
+import { BulkDeleteRequestDto } from '@/app/services/memberService';
 import { DeptResponseDto, JobGradeResponseDto, JobPositionResponseDto, JobTitleResponseDto } from '@/type/dept';
 
 export interface JobPositionRequestDto {

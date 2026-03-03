@@ -228,7 +228,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 						<Box sx={{ flexGrow: 1, height: '1px', bgcolor: theme.palette.grey[300] }} />
 					</Box>
 
-					<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
+					<Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
 						<Stack alignItems={'flex-end'} sx={{ mb: 2 }}>
 							<Stack direction={'row'} spacing={1}>
 								<Button variant='outlined' onClick={() => router.push(`/admin/dept/list/assign?deptId=${selectedDept.deptId}`)}>
@@ -237,7 +237,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 								<Button variant='outlined'>일괄 등록</Button>
 							</Stack>
 						</Stack>
-						<CommonTabs tabs={deptTabs} />
+						<CommonTabs tabs={deptTabs} containerSx={{ display: 'flex', flexDirection: 'column', padding: '0 1.125rem' }} />
 					</Box>
 				</Grid>
 			</Grid>

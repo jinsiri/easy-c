@@ -55,7 +55,6 @@ public class MemberService {
     public List<MemberLightResponseDto> getAllMembers() {
         List<MemberLightResponseDto> members = memberRepositoryCustom.findLightMembers();
 
-
         return members;
     }
 
