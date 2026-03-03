@@ -65,5 +65,9 @@ public class MemberLightResponseDto extends BaseDto {
         this.deptNm = deptNm;
         this.jobTitle = jobTitle;
         this.jobPosition = jobPosition;
+
+        if (deptNm != null) {
+            this.deptNms.add(deptNm);
+        }
     }
 }
