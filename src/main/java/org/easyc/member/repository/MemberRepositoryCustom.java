@@ -21,7 +21,6 @@ import static org.easyc.member.entity.QMember.member;
 import static org.easyc.member.entity.QMemberPersonal.memberPersonal;
 import static org.easyc.member.entity.QMemberProfile.memberProfile;
 import static org.easyc.memberJobPositionMap.entity.QMemberJobPositionMap.memberJobPositionMap;
-import static org.easyc.memberJobTitleMap.entity.QMemberJobTitleMap.memberJobTitleMap;
 
 @RequiredArgsConstructor
 @Repository
@@ -58,8 +57,7 @@ public class MemberRepositoryCustom {
                 .leftJoin(memberPersonal).on(member.memberId.eq(memberPersonal.memberId))
                 .leftJoin(deptMemberMap).on(member.memberId.eq(deptMemberMap.memberId), deptMemberMap.deleted.isFalse())
                 .leftJoin(dept).on(deptMemberMap.deptId.eq(dept.deptId))
-                .leftJoin(memberJobTitleMap).on(member.memberId.eq(memberJobTitleMap.memberId), memberJobTitleMap.deleted.isFalse())
-                .leftJoin(jobTitle).on(memberJobTitleMap.jobTitleId.eq(jobTitle.jobTitleId))
+                .leftJoin(jobTitle).on(deptMemberMap.jobTitleId.eq(jobTitle.jobTitleId))
                 .leftJoin(memberJobPositionMap).on(member.memberId.eq(memberJobPositionMap.memberId), memberJobPositionMap.deleted.isFalse())
                 .leftJoin(jobPosition).on(memberJobPositionMap.jobPositionId.eq(jobPosition.jobPositionId))
                 .where(member.deleted.isFalse())
@@ -110,8 +108,7 @@ public class MemberRepositoryCustom {
                 .leftJoin(memberPersonal).on(member.memberId.eq(memberPersonal.memberId))
                 .leftJoin(deptMemberMap).on(member.memberId.eq(deptMemberMap.memberId), deptMemberMap.deleted.isFalse())
                 .leftJoin(dept).on(deptMemberMap.deptId.eq(dept.deptId))
-                .leftJoin(memberJobTitleMap).on(member.memberId.eq(memberJobTitleMap.memberId), memberJobTitleMap.deleted.isFalse())
-                .leftJoin(jobTitle).on(memberJobTitleMap.jobTitleId.eq(jobTitle.jobTitleId))
+                .leftJoin(jobTitle).on(deptMemberMap.jobTitleId.eq(jobTitle.jobTitleId))
                 .leftJoin(memberJobPositionMap).on(member.memberId.eq(memberJobPositionMap.memberId), memberJobPositionMap.deleted.isFalse())
                 .leftJoin(jobPosition).on(memberJobPositionMap.jobPositionId.eq(jobPosition.jobPositionId))
                 .where(
@@ -170,8 +167,7 @@ public class MemberRepositoryCustom {
                 .leftJoin(memberPersonal).on(member.memberId.eq(memberPersonal.memberId))
                 .leftJoin(deptMemberMap).on(member.memberId.eq(deptMemberMap.memberId), deptMemberMap.deleted.isFalse())
                 .leftJoin(dept).on(deptMemberMap.deptId.eq(dept.deptId))
-                .leftJoin(memberJobTitleMap).on(member.memberId.eq(memberJobTitleMap.memberId), memberJobTitleMap.deleted.isFalse())
-                .leftJoin(jobTitle).on(memberJobTitleMap.jobTitleId.eq(jobTitle.jobTitleId))
+                .leftJoin(jobTitle).on(deptMemberMap.jobTitleId.eq(jobTitle.jobTitleId))
                 .leftJoin(memberJobPositionMap).on(member.memberId.eq(memberJobPositionMap.memberId), memberJobPositionMap.deleted.isFalse())
                 .leftJoin(jobPosition).on(memberJobPositionMap.jobPositionId.eq(jobPosition.jobPositionId))
                 .where(
@@ -225,8 +221,7 @@ public class MemberRepositoryCustom {
                 .leftJoin(deptMemberMap).on(member.memberId.eq(deptMemberMap.memberId), deptMemberMap.deleted.isFalse())
                 .leftJoin(dept).on(deptMemberMap.deptId.eq(dept.deptId))
                 // 기타 직급/직책 조인
-                .leftJoin(memberJobTitleMap).on(member.memberId.eq(memberJobTitleMap.memberId), memberJobTitleMap.deleted.isFalse())
-                .leftJoin(jobTitle).on(memberJobTitleMap.jobTitleId.eq(jobTitle.jobTitleId))
+                .leftJoin(jobTitle).on(deptMemberMap.jobTitleId.eq(jobTitle.jobTitleId))
                 .leftJoin(memberJobPositionMap).on(member.memberId.eq(memberJobPositionMap.memberId), memberJobPositionMap.deleted.isFalse())
                 .leftJoin(jobPosition).on(memberJobPositionMap.jobPositionId.eq(jobPosition.jobPositionId))
                 .where(
