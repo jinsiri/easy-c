@@ -6,7 +6,6 @@ import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import { AgGridReact } from 'ag-grid-react';
 import { MemberResponseDto, memberService } from '@/app/services/memberService';
 import { ColDef, ICellRendererParams } from 'ag-grid-community';
-import { palette } from '@mui/system';
 
 interface Props {
 	deptId: number;

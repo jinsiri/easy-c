@@ -1,6 +1,7 @@
 package org.easyc.member.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
@@ -34,11 +35,18 @@ public class MemberLightResponseDto extends BaseDto {
     private String employmentStatus;
     // personal
     private String phoneNumber;
-    // dept
+    // role
     private String deptNm;
-    private Set<String> deptNms = new LinkedHashSet<>();
     private String jobTitle;
     private String jobPosition;
+    private String JobGrade;
+    private String displayDeptInfo;
+
+    @Builder.Default
+    private Set<String> deptNms = new LinkedHashSet<>();
+
+    @Builder.Default
+    private Set<String> deptInfoSet = new LinkedHashSet<>();
 
     @QueryProjection
     public MemberLightResponseDto(
@@ -52,6 +60,9 @@ public class MemberLightResponseDto extends BaseDto {
     ) {
 //        super(deleted, active, registerDate, registerIp, registerUser, lastUpdateDate, lastUpdateIp, lastUpdateId, lastUpdateNm);
         super(deleted, active, registerDate, registerIp, registerUser, lastUpdateDate, lastUpdateIp, lastUpdateUser);
+
+        this.deptInfoSet = new LinkedHashSet<>();
+        this.deptNms = new LinkedHashSet<>();
         this.memberId = memberId;
         this.memberNm = memberNm;
         this.loginId = loginId;
@@ -62,12 +73,22 @@ public class MemberLightResponseDto extends BaseDto {
         this.employmentType = EnumOptionMapper.getLabel(employmentType, "employment.type");
         this.employmentStatus = EnumOptionMapper.getLabel(employmentStatus, "employment.status");
         this.phoneNumber = phoneNumber;
-        this.deptNm = deptNm;
-        this.jobTitle = jobTitle;
         this.jobPosition = jobPosition;
-
+        this.deptNm = deptNm;
         if (deptNm != null) {
             this.deptNms.add(deptNm);
         }
+        this.addDeptInfo(deptNm, jobTitle);
+    }
+
+    public void addDeptInfo(String deptNm, String jobTitle) {
+        if (deptNm != null) {
+            String info = (jobTitle != null && !jobTitle.isEmpty()) ? String.format("%s(%s)", deptNm, jobTitle) : deptNm;
+            this.deptInfoSet.add(info);
+        }
+    }
+
+    public void finalizeDisplayInfo() {
+        this.displayDeptInfo = String.join(", ", this.deptInfoSet);
     }
 }

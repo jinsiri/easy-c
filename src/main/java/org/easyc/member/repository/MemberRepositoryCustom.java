@@ -66,13 +66,18 @@ public class MemberRepositoryCustom {
                 .fetch();
 
         Map<Long, MemberLightResponseDto> map = new LinkedHashMap<>();
-
         for (MemberLightResponseDto dto : flatResults) {
-            map.computeIfAbsent(dto.getMemberId(), id -> dto)
-                    .getDeptNms().addAll(dto.getDeptNms());
+            MemberLightResponseDto mainDto = map.computeIfAbsent(dto.getMemberId(), id -> dto);
+
+            if (mainDto != dto) {
+                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle());
+            }
         }
 
-        return new ArrayList<>(map.values());
+        List<MemberLightResponseDto> result = new ArrayList<>(map.values());
+        result.forEach(MemberLightResponseDto::finalizeDisplayInfo);
+
+        return result;
     }
 
     public List<MemberLightResponseDto> findLightMembersByDeptIsNull() {
@@ -117,8 +122,11 @@ public class MemberRepositoryCustom {
 
         Map<Long, MemberLightResponseDto> map = new LinkedHashMap<>();
         for (MemberLightResponseDto dto : flatResults) {
-            map.computeIfAbsent(dto.getMemberId(), id -> dto)
-                    .getDeptNms().addAll(dto.getDeptNms());
+            MemberLightResponseDto mainDto = map.computeIfAbsent(dto.getMemberId(), id -> dto);
+
+            if (mainDto != dto) {
+                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle());
+            }
         }
 
         return new ArrayList<>(map.values());
@@ -174,11 +182,13 @@ public class MemberRepositoryCustom {
 
         Map<Long, MemberLightResponseDto> map = new LinkedHashMap<>();
         for (MemberLightResponseDto dto : flatResults) {
-            MemberLightResponseDto existing = map.computeIfAbsent(dto.getMemberId(), id -> dto);
-            if (dto.getDeptNms() != null) {
-                existing.getDeptNms().addAll(dto.getDeptNms());
+            MemberLightResponseDto mainDto = map.computeIfAbsent(dto.getMemberId(), id -> dto);
+
+            if (mainDto != dto) {
+                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle());
             }
         }
+
 
         return new ArrayList<>(map.values());
     }
@@ -226,11 +236,11 @@ public class MemberRepositoryCustom {
                 .fetch();
 
         Map<Long, MemberLightResponseDto> map = new LinkedHashMap<>();
-
         for (MemberLightResponseDto dto : flatResults) {
-            MemberLightResponseDto existing = map.computeIfAbsent(dto.getMemberId(), id -> dto);
-            if (dto.getDeptNms() != null) {
-                existing.getDeptNms().addAll(dto.getDeptNms());
+            MemberLightResponseDto mainDto = map.computeIfAbsent(dto.getMemberId(), id -> dto);
+
+            if (mainDto != dto) {
+                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle());
             }
         }
 

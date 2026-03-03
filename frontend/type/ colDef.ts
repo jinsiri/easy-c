@@ -2,7 +2,7 @@ import { ColDef } from 'ag-grid-community';
 
 export const memberColDefs: ColDef<Record<string, any>>[] = [
 	{ field: 'employeeId', headerName: '사번', editable: false },
-	{ field: 'deptNms', headerName: '소속', editable: false },
+	{ field: 'displayDeptInfo', headerName: '부서-직책', editable: false },
 	{ field: 'memberNm', headerName: '이름', editable: false },
 	{ field: 'loginId', headerName: '로그인아이디', editable: false },
 	{ field: 'positionTitle', headerName: '직위', editable: false },
