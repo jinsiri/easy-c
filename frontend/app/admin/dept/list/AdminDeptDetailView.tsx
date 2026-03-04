@@ -56,7 +56,7 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 
 	useEffect(() => {
 		fetchMembersMappedToDeptId(deptId);
-	}, []);
+	}, [deptId]);
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setChecked(event.target.checked);
@@ -89,7 +89,6 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 			<Grid container spacing={2} sx={{ flexGrow: 1 }}>
 				<Grid size={{ xs: 12, md: 4 }} sx={{ height: '100%' }}>
 					<CustomAgGridComp
-						key={deptId}
 						ref={gridRef}
 						rowData={deptMembers}
 						colDefs={deptMemberColDefs}
