@@ -3,10 +3,10 @@ import { persist } from 'zustand/middleware';
 
 interface DeptStore {
 	expandedIds: string[];
-	selectedId: string | null;
+	selectedId: number | null;
 	_hasHydrated: boolean;
 	setExpandedIds: (ids: string[]) => void;
-	setSelectedId: (id: string | null) => void;
+	setSelectedId: (id: number | null) => void;
 	setHasHydrated: (state: boolean) => void;
 }
 

@@ -94,7 +94,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 	const theme = useTheme();
 	const { success, danger } = useDialogStore();
 	const { expandedIds, setExpandedIds, selectedId, setSelectedId, _hasHydrated } = useDeptTreeStore();
-	const rootId = dbData?.[0]?.deptId ? String(dbData[0].deptId) : null;
+	const rootId = dbData?.[0]?.deptId ? dbData[0].deptId : null;
 	const selectedDept = dbData.find((d) => d.deptId === Number(selectedId)) ?? dbData[0];
 
 	const deptTabs = [
@@ -103,7 +103,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 			content: (
 				<Box sx={{ p: '1rem 1.5rem' }}>
 					<DeptManageComp
-						deptId={selectedDept.deptId}
+						deptId={selectedId || 1}
 						items={[
 							{ label: '부서명(한글)', value: selectedDept.deptNm ?? '부서 미선택', field: 'deptNm' },
 							{ label: '부서메일아이디', value: selectedDept.deptEmail ?? '-' },
@@ -114,7 +114,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 				</Box>
 			),
 		},
-		{ label: '부서원 목록', content: <AdminDeptDetailView deptId={selectedDept.deptId} /> },
+		{ label: '부서원 목록', content: <AdminDeptDetailView key={selectedId} deptId={selectedId || 1} /> },
 	];
 
 	const deleteDept = async (deptId: number) => {
@@ -134,7 +134,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 		await deleteDept(deptId);
 		await success('부서가 정상적으로 삭제되었습니다.');
 
-		setSelectedId(String(parentId));
+		setSelectedId(parentId);
 		router.refresh();
 	};
 
@@ -155,7 +155,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 			const exists = dbData.some((d) => d.deptId === Number(selectedId));
 
 			if (!exists && dbData[0]) {
-				setSelectedId(String(dbData[0].deptId));
+				setSelectedId(dbData[0].deptId);
 			}
 		}
 	}, [dbData]);
@@ -189,11 +189,11 @@ export default function AdminDeptListView({ dbData }: Props) {
 
 					<Box sx={{ mb: 1 }}>
 						<Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-							<IconButton className='contained-primary light' onClick={() => router.push(`/admin/dept/list/new?parentId=${selectedDept.deptId}`)}>
+							<IconButton className='contained-primary light' onClick={() => router.push(`/admin/dept/list/new?parentId=${selectedId}`)}>
 								<AddCircleOutline className='svg-small' />
 							</IconButton>
-							{selectedDept.deptId && selectedDept.deptId !== 1 && (
-								<IconButton className='contained-primary light' onClick={() => handleDelete(selectedDept.deptId)}>
+							{selectedId && selectedId !== 1 && (
+								<IconButton className='contained-primary light' onClick={() => handleDelete(selectedId)}>
 									<RemoveCircleOutline className='svg-small' />
 								</IconButton>
 							)}
@@ -209,7 +209,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 							selectedId={String(selectedId)}
 							placeholder='부서명을 검색하세요.'
 							onNodeClick={(node) => {
-								setSelectedId(String(node.deptId));
+								setSelectedId(node.deptId);
 							}}
 						/>
 					</Box>
@@ -231,7 +231,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 					<Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
 						<Stack alignItems={'flex-end'} sx={{ mb: 2 }}>
 							<Stack direction={'row'} spacing={1}>
-								<Button variant='outlined' onClick={() => router.push(`/admin/dept/list/assign?deptId=${selectedDept.deptId}`)}>
+								<Button variant='outlined' onClick={() => router.push(`/admin/dept/list/assign?deptId=${selectedId}`)}>
 									부서원 추가
 								</Button>
 								<Button variant='outlined'>일괄 등록</Button>
