@@ -1,8 +1,7 @@
 package org.easyc.vacation.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.attendance.dto.AttendancePolicyDto;
-import org.easyc.attendance.service.AttendancePolicyService;
+import org.easyc.common.audit.activity.AuditAction;
 import org.easyc.vacation.dto.VacationPolicyDto;
 import org.easyc.vacation.service.VacationPolicyService;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +21,13 @@ public class VacationPolicyController {
         return vacationPolicyService.getAllPolicy();
     }
 
+    @AuditAction(code = "VACATION_POLICY_SAVE", name = "휴가 정책 저장", targetType = "VACATION_POLICY")
     @PostMapping("/save")
     public void savePolicyData(@RequestBody VacationPolicyDto request) {
         vacationPolicyService.savePolicyData(request);
     }
 
+    @AuditAction(code = "VACATION_POLICY_DELETE", name = "휴가 정책 삭제", targetType = "VACATION_POLICY")
     @DeleteMapping("/delete")
     public void deletePolicyData(@RequestParam("target") String encodedId) {
         // Base64 디코딩

@@ -60,6 +60,12 @@ const AdminMenuItem: menuType[] = [
 						type: '2depth',
 						url: '/accesslogs',
 					},
+					{
+						id: 'admin-normal-activitylogs',
+						title: '활동 이력',
+						type: '2depth',
+						url: '/activitylogs',
+					},
 				],
 			},
 			{

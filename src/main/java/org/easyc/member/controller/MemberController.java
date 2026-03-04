@@ -2,6 +2,7 @@ package org.easyc.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.easyc.common.audit.activity.AuditAction;
 import org.easyc.common.dto.BulkDeleteRequestDto;
 import org.easyc.member.dto.*;
 import org.easyc.member.service.MemberService;
@@ -121,6 +122,7 @@ public class MemberController {
     /**
      * 멤버 등록
      */
+    @AuditAction(code = "MEMBER_CREATE", name = "회원 등록", targetType = "MEMBER")
     @PostMapping
     public void createMember(@RequestBody MemberCreateRequestDto dto) {
         memberService.createMember(
@@ -140,6 +142,7 @@ public class MemberController {
      * @param memberId 수정할 멤버 ID
      * @param dto      수정 데이터
      */
+    @AuditAction(code = "MEMBER_UPDATE", name = "회원 수정", targetType = "MEMBER")
     @PutMapping("/{memberId}")
     public void updateMember(@PathVariable Long memberId, @RequestBody MemberUpdateRequestDto dto) {
         memberService.updateMember(memberId, dto);
@@ -151,6 +154,7 @@ public class MemberController {
      * @param memberId 변경할 멤버 ID
      * @param dto      새 비밀번호
      */
+    @AuditAction(code = "MEMBER_PASSWORD_CHANGE", name = "비밀번호 변경", targetType = "MEMBER")
     @PutMapping("/{memberId}/password")
     public void updatePassword(@PathVariable Long memberId, @RequestBody MemberPasswordUpdateRequestDto dto) {
         memberService.updatePassword(memberId, dto.getPassword());
@@ -161,6 +165,7 @@ public class MemberController {
      *
      * @param memberId 삭제할 멤버 ID
      */
+    @AuditAction(code = "MEMBER_DELETE", name = "회원 삭제", targetType = "MEMBER")
     @DeleteMapping("/{memberId}")
     public void deleteMember(@PathVariable Long memberId) {
         memberService.delete(memberId);
@@ -171,6 +176,7 @@ public class MemberController {
      *
      * @param requestDto 삭제할 멤버 ID 리스트를 담은 DTO
      */
+    @AuditAction(code = "MEMBER_BULK_DELETE", name = "회원 일괄 삭제", targetType = "MEMBER")
     @DeleteMapping
     public void deleteMembers(@RequestBody BulkDeleteRequestDto requestDto) {
         memberService.delete(requestDto.getIds());

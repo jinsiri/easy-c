@@ -1,6 +1,7 @@
 package org.easyc.attendance.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.audit.activity.AuditAction;
 import org.easyc.attendance.dto.AttendancePolicyDto;
 import org.easyc.attendance.entity.AttendancePolicy;
 import org.easyc.attendance.repository.AttendancePolicyRepository;
@@ -22,11 +23,13 @@ public class AttendancePolicyController {
         return attendancePolicyService.getAllPolicy();
     }
 
+    @AuditAction(code = "ATTENDANCE_POLICY_SAVE", name = "근태 정책 저장", targetType = "ATTENDANCE_POLICY")
     @PostMapping("/save")
     public void savePolicyData(@RequestBody AttendancePolicyDto request) {
         attendancePolicyService.savePolicyData(request);
     }
 
+    @AuditAction(code = "ATTENDANCE_POLICY_DELETE", name = "근태 정책 삭제", targetType = "ATTENDANCE_POLICY")
     @DeleteMapping("/delete")
     public void deletePolicyData(@RequestParam("target") String encodedId) {
         // Base64 디코딩

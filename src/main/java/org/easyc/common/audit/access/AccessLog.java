@@ -37,12 +37,12 @@ public class AccessLog extends BaseLogEntity {
     @Column(length = 2000)
     private String queryString;     // 쿼리 파라미터 (?page=0&size=30 등), 없으면 null
 
-    /** 상관관계 추적용 */
-    private String requestId;
-
     /** 화면 이동 추적용 */
     @Column(length = 2000)
     private String referer;
+
+    /** 상관관계 추적용 */
+    private String requestId;
 
     private String ip;              // 클라이언트 IP (프록시 경유 시 X-Forwarded-For 헤더 우선)
     @Column(length = 1000)
