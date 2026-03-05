@@ -1,6 +1,7 @@
 package org.easyc.attendance.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.audit.activity.AuditAction;
 import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.attendance.service.AttendanceApplicationService;
@@ -23,6 +24,7 @@ public class AttendanceApplicationController {
         return attendanceApplicationService.getAllAttendanceApplication();
     }
 
+    @AuditAction(code = "ATTENDANCE_APP_SAVE", name = "근태 신청", targetType = "ATTENDANCE_APP")
     @PostMapping("/save")
     public void saveAttendanceApplication(@RequestBody AttendanceApplicationDto request) {
         attendanceApplicationService.saveAttendanceApplication(request);

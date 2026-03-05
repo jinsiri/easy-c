@@ -2,6 +2,7 @@ package org.easyc.dept.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.easyc.common.audit.activity.AuditAction;
 import org.easyc.dept.dto.DeptRequestDto;
 import org.easyc.dept.dto.DeptResponseDto;
 import org.easyc.dept.entity.Dept;
@@ -38,6 +39,7 @@ public class DeptController {
         return deptService.findById(id);
     }
 
+    @AuditAction(code = "DEPT_CREATE", name = "부서 등록", targetType = "DEPT")
     @PostMapping
     public ResponseEntity<Dept> saveChildDept(@RequestBody DeptRequestDto deptRequestDto) {
         Dept savedDept = deptService.saveChildDept(deptRequestDto);
@@ -45,11 +47,13 @@ public class DeptController {
         return ResponseEntity.ok(savedDept);
     }
 
+    @AuditAction(code = "DEPT_UPDATE", name = "부서 수정", targetType = "DEPT")
     @PutMapping("/{id}")
     public void updateDept(@PathVariable Long id, @RequestBody DeptRequestDto dto) {
         deptService.update(id, dto);
     }
 
+    @AuditAction(code = "DEPT_DELETE", name = "부서 삭제", targetType = "DEPT")
     @DeleteMapping("/{deptId}")
     public ResponseEntity<Void> deleteDept(@PathVariable Long deptId) {
         deptService.softDeleteDept(deptId);
