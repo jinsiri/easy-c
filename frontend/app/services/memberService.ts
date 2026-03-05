@@ -10,6 +10,10 @@ export interface MemberResponseDto {
 	[key: string]: any;
 }
 
+export interface MemberBundleResponseDto {
+	[key: string]: any;
+}
+
 export interface MemberProfileResponseDto {
 	// 기본정보 탭 타입
 	[key: string]: any;
@@ -57,6 +61,9 @@ export const memberService = {
 
 	// 기준 부서와 매핑된 멤버 목록 조회
 	getMembersMappedToDeptId: (deptId: number) => axiosConfig.get(`/api/members?target-deptId=${deptId}`),
+
+	// 멤버 등록/수정 시 메타데이터 번들 조회
+	getMemberBundle: () => axiosConfig.get<MemberBundleResponseDto[]>(`/api/member-bundle`),
 
 	// 기본 인사정보 조회
 	getMember: (memberId: number) => axiosConfig.get<MemberResponseDto>(`/api/members/${memberId}`),

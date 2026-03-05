@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { use, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
 	Box,
@@ -22,7 +22,7 @@ import {
 	useTheme,
 } from '@mui/material';
 import { Add, ArrowBack, Delete } from '@mui/icons-material';
-import { memberService } from '@/app/services/memberService';
+import { MemberBundleResponseDto, memberService } from '@/app/services/memberService';
 import { useDialogStore } from '@/store/useDialogStore';
 
 // ===== 타입 =====
@@ -56,8 +56,10 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 			{ key: 'employeeId', label: '사번', required: true },
 			{ key: 'extensionNumber', label: '대표전화' },
 			{ key: 'departmentPosition', label: '부서/직책' },
-			{ key: 'positionTitle', label: '직위' },
-			{ key: 'jobTitle', label: '직무' },
+			{ key: 'jobPosition', label: '직위' },
+			{ key: 'jobGrade', label: '직급' },
+			{ key: 'jobTitle', label: '직책' },
+			{ key: 'jobRole', label: '직무' },
 			{ key: 'email', label: '이메일' },
 			{
 				key: 'employmentStatus',
@@ -215,7 +217,7 @@ const careerCols: ColDef[] = [
 	{ key: 'startDate', label: '시작일', type: 'date' },
 	{ key: 'endDate', label: '종료일', type: 'date' },
 	{ key: 'companyName', label: '근무처', type: 'text' },
-	{ key: 'positionTitle', label: '직위', type: 'text' },
+	{ key: 'jobPosition', label: '직위', type: 'text' },
 	{ key: 'jobDescription', label: '담당업무', type: 'text' },
 	{ key: 'workPeriod', label: '근속기간', type: 'text' },
 	{ key: 'resignationReason', label: '퇴직사유', type: 'text' },
@@ -279,6 +281,16 @@ export default function MemberNewPage() {
 	const theme = useTheme();
 	const { alert, success } = useDialogStore();
 	const [saving, setSaving] = useState(false);
+	const [memberBundle, setMemberBundle] = useState<MemberBundleResponseDto>({});
+
+	const fecthMemberBundle = async () => {
+		const data = await memberService.getMemberBundle();
+		setMemberBundle(data);
+	};
+
+	useEffect(() => {
+		fecthMemberBundle();
+	}, []);
 
 	// totalInfoSections의 모든 필드를 하나의 state로 관리
 	const [formData, setFormData] = useState<Record<string, string>>({
@@ -290,8 +302,10 @@ export default function MemberNewPage() {
 		employeeId: '',
 		extensionNumber: '',
 		departmentPosition: '',
-		positionTitle: '',
+		jobPosition: '',
+		jobGrade: '',
 		jobTitle: '',
+		jobRole: '',
 		email: '',
 		employmentStatus: 'ACTIVE',
 		employmentType: '',
