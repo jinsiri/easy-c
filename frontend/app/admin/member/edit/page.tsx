@@ -25,29 +25,11 @@ import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import { Add, ArrowBack, Delete } from '@mui/icons-material';
 import { memberService } from '@/app/services/memberService';
 import { useDialogStore } from '@/store/useDialogStore';
-
-// ===== 타입 =====
-
-type FieldDef = {
-	key: string;
-	label: string;
-	wide?: boolean;
-	required?: boolean;
-	readOnly?: boolean;
-	type?: 'text' | 'password' | 'date' | 'number' | 'select' | 'checkbox';
-	options?: { label: string; value: string }[];
-};
-
-type ColDef = {
-	key: string;
-	label: string;
-	type?: 'text' | 'password' | 'date' | 'number' | 'select';
-	options?: { label: string; value: string }[];
-};
+import { careerCols, rewardCols, qualificationCols, languageCols, MemberColDef, MemberFieldDef } from '@/app/admin/member/_constant/formConst';
+import { makeEmptyRow } from '@/app/admin/member/_utils/formUtil';
 
 // ===== 필드 정의 (loginId 읽기전용, 비밀번호 제외) =====
-
-const editInfoSections: { title: string; fields: FieldDef[] }[] = [
+const editInfoSections: { title: string; fields: MemberFieldDef[] }[] = [
 	{
 		title: '기본 정보',
 		fields: [
@@ -56,8 +38,9 @@ const editInfoSections: { title: string; fields: FieldDef[] }[] = [
 			{ key: 'employeeId', label: '사번', required: true },
 			{ key: 'extensionNumber', label: '대표전화' },
 			{ key: 'departmentPosition', label: '부서/직책' },
-			{ key: 'positionTitle', label: '직위' },
-			{ key: 'jobTitle', label: '직무' },
+			{ key: 'jobPosition', label: '직위', type: 'select' },
+			{ key: 'jobGrade', label: '직급', type: 'select' },
+			{ key: 'jobRole', label: '직무' },
 			{ key: 'email', label: '이메일' },
 			{
 				key: 'employmentStatus',
@@ -211,67 +194,6 @@ const editInfoSections: { title: string; fields: FieldDef[] }[] = [
 	},
 ];
 
-const careerCols: ColDef[] = [
-	{ key: 'startDate', label: '시작일', type: 'date' },
-	{ key: 'endDate', label: '종료일', type: 'date' },
-	{ key: 'companyName', label: '근무처', type: 'text' },
-	{ key: 'positionTitle', label: '직위', type: 'text' },
-	{ key: 'jobDescription', label: '담당업무', type: 'text' },
-	{ key: 'workPeriod', label: '근속기간', type: 'text' },
-	{ key: 'resignationReason', label: '퇴직사유', type: 'text' },
-];
-
-const rewardCols: ColDef[] = [
-	{
-		key: 'type',
-		label: '구분',
-		type: 'select',
-		options: [
-			{ label: '포상', value: 'REWARD' },
-			{ label: '징계', value: 'DISCIPLINE' },
-		],
-	},
-	{ key: 'actionDate', label: '일자', type: 'date' },
-	{ key: 'title', label: '내용', type: 'text' },
-	{ key: 'reason', label: '사유', type: 'text' },
-	{ key: 'remark', label: '기타', type: 'text' },
-];
-
-const qualificationCols: ColDef[] = [
-	{
-		key: 'qualificationType',
-		label: '구분',
-		type: 'select',
-		options: [
-			{ label: '자격증', value: 'CERTIFICATE' },
-			{ label: '면허', value: 'LICENSE' },
-			{ label: '민간/국제인증', value: 'CERTIFICATION' },
-			{ label: '기타', value: 'ETC' },
-		],
-	},
-	{ key: 'qualificationName', label: '자격명', type: 'text' },
-	{ key: 'qualificationNumber', label: '자격번호', type: 'text' },
-	{ key: 'qualificationGrade', label: '자격등급', type: 'text' },
-	{ key: 'issuingOrganization', label: '기관명', type: 'text' },
-	{ key: 'acquiredDate', label: '취득일', type: 'date' },
-	{ key: 'suspendedDate', label: '정지일', type: 'date' },
-];
-
-const languageCols: ColDef[] = [
-	{ key: 'languageType', label: '구분', type: 'text' },
-	{ key: 'languageName', label: '어학명', type: 'text' },
-	{ key: 'evaluationDate', label: '평가일', type: 'date' },
-	{ key: 'evaluationAgency', label: '평가기관', type: 'text' },
-	{ key: 'score', label: '점수', type: 'number' },
-	{ key: 'grade', label: '등급', type: 'text' },
-	{ key: 'etc', label: '기타', type: 'text' },
-];
-
-const makeEmptyRow = (cols: ColDef[]): Record<string, string> => ({
-	_rowId: Math.random().toString(36).slice(2),
-	...cols.reduce((acc, c) => ({ ...acc, [c.key]: '' }), {}),
-});
-
 // API 응답 값에서 폼 state 용 string 추출 (EnumOption: { code, label })
 const toFormValue = (value: any): string => {
 	if (value === null || value === undefined) return '';
@@ -281,7 +203,7 @@ const toFormValue = (value: any): string => {
 };
 
 // 리스트 응답 행을 폼 행으로 변환 (EnumOption → value string)
-const toFormRow = (item: Record<string, any>, cols: ColDef[]): Record<string, string> => ({
+const toFormRow = (item: Record<string, any>, cols: MemberColDef[]): Record<string, string> => ({
 	_rowId: Math.random().toString(36).slice(2),
 	...cols.reduce(
 		(acc, col) => ({
@@ -497,7 +419,7 @@ export default function MemberEditPage() {
 
 	// ===== 필드 렌더링 =====
 	const renderField = useCallback(
-		(field: FieldDef) => {
+		(field: MemberFieldDef) => {
 			const value = formData[field.key] ?? '';
 			const onChange = (val: string) => setFormData((prev) => ({ ...prev, [field.key]: val }));
 
@@ -607,8 +529,8 @@ export default function MemberEditPage() {
 
 	// ===== 리스트 탭 =====
 	const renderListTab = useCallback(
-		(cols: ColDef[], rows: Record<string, string>[], setter: React.Dispatch<React.SetStateAction<Record<string, string>[]>>) => {
-			const renderCell = (col: ColDef, row: Record<string, string>, idx: number) => {
+		(cols: MemberColDef[], rows: Record<string, string>[], setter: React.Dispatch<React.SetStateAction<Record<string, string>[]>>) => {
+			const renderCell = (col: MemberColDef, row: Record<string, string>, idx: number) => {
 				if (col.type === 'select' && col.options) {
 					return (
 						<Select

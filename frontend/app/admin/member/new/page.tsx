@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
 	Box,
@@ -24,28 +24,11 @@ import {
 import { Add, ArrowBack, Delete } from '@mui/icons-material';
 import { MemberBundleResponseDto, memberService } from '@/app/services/memberService';
 import { useDialogStore } from '@/store/useDialogStore';
-
-// ===== 타입 =====
-
-type FieldDef = {
-	key: string;
-	label: string;
-	wide?: boolean;
-	required?: boolean;
-	type?: 'text' | 'password' | 'date' | 'number' | 'select' | 'checkbox';
-	options?: { label: string; value: string }[];
-};
-
-type ColDef = {
-	key: string;
-	label: string;
-	type?: 'text' | 'password' | 'date' | 'number' | 'select';
-	options?: { label: string; value: string }[];
-};
+import { careerCols, rewardCols, qualificationCols, languageCols, MemberColDef, MemberFieldDef } from '@/app/admin/member/_constant/formConst';
+import { getOptions, makeEmptyRow } from '@/app/admin/member/_utils/formUtil';
 
 // ===== 필드 정의 =====
-
-const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
+const totalInfoSections: { title: string; fields: MemberFieldDef[] }[] = [
 	{
 		title: '기본 정보',
 		fields: [
@@ -56,9 +39,8 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 			{ key: 'employeeId', label: '사번', required: true },
 			{ key: 'extensionNumber', label: '대표전화' },
 			{ key: 'departmentPosition', label: '부서/직책' },
-			{ key: 'jobPosition', label: '직위' },
-			{ key: 'jobGrade', label: '직급' },
-			{ key: 'jobTitle', label: '직책' },
+			{ key: 'jobPosition', label: '직위', type: 'select' },
+			{ key: 'jobGrade', label: '직급', type: 'select' },
 			{ key: 'jobRole', label: '직무' },
 			{ key: 'email', label: '이메일' },
 			{
@@ -213,67 +195,6 @@ const totalInfoSections: { title: string; fields: FieldDef[] }[] = [
 	},
 ];
 
-const careerCols: ColDef[] = [
-	{ key: 'startDate', label: '시작일', type: 'date' },
-	{ key: 'endDate', label: '종료일', type: 'date' },
-	{ key: 'companyName', label: '근무처', type: 'text' },
-	{ key: 'jobPosition', label: '직위', type: 'text' },
-	{ key: 'jobDescription', label: '담당업무', type: 'text' },
-	{ key: 'workPeriod', label: '근속기간', type: 'text' },
-	{ key: 'resignationReason', label: '퇴직사유', type: 'text' },
-];
-
-const rewardCols: ColDef[] = [
-	{
-		key: 'type',
-		label: '구분',
-		type: 'select',
-		options: [
-			{ label: '포상', value: 'REWARD' },
-			{ label: '징계', value: 'DISCIPLINE' },
-		],
-	},
-	{ key: 'actionDate', label: '일자', type: 'date' },
-	{ key: 'title', label: '내용', type: 'text' },
-	{ key: 'reason', label: '사유', type: 'text' },
-	{ key: 'remark', label: '기타', type: 'text' },
-];
-
-const qualificationCols: ColDef[] = [
-	{
-		key: 'qualificationType',
-		label: '구분',
-		type: 'select',
-		options: [
-			{ label: '자격증', value: 'CERTIFICATE' },
-			{ label: '면허', value: 'LICENSE' },
-			{ label: '민간/국제인증', value: 'CERTIFICATION' },
-			{ label: '기타', value: 'ETC' },
-		],
-	},
-	{ key: 'qualificationName', label: '자격명', type: 'text' },
-	{ key: 'qualificationNumber', label: '자격번호', type: 'text' },
-	{ key: 'qualificationGrade', label: '자격등급', type: 'text' },
-	{ key: 'issuingOrganization', label: '기관명', type: 'text' },
-	{ key: 'acquiredDate', label: '취득일', type: 'date' },
-	{ key: 'suspendedDate', label: '정지일', type: 'date' },
-];
-
-const languageCols: ColDef[] = [
-	{ key: 'languageType', label: '구분', type: 'text' },
-	{ key: 'languageName', label: '어학명', type: 'text' },
-	{ key: 'evaluationDate', label: '평가일', type: 'date' },
-	{ key: 'evaluationAgency', label: '평가기관', type: 'text' },
-	{ key: 'score', label: '점수', type: 'number' },
-	{ key: 'grade', label: '등급', type: 'text' },
-	{ key: 'etc', label: '기타', type: 'text' },
-];
-
-const makeEmptyRow = (cols: ColDef[]): Record<string, string> => ({
-	_rowId: Math.random().toString(36).slice(2),
-	...cols.reduce((acc, c) => ({ ...acc, [c.key]: '' }), {}),
-});
-
 // ===== 컴포넌트 =====
 
 export default function MemberNewPage() {
@@ -405,40 +326,39 @@ export default function MemberNewPage() {
 
 	// ===== 필드형 렌더링 (date/select/text 분기) =====
 	const renderField = useCallback(
-		(field: FieldDef) => {
+		(field: MemberFieldDef) => {
 			const value = formData[field.key] ?? '';
-			const onChange = (val: string) => setFormData((prev) => ({ ...prev, [field.key]: val }));
+			const handleChange = (val: string) => setFormData((prev) => ({ ...prev, [field.key]: val }));
 
-			if (field.type === 'checkbox') {
-				return <Checkbox checked={value === 'true'} onChange={(e) => onChange(e.target.checked ? 'true' : '')} size='small' />;
-			}
+			const commonProps = {
+				size: 'small' as const,
+				sx: { width: '100%', minWidth: '10rem' },
+			};
 
-			if (field.type === 'select' && field.options) {
-				return (
-					<Select size='small' displayEmpty value={value} onChange={(e) => onChange(e.target.value)} sx={{ width: '100%', minWidth: '10rem' }}>
-						<MenuItem value=''>
-							<em style={{ color: '#aaa' }}>선택</em>
-						</MenuItem>
-						{field.options.map((opt) => (
-							<MenuItem key={opt.value} value={opt.value}>
-								{opt.label}
+			switch (field.type) {
+				case 'checkbox':
+					return <Checkbox {...commonProps} checked={value === 'true'} onChange={(e) => handleChange(e.target.checked ? 'true' : '')} />;
+
+				case 'select':
+					const options = getOptions(field, memberBundle);
+					return (
+						<Select {...commonProps} displayEmpty value={value} onChange={(e) => handleChange(e.target.value as string)}>
+							<MenuItem value=''>
+								<em style={{ color: '#aaa' }}>{field.options ? '선택' : '미선택'}</em>
 							</MenuItem>
-						))}
-					</Select>
-				);
-			}
+							{options.map((opt) => (
+								<MenuItem key={opt.value} value={opt.value}>
+									{opt.label}
+								</MenuItem>
+							))}
+						</Select>
+					);
 
-			return (
-				<OutlinedInput
-					size='small'
-					type={field.type ?? 'text'}
-					value={value}
-					onChange={(e) => onChange(e.target.value)}
-					sx={{ width: '100%', minWidth: '10rem' }}
-				/>
-			);
+				default:
+					return <OutlinedInput {...commonProps} type={field.type ?? 'text'} value={value} onChange={(e) => handleChange(e.target.value)} />;
+			}
 		},
-		[formData],
+		[formData, memberBundle],
 	);
 
 	// ===== 필드 섹션 렌더링 =====
@@ -494,8 +414,8 @@ export default function MemberNewPage() {
 
 	// ===== 리스트 탭 =====
 	const renderListTab = useCallback(
-		(cols: ColDef[], rows: Record<string, string>[], setter: React.Dispatch<React.SetStateAction<Record<string, string>[]>>) => {
-			const renderCell = (col: ColDef, row: Record<string, string>, idx: number) => {
+		(cols: MemberColDef[], rows: Record<string, string>[], setter: React.Dispatch<React.SetStateAction<Record<string, string>[]>>) => {
+			const renderCell = (col: MemberColDef, row: Record<string, string>, idx: number) => {
 				if (col.type === 'select' && col.options) {
 					return (
 						<Select
