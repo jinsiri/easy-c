@@ -3,11 +3,10 @@ package org.easyc.attendance.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.easyc.attendance.entity.Attendance;
-import org.easyc.attendance.constant.WorkType;
-import org.easyc.attendance.constant.WorkStatus;
 import org.easyc.attendance.constant.VacationType;
-import org.easyc.common.dto.AuditUser;
+import org.easyc.attendance.constant.WorkStatus;
+import org.easyc.attendance.constant.WorkType;
+import org.easyc.attendance.entity.Attendance;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -1,7 +1,7 @@
 package org.easyc.vacation.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.common.audit.activity.AuditAction;
+import org.easyc.audit.activity.annotation.AuditAction;
 import org.easyc.vacation.dto.VacationPolicyDto;
 import org.easyc.vacation.service.VacationPolicyService;
 import org.springframework.web.bind.annotation.*;

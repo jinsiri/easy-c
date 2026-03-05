@@ -1,7 +1,7 @@
 package org.easyc.vacation.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.common.audit.activity.AuditAction;
+import org.easyc.audit.activity.annotation.AuditAction;
 import org.easyc.vacation.dto.VacationApplicationDto;
 import org.easyc.vacation.dto.VacationApplicationResponseDto;
 import org.easyc.vacation.entity.VacationApplication;
