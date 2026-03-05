@@ -7,6 +7,7 @@ import org.easyc.attendance.entity.*;
 import org.easyc.attendance.repository.*;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
+import org.easyc.vacation.constant.VacationType;
 import org.springframework.stereotype.Service;
 
 import java.time.*;

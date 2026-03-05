@@ -1,10 +1,12 @@
 package org.easyc.vacation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.easyc.attendance.constant.VacationType;
+import org.easyc.vacation.constant.VacationType;
 import org.easyc.vacation.entity.VacationApplication;
 
 import java.time.LocalDate;
@@ -16,7 +18,8 @@ public class VacationApplicationDto {
     private Long vacationApplicationId;
     private Long memberId;
 
-    private String vacationType;
+    @Enumerated(EnumType.STRING)
+    private VacationType vacationType;
     private Integer vacationDuration;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -31,7 +34,7 @@ public class VacationApplicationDto {
         VacationApplication entity = new VacationApplication();
         entity.setVacationApplicationId(this.vacationApplicationId);
         entity.setMemberId(this.memberId);
-        entity.setVacationType(VacationType.valueOf(this.vacationType));
+        entity.setVacationType(this.vacationType);
         entity.setVacationDuration(this.vacationDuration);
         entity.setStartDate(this.startDate);
         entity.setEndDate(this.endDate);

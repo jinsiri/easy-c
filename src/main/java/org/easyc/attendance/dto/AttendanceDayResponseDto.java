@@ -6,8 +6,7 @@ import lombok.Setter;
 import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.constant.WorkType;
 import org.easyc.attendance.constant.WorkStatus;
-import org.easyc.attendance.constant.VacationType;
-import org.easyc.common.dto.AuditUser;
+import org.easyc.vacation.constant.VacationType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -3,8 +3,20 @@ export interface BaseDto {
 	deleted: boolean;
 	active: boolean;
 	registerDate: string;
-	registerId: string;
-	registerNm: string;
+	registerIp: string;
+	registerUser: {
+		loginId: string;
+		memberNm: string;
+		memberRole: string;
+	};
+
+	lastUpdateDate: string;
+	lastUpdateIp: string;
+	lastUpdateUser: {
+		loginId: string;
+		memberNm: string;
+		memberRole: string;
+	};
 }
 
 // 트리 필드 (BaseTreeDto)

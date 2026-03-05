@@ -20,6 +20,7 @@ interface FieldProps<TFieldValues extends FieldValues> {
 	required?: boolean;
 	control: Control<TFieldValues>;
 	error?: string;
+	readOnly?: boolean;
 }
 
 export interface FormProps<T extends FieldValues> {
@@ -37,14 +38,27 @@ export const FormWrapper = ({ required, label, direction = 'row', children }: Fi
 	</Box>
 );
 
-export const FormItem = <TFieldValues extends FieldValues>({ name, label, placeholder, required, control, error }: FieldProps<TFieldValues>) => (
+export const FormItem = <TFieldValues extends FieldValues>({ name, label, placeholder, required, control, error, readOnly }: FieldProps<TFieldValues>) => (
 	<FormWrapper label={label} required={required}>
 		<Controller
 			name={name}
 			control={control}
 			rules={required ? { required: `${label}은(는) 필수입니다.` } : undefined}
 			render={({ field }) => (
-				<TextField {...field} value={field.value ?? ''} fullWidth size='small' placeholder={placeholder} error={!!error} helperText={error} />
+				<TextField
+					{...field}
+					value={field.value ?? ''}
+					fullWidth
+					size='small'
+					placeholder={placeholder}
+					error={!!error}
+					helperText={error}
+					slotProps={{
+						input: {
+							readOnly: readOnly ?? false,
+						},
+					}}
+				/>
 			)}
 		/>
 	</FormWrapper>

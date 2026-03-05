@@ -3,6 +3,7 @@ package org.easyc.vacation.controller;
 import lombok.RequiredArgsConstructor;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.vacation.dto.VacationPolicyDto;
+import org.easyc.vacation.dto.VacationResponseDto;
 import org.easyc.vacation.entity.Vacation;
 import org.easyc.vacation.service.VacationPolicyService;
 import org.easyc.vacation.service.VacationService;
@@ -19,13 +20,13 @@ public class VacationController {
     private final VacationService vacationService;
 
     @GetMapping("/data")
-    public Vacation getVacationData(@RequestParam("target") String encodeId) {
+    public VacationResponseDto getVacationData(@RequestParam("target") String encodeId) {
         // Base64 디코딩
         byte[] decodedBytes = Base64.getDecoder().decode(encodeId);
         String idStr = new String(decodedBytes);
         Long memberId = Long.parseLong(idStr);
 
-        return vacationService.getVacationData(memberId);
+        return vacationService.getVacation(memberId);
     }
 
     @PostMapping("/search")

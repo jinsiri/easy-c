@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Vacation extends BaseEntity {
+public class Vacation {
     @Id
     @SequenceGenerator(name="vacation_seq", sequenceName="vacation_seq", allocationSize=1)
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="vacation_seq")
@@ -34,39 +34,49 @@ public class Vacation extends BaseEntity {
 
 
     @Column(name = "vacation_policy_name")
-    String vacationPolicyName;
+    private String vacationPolicyName;
 
-    @Column(name = "years_of_service")
-    Long yearsOfService;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "vacation_policy_type")
+    private VacationPolicyType vacationPolicyType;
 
     @Column(name = "accrual_date")
-    LocalDate accrualDate;
+    private LocalDate accrualDate; //연차부여일
 
     @Column(name = "expire_date")
-    LocalDate expireDate;
+    private LocalDate expireDate; //만료일
+
+    @Column(name = "years_of_service") //근속 년수
+    private Long yearsOfService;
 
     @Column(name = "granted_day") //총 연차
-    Double grantedDay;
+    private Double grantedDay;
 
-    @Column(name = "used_date") //사용 연차
-    Double usedDay = 0.0;
+    @Builder.Default
+    @Column(name = "used_day") //사용 연차
+    private Double usedDay = 0.0;
 
-    @Column(name = "remain_date") //잔여 연차
-    Double remainDay;
+    @Column(name = "remain_day") //잔여 연차
+    private Double remainDay;
 
+    @Builder.Default
     @Column(name= "annual_vacation")
-    Integer annualVacation;
+    private Double annualVacation = 0.0;
 
+    @Builder.Default
     @Column(name="sick_vacation")
-    Integer sickVacation = 0;
+    private Double sickVacation = 0.0;
 
+    @Builder.Default
     @Column(name="holiday_vacation")
-    Integer holidayVacation = 0;
+    private Double holidayVacation = 0.0;
 
+    @Builder.Default
     @Column(name="special_vacation")
-    Integer specialVacation = 0;
+    private Double specialVacation = 0.0;
 
-    @Column(name = "carry_date")
-    Integer carryOverDay = 0;
+    @Builder.Default
+    @Column(name = "carry_over_vacation")
+    private Double carryOverVacation = 0.0;
 
 }

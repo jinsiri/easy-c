@@ -4,10 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.easyc.attendance.constant.WorkType;
 import org.easyc.attendance.constant.WorkStatus;
-import org.easyc.attendance.constant.VacationType;
+import org.easyc.vacation.constant.VacationType;
 import org.easyc.common.entity.BaseEntity;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 

@@ -7,6 +7,8 @@ export type menuType = {
 	children?: menuType[];
 };
 
+export type baseStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
 export type attendanceType = 'FIXED' | 'FLEXTIME' | 'SELECTIVE' | 'FLEXIBLE' | 'SHIFT';
 export type settlementPeriod = 'WEEK' | 'WEEK_2' | 'MONTH' | 'MONTH_2' | 'MONTH_3';
 export type worktimeRule = 'CAP_AT_40' | 'ALWAYS_40' | 'BY_WORK_DAYS';
@@ -16,5 +18,6 @@ export type workStatus = 'PRESENT' | 'LATE' | 'EARLY_LEAVE' | 'ABSENT' | 'VACATI
 
 export type vacationPolicyType = 'WORKING_DAY' | 'FINANCIAL_DAY';
 export type vacationType = 'FULL' | 'HALF_AM' | 'HALF_PM' | 'SICK_LEAVE' | 'SPECIAL_LEAVE' | 'HOLIDAY';
+export type vacationCategory = 'ANNUAL' | 'SICK' | 'SPECIAL' | 'HOLIDAY' | 'CARRYOVER';
 
 export type dayName = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';

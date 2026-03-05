@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 /** Lib */
-import dayjs from 'dayjs';
 import { useForm, Controller } from 'react-hook-form';
 import useModalStore from '@/store/useModalStore';
 import useLoaderStore from '@/store/useLoaderStore';

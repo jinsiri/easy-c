@@ -54,6 +54,12 @@ SELECT setval(
     true -- 차후 NEXTVAL 호출 시 MAX+1이 나오도록 설정
 );
 
+SELECT setval(
+    'attendance_seq',
+    COALESCE((SELECT MAX(attendance_id) FROM attendance), 1),
+    true
+);
+
 --근태 맵핑 데이터 세팅
 INSERT INTO attendance_policy_map (mapping_id, attendance_policy_id, member_id, login_id, deleted)
 SELECT 1, 1, 1, 'admin', false

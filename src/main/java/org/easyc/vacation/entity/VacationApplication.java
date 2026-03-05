@@ -2,7 +2,7 @@ package org.easyc.vacation.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.easyc.attendance.constant.VacationType;
+import org.easyc.vacation.constant.VacationType;
 import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.entity.BaseEntity;
 
@@ -23,6 +23,9 @@ public class VacationApplication extends BaseEntity {
     /** 근로자 정보 추가 */
     @Column(name = "member_id")
     private Long memberId;
+
+    @Column(name = "member_nm")
+    private String memberNm;
 
     @Column(name = "dept_nm")
     private String deptNm;

@@ -1,4 +1,12 @@
-import { vacationPolicyType } from '@/type/types';
+import { vacationPolicyType, vacationCategory } from '@/type/types';
+
+export const VACATIONCATEGORY: Record<vacationCategory, string> = {
+	ANNUAL: '연차',
+	SICK: '병가',
+	SPECIAL: '특별휴가',
+	HOLIDAY: '휴일대체휴가',
+	CARRYOVER: '이월휴가',
+};
 
 export const VACATIONPOLICYTYPE: Record<vacationPolicyType, string> = {
 	WORKING_DAY: '입사일',

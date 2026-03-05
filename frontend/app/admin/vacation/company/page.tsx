@@ -51,14 +51,6 @@ export default function VacationCompanyPage() {
 			},
 		},
 		{
-			field: 'accrualDate',
-			headerName: '휴가 부여일',
-		},
-		{
-			field: 'expireDate',
-			headerName: '휴가 만료일',
-		},
-		{
 			field: 'grantedDay',
 			headerName: '전체 휴가',
 		},
@@ -86,6 +78,10 @@ export default function VacationCompanyPage() {
 		{
 			field: 'carryOverDay',
 			headerName: '이월연차',
+		},
+		{
+			field: 'detail',
+			headerName: '상세내역',
 		},
 	];
 

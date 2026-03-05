@@ -1,12 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import secureLocalStorage from 'react-secure-storage';
 
 /** MUI */
 import { Box, Select, MenuItem } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 
 /** Lib */
+import dayjs from 'dayjs';
 import { useForm, Controller } from 'react-hook-form';
 import useModalStore from '@/store/useModalStore';
 
@@ -15,10 +18,14 @@ import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 
 /** Type / Interface */
 import { VACATIONTYPE } from '@/constant/attendanceConst';
-import { vacationApplicationController } from '@/app/services/vacationApplicationService';
+import { vacationApplicationController, vacationApplicationService, vacationApplicationDto } from '@/app/services/vacationApplicationService';
 import { FormItem, FormWrapper } from '@/app/_component/baseElement/FormComp';
 
 export default function VacationUserModal() {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const type = searchParams.get('type');
+
 	const { modalData, resetModalData } = useModalStore();
 
 	const [isSaving, setIsSaving] = useState(false);
@@ -26,6 +33,7 @@ export default function VacationUserModal() {
 
 	const {
 		control,
+		reset,
 		watch,
 		handleSubmit,
 		formState: { errors },
@@ -43,22 +51,51 @@ export default function VacationUserModal() {
 	const watchVacationDuration = watch('vacationDuration');
 
 	useEffect(() => {
-		if (modalData) setRemainDay(modalData.remainDay);
-	}, [modalData]);
+		if (modalData) {
+			if (type && type === 'read') {
+				reset({
+					vacationType: modalData.vacationType,
+					vacationDuration: String(modalData.vacationDuration),
+					startDate: modalData.startDate ? dayjs(modalData.startDate) : null,
+					endDate: modalData.endDate ? dayjs(modalData.endDate) : null,
+					vacationReason: modalData.vacationReason,
+				});
+			} else {
+				setRemainDay(modalData.remainDay);
+			}
+		}
+	}, [type, modalData]);
 
-	const handleSave = handleSubmit(() => {
-		//setIsSaving(true);
+	const handleSave = handleSubmit(async (data) => {
+		setIsSaving(true);
+
+		try {
+			const request: vacationApplicationDto = {
+				...data,
+				memberId: Number(secureLocalStorage.getItem('memberId')),
+				startDate: dayjs(data.startDate).format('YYYY-MM-DD'),
+				endDate: data.endDate ? dayjs(data.endDate).format('YYYY-MM-DD') : null,
+			};
+
+			await vacationApplicationService.saveVacationApplicationData(request);
+			if (confirm('요청이 성공적으로 등록되었습니다.')) {
+				resetModalData();
+				router.back();
+			}
+		} finally {
+			setIsSaving(false);
+		}
 	});
 
 	return (
-		<BaseDialog title={'휴가 신청'} loading={isSaving} onConfirm={handleSave}>
+		<BaseDialog title={'휴가 신청'} loading={isSaving} onConfirm={type === 'read' ? undefined : handleSave}>
 			<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 				<FormWrapper label='휴가종류' required>
 					<Controller
 						name='vacationType'
 						control={control}
 						render={({ field: { onChange, value } }) => (
-							<Select value={value} onChange={onChange} size='small' fullWidth>
+							<Select value={value} onChange={onChange} size='small' fullWidth inputProps={{ readOnly: type && type === 'read' }}>
 								{Object.entries(VACATIONTYPE).map(([key, value]) => (
 									<MenuItem key={key} value={key}>
 										{value}
@@ -74,7 +111,7 @@ export default function VacationUserModal() {
 							name='vacationDuration'
 							control={control}
 							render={({ field: { onChange, value } }) => (
-								<Select value={value} onChange={onChange} size='small' fullWidth>
+								<Select value={value} onChange={onChange} size='small' fullWidth inputProps={{ readOnly: type && type === 'read' }}>
 									{Array.from({ length: remainDay }, (_, i) => (
 										<MenuItem key={i} value={String(i + 1)}>
 											{i + 1}일
@@ -101,6 +138,7 @@ export default function VacationUserModal() {
 							render={({ field }) => (
 								<DatePicker
 									{...field}
+									readOnly={type === 'read'}
 									slotProps={{
 										textField: {
 											error: !!errors.startDate,
@@ -128,6 +166,7 @@ export default function VacationUserModal() {
 									render={({ field }) => (
 										<DatePicker
 											{...field}
+											readOnly={type === 'read'}
 											slotProps={{
 												textField: {
 													error: !!errors.endDate,
@@ -141,6 +180,7 @@ export default function VacationUserModal() {
 						)}
 					</Box>
 				</FormWrapper>
+
 				<FormItem
 					name='vacationReason'
 					label='휴가 사유'
@@ -148,6 +188,7 @@ export default function VacationUserModal() {
 					required
 					control={control}
 					error={errors.vacationReason?.message}
+					readOnly={type === 'read'}
 				></FormItem>
 			</Box>
 		</BaseDialog>
