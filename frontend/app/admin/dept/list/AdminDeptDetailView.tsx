@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import { AgGridReact } from 'ag-grid-react';
 import { MemberResponseDto, memberService } from '@/app/services/memberService';
-import { ColDef, ICellRendererParams } from 'ag-grid-community';
+import { CellClickedEvent, ColDef, FirstDataRenderedEvent, ICellRendererParams } from 'ag-grid-community';
+import MemberDetail from '@/app/admin/member/_component/MemberDetail';
 
 interface Props {
 	deptId: number;
@@ -15,7 +16,9 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 	const theme = useTheme();
 	const gridRef = useRef<AgGridReact>(null);
 	const [checked, setChecked] = useState(false);
+	const [selectedId, setSelectedId] = useState();
 	const [deptMembers, setDeptMembers] = useState<MemberResponseDto[]>([]);
+
 	const PhotoRenderer = (params: ICellRendererParams) => {
 		const photo = params.value ? params.value : '/images/blank_profile.png';
 		const name = params.data.memberNm;
@@ -62,8 +65,12 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 		setChecked(event.target.checked);
 	};
 
-	const handleCellDoubleClicked = () => {
-		console.log('double clicked!');
+	const handleCellClicked = (params: CellClickedEvent) => {
+		setSelectedId(params.data.memberId);
+	};
+
+	const handleFirstDataRendered = (params: FirstDataRenderedEvent) => {
+		params.api.setFocusedCell(0, 'photoUrl');
 	};
 
 	return (
@@ -87,7 +94,7 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 				</Button>
 			</Stack>
 			<Grid container spacing={2} sx={{ flexGrow: 1 }}>
-				<Grid size={{ xs: 12, md: 4 }} sx={{ height: '100%' }}>
+				<Grid size={{ xs: 12, md: deptMembers?.length !== 0 ? 4 : 12 }} sx={{ height: '100%' }}>
 					<CustomAgGridComp
 						ref={gridRef}
 						rowData={deptMembers}
@@ -96,10 +103,15 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 						rowHeight={80}
 						pagination={false}
 						rowSelectionMode={'multiple'}
-						onCellDoubleClicked={handleCellDoubleClicked}
+						onFirstDataRendered={handleFirstDataRendered}
+						onCellClicked={handleCellClicked}
 					/>
 				</Grid>
-				<Grid size={{ xs: 12, md: 8 }}>test2</Grid>
+				{deptMembers?.length !== 0 && (
+					<Grid size={{ xs: 12, md: 8 }}>
+						<MemberDetail selectedId={selectedId || deptMembers[0].memberId} />
+					</Grid>
+				)}
 			</Grid>
 		</>
 	);

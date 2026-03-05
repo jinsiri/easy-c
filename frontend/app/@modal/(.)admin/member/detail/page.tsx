@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
-import MemberDetailPage from '@/app/admin/member/detail/page';
+import MemberDetail from '@/app/admin/member/_component/MemberDetail';
 
 export default function MemberDetailModal() {
 	const router = useRouter();
@@ -22,7 +22,7 @@ export default function MemberDetailModal() {
 
 	return (
 		<BaseDialog title='멤버 상세' confirmLabel='수정' onConfirm={handleEdit} maxWidth={false} fullWidth paperSx={{ width: '90vw', maxWidth: '90vw' }}>
-			<MemberDetailPage />
+			<MemberDetail />
 		</BaseDialog>
 	);
 }

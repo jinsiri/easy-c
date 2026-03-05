@@ -1,6 +1,6 @@
 import { useState, useLayoutEffect, useRef } from 'react';
 
-const useContainerSize = () => {
+export const useContainerSize = () => {
 	const [size, setSize] = useState({ width: 0, height: 0 });
 	const targetRef = useRef<HTMLDivElement>(null);
 
