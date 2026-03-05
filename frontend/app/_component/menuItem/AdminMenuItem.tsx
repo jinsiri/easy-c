@@ -61,6 +61,12 @@ const AdminMenuItem: menuType[] = [
 						url: '/accesslogs',
 					},
 					{
+						id: 'admin-normal-securitylogs',
+						title: '보안 이력',
+						type: '2depth',
+						url: '/securitylogs',
+					},
+					{
 						id: 'admin-normal-activitylogs',
 						title: '활동 이력',
 						type: '2depth',

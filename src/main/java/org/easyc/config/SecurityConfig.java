@@ -2,9 +2,11 @@ package org.easyc.config;
 
 import lombok.RequiredArgsConstructor;
 import org.easyc.auth.jwt.JwtAuthenticationFilter;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authorization.SpringAuthorizationEventPublisher;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -109,6 +111,16 @@ public class SecurityConfig {
     AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    /**
+     * AuthorizationDeniedEvent 활성화
+     * 기본적으로 비활성화되어 있어 명시적으로 등록해야 한다.
+     * HTTP URL 기반 인가 거부 및 @PreAuthorize 거부 모두 이벤트를 발행한다.
+     */
+    @Bean
+    SpringAuthorizationEventPublisher authorizationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        return new SpringAuthorizationEventPublisher(eventPublisher);
     }
 
 
