@@ -81,7 +81,6 @@ export default function AttendancePolicyDataPage() {
 
 	useEffect(() => {
 		if (modalData) {
-			console.log(modalData);
 			reset({
 				...modalData,
 				startTime: modalData.startTime ? dayjs(modalData.startTime, 'HH:mm') : null,

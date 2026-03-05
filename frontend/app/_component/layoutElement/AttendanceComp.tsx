@@ -114,17 +114,17 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 		<Box sx={{ display: 'flex', flexDirection: 'column', padding: '1rem 1.5rem' }}>
 			<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
 				<LiveClock />
-				<Typography variant={'subtitle2'} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+				<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 					<AccessTimeRounded sx={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} />
-					{Object.keys(workData).length > 0
-						? `${ATTENDANCETYPE[workData?.attendanceType as attendanceType]} 
-							(
-							${workData.startTime ? dayjs(workData.startTime, 'HH:mm:ss').format('HH:mm') : '-'} 
-							~ 
-							${workData.endTime ? dayjs(workData.endTime, 'HH::mm:ss').format('HH:mm') : '-'}
-							)`
-						: ''}
-				</Typography>
+					<Typography variant='subtitle2' whiteSpace='nowrap'>
+						{workData && (
+							<>
+								{ATTENDANCETYPE[workData?.attendanceType]} ({workData.startTime ? dayjs(workData.startTime, 'HH:mm:ss').format('HH:mm') : '-'} ~{' '}
+								{workData.endTime ? dayjs(workData.endTime, 'HH::mm:ss').format('HH:mm') : '-'})
+							</>
+						)}
+					</Typography>
+				</Box>
 			</Box>
 
 			<Box

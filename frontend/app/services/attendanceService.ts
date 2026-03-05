@@ -1,5 +1,5 @@
 import axiosConfig from '../_lib/axiosConfig';
-import { workType, workStatus, vacationType, dayName } from '@/type/types';
+import { workType, workStatus, vacationType, dayName, attendanceType } from '@/type/types';
 
 export interface AttendanceReqDto {
 	//loginId: string;
@@ -38,7 +38,7 @@ export interface AttendanceDayResDto {
 export interface AttendanceResDto {
 	dayData: AttendanceDayResDto;
 
-	attendanceType: string;
+	attendanceType: attendanceType;
 	settlementPeriod: string;
 	worktimeRule: string;
 	startTime: string;

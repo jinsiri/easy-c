@@ -18,12 +18,13 @@ import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
 import Calendar from '@/app/(main)/attendance/Calendar';
 import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
 import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
+import CustomEchartComp from '@/app/_lib/CustomEchartComp';
+
 import { formatMinutes } from '@/utils/commonFunc';
 
 /** Type / Interface */
 import { dayName } from '@/type/types';
 import { attendanceService, AttendanceResDto, CalendarData } from '@/app/services/attendanceService';
-import CustomEchartComp from '@/app/_lib/CustomEchartComp';
 
 dayjs.extend(duration);
 
@@ -218,12 +219,12 @@ export default function AttendanceUserPage() {
 								flexDirection: 'column',
 							}}
 						>
-							<Box sx={{ display: 'flex', flexDirection: 'row' }}>
-								<Typography variant='h6'>주간 누적</Typography>
-								<Typography variant='h6' sx={{ marginLeft: '0.5rem', color: 'primary.main' }}>
+							<Typography variant='h6'>
+								주간 누적
+								<Typography component={'span'} variant='h6' sx={{ marginLeft: '0.5rem', color: 'primary.main' }}>
 									{formatMinutes(attendanceData.workTime)}
 								</Typography>
-							</Box>
+							</Typography>
 							<Typography sx={{ color: 'grey.700' }}>
 								이번 주 {attendanceData.effectiveWorkTime ? Math.floor((attendanceData.workTime / attendanceData.effectiveWorkTime) * 100) : 0}%
 								근무 했어요.

@@ -16,7 +16,8 @@ import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
 import { WORKSTATUS } from '@/constant/attendanceConst';
-import { BASICSTATUS } from '@/constant/commonConst';
+import StatusComp from '@/app/_component/baseElement/StatusComp';
+
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 
 /** Type / Interface */
@@ -35,12 +36,13 @@ export default function AttendanceApplicationPage() {
 	const colDefs: ColDef<Record<string, any>>[] = [
 		{
 			field: 'status',
-			headerName: '처리상태',
+			headerName: '상태',
 			flex: 1,
-			cellStyle: {
-				textAlign: 'center',
-			},
-			valueFormatter: (data) => (data.value ? BASICSTATUS[data.value] : '-'),
+			cellRenderer: (data) => (
+				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+					{data.value ? <StatusComp status={data.value} /> : '-'}
+				</Box>
+			),
 		},
 		{
 			field: 'workDate',

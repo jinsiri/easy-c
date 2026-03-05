@@ -23,12 +23,12 @@ import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
 // Ag-grid Row selection 옵션 추가
 export type RowSelectionMode = 'single' | 'multiple' | 'none';
 
-export const createRowSelection = (mode: RowSelectionMode) => {
+export const createRowSelection = (mode: RowSelectionMode, enableClickSelection: boolean) => {
 	if (mode === 'none') return undefined;
 
 	const options: RowSelectionOptions = {
 		mode: mode === 'single' ? 'singleRow' : 'multiRow',
-		enableClickSelection: false,
+		enableClickSelection: enableClickSelection ?? false,
 		enableSelectionWithoutKeys: true, // ctrl 키 없이 여러개 선택
 	};
 
@@ -42,6 +42,7 @@ interface propsType extends AgGridReactProps {
 	colDefs: ColDef<Record<string, any>>[];
 	pagination?: boolean;
 	rowSelectionMode?: 'single' | 'multiple' | 'none';
+	enableClickSelection?: boolean;
 	animateRows?: boolean;
 	isReorderMode?: boolean;
 	onGridReady?: (params: GridReadyEvent) => void;
@@ -57,6 +58,7 @@ const CustomAgGridComp = forwardRef(
 			colDefs,
 			pagination = true,
 			rowSelectionMode = 'none',
+			enableClickSelection = false,
 			animateRows,
 			isReorderMode = false,
 			onGridReady,
@@ -116,8 +118,8 @@ const CustomAgGridComp = forwardRef(
 
 		const rowSelection = useMemo(() => {
 			if (isReorderMode) return undefined;
-			return createRowSelection(rowSelectionMode);
-		}, [rowSelectionMode, isReorderMode]);
+			return createRowSelection(rowSelectionMode, enableClickSelection);
+		}, [rowSelectionMode, isReorderMode, enableClickSelection]);
 
 		const onGridReadyEvent = (params: GridReadyEvent) => {
 			params.api.sizeColumnsToFit();

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 /** Lib */
@@ -12,6 +13,7 @@ import { Box, Button, Typography } from '@mui/material';
 import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
 
 /** Type / Interface */
+import { VACATIONPOLICYTYPE } from '@/constant/vacationConst';
 import { VacationDataDto } from '@/app/services/vacationService';
 
 const vacationList: Record<string, any>[] = [
@@ -25,14 +27,23 @@ export default function VacationComp({ vacationData, onSuccess }: { vacationData
 	const router = useRouter();
 	const { setModalData } = useModalStore();
 
+	useEffect(() => {
+		console.log(vacationData);
+	}, [vacationData]);
+
 	const onClickvacationApplication = () => {
 		setModalData(vacationData);
 		router.push('/vacation/user/modal');
 	};
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', padding: '1rem 1.5rem', gap: 2 }}>
-			<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', padding: '1rem 1.5rem', gap: '1rem' }}>
+			<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+				<Typography variant='subtitle2' whiteSpace='nowrap'>
+					{vacationData && vacationData.vacationPolicyType && <> {VACATIONPOLICYTYPE[vacationData.vacationPolicyType]} 기준</>}
+				</Typography>
+			</Box>
+			<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: '0.5rem' }}>
 				{vacationList.map((item, idx) => (
 					<ColTitleAndText key={idx} subtitle={item.label} sx={{ flex: '1' }}>
 						<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
@@ -41,11 +52,9 @@ export default function VacationComp({ vacationData, onSuccess }: { vacationData
 					</ColTitleAndText>
 				))}
 			</Box>
-			<Box sx={{ width: '100%' }}>
-				<Button variant='contained' size='large' sx={{ width: '100%' }} onClick={onClickvacationApplication}>
-					휴가 신청
-				</Button>
-			</Box>
+			<Button variant='contained' size='large' sx={{ width: '100%' }} onClick={onClickvacationApplication}>
+				휴가 신청
+			</Button>
 		</Box>
 	);
 }

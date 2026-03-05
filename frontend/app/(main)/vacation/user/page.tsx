@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import secureLocalStorage from 'react-secure-storage';
 
 /** Lib */
@@ -8,7 +9,7 @@ import dayjs from 'dayjs';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
-import { Box, Button, Typography, Grid } from '@mui/material';
+import { Box, Button, Typography, Grid, useTheme } from '@mui/material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
@@ -17,65 +18,180 @@ import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import VacationComp from '@/app/_component/layoutElement/VacationComp';
+import StatusComp from '@/app/_component/baseElement/StatusComp';
+
+import CustomEchartComp from '@/app/_lib/CustomEchartComp';
 
 /** Type / Interface */
-import { vacationService, VacationDataDto } from '@/app/services/vacationService';
-import { vacationApplicationDto, vacationApplicationService } from '@/app/services/vacationApplicationService';
-import { VACATIONTYPE } from '@/constant/attendanceConst';
-import { BASICSTATUS } from '@/constant/commonConst';
 import { vacationType } from '@/type/types';
+
+import { vacationService, VacationDataDto, VacationHistoryDto } from '@/app/services/vacationService';
+import { vacationApplicationDataDto, vacationApplicationService } from '@/app/services/vacationApplicationService';
+import { VACATIONTYPE } from '@/constant/attendanceConst';
+import { VACATIONCATEGORY } from '@/constant/vacationConst';
 
 const vacationTypeList = [
 	{ key: 'planVacation', label: '예정 휴가' },
 	{ key: 'endVacation', label: '종료 휴가' },
 ];
 
-export default function VacationUserPage() {
-	const { loader, setLoader } = useLoaderStore();
-	const [vacationData, setVacationData] = useState<VacationDataDto>(null);
-	const [planVacationList, setPlanVacationList] = useState<vacationApplicationDto[]>([]);
-	const [endVacationList, setEndVacationList] = useState<vacationApplicationDto[]>([]);
+const colDefs: ColDef<Record<string, any>>[] = [
+	{
+		field: 'status',
+		headerName: '상태',
+		flex: 1,
+		cellRenderer: (data) => (
+			<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+				{data.value ? <StatusComp status={data.value} /> : '-'}
+			</Box>
+		),
+	},
+	{
+		field: 'vacationType',
+		headerName: '휴가종류',
+		flex: 2,
+		valueFormatter: (data) => (data.value ? VACATIONTYPE[data.value as vacationType] : '-'),
+	},
+	{
+		field: 'vacationDuration',
+		headerName: '휴가일',
+		flex: 1,
+	},
+	{
+		field: 'time',
+		headerName: '휴가기간',
+		flex: 3,
+		cellRenderer: (param) => (
+			<Box sx={{ display: 'flex', flexDirection: 'row', py: '6px' }}>
+				<Typography>{param.data.startDate ? dayjs(param.data.startDate).format('YYYY-MM-DD') : '-'}</Typography>
+				{param.data.endDate && (
+					<>
+						<Typography>~</Typography>
+						<Typography>{dayjs(param.data.endDate).format('YYYY-MM-DD')}</Typography>
+					</>
+				)}
+			</Box>
+		),
+	},
+];
 
-	const colDefs: ColDef<Record<string, any>>[] = [
-		{
-			field: 'status',
-			headerName: '상태',
-			flex: 1,
-			valueFormatter: (data) => (data.value ? BASICSTATUS[data.value] : '-'),
-		},
-		{
-			field: 'vacationType',
-			headerName: '휴가종류',
-			flex: 1,
-			valueFormatter: (data) => (data.value ? VACATIONTYPE[data.value as vacationType] : '-'),
-		},
-		{
-			field: 'vacationDuration',
-			headerName: '휴가일수',
-			flex: 1,
-		},
-		{
-			field: 'time',
-			headerName: '휴가기간',
-			flex: 3,
-			cellRenderer: (param) => (
-				<Box sx={{ display: 'flex', flexDirection: 'row', py: '6px' }}>
-					<Typography>{param.data.startDate ? dayjs(param.data.startDate).format('YYYY-MM-DD') : '-'}</Typography>
-					{param.data.endDate && (
-						<>
-							<Typography>~</Typography>
-							<Typography>{dayjs(param.data.endDate).format('YYYY-MM-DD')}</Typography>
-						</>
-					)}
-				</Box>
-			),
-		},
-	];
+const historyColDefs: ColDef<Record<string, any>>[] = [
+	{
+		field: 'vacationCategory',
+		headerName: '휴가 종류',
+		flex: 2,
+		valueFormatter: (param) => (param.value ? VACATIONCATEGORY[param.value] : '-'),
+	},
+	{
+		field: 'day',
+		headerName: '휴가일',
+		flex: 1,
+	},
+	{
+		field: 'time',
+		headerName: '휴가 지급일',
+		cellRenderer: (param) => (
+			<Box sx={{ display: 'flex', flexDirection: 'row', py: '6px' }}>
+				<Typography>{param.data ? dayjs(param.data.accrualDate).format('YYYY-MM-DD') : '-'}</Typography>
+			</Box>
+		),
+	},
+	{
+		field: 'time',
+		headerName: '휴가 만료일',
+		cellRenderer: (param) => (
+			<Box sx={{ display: 'flex', flexDirection: 'row', py: '6px' }}>
+				<Typography>{param.data ? dayjs(param.data.expireDate).format('YYYY-MM-DD') : '-'}</Typography>
+			</Box>
+		),
+	},
+];
+
+export default function VacationUserPage() {
+	const theme = useTheme();
+	const pathname = usePathname();
+	const { loader, setLoader } = useLoaderStore();
+
+	const [vacationData, setVacationData] = useState<VacationDataDto>(null);
+	const [vacationHistory, setVacationHistory] = useState<VacationHistoryDto[]>([]);
+	const [planVacationList, setPlanVacationList] = useState<vacationApplicationDataDto[]>([]);
+	const [endVacationList, setEndVacationList] = useState<vacationApplicationDataDto[]>([]);
+
+	const [chartOption, setChartOption] = useState<Record<string, any>>({});
 
 	useEffect(() => {
 		getVacationData();
 		getvacationApplicationList();
-	}, []);
+	}, [pathname]);
+
+	const makeChartOption = (data: VacationDataDto) => {
+		const _option = {
+			grid: {
+				left: 0,
+				right: 0,
+			},
+			xAxis: {
+				axisLabel: {
+					show: true,
+					color: 'rgba(0,0,0,0)',
+				},
+				splitLine: {
+					show: false,
+				},
+				max: data.grantedDay,
+			},
+			yAxis: {
+				data: [''],
+				nameGap: 0,
+				inverse: false,
+			},
+			series: [
+				{
+					type: 'bar',
+					showBackground: true,
+					barWidth: 15,
+					itemStyle: {
+						color: {
+							type: 'linear',
+							x: 0,
+							x2: 1,
+							colorStops: [
+								{
+									offset: 0,
+									color: theme.palette.primary.main,
+								},
+								{
+									offset: 1,
+									color: '#61fbd5',
+								},
+							],
+						},
+					},
+					data: [data.usedDay],
+					backgroundStyle: {
+						color: 'rgba(180, 180, 180, 0.2)',
+					},
+					markLine: {
+						symbol: ['none'],
+						label: {
+							show: true,
+							position: 'start',
+							fontFamily: 'Pretendard Variable',
+							color: theme.palette.grey[700],
+						},
+						lineStyle: {
+							type: 'dashed',
+							color: theme.palette.grey[500],
+						},
+						clip: false,
+						data: [{ xAxis: data.usedDay }, { xAxis: data.grantedDay }],
+					},
+				},
+			],
+		};
+
+		setChartOption(_option);
+	};
 
 	const getVacationData = async () => {
 		if (!loader) setLoader(true);
@@ -85,7 +201,9 @@ export default function VacationUserPage() {
 			const res = await vacationService.getVacationData(encodedMemberId);
 
 			if (res) {
-				setVacationData(res);
+				setVacationData(res.vacation);
+				setVacationHistory(res.history);
+				makeChartOption(res.vacation);
 			}
 		} catch (error: any) {
 		} finally {
@@ -113,7 +231,7 @@ export default function VacationUserPage() {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
 			<PathBreadcrumbs />
-			<Grid container spacing={4} sx={{ flexGrow: 1, flexDirection: 'column', width: '100%', height: '100%' }}>
+			<Grid container spacing={4} sx={{ flexGrow: 1, flexDirection: 'column', width: '100%', height: 'auto', gap: 2 }}>
 				<Grid
 					sx={{
 						display: 'flex',
@@ -122,30 +240,64 @@ export default function VacationUserPage() {
 						borderWidth: '1px',
 						borderStyle: 'solid',
 						borderColor: 'grey.300',
-						gap: '1rem',
 					}}
 				>
-					<Box sx={{ width: { sm: '100%', md: '50%' } }}>
+					<Box sx={{ width: { sm: '100%', md: '50%' }, borderRight: '1px solid', borderColor: 'grey.300' }}>
 						<VacationComp vacationData={vacationData} />
 					</Box>
+					<Box sx={{ width: { sm: '100%', md: '50%' }, borderRight: '1px solid', borderColor: 'grey.300' }}>
+						<Box
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								justifyContent: 'center',
+								padding: '1.5rem 1rem',
+								gap: '1rem',
+							}}
+						>
+							<Box>
+								<Typography variant='h6'>연차 소진률</Typography>
+								<Typography sx={{ color: 'grey.700' }}>
+									연차를{' '}
+									{vacationData && vacationData.usedDay && vacationData.grantedDay
+										? (vacationData.usedDay / vacationData.grantedDay) * 100
+										: 0}
+									% 소진했습니다.
+								</Typography>
+							</Box>
+							<Box sx={{ width: '100%', height: '4rem' }}>
+								<CustomEchartComp chartType={'rank_bar'} option={chartOption} />
+							</Box>
+						</Box>
+					</Box>
+				</Grid>
+				<Grid sx={{ display: 'flex', flexDirection: { lg: 'row', md: 'column', sm: 'column', xs: 'column' }, minHeight: '15rem', gap: '1rem' }}>
 					<Box
 						sx={{
 							display: 'flex',
 							flexDirection: 'column',
-							width: { sm: '100%', md: '50%' },
-							padding: '1rem 1.5rem',
-							borderLeftWidth: '1px',
-							borderStyle: 'solid',
-							borderColor: 'grey.300',
-							gap: '1rem',
+							width: '100%',
+							backgroundColor: 'grey.50',
+							border: '1px solid',
+							borderColor: 'grey.200',
+							borderRadius: '1rem',
 						}}
-					></Box>
+					>
+						<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0.5rem 0.5rem 1rem' }}>
+							<Typography variant='subtitle1'>연차 내역</Typography>
+						</Box>
+						<Box sx={{ flexGrow: 1, minHeight: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
+							<CustomAgGridComp rowData={vacationHistory} colDefs={historyColDefs} rowSelectionMode='none' />
+						</Box>
+					</Box>
 				</Grid>
-				<Grid sx={{ display: 'flex', flexDirection: { lg: 'row', md: 'column', sm: 'column', xs: 'column' }, gap: '1rem' }}>
+				<Grid sx={{ display: 'flex', flexDirection: { lg: 'row', md: 'column', sm: 'column', xs: 'column' }, flexGrow: 1, gap: '1rem' }}>
 					{vacationTypeList.map((item) => (
 						<Box
 							key={item.key}
 							sx={{
+								display: 'flex',
+								flexDirection: 'column',
 								width: { lg: `calc(100% / ${vacationTypeList.length})`, md: '100%', sm: '100%', xs: '100%' },
 								backgroundColor: 'grey.50',
 								border: '1px solid',
@@ -153,11 +305,10 @@ export default function VacationUserPage() {
 								borderRadius: '1rem',
 							}}
 						>
-							<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0.625rem 1rem 1.5rem' }}>
+							<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0.5rem 0.5rem 1rem' }}>
 								<Typography variant='subtitle1'>{item.label}</Typography>
-								<Button>더보기</Button>
 							</Box>
-							<Box sx={{ height: '15rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
+							<Box sx={{ flexGrow: 1, minHeight: '15rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
 								<CustomAgGridComp
 									rowData={item.key === 'planVacation' ? planVacationList : endVacationList}
 									colDefs={colDefs}

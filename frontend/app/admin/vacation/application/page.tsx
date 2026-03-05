@@ -6,50 +6,53 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
+import useLoaderStore from '@/store/useLoaderStore';
+import useModalStore from '@/store/useModalStore';
+
 /** MUI */
-import { Box, Button, Grid, IconButton, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import { Box, Button, Grid, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
-import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
-import { WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
+import { VACATIONTYPE, WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
 import { BASICSTATUS } from '@/constant/commonConst';
+import StatusComp from '@/app/_component/baseElement/StatusComp';
+
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
-import { formatMinutes } from '@/utils/commonFunc';
 
 /** Type / Interface */
-import { workStatus, workType } from '@/type/types';
-import { AttendanceDayResDto } from '@/app/services/attendanceService';
-import { AttendanceCompanyRequestDto, attendancePolicyService } from '@/app/services/attendanceCompanyService';
+import { SearchRequestDto } from '@/type/interface';
+import { vacationApplicationDto, vacationApplicationService } from '@/app/services/vacationApplicationService';
+import { useRouter } from 'next/navigation';
 
 dayjs.extend(duration);
 
 export default function VacationApplicationPage() {
+	const router = useRouter();
 	const { setLoader } = useLoaderStore();
+	const { setModalData } = useModalStore();
 
 	const [searchCategory, setSearchCategory] = useState<string>('memberNm');
 	const [searchValue, setSearchValue] = useState<string>('');
-
-	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
 	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
 
 	const colDefs: ColDef<Record<string, any>>[] = [
 		{
 			field: 'status',
-			headerName: '처리상태',
+			headerName: '상태',
 			flex: 1,
-			cellStyle: {
-				textAlign: 'center',
-			},
-			valueFormatter: (data) => (data.value ? BASICSTATUS[data.value] : '-'),
+			cellRenderer: (data) => (
+				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+					{data.value ? <StatusComp status={data.value} /> : '-'}
+				</Box>
+			),
 		},
 		{
 			field: 'member',
 			headerName: '근무자',
-			flex: 1,
 			cellRenderer: (param) => {
 				const deptNm = param.data?.deptNm;
 				const jobGrade = param.data?.jobGrade;
@@ -64,57 +67,77 @@ export default function VacationApplicationPage() {
 			},
 		},
 		{
-			field: 'workType',
-			headerName: '근로타입',
-			flex: 1,
-			valueFormatter: (param) => (param.data ? WORKTYPE[param.data.workType as workType] : '-'),
+			field: 'vacationType',
+			headerName: '휴가종류',
+			valueFormatter: (param) => (param.value ? VACATIONTYPE[param.value] : '-'),
 		},
 		{
-			field: 'workStatus',
-			headerName: '근로상태',
-			flex: 1,
-			valueFormatter: (param) => (param.data ? WORKSTATUS[param.data.workStatus as workStatus] : '-'),
+			field: 'vacationDuration',
+			headerName: '휴가일수',
 		},
 		{
 			field: 'time',
-			headerName: '근로시간',
+			headerName: '휴가기간',
 			flex: 3,
 			cellRenderer: (param) => (
 				<Box sx={{ py: '6px' }}>
-					<Typography>총 근로시간(분): {formatMinutes(param.data.fullTime)}</Typography>
-
-					<Typography>출근시간: {param.data.startTime ? dayjs(param.data.startTime).format('HH:mm') : '-'}</Typography>
-					<Typography>퇴근시간: {param.data.endTime ? dayjs(param.data.endTime).format('HH:mm') : '-'}</Typography>
+					<Typography>
+						{param.data.startDate ? dayjs(param.data.startDate).format('YYYY-MM-DD') : '-'}
+						{param.data.endDate ? ' ~ ' + dayjs(param.data.endDate).format('YYYY-MM-DD') : ''}
+					</Typography>
+				</Box>
+			),
+		},
+		{
+			field: 'detail',
+			headerName: '상세',
+			cellRenderer: (param) => (
+				<Box
+					sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', py: '6px' }}
+					onClick={(e) => {
+						setModalData(param.data);
+						router.push('/vacation/user/modal?type=read');
+					}}
+				>
+					<Button variant='outlined'>상세 보기</Button>
+				</Box>
+			),
+		},
+		{
+			field: 'action',
+			headerName: '처리',
+			cellRenderer: (param) => (
+				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', gap: 1, py: '6px' }}>
+					<Button variant='contained' onClick={(e) => clickEvent('approve', param.data)}>
+						승인
+					</Button>
+					<Button variant='contained' color='error' onClick={(e) => clickEvent('reject', param.data)}>
+						반려
+					</Button>
 				</Box>
 			),
 		},
 	];
 
+	useEffect(() => {
+		onClickSearch();
+	}, []);
+
 	const onClickSearch = async () => {
 		setLoader(true);
 
 		try {
-			const req: AttendanceCompanyRequestDto = {
-				workDate: calendarDate.format('YYYY-MM-DD'),
+			const req: SearchRequestDto = {
 				searchCategory: searchCategory,
 				searchValue: searchValue,
 			};
 
-			const res: AttendanceDayResDto[] = await attendancePolicyService.getAttendanceCompanySearch(req);
+			const res: vacationApplicationDto[] = await vacationApplicationService.searchVacationApplication(req);
 			setRowData(res);
 		} finally {
 			setLoader(false);
 		}
 	};
-
-	const onChangeDatePicker = useCallback(
-		(value) => {
-			if (value != null) {
-				setCalendarDate(value);
-			}
-		},
-		[calendarDate],
-	);
 
 	const handleChangeSearchCategory = useCallback(
 		(event: SelectChangeEvent) => {
@@ -156,6 +179,22 @@ export default function VacationApplicationPage() {
 		}
 	}, [searchCategory, searchValue]);
 
+	const clickEvent = async (type: 'reject' | 'approve', data: vacationApplicationDto) => {
+		if (data !== null) {
+			if (type === 'reject') {
+				await vacationApplicationService.rejectAttendanceApplication(data);
+				if (confirm('반려처리가 성공적으로 완료되었습니다.')) {
+					onClickSearch();
+				}
+			} else {
+				await vacationApplicationService.approveAttendanceApplication(data);
+				if (confirm('승인처리가 성공적으로 완료되었습니다.')) {
+					onClickSearch();
+				}
+			}
+		}
+	};
+
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
 			<Box sx={{ padding: '0 1.5rem' }}>
@@ -174,7 +213,7 @@ export default function VacationApplicationPage() {
 					</Button>
 				</Grid>
 				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='single' rowHeight={80} />
+					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='single' enableClickSelection={false} rowHeight={80} />
 				</Grid>
 			</Grid>
 		</Box>
