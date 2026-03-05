@@ -1,6 +1,7 @@
 package org.easyc.vacation.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.audit.activity.AuditAction;
 import org.easyc.vacation.dto.VacationApplicationDto;
 import org.easyc.vacation.dto.VacationApplicationResponseDto;
 import org.easyc.vacation.entity.VacationApplication;
@@ -17,6 +18,7 @@ public class VacationApplicationController {
 
     private final VacationApplicationService vacationApplicationService;
 
+    @AuditAction(code = "VACATION_APP_SAVE", name = "휴가 신청", targetType = "VACATION_APP")
     @PostMapping("/save")
     public void saveVacationApplicationData(VacationApplicationDto request) {
         vacationApplicationService.saveVacationApplication(request);

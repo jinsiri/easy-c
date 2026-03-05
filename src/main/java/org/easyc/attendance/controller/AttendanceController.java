@@ -2,6 +2,7 @@ package org.easyc.attendance.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.audit.activity.AuditAction;
 import org.easyc.attendance.dto.AttendanceCalendarResponseDto;
 import org.easyc.attendance.dto.AttendanceRequestDto;
 import org.easyc.attendance.dto.AttendanceResponseDto;
@@ -36,11 +37,13 @@ public class AttendanceController {
         return result;
     }
 
+    @AuditAction(code = "ATTENDANCE_START", name = "출근 기록", targetType = "ATTENDANCE")
     @PostMapping("/start")
     public void startAttendanceData( @RequestBody AttendanceSaveRequestDto request) {
        attendanceService.startAttendanceData(request);
     }
 
+    @AuditAction(code = "ATTENDANCE_FINISH", name = "퇴근 기록", targetType = "ATTENDANCE")
     @PostMapping("/finish")
     public void finishAttendanceData(@RequestBody AttendanceSaveRequestDto request) {
         attendanceService.finishAttendanceData(request);
