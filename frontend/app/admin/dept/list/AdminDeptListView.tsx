@@ -11,7 +11,7 @@ import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
 import { useEffect, useState } from 'react';
 import axiosConfig from '@/app/_lib/axiosConfig';
 import { useDialogStore } from '@/store/useDialogStore';
-import { useDeptForm } from '@/app/admin/dept/_component/hooks/useDeptForm';
+import { useDeptForm } from '@/app/admin/dept/_hooks/useDeptForm';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
 

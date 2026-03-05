@@ -1,7 +1,7 @@
 import { Box, Paper, Typography, Button, Container } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import JobGradeForm from '@/app/admin/dept/_component/JobGradeForm';
-import useJobGradeForm from '@/app/admin/dept/_component/hooks/useJobGradeForm';
+import useJobGradeForm from '@/app/admin/dept/_hooks/useJobGradeForm';
 
 export default function AddJobGradePage() {
 	const {

@@ -1,7 +1,7 @@
 import { Box, Paper, Typography, Button, Container } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import JobTitleForm from '@/app/admin/dept/_component/JobTitleForm';
-import useJobTitleForm from '@/app/admin/dept/_component/hooks/useJobTitleForm';
+import useJobTitleForm from '@/app/admin/dept/_hooks/useJobTitleForm';
 import { use } from 'react';
 
 export default function UpdateJobTitlePage({ params }: { params: Promise<{ id: string }> }) {

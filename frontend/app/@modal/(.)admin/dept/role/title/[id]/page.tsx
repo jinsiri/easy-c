@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
-import useJobTitleForm from '@/app/admin/dept/_component/hooks/useJobTitleForm';
+import useJobTitleForm from '@/app/admin/dept/_hooks/useJobTitleForm';
 import JobTitleForm from '@/app/admin/dept/_component/JobTitleForm';
 
 export default function UpdateJobTitleModal({ params }: { params: Promise<{ id: string }> }) {

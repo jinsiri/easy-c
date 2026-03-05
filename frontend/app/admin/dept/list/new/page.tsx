@@ -3,7 +3,7 @@
 import { Box, Paper, Typography, Button, Container } from '@mui/material';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
 import { ArrowBack } from '@mui/icons-material';
-import { useDeptForm } from '@/app/admin/dept/_component/hooks/useDeptForm';
+import { useDeptForm } from '@/app/admin/dept/_hooks/useDeptForm';
 
 export default function AddDeptPage() {
 	const {

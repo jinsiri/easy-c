@@ -1,7 +1,7 @@
 import { Box, Paper, Typography, Button, Container } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import JobPositionForm from '@/app/admin/dept/_component/JobPositionForm';
-import useJobPositionForm from '@/app/admin/dept/_component/hooks/useJobPositionForm';
+import useJobPositionForm from '@/app/admin/dept/_hooks/useJobPositionForm';
 import { use } from 'react';
 
 export default function UpdateJobPositionPage({ params }: { params: Promise<{ id: string }> }) {

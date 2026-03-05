@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
-import useJobGradeForm from '@/app/admin/dept/_component/hooks/useJobGradeForm';
+import useJobGradeForm from '@/app/admin/dept/_hooks/useJobGradeForm';
 import JobGradeForm from '@/app/admin/dept/_component/JobGradeForm';
 
 export default function UpdateJobGradeModal({ params }: { params: Promise<{ id: string }> }) {

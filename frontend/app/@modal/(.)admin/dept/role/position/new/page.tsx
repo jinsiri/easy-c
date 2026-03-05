@@ -1,7 +1,7 @@
 'use client';
 
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
-import useJobPositionForm from '@/app/admin/dept/_component/hooks/useJobPositionForm';
+import useJobPositionForm from '@/app/admin/dept/_hooks/useJobPositionForm';
 import JobPositionForm from '@/app/admin/dept/_component/JobPositionForm';
 
 export default function AddJobPositionModal() {

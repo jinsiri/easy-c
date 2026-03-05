@@ -2,7 +2,7 @@
 
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
-import { useDeptForm } from '@/app/admin/dept/_component/hooks/useDeptForm';
+import { useDeptForm } from '@/app/admin/dept/_hooks/useDeptForm';
 
 export default function AddDeptModal() {
 	const {
