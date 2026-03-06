@@ -405,6 +405,13 @@ export default function MemberNewPage() {
 		[theme],
 	);
 
+	const FORM_SECTIONS = [
+		{ title: '경력', name: 'careerList', cols: CAREER_COLS, helper: career },
+		{ title: '포상/징계', name: 'rewardDisciplineList', cols: REWARD_COLS, helper: reward },
+		{ title: '자격', name: 'qualificationList', cols: QUALIFICATION_COLS, helper: qual },
+		{ title: '어학', name: 'languageList', cols: LANGUAGE_COLS, helper: lang },
+	];
+
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 			<Box sx={{ flexShrink: 0, width: '100%', padding: '0 1.5rem', my: '1rem' }}>
@@ -420,33 +427,17 @@ export default function MemberNewPage() {
 
 			<Box>{tabTotalContent}</Box>
 
-			<Grid container component='section' spacing={5} sx={{ display: 'flex', flexDirection: 'column', width: '100%', p: '1rem' }}>
-				<Grid component='article'>
-					<Box sx={{ display: 'flex', alignItems: 'center', py: '0.5rem' }}>
-						<Typography sx={{ fontWeight: 600 }}>경력</Typography>
-						<Box sx={{ flexGrow: 1, height: '1px', ml: '1rem', backgroundColor: theme.palette.divider }} />
+			<Stack spacing={4} sx={{ width: '100%', p: '1rem' }}>
+				{FORM_SECTIONS.map((section) => (
+					<Box key={section.name} component='article'>
+						<Box sx={{ display: 'flex', alignItems: 'center', py: '0.5rem' }}>
+							<Typography sx={{ fontWeight: 600 }}>{section.title}</Typography>
+							<Box sx={{ flexGrow: 1, height: '1px', ml: '1rem', backgroundColor: theme.palette.divider }} />
+						</Box>
+						{renderListTab(section.cols, section.name, section.helper)}
 					</Box>
-					{renderListTab(CAREER_COLS, 'careerList', career)}
-
-					<Box sx={{ display: 'flex', alignItems: 'center', py: '0.5rem', mt: '2rem' }}>
-						<Typography sx={{ fontWeight: 600 }}>포상/징계</Typography>
-						<Box sx={{ flexGrow: 1, height: '1px', ml: '1rem', backgroundColor: theme.palette.divider }} />
-					</Box>
-					{renderListTab(REWARD_COLS, 'rewardDisciplineList', reward)}
-
-					<Box sx={{ display: 'flex', alignItems: 'center', py: '0.5rem', mt: '2rem' }}>
-						<Typography sx={{ fontWeight: 600 }}>자격</Typography>
-						<Box sx={{ flexGrow: 1, height: '1px', ml: '1rem', backgroundColor: theme.palette.divider }} />
-					</Box>
-					{renderListTab(QUALIFICATION_COLS, 'qualificationList', qual)}
-
-					<Box sx={{ display: 'flex', alignItems: 'center', py: '0.5rem', mt: '2rem' }}>
-						<Typography sx={{ fontWeight: 600 }}>어학</Typography>
-						<Box sx={{ flexGrow: 1, height: '1px', ml: '1rem', backgroundColor: theme.palette.divider }} />
-					</Box>
-					{renderListTab(LANGUAGE_COLS, 'languageList', lang)}
-				</Grid>
-			</Grid>
+				))}
+			</Stack>
 		</Box>
 	);
 }
