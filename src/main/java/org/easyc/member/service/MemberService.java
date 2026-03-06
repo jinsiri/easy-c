@@ -7,6 +7,8 @@ import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.member.dto.*;
 import org.easyc.member.entity.*;
 import org.easyc.member.repository.*;
+import org.easyc.memberJobGradeMap.service.MemberJobGradeMapService;
+import org.easyc.memberJobPositionMap.service.MemberJobPositionMapService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,8 @@ public class MemberService {
     private final MemberRewardDisciplineRepository memberRewardDisciplineRepository;
     private final MemberQualificationRepository memberQualificationRepository;
     private final MemberLanguageRepository memberLanguageRepository;
+    private final MemberJobGradeMapService memberJobGradeMapService;
+    private final MemberJobPositionMapService memberJobPositionMapService;
 
     // 로그인 아이디 중복 체크
     public boolean isLoginIdDuplicate(String loginId) {
@@ -178,6 +182,14 @@ public class MemberService {
                         encoder.encode(requestDto.getPassword())
                 )
         );
+
+        if(requestDto.getJobPosition() != null) {
+            memberJobPositionMapService.assignJobPosition(member.getMemberId(), requestDto.getJobPosition());
+        }
+
+        if(requestDto.getJobGrade() != null) {
+            memberJobGradeMapService.assignJobGrade(member.getMemberId(), requestDto.getJobGrade());
+        }
 
         MemberProfile profile = MemberProfile.of(member, profileRequestDto);
         memberProfileRepository.save(profile);

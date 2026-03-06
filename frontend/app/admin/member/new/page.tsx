@@ -51,7 +51,7 @@ const memberSchema = z
 		jobPosition: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 		jobGrade: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 		jobTitle: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
-		jobRole: z.string().default(''),
+		jobRole: z.string().default(''), // todo: 이거 중앙관리할지 텍스트로 받을지 결정해야함
 		email: z
 			.string()
 			.refine((val) => val === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
