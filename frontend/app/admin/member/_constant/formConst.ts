@@ -186,7 +186,7 @@ export const CAREER_COLS: MemberColDef[] = [
 	{ key: 'startDate', label: '시작일', type: 'date' },
 	{ key: 'endDate', label: '종료일', type: 'date' },
 	{ key: 'companyName', label: '근무처', type: 'text' },
-	{ key: 'jobPosition', label: '직위', type: 'text' },
+	{ key: 'positionTitle', label: '직위', type: 'text' },
 	{ key: 'jobDescription', label: '담당업무', type: 'text' },
 	{ key: 'workPeriod', label: '근속기간', type: 'text' },
 	{ key: 'resignationReason', label: '퇴직사유', type: 'text' },
