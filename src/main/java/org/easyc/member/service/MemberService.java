@@ -183,12 +183,12 @@ public class MemberService {
                 )
         );
 
-        if(requestDto.getJobPosition() != null) {
-            memberJobPositionMapService.assignJobPosition(member.getMemberId(), requestDto.getJobPosition());
+        if(requestDto.getJobPositionId() != null) {
+            memberJobPositionMapService.assignJobPosition(member.getMemberId(), requestDto.getJobPositionId());
         }
 
-        if(requestDto.getJobGrade() != null) {
-            memberJobGradeMapService.assignJobGrade(member.getMemberId(), requestDto.getJobGrade());
+        if(requestDto.getJobGradeId() != null) {
+            memberJobGradeMapService.assignJobGrade(member.getMemberId(), requestDto.getJobGradeId());
         }
 
         MemberProfile profile = MemberProfile.of(member, profileRequestDto);

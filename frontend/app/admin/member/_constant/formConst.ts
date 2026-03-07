@@ -26,9 +26,9 @@ export const MEMBER_FORM_CONFIG: { title: string; fields: MemberFieldDef[] }[] =
 			{ key: 'employeeId', label: '사번', required: true },
 			{ key: 'extensionNumber', label: '대표전화' },
 			{ key: 'departmentPosition', label: '부서/직책' },
-			{ key: 'jobPosition', label: '직위', type: 'select' },
-			{ key: 'jobGrade', label: '직급', type: 'select' },
-			{ key: 'jobRole', label: '직무' },
+			{ key: 'jobPositionId', label: '직위', type: 'select' },
+			{ key: 'jobGradeId', label: '직급', type: 'select' },
+			{ key: 'jobRoleId', label: '직무' },
 			{ key: 'email', label: '이메일' },
 			{
 				key: 'employmentStatus',
