@@ -1,3 +1,5 @@
+'use client';
+
 import { useSearchParams } from 'next/navigation';
 import { Box, Checkbox, Grid, List, ListItem, OutlinedInput, Typography, useTheme } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
@@ -356,6 +358,8 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 					display: 'flex',
 					flexDirection: 'column',
 					marginTop: '-1px',
+					height: '40vh',
+					minHeight: '400px',
 				}}
 			/>
 		</Box>

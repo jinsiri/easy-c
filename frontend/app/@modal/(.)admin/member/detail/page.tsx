@@ -21,7 +21,7 @@ export default function MemberDetailModal() {
 	};
 
 	return (
-		<BaseDialog title='멤버 상세' confirmLabel='수정' onConfirm={handleEdit} maxWidth={false} fullWidth paperSx={{ width: '90vw', maxWidth: '90vw' }}>
+		<BaseDialog title='멤버 상세' confirmLabel='수정' onConfirm={handleEdit} maxWidth={'lg'} fullWidth paperSx={{ width: '90vw' }}>
 			<MemberDetail />
 		</BaseDialog>
 	);
