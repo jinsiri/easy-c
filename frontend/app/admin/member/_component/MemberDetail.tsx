@@ -4,26 +4,20 @@ import { useSearchParams } from 'next/navigation';
 import { Box, Checkbox, Grid, List, ListItem, OutlinedInput, Typography, useTheme } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { memberService } from '@/app/services/memberService';
-import CommonTabs from '@/app/_component/CommonTabs';
-import { ColDef } from 'ag-grid-community';
 import { useContainerSize } from '@/app/_hooks/useContainerSize';
-
-const getDisplayValue = (value: any): string => {
-	if (value === null || value === undefined) return '-';
-	if (typeof value === 'boolean') return value ? 'Y' : 'N';
-	if (typeof value === 'object' && 'label' in value) return value.label || '-';
-	return String(value) || '-';
-};
+import { CAREER_COL_DEFS, CERTIFICATION_COL_DEFS, LANGUAGE_COL_DEFS, REWARD_COL_DEFS } from '@/app/admin/member/_constant/formConst';
+import CommonTabs from '@/app/_component/CommonTabs';
+import { getDisplayValue, transformGridData } from '@/app/admin/member/_utils/formUtil';
 
 // ========== 필드 매핑 정의 ==========
-
 // 상단 기본 인사정보 (카드 영역)
 const memberInfoFields: { key: string; label: string }[] = [
 	{ key: 'memberNm', label: '직원 이름' },
 	{ key: 'employeeId', label: '사번' },
 	{ key: 'departmentPosition', label: '부서/직책' }, // TODO: 부서/직책 필드 추가 필요
-	{ key: 'positionTitle', label: '직위' }, // TODO: 직위 필드 추가 필요
-	{ key: 'jobTitle', label: '직무' }, // TODO: 직무 필드 추가 필요
+	{ key: 'jobPosition', label: '직위' },
+	{ key: 'jobGrade', label: '직급' },
+	{ key: 'jobRole', label: '직무' },
 	{ key: 'hireDate', label: '입사일' },
 	{ key: 'extensionNumber', label: '대표전화' },
 	{ key: 'phoneNumber', label: '휴대전화' },
@@ -35,8 +29,9 @@ const memberInfoFields: { key: string; label: string }[] = [
 // 기본 정보 탭
 const basicInfoFields: { key: string; label: string }[] = [
 	{ key: 'departmentPosition', label: '부서/직책' }, // TODO: 부서/직책 필드 추가 필요
-	{ key: 'positionTitle', label: '직위' }, // TODO: 직위 필드 추가 필요
-	{ key: 'jobTitle', label: '직무' }, // TODO: 직무 필드 추가 필요
+	{ key: 'jobPosition', label: '직위' },
+	{ key: 'jobGrade', label: '직급' },
+	{ key: 'jobRole', label: '직무' },
 	{ key: 'employmentType', label: '직원 구분' },
 	{ key: 'recruitmentType', label: '채용 구분' },
 	{ key: 'salaryType', label: '급여 구분' },
@@ -85,63 +80,6 @@ const personalInfoSections = [
 	},
 ];
 
-// 그리드용 컬럼 정의 (field는 API 필드명, headerName은 한글 라벨)
-const careerColDefs: ColDef<Record<string, any>>[] = [
-	{ field: 'startDate', headerName: '시작일', editable: false },
-	{ field: 'endDate', headerName: '종료일', editable: false },
-	{ field: 'companyName', headerName: '근무처', editable: false },
-	{ field: 'positionTitle', headerName: '직위', editable: false },
-	{ field: 'jobDescription', headerName: '담당업무', editable: false },
-	{ field: 'workPeriod', headerName: '근속기간', editable: false },
-	{ field: 'resignationReason', headerName: '퇴직사유', editable: false },
-];
-
-const rewardColDefs: ColDef<Record<string, any>>[] = [
-	{ field: 'type', headerName: '구분', editable: false },
-	{ field: 'actionDate', headerName: '일자', editable: false },
-	{ field: 'title', headerName: '내용', editable: false },
-	{ field: 'reason', headerName: '사유', editable: false },
-	{ field: 'remark', headerName: '기타', editable: false },
-];
-
-const certificateColDefs: ColDef<Record<string, any>>[] = [
-	{ field: 'qualificationType', headerName: '구분', editable: false },
-	{ field: 'qualificationName', headerName: '자격명', editable: false },
-	{ field: 'qualificationNumber', headerName: '자격번호', editable: false },
-	{ field: 'qualificationGrade', headerName: '자격등급', editable: false },
-	{ field: 'issuingOrganization', headerName: '기관명', editable: false },
-	{ field: 'acquiredDate', headerName: '취득일', editable: false },
-	{ field: 'suspendedDate', headerName: '정지일', editable: false },
-];
-
-const languageColDefs: ColDef<Record<string, any>>[] = [
-	{ field: 'languageType', headerName: '구분', editable: false },
-	{ field: 'languageName', headerName: '어학명', editable: false },
-	{ field: 'evaluationDate', headerName: '평가일', editable: false },
-	{ field: 'evaluationAgency', headerName: '평가기관', editable: false },
-	{ field: 'score', headerName: '점수', editable: false },
-	{ field: 'grade', headerName: '등급', editable: false },
-	{ field: 'etc', headerName: '기타', editable: false },
-];
-
-// API 응답 데이터를 그리드용으로 변환 (EnumOption -> label 문자열)
-const transformGridData = (data: any[]): Record<string, any>[] => {
-	if (!data || !Array.isArray(data)) return [];
-	return data.map((item) => {
-		const transformed: Record<string, any> = {};
-		Object.entries(item).forEach(([key, value]) => {
-			if (value && typeof value === 'object' && 'label' in value) {
-				transformed[key] = value.label || '-';
-			} else if (value === null || value === undefined) {
-				transformed[key] = '-';
-			} else {
-				transformed[key] = value;
-			}
-		});
-		return transformed;
-	});
-};
-
 interface MemberDetailProps {
 	selectedId?: number;
 }
@@ -161,6 +99,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 	const [languageInfo, setLanguageInfo] = useState<any[]>([]);
 	const [loading, setLoading] = useState(false);
 
+	console.log('memberId:' + memberId);
 	useEffect(() => {
 		const fetchMemberData = async () => {
 			setLoading(true);
@@ -303,10 +242,10 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 	const userTabs = [
 		{ label: '기본 정보', content: tabInfoContents },
 		{ label: '신상 정보', content: tabPersonalContents },
-		{ label: '경력', type: 'grid', colDefs: careerColDefs, rowData: transformGridData(careerInfo) },
-		{ label: '포상/징계', type: 'grid', colDefs: rewardColDefs, rowData: transformGridData(rewardInfo) },
-		{ label: '자격', type: 'grid', colDefs: certificateColDefs, rowData: transformGridData(qualificationInfo) },
-		{ label: '어학', type: 'grid', colDefs: languageColDefs, rowData: transformGridData(languageInfo) },
+		{ label: '경력', type: 'grid', colDefs: CAREER_COL_DEFS, rowData: transformGridData(careerInfo) },
+		{ label: '포상/징계', type: 'grid', colDefs: REWARD_COL_DEFS, rowData: transformGridData(rewardInfo) },
+		{ label: '자격', type: 'grid', colDefs: CERTIFICATION_COL_DEFS, rowData: transformGridData(qualificationInfo) },
+		{ label: '어학', type: 'grid', colDefs: LANGUAGE_COL_DEFS, rowData: transformGridData(languageInfo) },
 	];
 
 	return (
@@ -331,7 +270,17 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 							{memberInfoFields.map(({ key, label }) => {
 								const combinedData = { ...memberInfo };
 								const value = combinedData[key];
-								const displayValue = getDisplayValue(value);
+								let displayValue = getDisplayValue(value);
+								switch (key) {
+									case 'jobPosition':
+										displayValue = combinedData.jobPositionMapDto?.jobPositionNm ?? '-';
+										break;
+									case 'jobGrade':
+										displayValue = combinedData.jobGradeMapDto?.jobGradeNm ?? '-';
+										break;
+									case 'jobRole':
+										displayValue = combinedData.jobRoleMapDto?.jobRoleNm ?? '-';
+								}
 
 								return (
 									<ListItem

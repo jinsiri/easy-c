@@ -1,3 +1,6 @@
+import { ColDef } from 'ag-grid-community';
+import { transformToColDefs } from '@/app/admin/member/_utils/formUtil';
+
 export type MemberFieldDef = {
 	key: string;
 	label: string;
@@ -236,4 +239,18 @@ export const LANGUAGE_COLS: MemberColDef[] = [
 	{ key: 'score', label: '점수', type: 'number' },
 	{ key: 'grade', label: '등급', type: 'text' },
 	{ key: 'etc', label: '기타', type: 'text' },
+];
+
+// ===== 데이터셋을 그리드용 컬럼으로 변경 =====
+export const CAREER_COL_DEFS = transformToColDefs(CAREER_COLS);
+export const REWARD_COL_DEFS = transformToColDefs(REWARD_COLS);
+export const LANGUAGE_COL_DEFS = transformToColDefs(LANGUAGE_COLS);
+export const CERTIFICATION_COL_DEFS: ColDef<Record<string, any>>[] = [
+	{ field: 'qualificationType', headerName: '구분', editable: false },
+	{ field: 'qualificationName', headerName: '자격명', editable: false },
+	{ field: 'qualificationNumber', headerName: '자격번호', editable: false },
+	{ field: 'qualificationGrade', headerName: '자격등급', editable: false },
+	{ field: 'issuingOrganization', headerName: '기관명', editable: false },
+	{ field: 'acquiredDate', headerName: '취득일', editable: false },
+	{ field: 'suspendedDate', headerName: '정지일', editable: false },
 ];

@@ -1,4 +1,5 @@
 import { MEMBER_FORM_CONFIG, MemberColDef, MemberFieldDef } from '@/app/admin/member/_constant/formConst';
+import { ColDef } from 'ag-grid-community';
 
 export const makeEmptyRow = (cols: MemberColDef[]): Record<string, string> => ({
 	_rowId: Math.random().toString(36).slice(2),
@@ -37,4 +38,39 @@ export const getMemberFormSections = (mode: 'create' | 'edit') => {
 				return field;
 			}),
 	}));
+};
+
+// ===== 공통 컬럼 정의를 그리드용 컬럼 정의로 변환하는 유틸 함수 =====
+export const transformToColDefs = (cols: MemberColDef[]): ColDef<Record<string, any>>[] => {
+	return cols.map((item) => ({
+		field: item.key,
+		headerName: item.label,
+		editable: false,
+	}));
+};
+
+// ===== 화면 표시용 value 가공 =====
+export const getDisplayValue = (value: any): string => {
+	if (value === null || value === undefined) return '-';
+	if (typeof value === 'boolean') return value ? 'Y' : 'N';
+	if (typeof value === 'object' && 'label' in value) return value.label || '-';
+	return String(value) || '-';
+};
+
+// ===== API 응답 데이터를 그리드용으로 변환 (EnumOption -> label 문자열) =====
+export const transformGridData = (data: any[]): Record<string, any>[] => {
+	if (!data || !Array.isArray(data)) return [];
+	return data.map((item) => {
+		const transformed: Record<string, any> = {};
+		Object.entries(item).forEach(([key, value]) => {
+			if (value && typeof value === 'object' && 'label' in value) {
+				transformed[key] = value.label || '-';
+			} else if (value === null || value === undefined) {
+				transformed[key] = '-';
+			} else {
+				transformed[key] = value;
+			}
+		});
+		return transformed;
+	});
 };
