@@ -37,7 +37,7 @@ export default function AssignDeptListPage() {
 		<Container maxWidth='md' sx={{ py: 4 }}>
 			<Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
 				<Typography variant='h5' sx={{ fontWeight: 700 }}>
-					부서 등록
+					부서원 추가
 				</Typography>
 				<Button startIcon={<ArrowBack />} onClick={() => router.back()} sx={{ color: 'text.secondary' }}>
 					뒤로가기
