@@ -8,6 +8,8 @@ import org.easyc.common.dto.BaseDto;
 import org.easyc.member.constant.AccountStatus;
 import org.easyc.member.constant.MemberRole;
 import org.easyc.member.entity.Member;
+import org.easyc.memberJobGradeMap.dto.MemberJobGradeMapResponseDto;
+import org.easyc.memberJobPositionMap.dto.MemberJobPositionMapResponseDto;
 
 import java.util.List;
 
@@ -21,6 +23,10 @@ public class MemberResponseDto extends BaseDto {
     private String memberNmEn; // 영문 이름
     private MemberRole memberRole;
     private AccountStatus accountStatus;
+
+    private MemberJobPositionMapResponseDto jobPositionMapDto;
+    private MemberJobGradeMapResponseDto jobGradeMapDto;
+//    private MemberJobRoleMapResponseDto jobRole;
 
     @JsonUnwrapped // 중첩 해제
     private MemberProfileResponseDto memberProfile;
