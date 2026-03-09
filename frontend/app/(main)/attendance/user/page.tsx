@@ -53,7 +53,6 @@ export default function AttendanceUserPage() {
 		{
 			field: 'status',
 			headerName: '상태',
-			flex: 1,
 			cellRenderer: (data) => (
 				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
 					{data.value ? <GridStatusComp status={data.value} /> : '-'}
@@ -63,7 +62,7 @@ export default function AttendanceUserPage() {
 		{
 			field: 'workDate',
 			headerName: '수정 근무일',
-			flex: 1,
+			flex: 2,
 			cellStyle: {
 				textAlign: 'center',
 			},
@@ -71,7 +70,7 @@ export default function AttendanceUserPage() {
 		{
 			field: 'member',
 			headerName: '수정 근무자',
-			flex: 1,
+			flex: 2,
 			cellRenderer: (param) => {
 				const deptNm = param.data?.deptNm;
 				const jobGrade = param.data?.jobGrade;
@@ -425,7 +424,7 @@ export default function AttendanceUserPage() {
 							<Typography variant='subtitle1'>근태 수정 요청 내역</Typography>
 						</Box>
 						<Box sx={{ flexGrow: 1, minHeight: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
-							<CustomAgGridComp rowData={[]} colDefs={colDefs} rowSelectionMode='none' />
+							<CustomAgGridComp rowData={[]} colDefs={colDefs} rowSelectionMode='multiple' />
 						</Box>
 					</Box>
 				</Grid>

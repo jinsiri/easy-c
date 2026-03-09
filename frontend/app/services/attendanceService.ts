@@ -68,6 +68,7 @@ export interface CalendarData {
 
 // API 정의
 export const attendanceService = {
+	getAttendanceUserData: (req: AttendanceReqDto) => axiosConfig.post<AttendanceDayResDto>('/api/attendance/user', req),
 	getAttendanceTodayData: (req: AttendanceReqDto) => axiosConfig.post<AttendanceResDto>('/api/attendance/today', req),
 	getAttendanceCalendarData: (req: AttendanceReqDto) => axiosConfig.post<Record<dayName, CalendarData>[]>('/api/attendance/calendar', req),
 	startTimeAttendanceData: (req: AttendanceSaveReqDto) => axiosConfig.post<void>('/api/attendance/start', req),

@@ -95,7 +95,7 @@ export default function AttendanceApplicationPage() {
 					sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', py: '6px' }}
 					onClick={(e) => {
 						setModalData(param.data);
-						router.push('/vacation/user/modal?type=read');
+						router.push('/attendance/user/modal?type=read');
 					}}
 				>
 					<Button variant='outlined'>상세 보기</Button>
@@ -225,7 +225,7 @@ export default function AttendanceApplicationPage() {
 					</Button>
 				</Grid>
 				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='none' rowHeight={60} />
+					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='multiple' rowHeight={60} />
 				</Grid>
 			</Grid>
 		</Box>

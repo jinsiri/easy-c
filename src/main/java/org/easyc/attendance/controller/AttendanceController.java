@@ -2,11 +2,9 @@ package org.easyc.attendance.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.easyc.attendance.dto.*;
+import org.easyc.attendance.entity.Attendance;
 import org.easyc.common.audit.activity.AuditAction;
-import org.easyc.attendance.dto.AttendanceCalendarResponseDto;
-import org.easyc.attendance.dto.AttendanceRequestDto;
-import org.easyc.attendance.dto.AttendanceResponseDto;
-import org.easyc.attendance.dto.AttendanceSaveRequestDto;
 import org.easyc.attendance.service.AttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +22,12 @@ public class AttendanceController {
 
     @Autowired
     private AttendanceService attendanceService;
+
+    @PostMapping("/user")
+    public AttendanceDayResponseDto getAttendanceUserData(@RequestBody AttendanceRequestDto request) {
+        AttendanceDayResponseDto result = attendanceService.getAttendanceUserData(request);
+        return result;
+    }
 
     @PostMapping("/today")
     public AttendanceResponseDto getAttendanceTodayData(@RequestBody AttendanceRequestDto request) {

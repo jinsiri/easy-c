@@ -30,6 +30,13 @@ public class AttendanceService {
     private final MemberProfileRepository memberProfileRepository;
     private final MemberRepository memberRepository;
 
+
+    public AttendanceDayResponseDto getAttendanceUserData(AttendanceRequestDto req) {
+        LocalDate workDate =  req.getWorkDate().toLocalDate();
+        Attendance attendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(),workDate).orElse(new Attendance());
+        return new AttendanceDayResponseDto(attendance);
+    }
+
     public AttendanceResponseDto getAttendanceTodayData (AttendanceRequestDto req){
         LocalDate workDate = req.getWorkDate().toLocalDate();
         LocalTime workTime = req.getWorkDate().toLocalTime();
