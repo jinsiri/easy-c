@@ -2,15 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import secureLocalStorage from 'react-secure-storage';
+import { useRouter } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+
 import useLoaderStore from '@/store/useLoaderStore';
+import useModalStore from '@/store/useModalStore';
 
 /** MUI */
-import { Box, Grid, IconButton, Typography, useTheme } from '@mui/material';
+import { Box, Button, Grid, IconButton, Typography, useTheme } from '@mui/material';
 import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
+
+/** Ag Grid */
+import { ColDef } from 'ag-grid-community';
+import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -19,6 +26,9 @@ import Calendar from '@/app/(main)/attendance/Calendar';
 import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
 import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
 import CustomEchartComp from '@/app/_lib/CustomEchartComp';
+
+import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
+import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
 
 import { formatMinutes } from '@/utils/commonFunc';
 
@@ -30,12 +40,92 @@ dayjs.extend(duration);
 
 export default function AttendanceUserPage() {
 	const theme = useTheme();
+	const router = useRouter();
 	const { loader, setLoader } = useLoaderStore();
+	const { setModalData } = useModalStore();
 
 	const [attendanceData, setAttenceData] = useState<AttendanceResDto>({});
 	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
 	const [calendarData, setCalendarData] = useState<Record<dayName, CalendarData>[]>([]);
 	const [chartOption, setChartOption] = useState<Record<string, any>>({});
+
+	const colDefs: ColDef<Record<string, any>>[] = [
+		{
+			field: 'status',
+			headerName: '상태',
+			flex: 1,
+			cellRenderer: (data) => (
+				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+					{data.value ? <GridStatusComp status={data.value} /> : '-'}
+				</Box>
+			),
+		},
+		{
+			field: 'workDate',
+			headerName: '수정 근무일',
+			flex: 1,
+			cellStyle: {
+				textAlign: 'center',
+			},
+		},
+		{
+			field: 'member',
+			headerName: '수정 근무자',
+			flex: 1,
+			cellRenderer: (param) => {
+				const deptNm = param.data?.deptNm;
+				const jobGrade = param.data?.jobGrade;
+
+				return (
+					<Box sx={{ py: '6px' }}>
+						<GridMemberComp memberNm={param.data.memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={param.data.attendancePolicyName} />
+					</Box>
+				);
+			},
+		},
+		{
+			field: 'summary',
+			headerName: '수정 내용',
+			flex: 2,
+			cellRenderer: (param) => {
+				const valueList: string[] = param?.value ? param.value.split(',') : [];
+				return (
+					<Box sx={{ py: '6px' }}>
+						{valueList.map((item, idx) => (
+							<Typography key={idx}>{item}</Typography>
+						))}
+					</Box>
+				);
+			},
+		},
+		{
+			field: 'detail',
+			headerName: '상세',
+			cellRenderer: (param) => (
+				<Box
+					sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', py: '6px' }}
+					onClick={(e) => {
+						setModalData(param.data);
+						router.push('/vacation/user/modal?type=read');
+					}}
+				>
+					<Button variant='outlined'>상세 보기</Button>
+				</Box>
+			),
+		},
+		{
+			field: 'action',
+			headerName: '처리',
+			cellRenderer: (param) => (
+				<Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, py: '6px' }}>
+					<Button variant='contained'>승인</Button>
+					<Button variant='contained' color='error'>
+						반려
+					</Button>
+				</Box>
+			),
+		},
+	];
 
 	useEffect(() => {
 		//금일 및 금주 데이터
@@ -318,6 +408,26 @@ export default function AttendanceUserPage() {
 				</Grid>
 				<Grid size={12} sx={{ flexGrow: 1 }}>
 					<Calendar calendarRow={calendarData} />
+				</Grid>
+				<Grid sx={{ display: 'flex', flexDirection: { lg: 'row', md: 'column', sm: 'column', xs: 'column' }, minHeight: '15rem', gap: '1rem' }}>
+					<Box
+						sx={{
+							display: 'flex',
+							flexDirection: 'column',
+							width: '100%',
+							backgroundColor: 'grey.50',
+							border: '1px solid',
+							borderColor: 'grey.200',
+							borderRadius: '1rem',
+						}}
+					>
+						<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0.5rem 0.5rem 1rem' }}>
+							<Typography variant='subtitle1'>근태 수정 요청 내역</Typography>
+						</Box>
+						<Box sx={{ flexGrow: 1, minHeight: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
+							<CustomAgGridComp rowData={[]} colDefs={colDefs} rowSelectionMode='none' />
+						</Box>
+					</Box>
 				</Grid>
 			</Grid>
 		</Box>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -17,16 +18,15 @@ import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
-import { VACATIONTYPE, WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
-import { BASICSTATUS } from '@/constant/commonConst';
-import StatusComp from '@/app/_component/baseElement/StatusComp';
+import { VACATIONTYPE, WORKSTATUS } from '@/constant/attendanceConst';
+import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
+import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
 
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 
 /** Type / Interface */
 import { SearchRequestDto } from '@/type/interface';
 import { vacationApplicationDto, vacationApplicationService } from '@/app/services/vacationApplicationService';
-import { useRouter } from 'next/navigation';
 
 dayjs.extend(duration);
 
@@ -46,7 +46,7 @@ export default function VacationApplicationPage() {
 			flex: 1,
 			cellRenderer: (data) => (
 				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-					{data.value ? <StatusComp status={data.value} /> : '-'}
+					{data.value ? <GridStatusComp status={data.value} /> : '-'}
 				</Box>
 			),
 		},
@@ -59,9 +59,7 @@ export default function VacationApplicationPage() {
 
 				return (
 					<Box sx={{ py: '6px' }}>
-						<Typography>{param.data.memberNm}</Typography>
-						<Typography variant='body2'>{deptNm && jobGrade ? deptNm + ' / ' + jobGrade : '-'}</Typography>
-						<Typography>{param.data.attendancePolicyName}</Typography>
+						<GridMemberComp memberNm={param.data.memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={param.data.vacationPolicyName} />
 					</Box>
 				);
 			},
@@ -213,7 +211,7 @@ export default function VacationApplicationPage() {
 					</Button>
 				</Grid>
 				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='single' enableClickSelection={false} rowHeight={80} />
+					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='single' enableClickSelection={false} rowHeight={58} />
 				</Grid>
 			</Grid>
 		</Box>

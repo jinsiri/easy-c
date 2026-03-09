@@ -1,10 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+
+import useLoaderStore from '@/store/useLoaderStore';
+import useModalStore from '@/store/useModalStore';
 
 /** MUI */
 import { Box, Button, Grid, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
@@ -12,12 +16,11 @@ import { Box, Button, Grid, Typography, TextField, Select, MenuItem, SelectChang
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
-import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
 import { WORKSTATUS } from '@/constant/attendanceConst';
-import StatusComp from '@/app/_component/baseElement/StatusComp';
-
+import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
+import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 
 /** Type / Interface */
@@ -27,7 +30,9 @@ import { SearchRequestDto } from '@/type/interface';
 dayjs.extend(duration);
 
 export default function AttendanceApplicationPage() {
+	const router = useRouter();
 	const { setLoader } = useLoaderStore();
+	const { setModalData } = useModalStore();
 
 	const [searchCategory, setSearchCategory] = useState<string>('depthNm');
 	const [searchValue, setSearchValue] = useState<string>('');
@@ -40,7 +45,7 @@ export default function AttendanceApplicationPage() {
 			flex: 1,
 			cellRenderer: (data) => (
 				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-					{data.value ? <StatusComp status={data.value} /> : '-'}
+					{data.value ? <GridStatusComp status={data.value} /> : '-'}
 				</Box>
 			),
 		},
@@ -62,9 +67,7 @@ export default function AttendanceApplicationPage() {
 
 				return (
 					<Box sx={{ py: '6px' }}>
-						<Typography>{param.data.memberNm}</Typography>
-						<Typography variant='body2'>{deptNm && jobGrade ? deptNm + ' / ' + jobGrade : '-'}</Typography>
-						<Typography>{param.data.attendancePolicyName}</Typography>
+						<GridMemberComp memberNm={param.data.memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={param.data.attendancePolicyName} />
 					</Box>
 				);
 			},
@@ -88,7 +91,13 @@ export default function AttendanceApplicationPage() {
 			field: 'detail',
 			headerName: '상세',
 			cellRenderer: (param) => (
-				<Box sx={{ display: 'flex', justifyContent: 'center', py: '6px' }}>
+				<Box
+					sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', py: '6px' }}
+					onClick={(e) => {
+						setModalData(param.data);
+						router.push('/vacation/user/modal?type=read');
+					}}
+				>
 					<Button variant='outlined'>상세 보기</Button>
 				</Box>
 			),
@@ -97,9 +106,11 @@ export default function AttendanceApplicationPage() {
 			field: 'action',
 			headerName: '처리',
 			cellRenderer: (param) => (
-				<Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, py: '6px' }}>
-					<Button variant='contained'>승인</Button>
-					<Button variant='contained' color='error'>
+				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', gap: 1, py: '6px' }}>
+					<Button variant='contained' onClick={(e) => clickEvent('approve', param.data)}>
+						승인
+					</Button>
+					<Button variant='contained' color='error' onClick={(e) => clickEvent('reject', param.data)}>
 						반려
 					</Button>
 				</Box>
@@ -181,6 +192,22 @@ export default function AttendanceApplicationPage() {
 		}
 	}, [searchCategory, searchValue]);
 
+	const clickEvent = async (type: 'reject' | 'approve', data: AttendanceApplicationResponseDto) => {
+		if (data !== null) {
+			if (type === 'reject') {
+				await attendanceApplicationService.rejectAttendanceApplication(data);
+				if (confirm('반려처리가 성공적으로 완료되었습니다.')) {
+					onClickSearch();
+				}
+			} else {
+				await attendanceApplicationService.approveAttendanceApplication(data);
+				if (confirm('승인처리가 성공적으로 완료되었습니다.')) {
+					onClickSearch();
+				}
+			}
+		}
+	};
+
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
 			<Box sx={{ padding: '0 1.5rem' }}>
@@ -198,7 +225,7 @@ export default function AttendanceApplicationPage() {
 					</Button>
 				</Grid>
 				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='none' rowHeight={80} />
+					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='none' rowHeight={60} />
 				</Grid>
 			</Grid>
 		</Box>

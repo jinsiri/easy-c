@@ -39,14 +39,15 @@ public class AttendanceCompanyService {
         Integer absentCount = 0;
         List<AttendanceDayResponseDto> data = new ArrayList<>();
         for(Attendance attendanceItem : attendance){
-            if(attendanceItem.getWorkStatus().equals(WorkStatus.LATE.name())){
-                lateCount++;
-            }else if(attendanceItem.getWorkStatus().equals(WorkStatus.EARLY_LEAVE.name())){
-                earlyLeaveCount++;
-            } else if (attendanceItem.getWorkStatus().equals(WorkStatus.ABSENT.name())) {
-                absentCount++;
+            if(attendanceItem.getWorkStatus() != null){
+                if(attendanceItem.getWorkStatus().equals(WorkStatus.LATE)){
+                    lateCount++;
+                }else if(attendanceItem.getWorkStatus().equals(WorkStatus.EARLY_LEAVE)){
+                    earlyLeaveCount++;
+                }else if (attendanceItem.getWorkStatus().equals(WorkStatus.ABSENT)) {
+                    absentCount++;
+                }
             }
-
             data.add(new AttendanceDayResponseDto(attendanceItem));
         }
 

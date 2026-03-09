@@ -5,15 +5,19 @@ import org.easyc.attendance.constant.WorkStatus;
 import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.entity.AttendanceApplication;
+import org.easyc.attendance.entity.AttendancePolicy;
 import org.easyc.attendance.repository.AttendanceApplicationRepository;
 import org.easyc.attendance.repository.AttendanceRepository;
+import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.member.repository.MemberRepository;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -24,9 +28,18 @@ public class AttendanceApplicationService {
     private final AttendanceApplicationRepository attendanceApplicationRepository;
     private final MemberRepository memberRepository;
     private final AttendanceRepository attendanceRepository;
+    private final AttendanceService attendanceService;
 
     public List<AttendanceApplication> getAllAttendanceApplication (){
         return attendanceApplicationRepository.findAll();
+    }
+
+    public List<AttendanceApplication> getUserAttendanceApplication(AttendanceRequestDto request){
+        LocalDate workDate = request.getWorkDate().toLocalDate();
+        LocalDate monthFirst = workDate.withDayOfMonth(1);
+        LocalDate monthEnd = workDate.withDayOfMonth(workDate.lengthOfMonth());
+
+        return attendanceApplicationRepository.findAllByMemberIdAndWorkDateBetween(request.getMemberId(), monthFirst, monthEnd);
     }
 
     public void saveAttendanceApplication (AttendanceApplicationDto req){
@@ -34,14 +47,9 @@ public class AttendanceApplicationService {
         AttendanceApplication attendanceApplication = req.returnAttendanceApplicationEntity();
         Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), req.getWorkDate()).orElse(null);
 
-        //attendace 없는 경우
-        if(targetAttendance == null){
-            throw new CustomException(CustomExceptionCode.ATTENDANCE_NOT_FOUND); 
-        }
-
         //기존에 같은날 요청사항이 있는 경우 대체(update)
         if(prevRequest != null){
-            attendanceApplication.setAttendanceApplicationId(prevRequest.getAttendanceApplicationId()); 
+            attendanceApplication.setAttendanceApplicationId(prevRequest.getAttendanceApplicationId());
         }
 
         /** login id로 depthNm, RoleGrade추가 **/
@@ -79,26 +87,93 @@ public class AttendanceApplicationService {
         return applicationList;
     }
 
-    private String makeSummary(Attendance origin, AttendanceApplication update) {
+    public void approveAttendanceApplicationData(AttendanceApplication request){
+        // 대상 근태 가져오기
+        AttendancePolicy targetPolicy = attendanceService.findAttendancePolicy(request.getMemberId());
+        Attendance targetAttendance = attendanceRepository
+                .findByMemberIdAndWorkDate(request.getMemberId(), request.getWorkDate())
+                .orElseGet(() -> attendanceService.makeNewAttendance(
+                        request.getMemberId(),
+                        request.getWorkDate(),
+                        null
+                ));
 
+        // 근태 로직 계산 - 출퇴근시간
+        Attendance convertAttendance = targetAttendance;
+
+        // 근태 로직 계산 - 출근시간
+        if (request.getStartTime() != null) {
+            convertAttendance = attendanceService.updateAttendanceByStartTime(
+                    convertAttendance,
+                    targetPolicy,
+                    LocalDateTime.of(request.getWorkDate(), request.getStartTime())
+            );
+        }
+
+        // 근태 로직 계산 - 퇴근시간
+        LocalDateTime endTime = null;
+
+        if (request.getEndTime() != null) {
+            endTime = LocalDateTime.of(request.getWorkDate(), request.getEndTime());
+        } else if (targetAttendance.getEndTime() != null) {
+            endTime = targetAttendance.getEndTime();
+        }
+
+        if (endTime != null) {
+            convertAttendance = attendanceService.updateAttendanceByEndTime(
+                    convertAttendance,
+                    targetPolicy,
+                    endTime
+            );
+        }
+
+        // 근태 로직 계산 - 근태상태
+        switch(request.getWorkStatus()){
+            case ABSENT :
+                convertAttendance.setNormalized(false);
+                convertAttendance.setWorkStatus(request.getWorkStatus());
+                break;
+            case OUTSIDE:
+            case BUSINESS_TRIP:
+                convertAttendance.setWorkStatus(request.getWorkStatus());
+                convertAttendance.setRemoted(true);
+                break;
+        }
+
+        attendanceRepository.save(convertAttendance);
+
+        request.setStatus(BasicStatus.APPROVED);
+        attendanceApplicationRepository.save(request);
+    }
+
+    public void rejectAttendanceApplicationData(AttendanceApplication request){
+        request.setStatus(BasicStatus.REJECTED);
+        attendanceApplicationRepository.save(request);
+    }
+
+    private String makeSummary(Attendance origin, AttendanceApplication update) {
         List<String> changes = new ArrayList<>();
 
-        LocalTime originStartTime = origin.getStartTime().toLocalTime();
-        LocalTime originEndTime = origin.getEndTime().toLocalTime();
-        LocalTime updateStartTime = update.getStartTime();
-        LocalTime updateEndTime = update.getEndTime();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        if(origin == null){
+            changes.add("근태기록 생성");
+        }else{
+            LocalTime originStartTime = origin.getStartTime().toLocalTime();
+            LocalTime originEndTime = origin.getEndTime().toLocalTime();
+            LocalTime updateStartTime = update.getStartTime();
+            LocalTime updateEndTime = update.getEndTime();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        if (updateStartTime != null && !Objects.equals(originStartTime, updateStartTime)) {
-            changes.add("출근시간: " + originStartTime.format(formatter) + " → " + updateStartTime.format(formatter));
-        }
+            if (updateStartTime != null && !Objects.equals(originStartTime, updateStartTime)) {
+                changes.add("출근시간: " + originStartTime.format(formatter) + " → " + updateStartTime.format(formatter));
+            }
 
-        if (updateEndTime != null && !Objects.equals(originEndTime, updateEndTime)) {
-            changes.add("퇴근시간: " + originEndTime.format(formatter) + " → " + updateEndTime.format(formatter));
-        }
+            if (updateEndTime != null && !Objects.equals(originEndTime, updateEndTime)) {
+                changes.add("퇴근시간: " + originEndTime.format(formatter) + " → " + updateEndTime.format(formatter));
+            }
 
-        if (!Objects.equals(origin.getWorkStatus(), update.getWorkStatus())) {
-            changes.add("근무상태: " + origin.getWorkStatus().formatViewText() + " → " + update.getWorkStatus().formatViewText());
+            if (!Objects.equals(origin.getWorkStatus(), update.getWorkStatus())) {
+                changes.add("근무상태: " + origin.getWorkStatus().formatViewText() + " → " + update.getWorkStatus().formatViewText());
+            }
         }
 
         return String.join(", ", changes);

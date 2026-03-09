@@ -1,6 +1,7 @@
 package org.easyc.vacation.service;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.attendance.service.AttendanceService;
 import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.member.entity.Member;
@@ -29,6 +30,7 @@ public class VacationApplicationService {
     private final VacationRepository vacationRepository;
     private final MemberRepository memberRepository;
     private final VacationHistoryRepository vacationHistoryRepository;
+    private final AttendanceService attendanceService;
 
     public void saveVacationApplication(VacationApplicationDto request) {
         Member member = memberRepository.findByMemberId(request.getMemberId()).orElse(null);
@@ -100,8 +102,11 @@ public class VacationApplicationService {
             vacationApplicationRepository.save(request);
             vacationHistoryRepository.save(newHistory);
             vacationRepository.save(targetVacation);
-        }
 
+            /* 근태 휴가 입력 */
+            attendanceService.saveVacationAttendance(request);
+
+        }
     }
 
     public void rejectVacationApplicationData (VacationApplication request) {

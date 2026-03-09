@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
-import { Box, Button, Typography, Grid, useTheme } from '@mui/material';
+import { Box, Typography, Grid, useTheme } from '@mui/material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
@@ -18,7 +18,7 @@ import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import VacationComp from '@/app/_component/layoutElement/VacationComp';
-import StatusComp from '@/app/_component/baseElement/StatusComp';
+import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
 
 import CustomEchartComp from '@/app/_lib/CustomEchartComp';
 
@@ -42,7 +42,7 @@ const colDefs: ColDef<Record<string, any>>[] = [
 		flex: 1,
 		cellRenderer: (data) => (
 			<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-				{data.value ? <StatusComp status={data.value} /> : '-'}
+				{data.value ? <GridStatusComp status={data.value} /> : '-'}
 			</Box>
 		),
 	},

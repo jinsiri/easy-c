@@ -7,7 +7,11 @@ import org.easyc.attendance.entity.*;
 import org.easyc.attendance.repository.*;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
+import org.easyc.member.entity.Member;
+import org.easyc.member.repository.MemberProfileRepository;
+import org.easyc.member.repository.MemberRepository;
 import org.easyc.vacation.constant.VacationType;
+import org.easyc.vacation.entity.VacationApplication;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -23,42 +27,36 @@ public class AttendanceService {
     private final AttendancePolicyMapRepository attendancePolicyMapRepository;
     private final HolidayCalendarRepository holidayCalendarRepository;
     private final AttendanceApplicationRepository attendanceApplicationRepository;
+    private final MemberProfileRepository memberProfileRepository;
+    private final MemberRepository memberRepository;
 
     public AttendanceResponseDto getAttendanceTodayData (AttendanceRequestDto req){
-        //데이터 조회 - 해당 일자 및 전날 데이터 불러와서 전날 데이터가 미완인 경우 전날 데이터
         LocalDate workDate = req.getWorkDate().toLocalDate();
         LocalTime workTime = req.getWorkDate().toLocalTime();
-        Attendance targetAttendance = null;
-
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getMemberId());
 
+        //데이터 조회 - 오전 7시 이전이면 이전 데이터 이후면 당일 데이터
+        Attendance targetAttendance = null;
         if(workTime.isBefore(LocalTime.of(7, 0))){
             Attendance beforeAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate.minus(1, ChronoUnit.DAYS)).orElse(null);
-
-
             if(beforeAttendance != null && beforeAttendance.getStartTime() != null && beforeAttendance.getEndTime() == null){
                 targetAttendance = beforeAttendance;
             }
         }
 
         if(targetAttendance == null){
-            targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate).orElse(null);
-
-            if(targetAttendance == null){
-                targetAttendance = attendanceRepository.saveAndFlush(
-                        Attendance.builder()
-                                .workDate(workDate)
-                                .attendancePolicyName(targetPolicy.getAttendancePolicyName())
-                                .deptNm("인사팀")
-                                .jobGrade("사원")
-                                .build());
-            }
+            targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate).orElse(
+                    Attendance.builder()
+                            .memberId(req.getMemberId())
+                            .workDate(workDate)
+                            .attendancePolicyName(targetPolicy.getAttendancePolicyName())
+                            .build()
+            );
         }
 
         AttendanceResponseDto findStatData = findStatData(req.getMemberId(), workDate, targetPolicy);
         AttendanceResponseDto result = new AttendanceResponseDto(targetAttendance);
         result.applyWeekData(findStatData);
-
         return result;
     }
 
@@ -142,18 +140,14 @@ public class AttendanceService {
 
         // 유관 데이터 조회
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getMemberId());
-        /** 멤버 조회해서 부서 및 직급 확인 로직 필요 **/
+        Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate).orElse(null);
 
-        // 데이터 조회
-        Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate)
-                .orElseGet(() -> Attendance.builder()
-                        .workDate(workDate)
-                        .attendancePolicyName(targetPolicy.getAttendancePolicyName())
-                        .deptNm("인사팀")
-                        .jobGrade("사원")
-                        .build());
+        if(targetAttendance == null){
+            targetAttendance = makeNewAttendance(req.getMemberId(), workDate, targetPolicy);
+        }
 
-        attendanceRepository.save(updateAttendanceByStartTime(req, targetAttendance, targetPolicy, startTime));
+        Attendance updateAttendance = updateAttendanceByStartTime(targetAttendance, targetPolicy, startTime);
+        attendanceRepository.save(updateAttendance);
     }
 
     public void finishAttendanceData (AttendanceSaveRequestDto req) {
@@ -169,6 +163,51 @@ public class AttendanceService {
 
         // 상태업데이트 해서 save
         attendanceRepository.saveAndFlush(updateAttendanceByEndTime(targetAttendance, targetPolicy, req.getEndTime()));
+    }
+
+    public void saveVacationAttendance (VacationApplication application) {
+        LocalDate startDate = application.getStartDate();
+        LocalDate endDate = application.getEndDate();
+        long duration = ChronoUnit.DAYS.between(startDate, endDate);
+
+        List<Attendance> attendanceList = new ArrayList<>();
+        for(long i = 0; i < duration; i++){
+            Attendance result = new Attendance();
+            result.setMemberId(application.getMemberId());
+            result.setMemberNm(application.getMemberNm());
+            result.setDeptNm(application.getDeptNm());
+            result.setJobGrade(application.getJobGrade());
+            result.setWorkDate(startDate.plusDays(i));
+            result.setWorkType(WorkType.NORMAL);
+            result.setWorkStatus(WorkStatus.VACATION);
+            result.setViolationReason(application.getViolationReason());
+            result.setVacationed(true);
+            result.setVacationType(application.getVacationType());
+
+            attendanceList.add(result);
+        }
+
+        attendanceRepository.saveAll(attendanceList);
+    }
+
+
+    public Attendance makeNewAttendance(Long memberId, LocalDate workDate, AttendancePolicy targetPolicy) {
+        Member member = memberRepository.findByMemberId(memberId).orElse(null);
+
+        if(targetPolicy == null){
+            targetPolicy = findAttendancePolicy(memberId);
+        }
+
+        Attendance result = Attendance.builder()
+                            .memberId(memberId)
+                            .memberNm(member.getMemberNm())
+                            .deptNm("인사팀")
+                            .jobGrade("과장")
+                            .attendancePolicyName(targetPolicy.getAttendancePolicyName())
+                            .workDate(workDate)
+                            .build();
+
+        return result;
     }
 
     private AttendanceCalendarResponseDto createResDto(LocalDate date, Attendance attendance, boolean isCurrentMonth, AttendanceApplication changeRequest) {
@@ -189,7 +228,7 @@ public class AttendanceService {
         return dto;
     }
 
-    private Attendance updateAttendanceByStartTime(AttendanceSaveRequestDto req, Attendance targetAttendance, AttendancePolicy targetPolicy, LocalDateTime startTime) {
+    public Attendance updateAttendanceByStartTime(Attendance targetAttendance, AttendancePolicy targetPolicy, LocalDateTime startTime) {
         if(targetAttendance != null && targetPolicy != null) {
             int dayOfWeek = startTime.getDayOfWeek().getValue();
             LocalTime currentStartTime = startTime.toLocalTime();
@@ -227,14 +266,12 @@ public class AttendanceService {
             targetAttendance.setStartTime(startTime);
             targetAttendance.setWorkType(workType);
             targetAttendance.setWorkStatus(status);
-            //targetAttendance.setRegisterLatitude(req.getRegisterLatitude());
-            //targetAttendance.setRegisterLongitude(req.getRegisterLongitude());
         }
 
         return targetAttendance;
     }
 
-    private Attendance updateAttendanceByEndTime(Attendance targetAttendance, AttendancePolicy targetPolicy, LocalDateTime endTime) {
+    public Attendance updateAttendanceByEndTime(Attendance targetAttendance, AttendancePolicy targetPolicy, LocalDateTime endTime) {
         if(targetAttendance != null && targetPolicy != null) {
             LocalTime currentEndTime = endTime.toLocalTime();
 
@@ -275,7 +312,7 @@ public class AttendanceService {
         return targetAttendance;
     }
 
-    private AttendancePolicy findAttendancePolicy(Long memberId) {
+    public AttendancePolicy findAttendancePolicy(Long memberId) {
         AttendancePolicyMap attendancePolicyMap = attendancePolicyMapRepository.findTopByMemberIdAndDeletedFalseOrderByMappingIdDesc(memberId).orElse(null);
         AttendancePolicy attendancePolicy = attendancePolicyRepository.findByAttendancePolicyId(attendancePolicyMap != null ? attendancePolicyMap.getAttendancePolicyId() : 1).orElseThrow();
         return attendancePolicy;
@@ -402,5 +439,6 @@ public class AttendanceService {
             default -> throw new IllegalArgumentException("Unsupported settlement period: " + period);
         }
     }
+
 
 }

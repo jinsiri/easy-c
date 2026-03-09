@@ -118,7 +118,6 @@ const RequestCorrection = forwardRef<RequestCorrectionRef, {}>((props, ref) => {
 						<Select value={value} onChange={onChange} size='small' fullWidth>
 							<MenuItem value='PRESENT'>정상 출근</MenuItem>
 							<MenuItem value='ABSENT'>결근</MenuItem>
-							<MenuItem value='VACATION'>휴가</MenuItem>
 							<MenuItem value='OUTSIDE'>외근</MenuItem>
 							<MenuItem value='BUSINESS_TRIP'>출장</MenuItem>
 						</Select>

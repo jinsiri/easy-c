@@ -9,7 +9,7 @@ import { BASICSTATUS } from '@/constant/commonConst';
 /** Type / Interface  */
 import { baseStatus } from '@/type/types';
 
-export default function StatusComp({ status }: { status: baseStatus }) {
+export default function GridStatusComp({ status }: { status: baseStatus }) {
 	const [color, setColor] = useState<string>('grey.500');
 
 	useEffect(() => {

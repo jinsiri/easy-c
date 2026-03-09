@@ -6,9 +6,11 @@ import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.attendance.service.AttendanceApplicationService;
 import org.easyc.common.dto.SearchRequestDto;
+import org.easyc.vacation.entity.VacationApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -24,7 +26,13 @@ public class AttendanceApplicationController {
         return attendanceApplicationService.getAllAttendanceApplication();
     }
 
-    @AuditAction(code = "ATTENDANCE_APP_SAVE", name = "근태 신청", targetType = "ATTENDANCE_APP")
+    @PostMapping("/user")
+    public List<AttendanceApplication> getUserAttendanceApplication(@RequestBody AttendanceRequestDto request) {
+        return attendanceApplicationService.getUserAttendanceApplication(request);
+    }
+
+
+    @AuditAction(code = "ATTENDANCE_APP_SAVE", name = "근태 수정 요청", targetType = "ATTENDANCE_APP")
     @PostMapping("/save")
     public void saveAttendanceApplication(@RequestBody AttendanceApplicationDto request) {
         attendanceApplicationService.saveAttendanceApplication(request);
@@ -33,6 +41,18 @@ public class AttendanceApplicationController {
     @PostMapping("/search")
     public List<AttendanceApplication> searchAttendanceApplication(@RequestBody SearchRequestDto request) {
         return attendanceApplicationService.searchAttendanceApplication(request);
+    }
+
+    @AuditAction(code = "ATTENDANCE_APP_APPROVE", name = "근태 수정 요청 승인", targetType = "ATTENDANCE_APP")
+    @PostMapping("/approve")
+    public void approveAttendanceApplicationData(@RequestBody AttendanceApplication request) {
+        attendanceApplicationService.approveAttendanceApplicationData(request);
+    }
+
+    @AuditAction(code = "ATTENDANCE_APP_REJECT", name = "근태 수정 요청 반려", targetType = "ATTENDANCE_APP")
+    @PostMapping("/reject")
+    public void rejectVacationApplicationData(@RequestBody AttendanceApplication request) {
+        attendanceApplicationService.rejectAttendanceApplicationData(request);
     }
 
 

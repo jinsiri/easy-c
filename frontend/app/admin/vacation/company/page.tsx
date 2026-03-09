@@ -6,20 +6,21 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
+import useLoaderStore from '@/store/useLoaderStore';
+
 /** MUI */
 import { Box, Button, Grid, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
-import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
 import { WORKSTATUS } from '@/constant/attendanceConst';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
+import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
 
 /** Type / Interface */
-import { workStatus, workType } from '@/type/types';
 import { VacationDataDto, vacationService } from '@/app/services/vacationService';
 import { SearchRequestDto } from '@/type/interface';
 
@@ -43,9 +44,7 @@ export default function VacationCompanyPage() {
 
 				return (
 					<Box sx={{ py: '6px' }}>
-						<Typography>{param.data.memberNm}</Typography>
-						<Typography variant='body2'>{deptNm && jobGrade ? deptNm + ' / ' + jobGrade : '-'}</Typography>
-						<Typography variant='body2'>{param.data ? param.data.vacationPolicyName : '-'}</Typography>
+						<GridMemberComp memberNm={param.data.memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={param.data.vacationPolicyName} />
 					</Box>
 				);
 			},

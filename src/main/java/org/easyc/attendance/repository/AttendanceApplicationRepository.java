@@ -22,4 +22,5 @@ public interface AttendanceApplicationRepository extends JpaRepository<Attendanc
     List<AttendanceApplication> findAllByWorkDateAndDeptNmAndActiveTrueOrderByAttendanceApplicationIdAsc(LocalDate workDate, String deptNm);
     List<AttendanceApplication> findAllByWorkDateAndMemberNmContainsAndActiveTrueOrderByAttendanceApplicationIdAsc(LocalDate workDate, String memberNm);
 
+    List<AttendanceApplication> findAllByMemberIdAndWorkDateBetween(Long memberId, LocalDate workDateAfter, LocalDate workDateBefore);
 }

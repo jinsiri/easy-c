@@ -39,6 +39,7 @@ public class AttendanceApplication extends BaseEntity {
     @Column(name = "work_date")
     private LocalDate workDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "work_status")
     private WorkStatus workStatus;
 
