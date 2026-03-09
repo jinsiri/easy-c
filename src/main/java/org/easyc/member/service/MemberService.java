@@ -7,7 +7,9 @@ import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.member.dto.*;
 import org.easyc.member.entity.*;
 import org.easyc.member.repository.*;
+import org.easyc.memberJobGradeMap.dto.MemberJobGradeMapResponseDto;
 import org.easyc.memberJobGradeMap.service.MemberJobGradeMapService;
+import org.easyc.memberJobPositionMap.dto.MemberJobPositionMapResponseDto;
 import org.easyc.memberJobPositionMap.service.MemberJobPositionMapService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,8 +25,6 @@ public class MemberService {
 
 //    private final BCryptPasswordEncoder encoder;
     private final PasswordEncoder encoder;
-
-
     private final MemberRepository memberRepository;
     private final MemberRepositoryCustom memberRepositoryCustom;
     private final MemberProfileRepository memberProfileRepository;
@@ -96,6 +96,16 @@ public class MemberService {
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         MemberResponseDto memberDto = MemberResponseDto.fromEntity(member);
+
+        MemberJobPositionMapResponseDto positionMap = memberJobPositionMapService.getJobPositionByMemberId(memberId);
+        if(positionMap != null) {
+            memberDto.setJobPositionMapDto(positionMap);
+        }
+
+        MemberJobGradeMapResponseDto gradeMap = memberJobGradeMapService.getJobGradeByMemberId(memberId);
+        if(gradeMap != null) {
+            memberDto.setJobGradeMapDto(gradeMap);
+        }
 
         Optional<MemberProfile> optionalProfile = memberProfileRepository.findById(memberId);
         optionalProfile.ifPresent(memberProfile -> memberDto.setMemberProfile(MemberProfileResponseDto.fromEntity(memberProfile)));

@@ -7,6 +7,7 @@ import org.easyc.jobGrade.repository.JobGradeRepository;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.memberJobGradeMap.entity.MemberJobGradeMap;
 import org.easyc.memberJobGradeMap.repository.MemberJobGradeMapRepository;
+import org.easyc.memberJobGradeMap.dto.MemberJobGradeMapResponseDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,19 @@ public class MemberJobGradeMapService {
     private final MemberJobGradeMapRepository repository;
     private final MemberRepository memberRepository;
     private final JobGradeRepository jobGradeRepository;
+
+    public MemberJobGradeMapResponseDto getJobGradeByMemberId(Long memberId) {
+        return repository.findByMemberId(memberId)
+                .map(mapping -> {
+                    MemberJobGradeMapResponseDto dto = new MemberJobGradeMapResponseDto(mapping);
+
+                    if (mapping.getJobGrade() != null) {
+                        dto.setJobGradeNm(mapping.getJobGrade().getJobGradeNm());
+                    }
+                    return dto;
+                })
+                .orElse(null);
+    }
 
     @Transactional
     public void assignJobGrade(Long memberId, Long jobGradeId) {
