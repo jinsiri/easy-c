@@ -36,21 +36,12 @@ public class AttendanceApplicationService {
 
     public List<AttendanceApplication> getUserAttendanceApplication(AttendanceRequestDto request){
         LocalDate workDate = request.getWorkDate().toLocalDate();
-        LocalDate monthFirst = workDate.withDayOfMonth(1);
-        LocalDate monthEnd = workDate.withDayOfMonth(workDate.lengthOfMonth());
-
-        return attendanceApplicationRepository.findAllByMemberIdAndWorkDateBetween(request.getMemberId(), monthFirst, monthEnd);
+        return attendanceApplicationRepository.findAllByWorkDateAndMemberId(workDate, request.getMemberId());
     }
 
     public void saveAttendanceApplication (AttendanceApplicationDto req){
-        AttendanceApplication prevRequest = attendanceApplicationRepository.findTopByWorkDateAndMemberId(req.getWorkDate(), req.getMemberId()).orElse(null);
         AttendanceApplication attendanceApplication = req.returnAttendanceApplicationEntity();
         Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), req.getWorkDate()).orElse(null);
-
-        //기존에 같은날 요청사항이 있는 경우 대체(update)
-        if(prevRequest != null){
-            attendanceApplication.setAttendanceApplicationId(prevRequest.getAttendanceApplicationId());
-        }
 
         /** login id로 depthNm, RoleGrade추가 **/
         String memberNm = memberRepository.findMemberNmByMemberId(req.getMemberId()).orElse("");
@@ -64,7 +55,6 @@ public class AttendanceApplicationService {
     }
 
     public List<AttendanceApplication> searchAttendanceApplication(SearchRequestDto request){
-        LocalDate workDate = request.getWorkDate();
         String searchCategory = request.getSearchCategory();
         String searchValue = request.getSearchValue();
 

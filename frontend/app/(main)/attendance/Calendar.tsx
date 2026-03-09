@@ -8,8 +8,9 @@ import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
 
 /** lib */
 import dayjs from 'dayjs';
-import CustomReactCalendarTimeline from '../../_lib/CustomReactCalendarTimeline';
 import { TimelineItemBase } from 'react-calendar-timeline';
+import CustomReactCalendarTimeline from '../../_lib/CustomReactCalendarTimeline';
+import useModalStore from '@/store/useModalStore';
 
 /** Custom */
 import { formatMinutes, getTimelineInnerData } from '@/utils/commonFunc';
@@ -49,6 +50,7 @@ const calendarCol: CalendarColData[] = [
 export default function Calendar({ calendarRow }: { calendarRow: Record<dayName, CalendarData>[] }) {
 	const theme = useTheme();
 	const router = useRouter();
+	const { setModalData } = useModalStore();
 
 	const detailCol: ColData[] = [
 		{
@@ -101,17 +103,24 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 		},
 		{
 			header: '수정 요청 상세',
-			key: 'changeRequestId',
+			key: 'applicationList',
 			formatter: (value, row) => {
-				return (
-					value && (
-						<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-							<Button size='small' variant='outlined' onClick={() => router.push('/attendance/user/modal?type=detail')}>
-								상세 보기
-							</Button>
-						</Box>
-					)
-				);
+				console.log(value);
+				if (value)
+					return (
+						value &&
+						value.length > 0 && (
+							<Box
+								sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', py: '6px' }}
+								onClick={(e) => {
+									setModalData(value);
+									router.push('/attendance/user/list');
+								}}
+							>
+								<Button variant='text'>상세 보기 ({value.length})</Button>
+							</Box>
+						)
+					);
 			},
 		},
 	];

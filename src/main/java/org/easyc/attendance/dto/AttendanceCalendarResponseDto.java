@@ -27,12 +27,6 @@ public class AttendanceCalendarResponseDto {
         this.detailData = new AttendanceDayResponseDto(entity);
     }
 
-    public AttendanceCalendarResponseDto(Attendance entity, AttendanceApplication requestEntity) {
-        AttendanceDayResponseDto dto = new AttendanceDayResponseDto(entity);
-        if( requestEntity != null ) dto.setChangeRequestId(requestEntity.getAttendanceApplicationId());
-
-        this.detailData = dto;
-    }
 }
 
 

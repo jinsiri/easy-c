@@ -30,7 +30,7 @@ export default function AttendanceUserModal() {
 	const type = searchParams.get('type');
 
 	const { setLoader } = useLoaderStore();
-	const { modalData, resetModalData } = useModalStore();
+	const { modalData, setModalData, resetModalData } = useModalStore();
 
 	const [isSaving, setIsSaving] = useState(false);
 	const [attendanceData, setAttendanceData] = useState<AttendanceDayResDto>();
@@ -58,21 +58,19 @@ export default function AttendanceUserModal() {
 	const watchIsEndTime = watch('isEndTime');
 
 	useEffect(() => {
-		if (modalData) {
-			if (type && type === 'read') {
-				reset({
-					workDate: dayjs(modalData.workDate),
-					isStartTime: modalData.startTime != null,
-					isEndTime: modalData.endTime != null,
-					startTime: dayjs(modalData.workDate + 'T' + modalData.startTime),
-					endTime: dayjs(modalData.workDate + 'T' + modalData.endTime),
-					workStatus: modalData.workStatus,
-					documentsAddress: modalData.documentsAddress,
-					violationReason: modalData.violationReason,
-				});
+		if (modalData && type) {
+			reset({
+				workDate: dayjs(modalData.workDate),
+				isStartTime: modalData.startTime != null,
+				isEndTime: modalData.endTime != null,
+				startTime: dayjs(modalData.workDate + 'T' + modalData.startTime),
+				endTime: dayjs(modalData.workDate + 'T' + modalData.endTime),
+				workStatus: modalData.workStatus,
+				documentsAddress: modalData.documentsAddress,
+				violationReason: modalData.violationReason,
+			});
 
-				getAttendanceUserData(modalData);
-			}
+			getAttendanceUserData(modalData);
 		}
 	}, [type, modalData]);
 
@@ -111,8 +109,18 @@ export default function AttendanceUserModal() {
 		}
 	});
 
+	const onClose = () => {
+		if (type === 'detail') {
+			setModalData(modalData.list);
+		} else {
+			resetModalData();
+		}
+
+		router.back();
+	};
+
 	return (
-		<BaseDialog title={'근무시간 수정'} loading={isSaving} onConfirm={handleSave}>
+		<BaseDialog title={type ? '근태 수정 확인' : '근태 수정'} loading={isSaving} onConfirm={type ? undefined : handleSave} onClose={onClose}>
 			<Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '28rem', py: 2 }}>
 				<FormWrapper label='수정 근무 일자' required>
 					<Controller
@@ -129,7 +137,7 @@ export default function AttendanceUserModal() {
 						render={({ field }) => (
 							<DatePicker
 								{...field}
-								readOnly={type === 'read'}
+								readOnly={type != null}
 								sx={{ minWidth: '19.5rem' }}
 								slotProps={{
 									textField: {
@@ -149,7 +157,7 @@ export default function AttendanceUserModal() {
 					required
 					control={control}
 					error={errors.violationReason?.message}
-					readOnly={type === 'read'}
+					readOnly={type != null}
 				/>
 
 				<FormWrapper label='수정 근무상태' required>
@@ -157,7 +165,7 @@ export default function AttendanceUserModal() {
 						name='workStatus'
 						control={control}
 						render={({ field: { onChange, value } }) => (
-							<Select value={value} onChange={onChange} size='small' fullWidth inputProps={{ readOnly: type && type === 'read' }}>
+							<Select value={value} onChange={onChange} size='small' fullWidth inputProps={{ readOnly: type != null }}>
 								<MenuItem value='PRESENT'>정상 출근</MenuItem>
 								<MenuItem value='ABSENT'>결근</MenuItem>
 								<MenuItem value='OUTSIDE'>외근</MenuItem>
@@ -181,7 +189,7 @@ export default function AttendanceUserModal() {
 									control={control}
 									render={({ field: { onChange, value } }) => (
 										<FormControlLabel
-											control={<Checkbox size='small' checked={value} onChange={onChange} disabled={type === 'read'} />}
+											control={<Checkbox size='small' checked={value} onChange={onChange} disabled={type != null} />}
 											color='primary'
 											label='출근시간'
 										/>
@@ -202,7 +210,7 @@ export default function AttendanceUserModal() {
 								render={({ field }) => (
 									<TimePicker
 										{...field}
-										readOnly={type === 'read'}
+										readOnly={type != null}
 										sx={{ maxWidth: '11rem' }}
 										slotProps={{
 											textField: {
@@ -226,7 +234,7 @@ export default function AttendanceUserModal() {
 									control={control}
 									render={({ field: { onChange, value } }) => (
 										<FormControlLabel
-											control={<Checkbox size='small' checked={value} onChange={onChange} disabled={type === 'read'} />}
+											control={<Checkbox size='small' checked={value} onChange={onChange} disabled={type != null} />}
 											color='primary'
 											label='퇴근시간'
 										/>
@@ -247,7 +255,7 @@ export default function AttendanceUserModal() {
 								render={({ field }) => (
 									<TimePicker
 										{...field}
-										readOnly={type === 'read'}
+										readOnly={type != null}
 										sx={{ maxWidth: '11rem' }}
 										slotProps={{
 											textField: {

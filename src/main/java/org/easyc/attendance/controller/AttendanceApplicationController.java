@@ -31,7 +31,6 @@ public class AttendanceApplicationController {
         return attendanceApplicationService.getUserAttendanceApplication(request);
     }
 
-
     @AuditAction(code = "ATTENDANCE_APP_SAVE", name = "근태 수정 요청", targetType = "ATTENDANCE_APP")
     @PostMapping("/save")
     public void saveAttendanceApplication(@RequestBody AttendanceApplicationDto request) {

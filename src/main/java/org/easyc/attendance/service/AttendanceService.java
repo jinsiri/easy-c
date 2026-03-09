@@ -5,6 +5,7 @@ import org.easyc.attendance.constant.*;
 import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.*;
 import org.easyc.attendance.repository.*;
+import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.member.entity.Member;
@@ -85,8 +86,11 @@ public class AttendanceService {
         Map<LocalDate,String> holidayMap = holidayCalendarList.stream().collect(Collectors.toMap(a -> a.getStartDate() , a -> a.getSubject()));
 
         List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdAndActiveTrueAndWorkDateBetween(memberId, firstDay, lastDay);
-        Map<Integer, AttendanceApplication> changeRequestMap = targetAttendanceChangeRequestList.stream()
-                .collect(Collectors.toMap(a -> a.getWorkDate().getDayOfMonth(), a -> a));
+        Map<Integer, List<AttendanceApplication>> changeRequestMap =
+                targetAttendanceChangeRequestList.stream()
+                        .collect(Collectors.groupingBy(
+                                a -> a.getWorkDate().getDayOfMonth()
+                        ));
 
         String[] weekKeys = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
         List<Map<String, AttendanceCalendarResponseDto>> calendarList = new ArrayList<>();
@@ -99,7 +103,7 @@ public class AttendanceService {
         if (offset > 0) {
             LocalDate prevMonthCursor = firstDay.minusDays(offset);
             for (int i = 0; i < offset; i++) {
-                currentWeek.put(weekKeys[i], createResDto(prevMonthCursor, null, false, null));
+                currentWeek.put(weekKeys[i], createResDto(prevMonthCursor, null, false));
                 prevMonthCursor = prevMonthCursor.plusDays(1);
             }
         }
@@ -110,8 +114,10 @@ public class AttendanceService {
             String key = weekKeys[dayOfWeek.getValue() - 1];
 
             Attendance targetAttendance = attendanceMap.get(cursor.getDayOfMonth());
-            AttendanceApplication targetAttendanceApplication = changeRequestMap.get(cursor.getDayOfMonth());
-            AttendanceCalendarResponseDto dto = createResDto(cursor, targetAttendance, true, targetAttendanceApplication );
+            List<AttendanceApplication> targetAttendanceApplication = changeRequestMap.getOrDefault(cursor.getDayOfMonth(), new ArrayList<>());
+            AttendanceCalendarResponseDto dto = createResDto(cursor, targetAttendance, true );
+            AttendanceDayResponseDto dtoDetailData = dto.getDetailData();
+            dtoDetailData.setApplicationList(targetAttendanceApplication);
 
             if(holidayMap.containsKey(cursor)){
                 dto.setIsHoliday(true);
@@ -127,7 +133,7 @@ public class AttendanceService {
                 if (cursor.equals(lastDay) && dayOfWeek != DayOfWeek.SUNDAY) {
                     LocalDate nextMonthCursor = lastDay.plusDays(1);
                     for (int i = dayOfWeek.getValue(); i < 7; i++) {
-                        currentWeek.put(weekKeys[i], createResDto(nextMonthCursor, null, false, null));
+                        currentWeek.put(weekKeys[i], createResDto(nextMonthCursor, null, false));
                         nextMonthCursor = nextMonthCursor.plusDays(1);
                     }
                 }
@@ -217,11 +223,11 @@ public class AttendanceService {
         return result;
     }
 
-    private AttendanceCalendarResponseDto createResDto(LocalDate date, Attendance attendance, boolean isCurrentMonth, AttendanceApplication changeRequest) {
+    private AttendanceCalendarResponseDto createResDto(LocalDate date, Attendance attendance, boolean isCurrentMonth) {
         AttendanceCalendarResponseDto dto = new AttendanceCalendarResponseDto();
 
         if (attendance != null) {
-            dto = new AttendanceCalendarResponseDto(attendance, changeRequest);
+            dto = new AttendanceCalendarResponseDto(attendance);
 
             AttendancePolicy targetPolicy = findAttendancePolicy(attendance.getMemberId());
             dto.setDefaultStartTime(targetPolicy.getStartTime());

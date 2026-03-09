@@ -6,10 +6,12 @@ import lombok.Setter;
 import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.constant.WorkType;
 import org.easyc.attendance.constant.WorkStatus;
+import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.vacation.constant.VacationType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,8 +32,8 @@ public class AttendanceDayResponseDto {
     private WorkType workType;
     private WorkStatus workStatus;
     private VacationType vacationType;
-    private Long changeRequestId;
     private String detail;
+    private List<AttendanceApplication> applicationList;
 
     public AttendanceDayResponseDto(Attendance entity) {
         this.attendanceId = entity.getAttendanceId();

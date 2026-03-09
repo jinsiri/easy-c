@@ -5,6 +5,7 @@ import axiosConfig from '../_lib/axiosConfig';
 import { workStatus, baseStatus } from '@/type/types';
 import { SearchRequestDto } from '@/type/interface';
 import { BaseDto } from '@/type/base';
+import { AttendanceReqDto } from '@/app/services/attendanceService';
 
 export interface AttendanceApplicationController {
 	workDate: Dayjs | null;
@@ -19,7 +20,6 @@ export interface AttendanceApplicationController {
 
 export interface AttendanceApplicationRequestDto {
 	memberId: number;
-	//loginId: string;
 	workDate: string;
 	startTime?: string | null;
 	endTime?: string | null;
@@ -45,6 +45,7 @@ export interface AttendanceApplicationResponseDto extends BaseDto {
 
 // API 정의
 export const attendanceApplicationService = {
+	getUserAttendanceApplication: (req: AttendanceReqDto) => axiosConfig.post<AttendanceApplicationResponseDto>('/api/attendance/application/user', req),
 	submitAttendanceApplication: (req: AttendanceApplicationRequestDto) => axiosConfig.post('/api/attendance/application/save', req),
 	searchAttendanceApplication: (req: SearchRequestDto) => axiosConfig.post<AttendanceApplicationResponseDto[]>('/api/attendance/application/search', req),
 	approveAttendanceApplication: (req: AttendanceApplicationResponseDto) => axiosConfig.post<void>('/api/attendance/application/approve', req),

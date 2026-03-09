@@ -1,8 +1,8 @@
 import axiosConfig from '../_lib/axiosConfig';
 import { workType, workStatus, vacationType, dayName, attendanceType } from '@/type/types';
+import { AttendanceApplicationResponseDto } from '@/app/services/attendanceApplicationService';
 
 export interface AttendanceReqDto {
-	//loginId: string;
 	memberId: number;
 	workDate: string;
 }
@@ -10,7 +10,6 @@ export interface AttendanceReqDto {
 export interface AttendanceSaveReqDto {
 	attendanceId?: number | null | undefined;
 	memberId: number;
-	//loginId: string;
 	startTime?: string;
 	endTime?: string;
 }
@@ -31,7 +30,7 @@ export interface AttendanceDayResDto {
 	workType?: workType;
 	workStatus?: workStatus;
 	vacationType?: vacationType;
-	changeRequestId?: number;
+	applicationList?: AttendanceApplicationResponseDto[];
 	detail?: string;
 }
 
