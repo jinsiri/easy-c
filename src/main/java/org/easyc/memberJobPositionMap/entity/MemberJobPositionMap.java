@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 import org.easyc.common.entity.BaseEntity;
 import org.easyc.jobPosition.entity.JobPosition;
 import org.easyc.member.entity.Member;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
@@ -21,6 +22,7 @@ import org.easyc.member.entity.Member;
         @Index(name = "idx_member_pos_map_pos", columnList = "job_position_id, deleted")
     }
 )
+@SQLRestriction("deleted = false")
 public class MemberJobPositionMap extends BaseEntity {
     @Id
     @SequenceGenerator(name="member_job_position_map_seq", sequenceName="member_job_position_map_seq", allocationSize=1)

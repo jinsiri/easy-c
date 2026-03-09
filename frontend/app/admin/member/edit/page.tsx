@@ -246,9 +246,10 @@ export default function MemberEditPage() {
 				languageList: languageList.map(strip),
 			};
 
-			await memberService.updateMember(memberId, payload);
-			await success('멤버 정보가 수정되었습니다.');
-			router.push('/admin/dept/member');
+			console.log(payload);
+			// await memberService.updateMember(memberId, payload);
+			// await success('멤버 정보가 수정되었습니다.');
+			// router.push('/admin/dept/member');
 		} finally {
 			setSaving(false);
 		}
@@ -526,6 +527,7 @@ export default function MemberEditPage() {
 					</Box>
 				</BaseDialog>
 			)}
+
 			<Box sx={{ flexShrink: 0, width: '100%', padding: '0 1.5rem', my: '1rem' }}>
 				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
 					<Button startIcon={<ArrowBack />} onClick={() => router.back()} disabled={saving}>

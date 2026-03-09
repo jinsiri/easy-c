@@ -2,6 +2,7 @@ package org.easyc.member.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.easyc.deptMemberMap.dto.DeptMemberMapRequestDto;
 import org.easyc.member.constant.*;
 
 import java.time.LocalDate;
@@ -47,6 +48,12 @@ public class MemberUpdateRequestDto {
     private String bankName;
     private String accountNumber;
     private String accountHolderName;
+
+    // ── 조직 관련 ──
+    private Long jobPositionId;
+    private Long jobGradeId;
+    private Long jobRoleId;
+    private List<DeptMemberMapRequestDto> deptMemberMapDto;
 
     // ── 리스트 ──
     private List<MemberCareerRequestDto>           careerList;

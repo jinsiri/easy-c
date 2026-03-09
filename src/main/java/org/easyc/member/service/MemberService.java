@@ -242,6 +242,14 @@ public class MemberService {
             member.changePassword(encoder.encode(dto.getPassword()));
         }
 
+        if(dto.getJobPositionId() != null) {
+            memberJobPositionMapService.assignJobPosition(member.getMemberId(), dto.getJobPositionId());
+        }
+
+        if(dto.getJobGradeId() != null) {
+            memberJobGradeMapService.assignJobGrade(member.getMemberId(), dto.getJobGradeId());
+        }
+
         MemberProfile profile = memberProfileRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
         profile.update(dto.toProfileDto());

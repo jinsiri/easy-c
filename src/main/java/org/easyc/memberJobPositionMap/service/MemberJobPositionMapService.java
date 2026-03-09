@@ -11,6 +11,8 @@ import org.easyc.memberJobPositionMap.repository.MemberJobPositionMapRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class MemberJobPositionMapService {
@@ -33,17 +35,26 @@ public class MemberJobPositionMapService {
 
     @Transactional
     public void assignJobPosition(Long memberId, Long jobPositionId) {
-        memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND));
+        validateMemberAndPosition(memberId, jobPositionId);
 
-        jobPositionRepository.findById(jobPositionId)
-                .orElseThrow(() -> new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND));
+        repository.findByMemberId(memberId).ifPresent(storedData -> {
+            if (Objects.equals(storedData.getJobPositionId(), jobPositionId)) {
+                return;
+            }
+
+            repository.softDeleteById(storedData.getMemberJobPositionMapId());
+        });
 
         MemberJobPositionMap mappingData = MemberJobPositionMap.builder()
                 .memberId(memberId)
                 .jobPositionId(jobPositionId)
                 .build();
-
         repository.save(mappingData);
+    }
+
+    private void validateMemberAndPosition(Long memberId, Long jobPositionId) {
+        if (!memberRepository.existsById(memberId) || !jobPositionRepository.existsById(jobPositionId)) {
+            throw new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND);
+        }
     }
 }
