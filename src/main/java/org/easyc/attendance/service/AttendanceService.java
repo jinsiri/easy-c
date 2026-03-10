@@ -181,10 +181,10 @@ public class AttendanceService {
     public void saveVacationAttendance (VacationApplication application) {
         LocalDate startDate = application.getStartDate();
         LocalDate endDate = application.getEndDate();
-        long duration = ChronoUnit.DAYS.between(startDate, endDate);
+        long duration = endDate != null ? ChronoUnit.DAYS.between(startDate, endDate) : 0;
 
         List<Attendance> attendanceList = new ArrayList<>();
-        for(long i = 0; i < duration; i++){
+        for(long i = 0; i <= duration; i++){
             Attendance result = new Attendance();
             result.setMemberId(application.getMemberId());
             result.setMemberNm(application.getMemberNm());

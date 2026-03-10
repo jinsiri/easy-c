@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 /** Lib */
@@ -12,13 +12,15 @@ import useModalStore from '@/store/useModalStore';
 
 /** MUI */
 import { Box, Button, Grid, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
-import { WORKSTATUS } from '@/constant/attendanceConst';
+import { BASICSTATUS } from '@/constant/commonConst';
+
 import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
 import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -33,9 +35,10 @@ export default function AttendanceApplicationPage() {
 	const router = useRouter();
 	const { setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
+	const gridRef = useRef();
 
-	const [searchCategory, setSearchCategory] = useState<string>('depthNm');
-	const [searchValue, setSearchValue] = useState<string>('');
+	const [searchCategory, setSearchCategory] = useState<string>('status');
+	const [searchValue, setSearchValue] = useState<string>('all');
 	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
 
 	const colDefs: ColDef<Record<string, any>>[] = [
@@ -98,23 +101,29 @@ export default function AttendanceApplicationPage() {
 						router.push('/attendance/user/modal?mode=detail');
 					}}
 				>
-					<Button variant='outlined'>상세 보기</Button>
+					<Button variant='outlined' size='small'>
+						상세 보기
+					</Button>
 				</Box>
 			),
 		},
 		{
 			field: 'action',
 			headerName: '처리',
-			cellRenderer: (param) => (
-				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', gap: 1, py: '6px' }}>
-					<Button variant='contained' onClick={(e) => clickEvent('approve', param.data)}>
-						승인
-					</Button>
-					<Button variant='contained' color='error' onClick={(e) => clickEvent('reject', param.data)}>
-						반려
-					</Button>
-				</Box>
-			),
+			cellRenderer: (param) => {
+				return (
+					param.data.status === 'PENDING' && (
+						<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', gap: 1, py: '6px' }}>
+							<Button variant='contained' size='small' onClick={(e) => clickEvent('approve', param.data)}>
+								승인
+							</Button>
+							<Button variant='contained' size='small' color='error' onClick={(e) => clickEvent('reject', param.data)}>
+								반려
+							</Button>
+						</Box>
+					)
+				);
+			},
 		},
 	];
 
@@ -129,8 +138,8 @@ export default function AttendanceApplicationPage() {
 			const res: AttendanceApplicationResponseDto[] = await attendanceApplicationService.searchAttendanceApplication({});
 
 			setRowData(res);
-			setSearchCategory('depthNm');
-			setSearchValue('');
+			setSearchCategory('status');
+			setSearchValue('all');
 		} finally {
 			setLoader(false);
 		}
@@ -158,8 +167,11 @@ export default function AttendanceApplicationPage() {
 
 			if (searchCategory !== targetValue) {
 				switch (targetValue) {
-					case 'workStatus':
-						setSearchValue('PRESENT');
+					case 'status':
+						setSearchValue('all');
+						break;
+					case 'workDate':
+						setSearchValue(dayjs().format('YYYY-MM-DD'));
 						break;
 					default:
 						setSearchValue('');
@@ -177,16 +189,19 @@ export default function AttendanceApplicationPage() {
 
 	const changeSearchCategoryContents = useMemo(() => {
 		switch (searchCategory) {
-			case 'workStatus':
+			case 'status':
 				return (
-					<Select name={'workStatus'} value={searchValue} onChange={onChangeValue} size='small' sx={{ minWidth: '10rem', marginRight: '0.5rem' }}>
-						{Object.entries(WORKSTATUS).map(([key, value]) => (
+					<Select name={'status'} value={searchValue} onChange={onChangeValue} size='small' sx={{ minWidth: '10rem', marginRight: '0.5rem' }}>
+						<MenuItem value={'all'}>전체</MenuItem>
+						{Object.entries(BASICSTATUS).map(([key, value]) => (
 							<MenuItem key={key} value={key}>
 								{value}
 							</MenuItem>
 						))}
 					</Select>
 				);
+			case 'workDate':
+				return <DatePicker value={dayjs(searchValue, 'YYYY-MM-DD')} onChange={(newValue) => setSearchValue(dayjs(newValue).format('YYYY-MM-DD'))} />;
 			default:
 				return <TextField variant='outlined' size='small' value={searchValue} onChange={onChangeValue} />;
 		}
@@ -194,16 +209,27 @@ export default function AttendanceApplicationPage() {
 
 	const clickEvent = async (type: 'reject' | 'approve', data: AttendanceApplicationResponseDto) => {
 		if (data !== null) {
-			if (type === 'reject') {
-				await attendanceApplicationService.rejectAttendanceApplication(data);
-				if (confirm('반려처리가 성공적으로 완료되었습니다.')) {
-					onClickSearch();
-				}
-			} else {
-				await attendanceApplicationService.approveAttendanceApplication(data);
-				if (confirm('승인처리가 성공적으로 완료되었습니다.')) {
-					onClickSearch();
-				}
+			approveRejectData(type, [data]);
+		}
+	};
+
+	const clickAllEvent = (type: 'reject' | 'approve') => {
+		if (gridRef.current) {
+			const selectedRows = gridRef.current.api.getSelectedRows();
+			approveRejectData(type, selectedRows);
+		}
+	};
+
+	const approveRejectData = async (type: 'reject' | 'approve', data: AttendanceApplicationResponseDto[]) => {
+		if (type === 'reject') {
+			await attendanceApplicationService.rejectAttendanceApplication(data);
+			if (confirm('반려처리가 성공적으로 완료되었습니다.')) {
+				onClickSearch();
+			}
+		} else {
+			await attendanceApplicationService.approveAttendanceApplication(data);
+			if (confirm('승인처리가 성공적으로 완료되었습니다.')) {
+				onClickSearch();
 			}
 		}
 	};
@@ -214,18 +240,62 @@ export default function AttendanceApplicationPage() {
 				<PathBreadcrumbs />
 			</Box>
 			<Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
-				<Grid sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', alignItems: 'center', padding: '0.5rem 1.5rem', gap: '0.5rem' }}>
-					<Select id='demo-simple-select' value={searchCategory} onChange={handleChangeSearchCategory} size='small'>
-						<MenuItem value={'depthNm'}>부서명</MenuItem>
-						<MenuItem value={'workStatus'}>근로상태</MenuItem>
-					</Select>
-					{changeSearchCategoryContents}
-					<Button variant='contained' onClick={onClickSearch}>
-						검색
-					</Button>
+				<Grid
+					sx={{
+						display: 'flex',
+						flexDirection: 'row',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+						padding: '0.5rem 1.5rem',
+						gap: '0.5rem',
+					}}
+				>
+					<Box
+						sx={{
+							display: 'flex',
+							flexDirection: 'row',
+							alignItems: 'center',
+							gap: '0.5rem',
+						}}
+					>
+						<Button variant='contained' onClick={(e) => clickAllEvent('approve')}>
+							일괄승인
+						</Button>
+						<Button variant='contained' color='error' onClick={(e) => clickAllEvent('reject')}>
+							일괄반려
+						</Button>
+					</Box>
+					<Box
+						sx={{
+							display: 'flex',
+							flexDirection: 'row',
+							alignItems: 'center',
+							gap: '0.5rem',
+						}}
+					>
+						<Select id='demo-simple-select' value={searchCategory} onChange={handleChangeSearchCategory} size='small'>
+							<MenuItem value={'status'}>처리상태</MenuItem>
+							<MenuItem value={'depthNm'}>부서명</MenuItem>
+							<MenuItem value={'memberNm'}>근무자명</MenuItem>
+							<MenuItem value={'workDate'}>수정근무일</MenuItem>
+						</Select>
+						{changeSearchCategoryContents}
+						<Button variant='contained' onClick={onClickSearch}>
+							검색
+						</Button>
+					</Box>
 				</Grid>
 				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='multiple' rowHeight={60} />
+					<CustomAgGridComp
+						ref={gridRef}
+						rowData={rowData}
+						colDefs={colDefs}
+						rowSelectionMode='multiple'
+						rowHeight={56}
+						isRowSelectable={(rowNode) => {
+							return rowNode.data.status ? rowNode.data.status === 'PENDING' : false;
+						}}
+					/>
 				</Grid>
 			</Grid>
 		</Box>

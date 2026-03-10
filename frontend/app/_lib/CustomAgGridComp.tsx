@@ -17,17 +17,20 @@ import {
 	RowDragEndEvent,
 	CellClickedEvent,
 	CellDoubleClickedEvent,
+	IsRowSelectable as IsRowSelectableType,
 } from 'ag-grid-community';
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
 
 // Ag-grid Row selection 옵션 추가
 export type RowSelectionMode = 'single' | 'multiple' | 'none';
 
-export const createRowSelection = (mode: RowSelectionMode, enableClickSelection: boolean) => {
+export const createRowSelection = (mode: RowSelectionMode, enableClickSelection: boolean, isRowSelectable: IsRowSelectableType) => {
 	if (mode === 'none') return undefined;
 
 	const options: RowSelectionOptions = {
 		mode: mode === 'single' ? 'singleRow' : 'multiRow',
+		isRowSelectable: isRowSelectable ?? true,
+		hideDisabledCheckboxes: true,
 		enableClickSelection: enableClickSelection ?? false,
 		enableSelectionWithoutKeys: true, // ctrl 키 없이 여러개 선택
 	};
@@ -43,6 +46,7 @@ interface propsType extends AgGridReactProps {
 	pagination?: boolean;
 	rowSelectionMode?: 'single' | 'multiple' | 'none';
 	enableClickSelection?: boolean;
+	isRowSelectable?: IsRowSelectableType;
 	animateRows?: boolean;
 	isReorderMode?: boolean;
 	onGridReady?: (params: GridReadyEvent) => void;
@@ -59,6 +63,7 @@ const CustomAgGridComp = forwardRef(
 			pagination = true,
 			rowSelectionMode = 'none',
 			enableClickSelection = false,
+			isRowSelectable,
 			animateRows,
 			isReorderMode = false,
 			onGridReady,
@@ -118,8 +123,8 @@ const CustomAgGridComp = forwardRef(
 
 		const rowSelection = useMemo(() => {
 			if (isReorderMode) return undefined;
-			return createRowSelection(rowSelectionMode, enableClickSelection);
-		}, [rowSelectionMode, isReorderMode, enableClickSelection]);
+			return createRowSelection(rowSelectionMode, enableClickSelection, isRowSelectable ?? (() => true));
+		}, [rowSelectionMode, isReorderMode, enableClickSelection, isRowSelectable]);
 
 		const onGridReadyEvent = (params: GridReadyEvent) => {
 			params.api.sizeColumnsToFit();

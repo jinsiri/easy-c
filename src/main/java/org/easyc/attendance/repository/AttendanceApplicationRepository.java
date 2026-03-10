@@ -18,7 +18,7 @@ public interface AttendanceApplicationRepository extends JpaRepository<Attendanc
 
 
     List<AttendanceApplication> findAllByActiveTrueOrderByAttendanceApplicationIdAsc();
-    List<AttendanceApplication> findAllByDeptNmAndActiveTrueOrderByAttendanceApplicationIdAsc(String deptNm);
+    List<AttendanceApplication> findAllByDeptNmContainsAndActiveTrueOrderByAttendanceApplicationIdAsc(String deptNm);
     List<AttendanceApplication> findAllByMemberNmContainsAndActiveTrueOrderByAttendanceApplicationIdAsc(String searchValue);
-
+    List<AttendanceApplication> findAllByStatusAndActiveTrueOrderByAttendanceApplicationIdAsc(BasicStatus basicStatus);
 }

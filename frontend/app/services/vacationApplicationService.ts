@@ -50,6 +50,6 @@ export const vacationApplicationService = {
 		axiosConfig.get<vacationApplicationListDto>(`/api/vacation/application/user?target=${encodedMemberId}`),
 	saveVacationApplicationData: (req: vacationApplicationDataDto) => axiosConfig.post<void>('/api/vacation/application/save', req),
 	searchVacationApplication: (req: SearchRequestDto) => axiosConfig.post<vacationApplicationDto[]>('/api/vacation/application/search', req),
-	approveAttendanceApplication: (req: vacationApplicationDto) => axiosConfig.post<void>('/api/vacation/application/approve', req),
-	rejectAttendanceApplication: (req: vacationApplicationDto) => axiosConfig.post<void>('/api/vacation/application/reject', req),
+	approveAttendanceApplication: (req: vacationApplicationDto[]) => axiosConfig.post<void>('/api/vacation/application/approve', req),
+	rejectAttendanceApplication: (req: vacationApplicationDto[]) => axiosConfig.post<void>('/api/vacation/application/reject', req),
 };

@@ -35,18 +35,21 @@ public class VacationApplicationController {
         vacationApplicationService.saveVacationApplication(request);
     }
 
+    @AuditAction(code = "VACATION_APP_SEARCH", name = "휴가 신청 내역 검색", targetType = "VACATION_APP")
     @PostMapping("/search")
     public List<VacationApplication> searchVacationApplicationData(@RequestBody SearchRequestDto request) {
         return vacationApplicationService.searchVacationApplicationData(request);
     }
 
+    @AuditAction(code = "VACATION_APP_APPROVE", name = "휴가 신청 승인", targetType = "VACATION_APP")
     @PostMapping("/approve")
-    public void approveVacationApplicationData(@RequestBody VacationApplication request) {
+    public void approveVacationApplicationData(@RequestBody List<VacationApplication> request) {
         vacationApplicationService.approveVacationApplicationData(request);
     }
 
+    @AuditAction(code = "VACATION_APP_REJECT", name = "휴가 신청 반려", targetType = "VACATION_APP")
     @PostMapping("/reject")
-    public void rejectVacationApplicationData(@RequestBody VacationApplication request) {
+    public void rejectVacationApplicationData(@RequestBody  List<VacationApplication> request) {
         vacationApplicationService.rejectVacationApplicationData(request);
     }
 

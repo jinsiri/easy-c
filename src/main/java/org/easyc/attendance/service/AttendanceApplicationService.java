@@ -60,16 +60,25 @@ public class AttendanceApplicationService {
 
         List<AttendanceApplication> applicationList = new ArrayList<>();
 
-        if(searchValue== null || searchValue.equals("")){
+        if(searchValue== null || searchValue.equals("") || searchValue.equals("all")){
             applicationList = attendanceApplicationRepository.findAllByActiveTrueOrderByAttendanceApplicationIdAsc();
         }else{
             switch (searchCategory){
-                case "depthNm":
-                    applicationList = attendanceApplicationRepository.findAllByDeptNmAndActiveTrueOrderByAttendanceApplicationIdAsc(searchValue);
+                case "memberNm":
+                    applicationList = attendanceApplicationRepository.findAllByMemberNmContainsAndActiveTrueOrderByAttendanceApplicationIdAsc(searchValue);
                     break;
 
-                default:
-                    applicationList = attendanceApplicationRepository.findAllByMemberNmContainsAndActiveTrueOrderByAttendanceApplicationIdAsc(searchValue);
+                case "depthNm":
+                    applicationList = attendanceApplicationRepository.findAllByDeptNmContainsAndActiveTrueOrderByAttendanceApplicationIdAsc(searchValue);
+                    break;
+
+                case "workDate":
+                    LocalDate workDate = LocalDate.parse(searchValue, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    applicationList = attendanceApplicationRepository.findAllByWorkDateAndActiveTrueOrderByAttendanceApplicationIdAsc(workDate);
+                    break;
+
+                default: //처리상태
+                    applicationList = attendanceApplicationRepository.findAllByStatusAndActiveTrueOrderByAttendanceApplicationIdAsc(BasicStatus.valueOf(searchValue));
                     break;
             }
         }
@@ -77,7 +86,37 @@ public class AttendanceApplicationService {
         return applicationList;
     }
 
-    public void approveAttendanceApplicationData(AttendanceApplication request){
+    public void approveAttendanceApplicationData(List<AttendanceApplication> request){
+        List<Attendance> attendanceList = new ArrayList<>();
+        List<AttendanceApplication> applicationList = new ArrayList<>();
+
+        for(AttendanceApplication attendanceApplication : request){
+            if(attendanceApplication.getStatus().equals(BasicStatus.PENDING)){
+                attendanceList.add(approveAttendanceData(attendanceApplication));
+
+                attendanceApplication.setStatus(BasicStatus.APPROVED);
+                applicationList.add(attendanceApplication);
+            }
+        }
+
+        attendanceRepository.saveAll(attendanceList);
+        attendanceApplicationRepository.saveAll(applicationList);
+    }
+
+    public void rejectAttendanceApplicationData(List<AttendanceApplication> request){
+        List<AttendanceApplication> applicationList = new ArrayList<>();
+
+        for(AttendanceApplication attendanceApplication : request){
+            if(attendanceApplication.getStatus().equals(BasicStatus.PENDING)) {
+                attendanceApplication.setStatus(BasicStatus.REJECTED);
+                applicationList.add(attendanceApplication);
+            }
+        }
+
+        attendanceApplicationRepository.saveAll(applicationList);
+    }
+
+    public Attendance approveAttendanceData(AttendanceApplication request){
         // 대상 근태 가져오기
         AttendancePolicy targetPolicy = attendanceService.findAttendancePolicy(request.getMemberId());
         Attendance targetAttendance = attendanceRepository
@@ -130,15 +169,7 @@ public class AttendanceApplicationService {
                 break;
         }
 
-        attendanceRepository.save(convertAttendance);
-
-        request.setStatus(BasicStatus.APPROVED);
-        attendanceApplicationRepository.save(request);
-    }
-
-    public void rejectAttendanceApplicationData(AttendanceApplication request){
-        request.setStatus(BasicStatus.REJECTED);
-        attendanceApplicationRepository.save(request);
+        return convertAttendance;
     }
 
     private String makeSummary(Attendance origin, AttendanceApplication update) {

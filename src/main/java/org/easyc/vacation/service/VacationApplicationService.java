@@ -1,6 +1,7 @@
 package org.easyc.vacation.service;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.attendance.service.AttendanceService;
 import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.dto.SearchRequestDto;
@@ -19,8 +20,10 @@ import org.easyc.vacation.repository.VacationApplicationRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +46,36 @@ public class VacationApplicationService {
     }
 
     public List<VacationApplication> searchVacationApplicationData(SearchRequestDto request) {
-        return vacationApplicationRepository.findAllByDeletedFalseOrderByRegisterDateAsc();
+        String searchCategory = request.getSearchCategory();
+        String searchValue = request.getSearchValue();
+
+        List<VacationApplication> vacationList = new ArrayList<>();
+
+        if(searchValue== null || searchValue.equals("")  || searchValue.equals("all")){
+            vacationList = vacationApplicationRepository.findAllByDeletedFalseOrderByRegisterDateAsc();
+        }else{
+            switch (searchCategory){
+                case "memberNm":
+                    vacationList = vacationApplicationRepository.findAllByMemberNmContainsAndActiveTrueOrderByVacationApplicationIdAsc(searchValue);
+                    break;
+
+                case "depthNm":
+                    vacationList = vacationApplicationRepository.findAllByDeptNmContainsAndActiveTrueOrderByVacationApplicationIdAsc(searchValue);
+                    break;
+
+                case "workDate":
+                    LocalDate workDate = LocalDate.parse(searchValue, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    vacationList = vacationApplicationRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqualAndActiveTrueOrderByVacationApplicationIdAsc(workDate, workDate);
+                    break;
+
+                default: //처리상태
+
+                    vacationList = vacationApplicationRepository.findAllByStatusAndActiveTrueOrderByVacationApplicationIdAsc(BasicStatus.valueOf(searchValue));
+                    break;
+            }
+        }
+
+        return vacationList;
     }
 
     public VacationApplicationResponseDto findUserVacationApplicationData(Long memberId){
@@ -64,7 +96,6 @@ public class VacationApplicationService {
                     endVacation.add(vacationApplication);
                 }else{
                     planVacation.add(vacationApplication);
-
                 }
             }
 
@@ -75,8 +106,43 @@ public class VacationApplicationService {
         return result;
     }
 
-    public void approveVacationApplicationData(VacationApplication request) {
+    public void approveVacationApplicationData( List<VacationApplication> request) {
+        List<VacationApplication> vacationApplicationList = new ArrayList<>();
+        List<Vacation> vacationList = new ArrayList<>();
+        List<VacationHistory> vacationHistoryList = new ArrayList<>();
+
+        for(VacationApplication vacationApplication : request){
+            if(vacationApplication.getStatus().equals(BasicStatus.PENDING)){
+                Map<String, Object> vacationData = approveVacationData(vacationApplication);
+
+                vacationApplication.setStatus(BasicStatus.APPROVED);
+                vacationApplicationList.add(vacationApplication);
+
+                if(vacationData.get("vacation") != null) vacationList.add((Vacation) vacationData.get("vacation"));
+                if(vacationData.get("history") != null)  vacationHistoryList.add((VacationHistory) vacationData.get("history"));
+            }
+        }
+
+        vacationApplicationRepository.saveAll(vacationApplicationList);
+        vacationHistoryRepository.saveAll(vacationHistoryList);
+        vacationRepository.saveAll(vacationList);
+    }
+
+    public void rejectVacationApplicationData ( List<VacationApplication> request) {
+        List<VacationApplication> vacationApplicationList = new ArrayList<>();
+
+        for(VacationApplication vacationApplication : request){
+            if(vacationApplication.getStatus().equals(BasicStatus.PENDING)){
+                vacationApplication.setStatus(BasicStatus.REJECTED);
+                vacationApplicationList.add(vacationApplication);
+            }
+        }
+        vacationApplicationRepository.saveAll(vacationApplicationList);
+    }
+
+    public Map<String, Object> approveVacationData(VacationApplication request) {
         Vacation targetVacation = vacationRepository.findAllByMemberId(request.getMemberId()).orElse(null);
+        VacationHistory newHistory = null;
 
         if(targetVacation != null){
             VacationCategory vacationCategory = null;
@@ -87,9 +153,7 @@ public class VacationApplicationService {
                 default: vacationCategory = VacationCategory.ANNUAL;
             }
 
-            request.setStatus(BasicStatus.APPROVED);
-
-            VacationHistory newHistory = VacationHistory.builder()
+            newHistory = VacationHistory.builder()
                     .memberId(request.getMemberId())
                     .vacationCategory(vacationCategory)
                     .day(request.getVacationDuration() * 1.0)
@@ -99,19 +163,11 @@ public class VacationApplicationService {
             targetVacation.setUsedDay(targetVacation.getUsedDay() + request.getVacationDuration());
             targetVacation.setRemainDay(targetVacation.getRemainDay() - request.getVacationDuration());
 
-            vacationApplicationRepository.save(request);
-            vacationHistoryRepository.save(newHistory);
-            vacationRepository.save(targetVacation);
-
             /* 근태 휴가 입력 */
             attendanceService.saveVacationAttendance(request);
-
         }
-    }
+        return Map.of("vacationHistory", newHistory, "vacation", targetVacation);
 
-    public void rejectVacationApplicationData (VacationApplication request) {
-        request.setStatus(BasicStatus.REJECTED);
-        vacationApplicationRepository.save(request);
     }
 
 

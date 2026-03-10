@@ -48,6 +48,6 @@ export const attendanceApplicationService = {
 	getUserAttendanceApplication: (req: AttendanceReqDto) => axiosConfig.post<AttendanceApplicationResponseDto>('/api/attendance/application/user', req),
 	submitAttendanceApplication: (req: AttendanceApplicationRequestDto) => axiosConfig.post('/api/attendance/application/save', req),
 	searchAttendanceApplication: (req: SearchRequestDto) => axiosConfig.post<AttendanceApplicationResponseDto[]>('/api/attendance/application/search', req),
-	approveAttendanceApplication: (req: AttendanceApplicationResponseDto) => axiosConfig.post<void>('/api/attendance/application/approve', req),
-	rejectAttendanceApplication: (req: AttendanceApplicationResponseDto) => axiosConfig.post<void>('/api/attendance/application/reject', req),
+	approveAttendanceApplication: (req: AttendanceApplicationResponseDto[]) => axiosConfig.post<void>('/api/attendance/application/approve', req),
+	rejectAttendanceApplication: (req: AttendanceApplicationResponseDto[]) => axiosConfig.post<void>('/api/attendance/application/reject', req),
 };
