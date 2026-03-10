@@ -1,4 +1,4 @@
-package org.easyc.memberJobTitleMap.dto;
+package org.easyc.memberJobRoleMap.dto;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -9,8 +9,8 @@ import org.easyc.common.dto.BaseDto;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
-public class MemberJobTitleMapRequestDto extends BaseDto {
-    private Long memberJobTitleMapId;
+public class MemberJobRoleMapResponseDto extends BaseDto {
+    private Long memberJobRoleMapId;
     private Long memberId;
-    private Long jobTitleId;
+    private Long jobRoleId;
 }
