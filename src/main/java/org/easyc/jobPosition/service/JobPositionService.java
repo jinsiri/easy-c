@@ -114,11 +114,11 @@ public class JobPositionService {
 
         List<JobPosition> positions = jobPositionRepository.findAllById(ids);
 
-        Map<Long, JobPosition> gradeMap = positions.stream()
+        Map<Long, JobPosition> positionMap = positions.stream()
                 .collect(Collectors.toMap(JobPosition::getJobPositionId, g -> g));
 
         for (JobPositionRequestDto dto : dtos) {
-            JobPosition position = gradeMap.get(dto.getJobPositionId());
+            JobPosition position = positionMap.get(dto.getJobPositionId());
             if (position != null) {
                 position.changeLevel(dto.getJobPositionLevel());
             }

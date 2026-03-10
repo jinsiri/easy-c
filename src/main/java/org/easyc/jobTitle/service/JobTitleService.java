@@ -114,11 +114,11 @@ public class JobTitleService {
 
         List<JobTitle> titles = jobTitleRepository.findAllById(ids);
 
-        Map<Long, JobTitle> gradeMap = titles.stream()
+        Map<Long, JobTitle> titleMap = titles.stream()
                 .collect(Collectors.toMap(JobTitle::getJobTitleId, g -> g));
 
         for (JobTitleRequestDto dto : dtos) {
-            JobTitle title = gradeMap.get(dto.getJobTitleId());
+            JobTitle title = titleMap.get(dto.getJobTitleId());
             if (title != null) {
                 title.changeLevel(dto.getJobTitleLevel());
             }

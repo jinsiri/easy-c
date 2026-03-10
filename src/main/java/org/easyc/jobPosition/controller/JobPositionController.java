@@ -55,7 +55,7 @@ public class JobPositionController {
 
     @AuditAction(code = "JOB_POSITION_UPDATE_LEVELS", name = "직위 레벨 수정", targetType = "JOB_POSITION")
     @PostMapping("/update-levels")
-    public void updateGradeLevels(@RequestBody List<JobPositionRequestDto> dtos) {
+    public void updatePositionLevels(@RequestBody List<JobPositionRequestDto> dtos) {
         jobPositionService.updateLevels(dtos);
     }
 }
