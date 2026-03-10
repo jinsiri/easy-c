@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,19 +38,22 @@ public class MemberJobPositionMapService {
     public void assignJobPosition(Long memberId, Long jobPositionId) {
         validateMemberAndPosition(memberId, jobPositionId);
 
-        repository.findByMemberId(memberId).ifPresent(storedData -> {
-            if (Objects.equals(storedData.getJobPositionId(), jobPositionId)) {
+        Optional<MemberJobPositionMap> lastPosition = repository.findByMemberId(memberId);
+
+        if (lastPosition.isPresent()) {
+            if (Objects.equals(lastPosition.get().getJobPositionId(), jobPositionId)) {
                 return;
             }
 
-            repository.softDeleteById(storedData.getMemberJobPositionMapId());
-        });
+            repository.softDeleteById(lastPosition.get().getMemberJobPositionMapId());
+        }
 
-        MemberJobPositionMap mappingData = MemberJobPositionMap.builder()
+        MemberJobPositionMap newHistory = MemberJobPositionMap.builder()
                 .memberId(memberId)
                 .jobPositionId(jobPositionId)
                 .build();
-        repository.save(mappingData);
+
+        repository.save(newHistory);
     }
 
     private void validateMemberAndPosition(Long memberId, Long jobPositionId) {

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,13 +39,15 @@ public class MemberJobGradeMapService {
     public void assignJobGrade(Long memberId, Long jobGradeId) {
         validateMemberAndGrade(memberId, jobGradeId);
 
-        repository.findByMemberId(memberId).ifPresent(storedData -> {
-            if (Objects.equals(storedData.getJobGradeId(), jobGradeId)) {
+        Optional<MemberJobGradeMap> lastGrade = repository.findByMemberId(memberId);
+
+        if(lastGrade.isPresent()) {
+            if(Objects.equals(lastGrade.get().getJobGradeId(), jobGradeId)) {
                 return;
             }
 
-            repository.softDeleteById(storedData.getMemberJobGradeMapId());
-        });
+            repository.softDeleteById(lastGrade.get().getMemberJobGradeMapId());
+        }
 
         MemberJobGradeMap mappingData = MemberJobGradeMap.builder()
                 .memberId(memberId)
