@@ -212,7 +212,7 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 					>
 						{activated ? '퇴근하기' : '출근하기'}
 					</Button>
-					<Button variant='outlined' size='large' onClick={() => router.push('/attendance/user/modal?type=request')}>
+					<Button variant='outlined' size='large' onClick={() => router.push('/attendance/user/modal?mode=detail')}>
 						근태 수정 요청하기
 					</Button>
 				</Box>

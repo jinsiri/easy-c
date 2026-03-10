@@ -95,7 +95,7 @@ export default function AttendanceApplicationPage() {
 					sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', py: '6px' }}
 					onClick={(e) => {
 						setModalData(param.data);
-						router.push('/attendance/user/modal?type=read');
+						router.push('/attendance/user/modal?mode=detail');
 					}}
 				>
 					<Button variant='outlined'>상세 보기</Button>

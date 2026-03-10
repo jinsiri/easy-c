@@ -8,6 +8,8 @@ import { SxProps, Theme } from '@mui/material/styles';
 export interface BaseDialogProps {
 	title: string;
 	children: React.ReactNode;
+
+	className?: string;
 	loading?: boolean;
 	onConfirm?: () => void;
 	onClose?: () => void;
@@ -18,7 +20,7 @@ export interface BaseDialogProps {
 }
 
 export default function BaseDialog(props: BaseDialogProps) {
-	const { title, children, loading, onConfirm, onClose, confirmLabel = '저장', maxWidth = 'sm', fullWidth = false, paperSx } = props;
+	const { title, children, loading, onConfirm, onClose, confirmLabel = '저장', maxWidth = 'sm', fullWidth = false, className = '', paperSx } = props;
 	const router = useRouter();
 
 	const handleClose = () => {
@@ -31,6 +33,7 @@ export default function BaseDialog(props: BaseDialogProps) {
 
 	return (
 		<Dialog
+			className={className}
 			onClose={handleClose}
 			open={true}
 			maxWidth={maxWidth}

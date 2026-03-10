@@ -3,6 +3,11 @@ import { Theme } from '@mui/material/styles';
 const Dialog = (theme: Theme) => ({
 	MuiDialog: {
 		styleOverrides: {
+			root: {
+				'&.none-padding .MuiDialogContent-root': {
+					padding: 0,
+				},
+			},
 			paper: {
 				borderRadius: '1rem',
 				padding: '4.375rem 0 0',

@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Dispatch, SetStateAction } from 'react';
 
 /** MUI */
 import { Box, Button, Typography } from '@mui/material';
@@ -10,25 +9,22 @@ import { Box, Button, Typography } from '@mui/material';
 import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
-/** Lib */
-import useModalStore from '@/store/useModalStore';
-import useLoaderStore from '@/store/useLoaderStore';
-
 /** Custom */
-import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
 import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
 
 /** Type / Interface */
-import { WORKSTATUS } from '@/constant/attendanceConst';
+import { AttendanceApplicationResponseDto } from '@/app/services/attendanceApplicationService';
 
-export default function AttendanceUserModal() {
-	const router = useRouter();
-	const { setLoader } = useLoaderStore();
-	const { modalData, setModalData, resetModalData } = useModalStore();
-
-	const [isSaving, setIsSaving] = useState(false);
-
+export default function AttendanceUserListModal({
+	setModalMode,
+	modalData,
+	setModalData,
+}: {
+	setModalMode: Dispatch<SetStateAction<string | null>>;
+	modalData: AttendanceApplicationResponseDto[];
+	setModalData: Dispatch<SetStateAction<any | null>>;
+}) {
 	const colDefs: ColDef<Record<string, any>>[] = [
 		{
 			field: 'status',
@@ -82,7 +78,7 @@ export default function AttendanceUserModal() {
 							list: modalData,
 						};
 						setModalData(_sendData);
-						router.push('/attendance/user/modal?type=detail');
+						setModalMode('detail');
 					}}
 				>
 					<Button variant='outlined'>상세 보기</Button>
@@ -91,11 +87,5 @@ export default function AttendanceUserModal() {
 		},
 	];
 
-	return (
-		<BaseDialog title={'근무시간 수정'} loading={isSaving}>
-			<Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '30rem', height: '20rem' }}>
-				<CustomAgGridComp rowData={modalData ?? []} colDefs={colDefs} rowSelectionMode='none' rowHeight={60} />
-			</Box>
-		</BaseDialog>
-	);
+	return <CustomAgGridComp rowData={modalData ?? []} colDefs={colDefs} rowSelectionMode='none' rowHeight={60} />;
 }

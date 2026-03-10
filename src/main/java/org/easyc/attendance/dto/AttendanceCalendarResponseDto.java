@@ -4,9 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.easyc.attendance.entity.Attendance;
-import org.easyc.attendance.entity.AttendanceApplication;
-
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter

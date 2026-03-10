@@ -114,7 +114,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 								sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', py: '6px' }}
 								onClick={(e) => {
 									setModalData(value);
-									router.push('/attendance/user/list');
+									router.push('/attendance/user/modal?mode=list');
 								}}
 							>
 								<Button variant='text'>상세 보기 ({value.length})</Button>
