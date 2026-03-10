@@ -24,6 +24,7 @@ public class MemberJoinRequestDto { //회원가입 등 비밀번호 필요할 �
     private MemberRole memberRole;
     private AccountStatus accountStatus;
 
+    // ── 조직 관련 ──
     private Long jobPositionId;
     private Long jobGradeId;
     private Long jobRoleId;

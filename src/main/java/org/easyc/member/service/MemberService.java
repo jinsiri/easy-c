@@ -99,12 +99,12 @@ public class MemberService {
 
         MemberJobPositionMapResponseDto positionMap = memberJobPositionMapService.getJobPositionByMemberId(memberId);
         if(positionMap != null) {
-            memberDto.setJobPositionMapDto(positionMap);
+            memberDto.setJobPosition(positionMap);
         }
 
         MemberJobGradeMapResponseDto gradeMap = memberJobGradeMapService.getJobGradeByMemberId(memberId);
         if(gradeMap != null) {
-            memberDto.setJobGradeMapDto(gradeMap);
+            memberDto.setJobGrade(gradeMap);
         }
 
         Optional<MemberProfile> optionalProfile = memberProfileRepository.findById(memberId);
@@ -240,6 +240,14 @@ public class MemberService {
         member.update(dto.getMemberNm(), dto.getMemberNmEn());
         if (dto.hasNewPassword()) {
             member.changePassword(encoder.encode(dto.getPassword()));
+        }
+
+        if(dto.getJobPositionId() != null) {
+            memberJobPositionMapService.assignJobPosition(member.getMemberId(), dto.getJobPositionId());
+        }
+
+        if(dto.getJobGradeId() != null) {
+            memberJobGradeMapService.assignJobGrade(member.getMemberId(), dto.getJobGradeId());
         }
 
         MemberProfile profile = memberProfileRepository.findById(memberId)

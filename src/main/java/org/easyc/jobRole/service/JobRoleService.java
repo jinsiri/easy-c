@@ -22,8 +22,6 @@ public class JobRoleService {
 
     public void save(JobRoleRequestDto jobRoleRequestDto) {
         JobRole jobRole = jobRoleRequestDto.toEntity();
-
-        // todo: 작성자 세팅해야함
         jobRoleRepository.save(jobRole);
     }
 }

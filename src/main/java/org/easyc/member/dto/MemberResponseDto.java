@@ -24,8 +24,8 @@ public class MemberResponseDto extends BaseDto {
     private MemberRole memberRole;
     private AccountStatus accountStatus;
 
-    private MemberJobPositionMapResponseDto jobPositionMapDto;
-    private MemberJobGradeMapResponseDto jobGradeMapDto;
+    private MemberJobPositionMapResponseDto jobPosition;
+    private MemberJobGradeMapResponseDto jobGrade;
 //    private MemberJobRoleMapResponseDto jobRole;
 
     @JsonUnwrapped // 중첩 해제

@@ -8,7 +8,7 @@ import org.easyc.jobGrade.entity.JobGrade;
 @Getter
 @SuperBuilder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // todo: 액세스레벨 체크
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 public class JobGradeRequestDto extends BaseDto {
     private Long jobGradeId;
