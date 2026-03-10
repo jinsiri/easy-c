@@ -4,12 +4,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button, Checkbox, Grid, MenuItem, OutlinedInput, Select, Stack, Typography, useTheme } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import MemberTableField from '@/app/admin/member/_component/MemberTableField';
-import PasswordChangeDialog from '@/app/admin/member/_component/PasswordChangeDialog';
 import { CAREER_COLS, LANGUAGE_COLS, MemberFieldDef, QUALIFICATION_COLS, REWARD_COLS } from '@/app/admin/member/_constant/formConst';
 import { getMemberFormSections, getOptions } from '@/app/admin/member/_utils/formUtil';
 import { MemberBundleResponseDto, memberService } from '@/app/services/memberService';
 import { ArrowBack } from '@mui/icons-material';
+import MemberTableField from '@/app/admin/member/_component/MemberTableField';
+import PasswordChangeDialog from '@/app/admin/member/_component/PasswordChangeDialog';
+import DeptJobTitleChangeDialog from '@/app/admin/member/_component/DeptJobTitleChangeDialog';
 
 const createMemberSchema = z
 	.object({
@@ -152,6 +153,7 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 	const theme = useTheme();
 
 	const [saving, setSaving] = useState(false);
+	const [deptJobTitleDialogOpen, setDeptJobTitleDialogOpen] = useState(false);
 	const [pwDialogOpen, setPwDialogOpen] = useState(false);
 	const [memberBundle, setMemberBundle] = useState<MemberBundleResponseDto>({});
 
@@ -238,6 +240,15 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+			{memberId && deptJobTitleDialogOpen && (
+				<DeptJobTitleChangeDialog
+					value={''}
+					onClose={() => setDeptJobTitleDialogOpen(false)}
+					memberId={memberId}
+					deptList={memberBundle.deptList}
+					jobTitleList={memberBundle.jobTitleList}
+				/>
+			)}
 			{isEdit && memberId && pwDialogOpen && <PasswordChangeDialog onClose={() => setPwDialogOpen(false)} memberId={memberId} />}
 
 			<Box sx={{ flexShrink: 0, width: '100%', padding: '0 1.5rem', my: '1rem' }}>
@@ -268,34 +279,43 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 								borderRadius: '1rem',
 							}}
 						>
-							{section.fields.map((field) => (
-								<Box
-									key={field.key}
-									sx={{
-										display: 'flex',
-										alignItems: 'center',
-										flexBasis: field.wide ? '66.66%' : '33.33%',
-										padding: '0.5rem 1rem',
-										minWidth: '18rem',
-										whiteSpace: 'nowrap',
-									}}
-								>
-									<Box sx={{ width: '8rem', flexShrink: 0 }}>
-										{field.label}
-										{field.required && (
-											<Box component='span' sx={{ color: 'error.main', ml: '2px' }}>
-												*
-											</Box>
-										)}
+							{section.fields.map((field) => {
+								return field.key === 'departmentPosition' ? (
+									<Box sx={{ display: 'flex', alignItems: 'center', flexBasis: '33.33%', padding: '0.5rem 1rem', minWidth: '18rem' }}>
+										<Box sx={{ width: '8rem', flexShrink: 0 }}>부서/직책</Box>
+										<Button variant='outlined' onClick={() => setDeptJobTitleDialogOpen(true)}>
+											부서/직책 설정
+										</Button>
 									</Box>
-									<Box sx={{ width: 'calc(100% - 8rem)' }}>{renderField(field)}</Box>
-								</Box>
-							))}
+								) : (
+									<Box
+										key={field.key}
+										sx={{
+											display: 'flex',
+											alignItems: 'center',
+											flexBasis: field.wide ? '66.66%' : '33.33%',
+											padding: '0.5rem 1rem',
+											minWidth: '18rem',
+											whiteSpace: 'nowrap',
+										}}
+									>
+										<Box sx={{ width: '8rem', flexShrink: 0 }}>
+											{field.label}
+											{field.required && (
+												<Box component='span' sx={{ color: 'error.main', ml: '2px' }}>
+													*
+												</Box>
+											)}
+										</Box>
+										<Box sx={{ width: 'calc(100% - 8rem)' }}>{renderField(field)}</Box>
+									</Box>
+								);
+							})}
 
 							{isEdit && si === 0 && (
 								<Box sx={{ display: 'flex', alignItems: 'center', flexBasis: '33.33%', padding: '0.5rem 1rem', minWidth: '18rem' }}>
 									<Box sx={{ width: '8rem', flexShrink: 0 }}>비밀번호</Box>
-									<Button variant='outlined' size='small' onClick={() => setPwDialogOpen(true)}>
+									<Button variant='outlined' onClick={() => setPwDialogOpen(true)}>
 										비밀번호 변경
 									</Button>
 								</Box>
