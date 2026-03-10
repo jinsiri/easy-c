@@ -63,7 +63,7 @@ export const getDisplayValue = (key: string, value: any): string => {
 		case 'jobRole':
 			const fields = [value?.jobRoleCategory, value?.jobRoleType, value?.jobRoleNm];
 
-			return fields.filter(Boolean).join('-');
+			return fields.filter(Boolean).join('-') || '-';
 		default:
 	}
 
