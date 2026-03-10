@@ -245,7 +245,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-			<Box sx={{ flexShrink: 0, width: '100%', padding: '0 1.5rem', mb: '1rem' }}>
+			<Box sx={{ flexShrink: 0, width: '100%', mb: '1rem' }}>
 				<Box
 					ref={targetRef}
 					sx={{
