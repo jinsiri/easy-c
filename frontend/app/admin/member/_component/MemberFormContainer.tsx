@@ -29,7 +29,7 @@ const createMemberSchema = z
 		jobPosition: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 		jobGrade: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 		jobTitle: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
-		jobRole: z.string().default(''), // todo: 이거 중앙관리할지 텍스트로 받을지 결정해야함
+		jobRole: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 		email: z
 			.string()
 			.refine((val) => val === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
@@ -90,7 +90,7 @@ const updateMemberSchema = z.object({
 	jobPosition: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 	jobGrade: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 	jobTitle: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
-	jobRole: z.string().default(''), // todo: 이거 중앙관리할지 텍스트로 받을지 결정해야함
+	jobRole: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 	email: z
 		.string()
 		.refine((val) => val === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
@@ -240,11 +240,11 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-			{memberId && deptJobTitleDialogOpen && (
+			{deptJobTitleDialogOpen && (
 				<DeptJobTitleChangeDialog
-					value={''}
+					memberId={memberId ?? 0}
+					value={''} // todo: 뎁트잡타이틀맵아이디
 					onClose={() => setDeptJobTitleDialogOpen(false)}
-					memberId={memberId}
 					deptList={memberBundle.deptList}
 					jobTitleList={memberBundle.jobTitleList}
 				/>
@@ -281,7 +281,10 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 						>
 							{section.fields.map((field) => {
 								return field.key === 'departmentPosition' ? (
-									<Box sx={{ display: 'flex', alignItems: 'center', flexBasis: '33.33%', padding: '0.5rem 1rem', minWidth: '18rem' }}>
+									<Box
+										key={field.key}
+										sx={{ display: 'flex', alignItems: 'center', flexBasis: '33.33%', padding: '0.5rem 1rem', minWidth: '18rem' }}
+									>
 										<Box sx={{ width: '8rem', flexShrink: 0 }}>부서/직책</Box>
 										<Button variant='outlined' onClick={() => setDeptJobTitleDialogOpen(true)}>
 											부서/직책 설정

@@ -20,7 +20,7 @@ export default function MemberNewPage() {
 		jobPosition: '' as any,
 		jobGrade: '' as any,
 		jobTitle: '' as any,
-		jobRole: '',
+		jobRole: '' as any,
 		email: '',
 		hireDate: '',
 		employmentStatus: 'ACTIVE',

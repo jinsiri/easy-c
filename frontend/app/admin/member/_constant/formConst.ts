@@ -31,7 +31,7 @@ export const MEMBER_FORM_CONFIG: { title: string; fields: MemberFieldDef[] }[] =
 			{ key: 'departmentPosition', label: '부서/직책' },
 			{ key: 'jobPosition', label: '직위', type: 'select' },
 			{ key: 'jobGrade', label: '직급', type: 'select' },
-			{ key: 'jobRole', label: '직무' },
+			{ key: 'jobRole', label: '직무', type: 'select' },
 			{ key: 'email', label: '이메일' },
 			{
 				key: 'employmentStatus',

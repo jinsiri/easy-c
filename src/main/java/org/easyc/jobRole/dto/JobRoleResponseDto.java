@@ -11,13 +11,15 @@ import java.util.stream.Collectors;
 @Getter
 @SuperBuilder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class JobRoleResponseDto extends BaseDto {
     private Long jobRoleId;
     private String jobRoleCategory;
     private String jobRoleType;
-    private int jobRoleNm;
+    private String jobRoleNm;
+    private int jobRoleOrder;
+    private int userCount;
 
     public static JobRoleResponseDto fromEntity(JobRole jobRole) {
         return JobRoleResponseDto.builder()
@@ -25,6 +27,7 @@ public class JobRoleResponseDto extends BaseDto {
                 .jobRoleCategory(jobRole.getJobRoleCategory())
                 .jobRoleType(jobRole.getJobRoleType())
                 .jobRoleNm(jobRole.getJobRoleNm())
+                .jobRoleOrder(jobRole.getJobRoleOrder())
                 .deleted(jobRole.isDeleted())
                 .active(jobRole.isActive())
                 .registerDate(jobRole.getRegisterDate())

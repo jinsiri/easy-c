@@ -1,6 +1,6 @@
 import axiosConfig from '../_lib/axiosConfig';
 import { BulkDeleteRequestDto } from '@/app/services/memberService';
-import { DeptResponseDto, JobGradeResponseDto, JobPositionResponseDto, JobTitleResponseDto } from '@/type/dept';
+import { DeptResponseDto, JobGradeResponseDto, JobPositionResponseDto, JobRoleResponseDto, JobTitleResponseDto } from '@/type/dept';
 
 export interface JobPositionRequestDto {
 	[key: string]: any;
@@ -11,6 +11,10 @@ export interface JobTitleRequestDto {
 }
 
 export interface JobGradeRequestDto {
+	[key: string]: any;
+}
+
+export interface JobRoleRequestDto {
 	[key: string]: any;
 }
 
@@ -41,4 +45,9 @@ export const deptService = {
 	saveJobGradeTemplates: (dtos: JobGradeRequestDto[]) => axiosConfig.post(`/api/job-grades/from-template`, dtos),
 	deleteJobGrades: (requestDto: BulkDeleteRequestDto) => axiosConfig.delete(`/api/job-grades`, { data: requestDto }),
 	updateJobGradeLevels: (dtos: JobGradeRequestDto[]) => axiosConfig.post(`/api/job-grades/update-levels`, dtos),
+
+	// 직무
+	getJobRoles: () => axiosConfig.get<JobRoleResponseDto[]>(`/api/job-roles`),
+	deleteJobRoles: (requestDto: BulkDeleteRequestDto) => axiosConfig.delete(`/api/job-roles`, { data: requestDto }),
+	updateJobRoleOrders: (dtos: JobRoleRequestDto[]) => axiosConfig.post(`/api/job-roles/update-orders`, dtos),
 };

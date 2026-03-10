@@ -30,8 +30,10 @@ export default function DeptJobTitleChangeDialog({ value, onClose, memberId, dep
 	const handleSave = async () => {
 		try {
 			setLoading(true);
+			// todo: 부서-직책 매핑데이터 업데이트
 			// await memberService.updatePassword(memberId, password);
 			// await success('비밀번호가 변경되었습니다.');
+			console.log(memberId);
 			onClose();
 		} catch (e: any) {
 			await alert(e?.message ?? '부서/직책 설정에 실패했습니다.');

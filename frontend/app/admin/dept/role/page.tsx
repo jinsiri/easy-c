@@ -27,6 +27,11 @@ export default function AdminDeptRolePage() {
 			type: 'grid',
 			content: <DeptRoleLayoutElement category={'GRADE'} />,
 		},
+		{
+			label: '직무',
+			type: 'grid',
+			content: <DeptRoleLayoutElement category={'ROLE'} />,
+		},
 	];
 
 	return (

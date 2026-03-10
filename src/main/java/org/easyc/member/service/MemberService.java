@@ -11,6 +11,7 @@ import org.easyc.memberJobGradeMap.dto.MemberJobGradeMapResponseDto;
 import org.easyc.memberJobGradeMap.service.MemberJobGradeMapService;
 import org.easyc.memberJobPositionMap.dto.MemberJobPositionMapResponseDto;
 import org.easyc.memberJobPositionMap.service.MemberJobPositionMapService;
+import org.easyc.memberJobRoleMap.dto.MemberJobRoleMapResponseDto;
 import org.easyc.memberJobRoleMap.service.MemberJobRoleMapService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -109,6 +110,11 @@ public class MemberService {
             memberDto.setJobGrade(gradeMap);
         }
 
+        MemberJobRoleMapResponseDto roleMap = memberJobRoleMapService.getJobRoleByMemberId(memberId);
+        if(roleMap != null) {
+            memberDto.setJobRole(roleMap);
+        }
+
         Optional<MemberProfile> optionalProfile = memberProfileRepository.findById(memberId);
         optionalProfile.ifPresent(memberProfile -> memberDto.setMemberProfile(MemberProfileResponseDto.fromEntity(memberProfile)));
 
@@ -203,9 +209,9 @@ public class MemberService {
             memberJobGradeMapService.assignJobGrade(member.getMemberId(), requestDto.getJobGradeId());
         }
 
-//        if(requestDto.getJobRoleId() != null) {
-//            memberJobRoleMapService.assignJobRole(member.getMemberId(), requestDto.getJobRoleId());
-//        }
+        if(requestDto.getJobRoleId() != null) {
+            memberJobRoleMapService.assignJobRole(member.getMemberId(), requestDto.getJobRoleId());
+        }
 
         MemberProfile profile = MemberProfile.of(member, profileRequestDto);
         memberProfileRepository.save(profile);
@@ -254,6 +260,10 @@ public class MemberService {
 
         if(dto.getJobGradeId() != null) {
             memberJobGradeMapService.assignJobGrade(member.getMemberId(), dto.getJobGradeId());
+        }
+
+        if(dto.getJobRoleId() != null) {
+            memberJobRoleMapService.assignJobRole(member.getMemberId(), dto.getJobRoleId());
         }
 
         MemberProfile profile = memberProfileRepository.findById(memberId)

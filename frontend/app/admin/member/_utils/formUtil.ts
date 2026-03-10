@@ -13,6 +13,10 @@ export const getOptions = (field: MemberFieldDef, memberBundle: any) => {
 	const strategy: Record<string, any[]> = {
 		jobPosition: (memberBundle?.jobPositionList ?? []).map((id: any) => ({ value: id.jobPositionId, label: id.jobPositionNm })),
 		jobGrade: (memberBundle?.jobGradeList ?? []).map((id: any) => ({ value: id.jobGradeId, label: id.jobGradeNm })),
+		jobRole: (memberBundle?.jobRoleList ?? []).map((id: any) => ({
+			value: id.jobRoleId,
+			label: `${id.jobRoleCategory}-${id.jobRoleType}-${id.jobRoleNm}`,
+		})),
 	};
 
 	return strategy[field.key] || [];
@@ -57,7 +61,9 @@ export const getDisplayValue = (key: string, value: any): string => {
 		case 'jobGrade':
 			return value?.jobGradeNm ?? '-';
 		case 'jobRole':
-			return value?.jobRoleNm ?? '-';
+			const fields = [value?.jobRoleCategory, value?.jobRoleType, value?.jobRoleNm];
+
+			return fields.filter(Boolean).join('-');
 		default:
 	}
 
