@@ -21,15 +21,79 @@ import {
 	Typography,
 	useTheme,
 } from '@mui/material';
-import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import { Add, ArrowBack, Delete } from '@mui/icons-material';
-import { memberService } from '@/app/services/memberService';
+import { MemberBundleResponseDto, memberService } from '@/app/services/memberService';
 import { useDialogStore } from '@/store/useDialogStore';
 import { CAREER_COLS, REWARD_COLS, QUALIFICATION_COLS, LANGUAGE_COLS, MemberColDef, MemberFieldDef } from '@/app/admin/member/_constant/formConst';
-import { getMemberFormSections, makeEmptyRow } from '@/app/admin/member/_utils/formUtil';
+import { getMemberFormSections, getOptions, makeEmptyRow } from '@/app/admin/member/_utils/formUtil';
+import { z } from 'zod';
+import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import BaseDialog from '@/app/_component/baseElement/BaseDialog';
+import PasswordChangeDialog from '@/app/admin/member/_component/PasswordChangeDialog';
 
-// ===== 필드 정의 (loginId 읽기전용, 비밀번호 제외) =====
+// ===== 필드 정의 =====
 const editInfoSections = getMemberFormSections('edit');
+
+// ===== 유효성 검사 =====
+const memberSchema = z.object({
+	// 기본 정보
+	loginId: z.string().min(4, '아이디는 4자 이상이어야 합니다.'),
+	memberNm: z.string().min(1, '직원 이름은 필수입니다.'),
+	employeeId: z.string().min(1, '사번은 필수입니다.'),
+	extensionNumber: z.string().default(''),
+	departmentPosition: z.string().default(''), //todo
+	jobPosition: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
+	jobGrade: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
+	jobTitle: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
+	jobRole: z.string().default(''), // todo: 이거 중앙관리할지 텍스트로 받을지 결정해야함
+	email: z
+		.string()
+		.refine((val) => val === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
+			message: '이메일 형식이 올바르지 않습니다.',
+		})
+		.default(''),
+	hireDate: z.string().min(1, '입사일은 필수입니다.'),
+	employmentStatus: z.string().default('ACTIVE'),
+	employmentType: z.string().min(1, '직원구분은 필수입니다.'),
+	recruitmentType: z.string().min(1, '채용 구분은 필수입니다.'),
+	salaryType: z.string().min(1, '급여 구분은 필수입니다.'),
+	referredBy: z.string().default(''),
+	resignationDate: z.string().default(''),
+	memberNmEn: z.string().default(''),
+	phoneNumber: z.string().default(''),
+	externalEmail: z
+		.string()
+		.refine((val) => val === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
+			message: '이메일 형식이 올바르지 않습니다.',
+		})
+		.default(''),
+	gender: z.string().min(1, '성별은 필수입니다.'),
+	nationality: z.string().default('KR'),
+	dateOfBirth: z.string().default(''),
+	address: z.string().default(''),
+	faxNumber: z.string().default(''),
+	// 보훈 정보
+	veteranNumber: z.string().default(''),
+	veteranType: z.string().default('NONE'),
+	veteranFamily: z.string().default(''),
+	// 장애 정보
+	disabilityRegistrationNumber: z.string().default(''),
+	disabilityType: z.string().default('NONE'),
+	disabilityRecognition: z.string().default('NONE'),
+	disabilityGrade: z.string().default(''),
+	// 계좌 정보
+	bankName: z.string().default(''),
+	accountHolderName: z.string().default(''),
+	accountNumber: z.string().default(''),
+	// 리스트 데이터 (동적 테이블용)
+	careerList: z.array(z.any()).default([]),
+	rewardDisciplineList: z.array(z.any()).default([]),
+	qualificationList: z.array(z.any()).default([]),
+	languageList: z.array(z.any()).default([]),
+});
+
+export type MemberUpdateFormValues = z.infer<typeof memberSchema>;
 
 // API 응답 값에서 폼 state 용 string 추출 (EnumOption: { code, label })
 const toFormValue = (value: any): string => {
@@ -52,7 +116,6 @@ const toFormRow = (item: Record<string, any>, cols: MemberColDef[]): Record<stri
 });
 
 // ===== 컴포넌트 =====
-
 export default function MemberEditPage() {
 	const router = useRouter();
 	const theme = useTheme();
@@ -63,56 +126,73 @@ export default function MemberEditPage() {
 	const [loading, setLoading] = useState(true);
 	const [pwDialog, setPwDialog] = useState(false);
 	const [pwForm, setPwForm] = useState({ password: '', passwordCheck: '' });
-
-	const [formData, setFormData] = useState<Record<string, string>>({
-		loginId: '',
-		memberNm: '',
-		employeeId: '',
-		extensionNumber: '',
-		departmentPosition: '',
-		positionTitle: '',
-		jobTitle: '',
-		email: '',
-		employmentStatus: 'ACTIVE',
-		employmentType: '',
-		recruitmentType: '',
-		salaryType: '',
-		referredBy: '',
-		hireDate: '',
-		resignationDate: '',
-		memberNmEn: '',
-		phoneNumber: '',
-		externalEmail: '',
-		gender: '',
-		nationality: 'KR',
-		dateOfBirth: '',
-		address: '',
-		faxNumber: '',
-		veteranNumber: '',
-		veteranType: 'NONE',
-		veteranFamily: '',
-		disabilityRegistrationNumber: '',
-		disabilityType: 'NONE',
-		disabilityRecognition: 'NONE',
-		disabilityGrade: '',
-		bankName: '',
-		accountHolderName: '',
-		accountNumber: '',
+	const [memberBundle, setMemberBundle] = useState<MemberBundleResponseDto>({});
+	const {
+		reset,
+		control,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<MemberUpdateFormValues>({
+		resolver: zodResolver(memberSchema) as any,
+		mode: 'onBlur',
+		reValidateMode: 'onBlur',
+		defaultValues: {
+			loginId: '',
+			memberNm: '',
+			employeeId: '',
+			extensionNumber: '',
+			departmentPosition: '',
+			jobPosition: '' as any,
+			jobGrade: '' as any,
+			jobTitle: '' as any,
+			jobRole: '',
+			email: '',
+			hireDate: '',
+			employmentStatus: 'ACTIVE',
+			employmentType: '',
+			recruitmentType: '',
+			salaryType: '',
+			referredBy: '',
+			resignationDate: '',
+			// 개인 정보
+			memberNmEn: '',
+			phoneNumber: '',
+			externalEmail: '',
+			gender: '',
+			nationality: 'KR',
+			dateOfBirth: '',
+			address: '',
+			faxNumber: '',
+			// 보훈 정보
+			veteranNumber: '',
+			veteranType: 'NONE',
+			veteranFamily: '',
+			// 장애 정보
+			disabilityRegistrationNumber: '',
+			disabilityType: 'NONE',
+			disabilityRecognition: 'NONE',
+			disabilityGrade: '',
+			// 계좌 정보
+			bankName: '',
+			accountHolderName: '',
+			accountNumber: '',
+			careerList: [],
+			rewardDisciplineList: [],
+			qualificationList: [],
+			languageList: [],
+		},
 	});
+	const career = useFieldArray({ control, name: 'careerList' });
+	const reward = useFieldArray({ control, name: 'rewardDisciplineList' });
+	const qual = useFieldArray({ control, name: 'qualificationList' });
+	const lang = useFieldArray({ control, name: 'languageList' });
 
-	const [careerList, setCareerList] = useState<Record<string, string>[]>([]);
-	const [rewardList, setRewardList] = useState<Record<string, string>[]>([]);
-	const [qualificationList, setQualificationList] = useState<Record<string, string>[]>([]);
-	const [languageList, setLanguageList] = useState<Record<string, string>[]>([]);
-
-	// ===== 기존 데이터 로드 =====
 	useEffect(() => {
 		if (!memberId) return;
-
 		const fetchData = async () => {
-			setLoading(true);
 			try {
-				const [memberRes, careerRes, rewardRes, qualRes, langRes] = await Promise.all([
+				const [bundle, memberRes, careerRes, rewardRes, qualRes, langRes] = await Promise.all([
+					memberService.getMemberBundle(),
 					memberService.getMember(memberId),
 					memberService.getMemberCareerInfo(memberId),
 					memberService.getMemberRewardDisciplineInfo(memberId),
@@ -120,15 +200,17 @@ export default function MemberEditPage() {
 					memberService.getMemberLanguageInfo(memberId),
 				]);
 
+				setMemberBundle(bundle);
+
 				const m = memberRes as Record<string, any>;
-				setFormData({
+				reset({
 					loginId: toFormValue(m.loginId),
 					memberNm: toFormValue(m.memberNm),
 					employeeId: toFormValue(m.employeeId),
 					extensionNumber: toFormValue(m.extensionNumber),
 					departmentPosition: toFormValue(m.departmentPosition),
-					positionTitle: toFormValue(m.positionTitle),
-					jobTitle: toFormValue(m.jobTitle),
+					jobPosition: m.jobPositionMapDto?.jobPositionId ?? '',
+					jobGrade: m.jobGradeMapDto?.jobGradeId ?? '',
 					email: toFormValue(m.email),
 					employmentStatus: toFormValue(m.employmentStatus) || 'ACTIVE',
 					employmentType: toFormValue(m.employmentType),
@@ -155,41 +237,42 @@ export default function MemberEditPage() {
 					bankName: toFormValue(m.bankName),
 					accountHolderName: toFormValue(m.accountHolderName),
 					accountNumber: toFormValue(m.accountNumber),
-				});
 
-				setCareerList((careerRes as any[]).map((item) => toFormRow(item, CAREER_COLS)));
-				setRewardList((rewardRes as any[]).map((item) => toFormRow(item, REWARD_COLS)));
-				setQualificationList((qualRes as any[]).map((item) => toFormRow(item, QUALIFICATION_COLS)));
-				setLanguageList((langRes as any[]).map((item) => toFormRow(item, LANGUAGE_COLS)));
-			} catch (e: any) {
-				await alert(e?.message ?? '데이터를 불러오지 못했습니다.');
+					careerList: (careerRes as any[]).map((item) => toFormRow(item, CAREER_COLS)),
+					rewardDisciplineList: (rewardRes as any[]).map((item) => toFormRow(item, REWARD_COLS)),
+					qualificationList: (qualRes as any[]).map((item) => toFormRow(item, QUALIFICATION_COLS)),
+					languageList: (langRes as any[]).map((item) => toFormRow(item, LANGUAGE_COLS)),
+				});
 			} finally {
 				setLoading(false);
 			}
 		};
-
 		fetchData();
-	}, [memberId]);
+	}, [memberId, reset]);
 
-	const updateRow = useCallback(
-		(setter: React.Dispatch<React.SetStateAction<Record<string, string>[]>>, idx: number, key: string, val: string) =>
-			setter((prev) => prev.map((row, i) => (i === idx ? { ...row, [key]: val } : row))),
-		[],
-	);
+	const onValid: SubmitHandler<MemberUpdateFormValues> = async (data) => {
+		try {
+			const strip = (row: Record<string, string>) => {
+				const { _rowId: _, ...rest } = row as any;
+				return rest;
+			};
 
-	const validate = (): string | null => {
-		const { memberNm, employeeId, email, hireDate, employmentType, recruitmentType, salaryType, gender } = formData;
+			const payload = {
+				...data,
+				jobPositionId: data.jobPosition,
+				jobGradeId: data.jobGrade,
+				careerList: data.careerList.map(strip),
+				rewardDisciplineList: data.rewardDisciplineList.map(strip),
+				qualificationList: data.qualificationList.map(strip),
+				languageList: data.languageList.map(strip),
+			};
 
-		if (!memberNm?.trim()) return '직원 이름은 필수입니다.';
-		if (!employeeId?.trim()) return '사번은 필수입니다.';
-		if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return '이메일 형식이 올바르지 않습니다.';
-		if (!hireDate) return '입사일은 필수입니다.';
-		if (!employmentType) return '직원구분은 필수입니다.';
-		if (!recruitmentType) return '채용 구분은 필수입니다.';
-		if (!salaryType) return '급여 구분은 필수입니다.';
-		if (!gender) return '성별은 필수입니다.';
-
-		return null;
+			await memberService.updateMember(memberId, payload);
+			await success('수정되었습니다.');
+			router.push('/admin/dept/member');
+		} catch (e) {
+			await alert('수정 중 오류 발생');
+		}
 	};
 
 	// ===== 비밀번호 변경 =====
@@ -222,82 +305,56 @@ export default function MemberEditPage() {
 		}
 	};
 
-	// ===== handleSave =====
-	const handleSave = async () => {
-		const errorMsg = validate();
-		if (errorMsg) {
-			await alert(errorMsg);
-			return;
-		}
-		setSaving(true);
-		try {
-			const strip = (row: Record<string, string>) => {
-				const { _rowId: _, ...rest } = row as any;
-				return rest;
-			};
-
-			const sendData = formData;
-
-			const payload = {
-				...sendData,
-				careerList: careerList.map(strip),
-				rewardDisciplineList: rewardList.map(strip),
-				qualificationList: qualificationList.map(strip),
-				languageList: languageList.map(strip),
-			};
-
-			console.log(payload);
-			// await memberService.updateMember(memberId, payload);
-			// await success('멤버 정보가 수정되었습니다.');
-			// router.push('/admin/dept/member');
-		} finally {
-			setSaving(false);
-		}
-	};
-
-	// ===== 필드 렌더링 =====
+	// ===== 필드형 렌더링 (date/select/text 분기) =====
 	const renderField = useCallback(
 		(field: MemberFieldDef) => {
-			const value = formData[field.key] ?? '';
-			const onChange = (val: string) => setFormData((prev) => ({ ...prev, [field.key]: val }));
-
-			if (field.readOnly) {
-				return <OutlinedInput size='small' value={value} readOnly sx={{ width: '100%', minWidth: '10rem', backgroundColor: 'action.hover' }} />;
-			}
-
-			if (field.type === 'checkbox') {
-				return <Checkbox checked={value === 'true'} onChange={(e) => onChange(e.target.checked ? 'true' : '')} size='small' />;
-			}
-
-			if (field.type === 'select' && field.options) {
-				return (
-					<Select size='small' displayEmpty value={value} onChange={(e) => onChange(e.target.value)} sx={{ width: '100%', minWidth: '10rem' }}>
-						<MenuItem value=''>
-							<em style={{ color: '#aaa' }}>선택</em>
-						</MenuItem>
-						{field.options.map((opt) => (
-							<MenuItem key={opt.value} value={opt.value}>
-								{opt.label}
-							</MenuItem>
-						))}
-					</Select>
-				);
-			}
-
 			return (
-				<OutlinedInput
-					size='small'
-					type={field.type ?? 'text'}
-					value={value}
-					onChange={(e) => onChange(e.target.value)}
-					sx={{ width: '100%', minWidth: '10rem' }}
+				<Controller
+					name={field.key as any}
+					control={control}
+					render={({ field: { onChange, value, onBlur }, fieldState: { error } }) => {
+						const commonProps = {
+							size: 'small' as const,
+							sx: { width: '100%' },
+							onBlur,
+							...(!!error && { error: true }),
+						};
+
+						return (
+							<Box sx={{ width: '100%' }}>
+								{field.type === 'checkbox' ? (
+									<Checkbox {...commonProps} checked={value === 'true'} onChange={(e) => onChange(e.target.checked ? 'true' : '')} />
+								) : field.type === 'select' ? (
+									<Select {...commonProps} displayEmpty value={value ?? ''} onChange={onChange}>
+										<MenuItem value=''>
+											<em style={{ color: '#aaa' }}>선택</em>
+										</MenuItem>
+										{getOptions(field, memberBundle).map((opt) => {
+											return (
+												<MenuItem key={opt.value} value={opt.value}>
+													{opt.label}
+												</MenuItem>
+											);
+										})}
+									</Select>
+								) : (
+									<OutlinedInput {...commonProps} type={field.type ?? 'text'} value={value ?? ''} onChange={onChange} />
+								)}
+								{error && (
+									<Typography variant='caption' color='error' sx={{ mt: 0.5, display: 'block' }}>
+										{error.message}
+									</Typography>
+								)}
+							</Box>
+						);
+					}}
 				/>
 			);
 		},
-		[formData],
+		[control, memberBundle],
 	);
 
-	// ===== 섹션 렌더링 =====
+	// ===== 필드 섹션 렌더링 =====
 	const tabTotalContent = useMemo(
 		() => (
 			<Grid container component='section' spacing={5} sx={{ display: 'flex', flexDirection: 'column', width: '100%', p: '1rem' }}>
@@ -362,117 +419,107 @@ export default function MemberEditPage() {
 				))}
 			</Grid>
 		),
-		[formData, theme, renderField],
+		[theme, renderField],
 	);
 
 	// ===== 리스트 탭 =====
 	const renderListTab = useCallback(
-		(cols: MemberColDef[], rows: Record<string, string>[], setter: React.Dispatch<React.SetStateAction<Record<string, string>[]>>) => {
-			const renderCell = (col: MemberColDef, row: Record<string, string>, idx: number) => {
-				if (col.type === 'select' && col.options) {
-					return (
-						<Select
-							size='small'
-							displayEmpty
-							value={row[col.key] ?? ''}
-							onChange={(e) => updateRow(setter, idx, col.key, e.target.value)}
-							sx={{
-								width: '100%',
-								fontSize: '0.875rem',
-								'& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-							}}
-						>
-							<MenuItem value=''>
-								<em style={{ color: '#aaa' }}>선택</em>
-							</MenuItem>
-							{col.options.map((opt) => (
-								<MenuItem key={opt.value} value={opt.value}>
-									{opt.label}
-								</MenuItem>
-							))}
-						</Select>
-					);
-				}
-
-				return (
-					<InputBase
-						type={col.type ?? 'text'}
-						value={row[col.key] ?? ''}
-						onChange={(e) => updateRow(setter, idx, col.key, e.target.value)}
-						sx={{
-							px: '0.625rem',
-							width: '100%',
-							fontSize: '0.875rem',
-							'& input': {
-								py: '0.5rem',
-								...(col.type === 'date' && { cursor: 'pointer' }),
-							},
-							'&.Mui-focused': { backgroundColor: 'primary.50' },
-						}}
-					/>
-				);
-			};
+		(cols: MemberColDef[], name: string, arrayHelper: any) => {
+			const { fields, append, remove } = arrayHelper;
 
 			return (
 				<Box>
 					<Stack direction='row' justifyContent='flex-end' sx={{ mb: 1 }}>
-						<Button size='small' variant='outlined' startIcon={<Add />} onClick={() => setter((prev) => [...prev, makeEmptyRow(cols)])}>
+						<Button size='small' variant='outlined' startIcon={<Add />} onClick={() => append(makeEmptyRow(cols))}>
 							행 추가
 						</Button>
 					</Stack>
 					<Table size='small' sx={{ border: `1px solid ${theme.palette.divider}`, borderCollapse: 'collapse' }}>
 						<TableHead>
-							<TableRow>
-								{cols.map((col) => (
-									<TableCell
-										key={col.key}
-										sx={{
-											fontWeight: 600,
-											backgroundColor: theme.palette.grey[50],
-											py: '0.625rem',
-											px: '0.75rem',
-											borderBottom: `2px solid ${theme.palette.divider}`,
-											borderRight: `1px solid ${theme.palette.divider}`,
-											'&:last-of-type': { borderRight: 'none' },
-										}}
-									>
-										{col.label}
-									</TableCell>
-								))}
-								<TableCell
-									sx={{
-										width: 48,
+							<TableRow
+								sx={{
+									'& th': {
+										fontWeight: 600,
 										backgroundColor: theme.palette.grey[50],
+										py: '0.625rem',
+										px: '0.75rem',
 										borderBottom: `2px solid ${theme.palette.divider}`,
-									}}
-								/>
+										borderRight: `1px solid ${theme.palette.divider}`,
+										'&:last-of-type': { borderRight: 'none' },
+									},
+								}}
+							>
+								{cols.map((col) => (
+									<TableCell key={col.key}>{col.label}</TableCell>
+								))}
+								<TableCell />
 							</TableRow>
 						</TableHead>
+
 						<TableBody>
-							{rows.length === 0 ? (
+							{fields.length === 0 ? (
 								<TableRow>
 									<TableCell colSpan={cols.length + 1} align='center' sx={{ py: 2, color: theme.palette.grey[400] }}>
 										데이터가 없습니다. 행 추가 버튼을 클릭하여 추가하세요.
 									</TableCell>
 								</TableRow>
 							) : (
-								rows.map((row, idx) => (
-									<TableRow key={row._rowId} sx={{ '&:hover': { backgroundColor: theme.palette.grey[50] } }}>
+								fields.map((field: any, idx: number) => (
+									<TableRow key={field.id} sx={{ '&:hover': { backgroundColor: theme.palette.grey[50] } }}>
 										{cols.map((col) => (
 											<TableCell
 												key={col.key}
-												sx={{
-													p: 0,
-													borderRight: `1px solid ${theme.palette.divider}`,
-													...(col.type === 'date' && { minWidth: 140 }),
-													...(col.type === 'number' && { maxWidth: 80 }),
-												}}
+												sx={{ p: 0, borderRight: `1px solid ${theme.palette.divider}`, ...(col.type === 'date' && { minWidth: 140 }) }}
 											>
-												{renderCell(col, row, idx)}
+												<Controller
+													name={`${name}.${idx}.${col.key}` as any}
+													control={control}
+													render={({ field: { onChange, value } }) => {
+														if (col.type === 'select' && col.options) {
+															return (
+																<Select
+																	size='small'
+																	displayEmpty
+																	value={value ?? ''}
+																	onChange={onChange}
+																	sx={{
+																		width: '100%',
+																		fontSize: '0.875rem',
+																		'& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+																	}}
+																>
+																	<MenuItem value=''>
+																		<em style={{ color: '#aaa' }}>선택</em>
+																	</MenuItem>
+																	{col.options.map((opt) => (
+																		<MenuItem key={opt.value} value={opt.value.toString()}>
+																			{opt.label}
+																		</MenuItem>
+																	))}
+																</Select>
+															);
+														}
+
+														return (
+															<InputBase
+																type={col.type ?? 'text'}
+																value={value ?? ''}
+																onChange={onChange}
+																sx={{
+																	px: '0.625rem',
+																	width: '100%',
+																	fontSize: '0.875rem',
+																	'& input': { py: '0.5rem' },
+																	'&.Mui-focused': { backgroundColor: 'primary.50' },
+																}}
+															/>
+														);
+													}}
+												/>
 											</TableCell>
 										))}
 										<TableCell sx={{ p: '4px', textAlign: 'center' }}>
-											<IconButton size='small' color='error' onClick={() => setter((prev) => prev.filter((_, i) => i !== idx))}>
+											<IconButton size='small' color='error' onClick={() => remove(idx)}>
 												<Delete fontSize='small' />
 											</IconButton>
 										</TableCell>
@@ -484,56 +531,28 @@ export default function MemberEditPage() {
 				</Box>
 			);
 		},
-		[theme, updateRow],
+		[theme],
 	);
 
-	const tabCareerContent = useMemo(() => renderListTab(CAREER_COLS, careerList, setCareerList), [careerList, renderListTab]);
-	const tabRewardContent = useMemo(() => renderListTab(REWARD_COLS, rewardList, setRewardList), [rewardList, renderListTab]);
-	const tabQualContent = useMemo(() => renderListTab(QUALIFICATION_COLS, qualificationList, setQualificationList), [qualificationList, renderListTab]);
-	const tabLangContent = useMemo(() => renderListTab(LANGUAGE_COLS, languageList, setLanguageList), [languageList, renderListTab]);
+	const FORM_SECTIONS = [
+		{ title: '경력', name: 'careerList', cols: CAREER_COLS, helper: career },
+		{ title: '포상/징계', name: 'rewardDisciplineList', cols: REWARD_COLS, helper: reward },
+		{ title: '자격', name: 'qualificationList', cols: QUALIFICATION_COLS, helper: qual },
+		{ title: '어학', name: 'languageList', cols: LANGUAGE_COLS, helper: lang },
+	];
 
 	if (loading) return null;
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-			{/* 비밀번호 변경 모달 */}
-			{pwDialog && (
-				<BaseDialog
-					title='비밀번호 변경'
-					confirmLabel='변경'
-					onConfirm={handlePasswordSave}
-					onClose={() => {
-						setPwDialog(false);
-						setPwForm({ password: '', passwordCheck: '' });
-					}}
-					maxWidth='xs'
-					fullWidth
-				>
-					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '0.5rem' }}>
-						<OutlinedInput
-							size='small'
-							type='password'
-							placeholder='새 비밀번호'
-							value={pwForm.password}
-							onChange={(e) => setPwForm((p) => ({ ...p, password: e.target.value }))}
-						/>
-						<OutlinedInput
-							size='small'
-							type='password'
-							placeholder='비밀번호 확인'
-							value={pwForm.passwordCheck}
-							onChange={(e) => setPwForm((p) => ({ ...p, passwordCheck: e.target.value }))}
-						/>
-					</Box>
-				</BaseDialog>
-			)}
+			{pwDialog && <PasswordChangeDialog onClose={() => setPwDialog(false)} memberId={memberId} />}
 
 			<Box sx={{ flexShrink: 0, width: '100%', padding: '0 1.5rem', my: '1rem' }}>
 				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
 					<Button startIcon={<ArrowBack />} onClick={() => router.back()} disabled={saving}>
 						뒤로가기
 					</Button>
-					<Button variant='contained' onClick={handleSave} disabled={saving}>
+					<Button variant='contained' onClick={handleSubmit(onValid)} disabled={saving}>
 						{saving ? '저장 중...' : '저장'}
 					</Button>
 				</Box>
@@ -541,33 +560,17 @@ export default function MemberEditPage() {
 
 			<Box>{tabTotalContent}</Box>
 
-			<Grid container component='section' spacing={5} sx={{ display: 'flex', flexDirection: 'column', width: '100%', p: '1rem' }}>
-				<Grid component='article'>
-					<Box sx={{ display: 'flex', alignItems: 'center', py: '0.5rem' }}>
-						<Typography sx={{ fontWeight: 600 }}>경력</Typography>
-						<Box sx={{ flexGrow: 1, height: '1px', ml: '1rem', backgroundColor: theme.palette.divider }} />
+			<Stack spacing={4} sx={{ width: '100%', p: '1rem' }}>
+				{FORM_SECTIONS.map((section) => (
+					<Box key={section.name} component='article'>
+						<Box sx={{ display: 'flex', alignItems: 'center', py: '0.5rem' }}>
+							<Typography sx={{ fontWeight: 600 }}>{section.title}</Typography>
+							<Box sx={{ flexGrow: 1, height: '1px', ml: '1rem', backgroundColor: theme.palette.divider }} />
+						</Box>
+						{renderListTab(section.cols, section.name, section.helper)}
 					</Box>
-					<Box>{tabCareerContent}</Box>
-
-					<Box sx={{ display: 'flex', alignItems: 'center', py: '0.5rem', mt: '1rem' }}>
-						<Typography sx={{ fontWeight: 600 }}>포상/징계</Typography>
-						<Box sx={{ flexGrow: 1, height: '1px', ml: '1rem', backgroundColor: theme.palette.divider }} />
-					</Box>
-					<Box>{tabRewardContent}</Box>
-
-					<Box sx={{ display: 'flex', alignItems: 'center', py: '0.5rem', mt: '1rem' }}>
-						<Typography sx={{ fontWeight: 600 }}>자격</Typography>
-						<Box sx={{ flexGrow: 1, height: '1px', ml: '1rem', backgroundColor: theme.palette.divider }} />
-					</Box>
-					<Box>{tabQualContent}</Box>
-
-					<Box sx={{ display: 'flex', alignItems: 'center', py: '0.5rem', mt: '1rem' }}>
-						<Typography sx={{ fontWeight: 600 }}>어학</Typography>
-						<Box sx={{ flexGrow: 1, height: '1px', ml: '1rem', backgroundColor: theme.palette.divider }} />
-					</Box>
-					<Box>{tabLangContent}</Box>
-				</Grid>
-			</Grid>
+				))}
+			</Stack>
 		</Box>
 	);
 }
