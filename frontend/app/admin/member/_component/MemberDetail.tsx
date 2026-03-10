@@ -294,6 +294,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 					marginTop: '-1px',
 					height: '40vh',
 					minHeight: '400px',
+					overflowY: 'auto',
 				}}
 			/>
 		</Box>
