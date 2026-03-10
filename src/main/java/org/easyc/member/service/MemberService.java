@@ -99,12 +99,12 @@ public class MemberService {
 
         MemberJobPositionMapResponseDto positionMap = memberJobPositionMapService.getJobPositionByMemberId(memberId);
         if(positionMap != null) {
-            memberDto.setJobPositionMapDto(positionMap);
+            memberDto.setJobPosition(positionMap);
         }
 
         MemberJobGradeMapResponseDto gradeMap = memberJobGradeMapService.getJobGradeByMemberId(memberId);
         if(gradeMap != null) {
-            memberDto.setJobGradeMapDto(gradeMap);
+            memberDto.setJobGrade(gradeMap);
         }
 
         Optional<MemberProfile> optionalProfile = memberProfileRepository.findById(memberId);

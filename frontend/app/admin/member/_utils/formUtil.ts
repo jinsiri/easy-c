@@ -50,10 +50,21 @@ export const transformToColDefs = (cols: MemberColDef[]): ColDef<Record<string, 
 };
 
 // ===== 화면 표시용 value 가공 =====
-export const getDisplayValue = (value: any): string => {
+export const getDisplayValue = (key: string, value: any): string => {
+	switch (key) {
+		case 'jobPosition':
+			return value?.jobPositionNm ?? '-';
+		case 'jobGrade':
+			return value?.jobGradeNm ?? '-';
+		case 'jobRole':
+			return value?.jobRoleNm ?? '-';
+		default:
+	}
+
 	if (value === null || value === undefined) return '-';
 	if (typeof value === 'boolean') return value ? 'Y' : 'N';
 	if (typeof value === 'object' && 'label' in value) return value.label || '-';
+
 	return String(value) || '-';
 };
 

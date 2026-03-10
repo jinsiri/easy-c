@@ -28,15 +28,10 @@ const memberInfoFields: { key: string; label: string }[] = [
 
 // 기본 정보 탭
 const basicInfoFields: { key: string; label: string }[] = [
-	{ key: 'departmentPosition', label: '부서/직책' }, // TODO: 부서/직책 필드 추가 필요
-	{ key: 'jobPosition', label: '직위' },
-	{ key: 'jobGrade', label: '직급' },
-	{ key: 'jobRole', label: '직무' },
 	{ key: 'employmentType', label: '직원 구분' },
 	{ key: 'recruitmentType', label: '채용 구분' },
 	{ key: 'salaryType', label: '급여 구분' },
 	{ key: 'referredBy', label: '추천자' },
-	{ key: 'hireDate', label: '입사일' },
 	{ key: 'resignationDate', label: '퇴사일' },
 ];
 
@@ -99,7 +94,6 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 	const [languageInfo, setLanguageInfo] = useState<any[]>([]);
 	const [loading, setLoading] = useState(false);
 
-	console.log('memberId:' + memberId);
 	useEffect(() => {
 		const fetchMemberData = async () => {
 			setLoading(true);
@@ -153,7 +147,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 			<Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
 				{basicInfoFields.map(({ key, label }) => {
 					const value = basicInfo[key];
-					const displayValue = getDisplayValue(value);
+					const displayValue = getDisplayValue(key, value);
 
 					return (
 						<Box
@@ -168,6 +162,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 							}}
 						>
 							<Box sx={{ width: '8rem' }}>{label}</Box>
+
 							<OutlinedInput size='small' value={displayValue} readOnly></OutlinedInput>
 						</Box>
 					);
@@ -201,7 +196,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 								{section.fields.map((field, idx) => {
 									const { key, label } = field as any;
 									const value = combinedInfo[key];
-									const displayValue = getDisplayValue(value);
+									const displayValue = getDisplayValue(key, value);
 
 									return (
 										<Box
@@ -270,17 +265,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 							{memberInfoFields.map(({ key, label }) => {
 								const combinedData = { ...memberInfo };
 								const value = combinedData[key];
-								let displayValue = getDisplayValue(value);
-								switch (key) {
-									case 'jobPosition':
-										displayValue = combinedData.jobPositionMapDto?.jobPositionNm ?? '-';
-										break;
-									case 'jobGrade':
-										displayValue = combinedData.jobGradeMapDto?.jobGradeNm ?? '-';
-										break;
-									case 'jobRole':
-										displayValue = combinedData.jobRoleMapDto?.jobRoleNm ?? '-';
-								}
+								const displayValue = getDisplayValue(key, value);
 
 								return (
 									<ListItem
