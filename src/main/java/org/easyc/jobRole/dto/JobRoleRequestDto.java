@@ -14,7 +14,8 @@ public class JobRoleRequestDto extends BaseDto {
     private Long jobRoleId;
     private String jobRoleCategory;
     private String jobRoleType;
-    private int jobRoleNm;
+    private String jobRoleNm;
+    private int jobRoleOrder;
 
     public JobRole toEntity() {
         return JobRole.builder()
@@ -22,6 +23,7 @@ public class JobRoleRequestDto extends BaseDto {
                 .jobRoleCategory(jobRoleCategory)
                 .jobRoleType(jobRoleType)
                 .jobRoleNm(jobRoleNm)
+                .jobRoleOrder(jobRoleOrder)
                 .build()
                 ;
     }

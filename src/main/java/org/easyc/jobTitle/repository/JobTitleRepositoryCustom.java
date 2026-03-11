@@ -3,9 +3,9 @@ package org.easyc.jobTitle.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.easyc.deptMemberMap.entity.QDeptMemberMap;
 import org.easyc.jobTitle.dto.JobTitleResponseDto;
 import org.easyc.jobTitle.entity.QJobTitle;
-import org.easyc.memberJobTitleMap.entity.QMemberJobTitleMap;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class JobTitleRepositoryCustom {
 
     public List<JobTitleResponseDto> findAllWithMemberCountOrderByLevel() {
         QJobTitle p = QJobTitle.jobTitle;
-        QMemberJobTitleMap m = QMemberJobTitleMap.memberJobTitleMap;
+        QDeptMemberMap m = QDeptMemberMap.deptMemberMap;
 
         return queryFactory
                 .select(Projections.fields(JobTitleResponseDto.class,

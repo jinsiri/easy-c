@@ -29,3 +29,11 @@ export interface JobTitleResponseDto extends BaseDto {
 	jobTitleCode: string;
 	jobTitleLevel: number;
 }
+
+export interface JobRoleResponseDto extends BaseDto {
+	jobRoleId: number;
+	jobRoleNm: string;
+	jobRoleCategory: string;
+	jobRoleType: string;
+	jobRoleOrder: number;
+}

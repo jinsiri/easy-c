@@ -79,7 +79,7 @@ export default function AdminDeptRolePage() {
 		<>
 			<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem', bgcolor: theme.palette.grey[50] }}>
 				<PathBreadcrumbs />
-				<Grid container direction={'row'} spacing={2} sx={{ flexGrow: 1, width: '100%', p: 2 }}>
+				<Grid container direction={'row'} spacing={2} sx={{ flexGrow: 1, width: '100%' }}>
 					<Grid
 						size={{
 							xs: 12,

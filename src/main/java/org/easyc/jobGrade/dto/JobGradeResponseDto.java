@@ -18,6 +18,7 @@ public class JobGradeResponseDto extends BaseDto {
     private String jobGradeNm;
     private String jobGradeCode;
     private int jobGradeLevel;
+    private int userCount;
 
     public static JobGradeResponseDto fromEntity(JobGrade jobGrade) {
         return JobGradeResponseDto.builder()

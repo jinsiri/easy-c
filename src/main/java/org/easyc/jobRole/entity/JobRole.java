@@ -28,5 +28,25 @@ public class JobRole extends BaseEntity {
     private String jobRoleType;
 
     @Column(name="job_role_nm")
-    private int jobRoleNm;
+    private String jobRoleNm;
+
+    @Column(name="job_role_order")
+    private int jobRoleOrder;
+    
+    public void updateInfo(String nm, String category, String roleType) {
+        if (nm != null && !nm.isBlank()) this.jobRoleNm = nm;
+        if (category != null && !category.isBlank()) this.jobRoleCategory = category;
+        if (roleType != null && !roleType.isBlank()) this.jobRoleType = roleType;
+    }
+
+    public void delete() {
+        super.delete();
+    }
+
+    public void changeOrder(Integer newOrder) {
+        if (newOrder == null || newOrder < 1) {
+            throw new IllegalArgumentException("유효하지 않은 레벨입니다.");
+        }
+        this.jobRoleOrder = newOrder;
+    }
 }

@@ -49,7 +49,7 @@ public class JobTitleCotroller {
     }
 
     @PostMapping("/update-levels")
-    public void updateGradeLevels(@RequestBody List<JobTitleRequestDto> dtos) {
+    public void updateTitleLevels(@RequestBody List<JobTitleRequestDto> dtos) {
         jobTitleService.updateLevels(dtos);
     }
 }

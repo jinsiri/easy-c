@@ -3,12 +3,13 @@ export interface DeptRoleItem {
 	deptRoleCode: string;
 }
 
-export type RoleCategory = 'POSITION' | 'TITLE' | 'GRADE';
+export type RoleCategory = 'POSITION' | 'TITLE' | 'GRADE' | 'ROLE';
 
 export const RANK_CATEGORY_INFO: Record<RoleCategory, string> = {
 	POSITION: '직위',
 	TITLE: '직책',
 	GRADE: '직급',
+	ROLE: '직무',
 };
 
 export const OFFICE_POSITIONS: DeptRoleItem[] = [
@@ -224,5 +225,9 @@ export const RANK_TEMPLATES: Record<
 			RESEARCH_NAME: { label: '연구직(명칭)', list: RESEARCH_NAME_GRADES },
 			RESEARCH_CODE: { label: '연구직(코드)', list: RESEARCH_CODE_GRADES },
 		},
+	},
+	ROLE: {
+		label: RANK_CATEGORY_INFO.ROLE, // '직무'
+		subTypes: {},
 	},
 } as const;

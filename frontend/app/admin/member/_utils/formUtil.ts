@@ -13,6 +13,10 @@ export const getOptions = (field: MemberFieldDef, memberBundle: any) => {
 	const strategy: Record<string, any[]> = {
 		jobPosition: (memberBundle?.jobPositionList ?? []).map((id: any) => ({ value: id.jobPositionId, label: id.jobPositionNm })),
 		jobGrade: (memberBundle?.jobGradeList ?? []).map((id: any) => ({ value: id.jobGradeId, label: id.jobGradeNm })),
+		jobRole: (memberBundle?.jobRoleList ?? []).map((id: any) => ({
+			value: id.jobRoleId,
+			label: `${id.jobRoleCategory}-${id.jobRoleType}-${id.jobRoleNm}`,
+		})),
 	};
 
 	return strategy[field.key] || [];
@@ -50,10 +54,23 @@ export const transformToColDefs = (cols: MemberColDef[]): ColDef<Record<string, 
 };
 
 // ===== 화면 표시용 value 가공 =====
-export const getDisplayValue = (value: any): string => {
+export const getDisplayValue = (key: string, value: any): string => {
+	switch (key) {
+		case 'jobPosition':
+			return value?.jobPositionNm ?? '-';
+		case 'jobGrade':
+			return value?.jobGradeNm ?? '-';
+		case 'jobRole':
+			const fields = [value?.jobRoleCategory, value?.jobRoleType, value?.jobRoleNm];
+
+			return fields.filter(Boolean).join('-') || '-';
+		default:
+	}
+
 	if (value === null || value === undefined) return '-';
 	if (typeof value === 'boolean') return value ? 'Y' : 'N';
 	if (typeof value === 'object' && 'label' in value) return value.label || '-';
+
 	return String(value) || '-';
 };
 

@@ -61,7 +61,7 @@ public class MemberController {
 
      * @param memberId 조회할 멤버 ID
      * @return 해당 멤버의 기본 인사 정보 (MemberResponseDto)
-     *         TODO: 부서 정보, 직위/직무 등 추가 필요
+     *
      */
     @GetMapping("/{memberId}")
     public MemberResponseDto getMember(@PathVariable Long memberId) {

@@ -7,12 +7,14 @@ import { AgGridReact } from 'ag-grid-react';
 import { MemberResponseDto, memberService } from '@/app/services/memberService';
 import { CellClickedEvent, ColDef, FirstDataRenderedEvent, ICellRendererParams } from 'ag-grid-community';
 import MemberDetail from '@/app/admin/member/_component/MemberDetail';
+import { useRouter } from 'next/navigation';
 
 interface Props {
 	deptId: number;
 }
 
 export default function AdminDeptDetailView({ deptId = 1 }: Props) {
+	const router = useRouter();
 	const theme = useTheme();
 	const gridRef = useRef<AgGridReact>(null);
 	const [checked, setChecked] = useState(false);
@@ -55,6 +57,12 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 
 		const res = await memberService.getMembersMappedToDeptId(deptId);
 		setDeptMembers(res);
+
+		if (res && res.length > 0) {
+			setSelectedId(res[0].memberId);
+		} else {
+			setSelectedId(undefined);
+		}
 	};
 
 	useEffect(() => {
@@ -107,9 +115,9 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 						onCellClicked={handleCellClicked}
 					/>
 				</Grid>
-				{deptMembers?.length !== 0 && (
+				{selectedId && (
 					<Grid size={{ xs: 12, md: 8 }}>
-						<MemberDetail selectedId={selectedId || deptMembers[0].memberId} />
+						<MemberDetail selectedId={selectedId} />
 					</Grid>
 				)}
 			</Grid>
