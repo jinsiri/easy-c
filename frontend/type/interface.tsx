@@ -3,3 +3,8 @@ export interface SearchRequestDto {
 	searchCategory?: string;
 	searchValue?: string;
 }
+
+export interface ExcelRequestDto {
+	fileName: string;
+	search?: SearchRequestDto;
+}

@@ -1,15 +1,18 @@
 package org.easyc.attendance.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.easyc.common.audit.activity.AuditAction;
 import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.attendance.service.AttendanceApplicationService;
 import org.easyc.common.dto.SearchRequestDto;
-import org.easyc.vacation.entity.VacationApplication;
+import org.easyc.excel.dto.ExcelRequestDto;
+import org.easyc.util.ExcelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -55,5 +58,23 @@ public class AttendanceApplicationController {
         attendanceApplicationService.rejectAttendanceApplicationData(request);
     }
 
+    @AuditAction(code = "ATTENDANCE_APP_EXCELDOWN", name = "근태 수정 요청 엑셀 다운로드", targetType = "ATTENDANCE_APP")
+    @PostMapping("/excel")
+    public void excelAttendanceApplication(HttpServletResponse response, @RequestBody ExcelRequestDto request) throws Exception {
+        List<AttendanceApplication> searchList = attendanceApplicationService.searchAttendanceApplication(request.getSearch());
+        List<ExcelAttendanceApplicationDto> list = new ArrayList<>();
+
+        for (AttendanceApplication attendanceApplication : searchList) {
+            list.add(new ExcelAttendanceApplicationDto(attendanceApplication));
+        }
+
+        ExcelUtil.excelDownload(
+                response,
+                request.getFileName(),
+                "attendance_application",
+                ExcelAttendanceApplicationDto.class,
+                list
+        );
+    }
 
 }

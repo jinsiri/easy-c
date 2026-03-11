@@ -1,6 +1,8 @@
 package org.easyc.attendance.constant;
 
-public enum WorkStatus {
+import org.easyc.excel.dto.EnumInterface;
+
+public enum WorkStatus implements EnumInterface {
     PRESENT,        //정상 출근
     LATE,	        //지각
     EARLY_LEAVE	,   //조퇴
@@ -12,6 +14,7 @@ public enum WorkStatus {
     UNNORMAL_END;   //비정상퇴근 - 근로시간 외 퇴근
 
 
+    @Override
     public String formatViewText() {
         switch (this){
             case LATE: return "지각";

@@ -172,6 +172,7 @@ public class AttendanceApplicationService {
         return convertAttendance;
     }
 
+
     private String makeSummary(Attendance origin, AttendanceApplication update) {
         List<String> changes = new ArrayList<>();
 

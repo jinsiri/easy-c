@@ -13,6 +13,7 @@ import useModalStore from '@/store/useModalStore';
 /** MUI */
 import { Box, Button, Grid, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
+import { SearchRounded, DownloadRounded } from '@mui/icons-material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
@@ -22,11 +23,12 @@ import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import { VACATIONTYPE } from '@/constant/attendanceConst';
 import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
 import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
+import { downloadExcel } from '@/utils/excelDownloadFunc';
 
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 
 /** Type / Interface */
-import { SearchRequestDto } from '@/type/interface';
+import { SearchRequestDto, ExcelRequestDto } from '@/type/interface';
 import { vacationApplicationDto, vacationApplicationService } from '@/app/services/vacationApplicationService';
 import { BASICSTATUS } from '@/constant/commonConst';
 
@@ -143,6 +145,24 @@ export default function VacationApplicationPage() {
 			setRowData(res);
 			setSearchCategory('status');
 			setSearchValue('all');
+		} finally {
+			setLoader(false);
+		}
+	};
+
+	const onClickExcel = () => {
+		setLoader(true);
+
+		try {
+			const req: ExcelRequestDto = {
+				fileName: '휴가신청내역',
+				search: {
+					searchCategory: searchCategory,
+					searchValue: searchValue,
+				},
+			};
+
+			downloadExcel('/api/vacation/application/excel', req);
 		} finally {
 			setLoader(false);
 		}
@@ -267,8 +287,11 @@ export default function VacationApplicationPage() {
 							<MenuItem value={'workDate'}>휴가일</MenuItem>
 						</Select>
 						{changeSearchCategoryContents}
-						<Button variant='contained' onClick={onClickSearch}>
+						<Button variant='contained' startIcon={<SearchRounded />} onClick={onClickSearch}>
 							검색
+						</Button>
+						<Button variant='contained' color='info' startIcon={<DownloadRounded />} onClick={onClickExcel}>
+							엑셀 다운로드
 						</Button>
 					</Box>
 				</Grid>

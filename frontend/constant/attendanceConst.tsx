@@ -12,8 +12,8 @@ export const WORKDAYOFWEEKNUMBER: Record<string, string> = {
 
 export const WORKTYPE: Record<workType, string> = {
 	NORMAL: '평일 근무',
-	WEEKEND: '주말 출근',
-	HOLIDAY: '휴일 근로',
+	WEEKEND: '주말 근무',
+	HOLIDAY: '휴일 근무',
 };
 
 export const WORKSTATUS: Record<workStatus, string> = {

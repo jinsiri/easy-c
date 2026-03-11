@@ -1,16 +1,25 @@
 package org.easyc.vacation.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.easyc.attendance.dto.ExcelAttendanceApplicationDto;
+import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.common.audit.activity.AuditAction;
+import org.easyc.excel.dto.ExcelRequestDto;
+import org.easyc.util.ExcelUtil;
+import org.easyc.vacation.dto.ExcelVacationApplicationDto;
 import org.easyc.vacation.dto.VacationApplicationDto;
 import org.easyc.vacation.dto.VacationApplicationResponseDto;
 import org.easyc.vacation.entity.VacationApplication;
 import org.easyc.vacation.service.VacationApplicationService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+
+import static org.easyc.attendance.entity.QAttendanceApplication.attendanceApplication;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,6 +60,25 @@ public class VacationApplicationController {
     @PostMapping("/reject")
     public void rejectVacationApplicationData(@RequestBody  List<VacationApplication> request) {
         vacationApplicationService.rejectVacationApplicationData(request);
+    }
+
+    @AuditAction(code = "VACATION_APP_EXCELDOWN", name = "휴가 신청 엑셀 다운로드", targetType = "VACATION_APP")
+    @PostMapping("/excel")
+    public void excelVacationApplication(HttpServletResponse response, @RequestBody ExcelRequestDto request) throws Exception {
+        List<VacationApplication> searchList = vacationApplicationService.searchVacationApplicationData(request.getSearch());
+        List<ExcelVacationApplicationDto> list = new ArrayList<>();
+
+        for (VacationApplication vacationApplication : searchList) {
+            list.add(new ExcelVacationApplicationDto(vacationApplication));
+        }
+
+        ExcelUtil.excelDownload(
+                response,
+                request.getFileName(),
+                "vacation_application",
+                ExcelVacationApplicationDto.class,
+                list
+        );
     }
 
 }

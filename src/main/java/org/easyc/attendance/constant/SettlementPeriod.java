@@ -1,11 +1,24 @@
 package org.easyc.attendance.constant;
 
-public enum SettlementPeriod {
+import org.easyc.excel.dto.EnumInterface;
+
+public enum SettlementPeriod implements EnumInterface {
     WEEK,
     WEEK_2,
     MONTH,
     MONTH_2,
     MONTH_3;
+
+    @Override
+    public String formatViewText() {
+        switch (this){
+            case WEEK_2: return "2주";
+            case MONTH: return "1개월";
+            case MONTH_2: return "2개월";
+            case MONTH_3: return "3개월";
+            default: return "1주";
+        }
+    }
 
     public Integer getWeekNumber() {
         switch (this) {
@@ -40,5 +53,7 @@ public enum SettlementPeriod {
             default: return baseMinutes * 12;
         }
     }
+
+
 }
 

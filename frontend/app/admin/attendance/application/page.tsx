@@ -13,6 +13,7 @@ import useModalStore from '@/store/useModalStore';
 /** MUI */
 import { Box, Button, Grid, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
+import { SearchRounded, DownloadRounded } from '@mui/icons-material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
@@ -24,10 +25,11 @@ import { BASICSTATUS } from '@/constant/commonConst';
 import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
 import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
+import { downloadExcel } from '@/utils/excelDownloadFunc';
 
 /** Type / Interface */
 import { AttendanceApplicationResponseDto, attendanceApplicationService } from '@/app/services/attendanceApplicationService';
-import { SearchRequestDto } from '@/type/interface';
+import { SearchRequestDto, ExcelRequestDto } from '@/type/interface';
 
 dayjs.extend(duration);
 
@@ -161,6 +163,24 @@ export default function AttendanceApplicationPage() {
 		}
 	};
 
+	const onClickExcel = () => {
+		setLoader(true);
+
+		try {
+			const req: ExcelRequestDto = {
+				fileName: '근태요청내역',
+				search: {
+					searchCategory: searchCategory,
+					searchValue: searchValue,
+				},
+			};
+
+			downloadExcel('/api/attendance/application/excel', req);
+		} finally {
+			setLoader(false);
+		}
+	};
+
 	const handleChangeSearchCategory = useCallback(
 		(event: SelectChangeEvent) => {
 			const targetValue = event.target.value;
@@ -280,8 +300,11 @@ export default function AttendanceApplicationPage() {
 							<MenuItem value={'workDate'}>수정근무일</MenuItem>
 						</Select>
 						{changeSearchCategoryContents}
-						<Button variant='contained' onClick={onClickSearch}>
+						<Button variant='contained' startIcon={<SearchRounded />} onClick={onClickSearch}>
 							검색
+						</Button>
+						<Button variant='contained' color='info' startIcon={<DownloadRounded />} onClick={onClickExcel}>
+							엑셀 다운로드
 						</Button>
 					</Box>
 				</Grid>
