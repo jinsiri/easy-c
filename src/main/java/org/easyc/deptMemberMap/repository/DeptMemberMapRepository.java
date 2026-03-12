@@ -2,8 +2,17 @@ package org.easyc.deptMemberMap.repository;
 
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface DeptMemberMapRepository extends JpaRepository<DeptMemberMap, Long> {
+    @Query("SELECT dmm FROM DeptMemberMap dmm " +
+            "LEFT JOIN FETCH dmm.dept " +
+            "LEFT JOIN FETCH dmm.jobTitle " +
+            "WHERE dmm.memberId = :memberId")
+    List<DeptMemberMap> findAllByMemberIdWithFetchJoin(@Param("memberId") Long memberId);
 }

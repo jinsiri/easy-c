@@ -6,6 +6,8 @@ import org.easyc.common.dto.BaseDto;
 import org.easyc.deptMemberMap.constant.DeptRole;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 
+import java.util.List;
+
 @Getter
 @SuperBuilder
 @AllArgsConstructor
@@ -15,15 +17,27 @@ public class DeptMemberMapResponseDto extends BaseDto {
     private Long deptMemberMapId;
     private Long deptId;
     private Long memberId;
+    private Long jobTitleId;
     private DeptRole deptRole;
 
-    @Builder
-    public static DeptMemberMapResponseDto fromEntity(DeptMemberMap deptMemberMap) {
+    private String deptNm;
+    private String jobTitleNm;
+
+    public static DeptMemberMapResponseDto fromEntity(DeptMemberMap map) {
         return DeptMemberMapResponseDto.builder()
-                .deptMemberMapId(deptMemberMap.getDeptMemberMapId())
-                .deptId(deptMemberMap.getDeptId())
-                .memberId(deptMemberMap.getMemberId())
-                .deptRole(deptMemberMap.getDeptRole())
+                .deptMemberMapId(map.getDeptMemberMapId())
+                .deptId(map.getDeptId())
+                .memberId(map.getMemberId())
+                .jobTitleId(map.getJobTitleId())
+                .deptRole(map.getDeptRole())
+                .deptNm(map.getDept().getDeptNm())
+                .jobTitleNm(map.getJobTitle().getJobTitleNm())
                 .build();
+    }
+
+    public static List<DeptMemberMapResponseDto> fromEntityList(List<DeptMemberMap> maps) {
+        return maps.stream()
+                .map(DeptMemberMapResponseDto::fromEntity)
+                .toList();
     }
 }

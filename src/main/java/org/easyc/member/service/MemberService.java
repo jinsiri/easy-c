@@ -124,6 +124,7 @@ public class MemberService {
         return memberDto;
     }
 
+
     public MemberProfileResponseDto getMemberBasicInfo(Long memberId) {
         if (memberId == null) return null;
 

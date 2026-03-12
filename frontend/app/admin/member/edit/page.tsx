@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Typography } from '@mui/material';
 import { memberService } from '@/app/services/memberService';
 import { useDialogStore } from '@/store/useDialogStore';
-import { CAREER_COLS, REWARD_COLS, QUALIFICATION_COLS, LANGUAGE_COLS, MemberColDef } from '@/app/admin/member/_constant/formConst';
+import { CAREER_COLS, REWARD_COLS, QUALIFICATION_COLS, LANGUAGE_COLS, MemberColDef, DEPT_COLS } from '@/app/admin/member/_constant/formConst';
 import MemberFormContainer, { MemberFormValues, MemberUpdateFormValues } from '@/app/admin/member/_component/MemberFormContainer';
 import Loader from '@/app/_component/baseElement/Loader';
 
@@ -49,8 +49,9 @@ export default function MemberEditPage() {
 		const fetchData = async () => {
 			try {
 				setLoading(true);
-				const [memberRes, careerRes, rewardRes, qualRes, langRes] = await Promise.all([
+				const [memberRes, deptMemberMapRes, careerRes, rewardRes, qualRes, langRes] = await Promise.all([
 					memberService.getMember(memberId),
+					memberService.getDeptMemberMapInfo(memberId),
 					memberService.getMemberCareerInfo(memberId),
 					memberService.getMemberRewardDisciplineInfo(memberId),
 					memberService.getMemberQualificationInfo(memberId),
@@ -63,7 +64,6 @@ export default function MemberEditPage() {
 					memberNm: toFormValue(m.memberNm),
 					employeeId: toFormValue(m.employeeId),
 					extensionNumber: toFormValue(m.extensionNumber),
-					departmentPosition: toFormValue(m.departmentPosition),
 					jobPosition: m.jobPosition?.jobPositionId ?? '',
 					jobGrade: m.jobGrade?.jobGradeId ?? '',
 					jobRole: m.jobRole?.jobRoleId ?? '',
@@ -95,6 +95,7 @@ export default function MemberEditPage() {
 					accountNumber: toFormValue(m.accountNumber),
 
 					// 리스트 데이터 변환
+					deptMemberMapList: (deptMemberMapRes as any[]).map((item) => toFormRow(item, DEPT_COLS)), //todo: check
 					careerList: (careerRes as any[]).map((item) => toFormRow(item, CAREER_COLS)),
 					rewardDisciplineList: (rewardRes as any[]).map((item) => toFormRow(item, REWARD_COLS)),
 					qualificationList: (qualRes as any[]).map((item) => toFormRow(item, QUALIFICATION_COLS)),
@@ -123,6 +124,7 @@ export default function MemberEditPage() {
 				jobPositionId: data.jobPosition,
 				jobGradeId: data.jobGrade,
 				jobRoleId: data.jobRole,
+				deptMemberMapList: data.deptMemberMapList.map(strip),
 				careerList: data.careerList.map(strip),
 				rewardDisciplineList: data.rewardDisciplineList.map(strip),
 				qualificationList: data.qualificationList.map(strip),

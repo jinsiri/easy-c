@@ -4,15 +4,16 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.entity.BaseEntity;
+import org.easyc.dept.entity.Dept;
 import org.easyc.deptMemberMap.constant.DeptRole;
+import org.easyc.jobTitle.entity.JobTitle;
+import org.easyc.member.entity.Member;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class DeptMemberMap extends BaseEntity {
     @Id
     @SequenceGenerator(name="dept_member_map_seq", sequenceName="dept_member_map_seq", allocationSize=1)
@@ -30,4 +31,19 @@ public class DeptMemberMap extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private DeptRole deptRole;
+
+    // 읽기 전용 - 부서
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dept_id", insertable = false, updatable = false)
+    private Dept dept;
+
+    // 읽기 전용 - 멤버
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", insertable = false, updatable = false)
+    private Member member;
+
+    // 읽기 전용 - 직책
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "job_title_id", insertable = false, updatable = false)
+    private JobTitle jobTitle;
 }

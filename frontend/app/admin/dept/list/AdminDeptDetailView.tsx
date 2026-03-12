@@ -24,16 +24,14 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 
 	const PhotoRenderer = (params: ICellRendererParams) => {
 		const photo = params.value ? params.value : '/images/blank_profile.png';
-		const name = params.data.memberNm;
-		const jobTitle = params.data.jobTitle;
-		const loginId = params.data.loginId;
+		const { memberNm, jobTitle, loginId } = params.data;
 
 		return (
 			<Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
 				<img src={photo} alt={'프로필'} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
 				<Typography sx={{ display: 'flex', flexDirection: 'column', '& small': { color: theme.palette.grey[600] } }}>
 					<span>
-						{name} {jobTitle}
+						{memberNm} {jobTitle}
 					</span>
 					<small style={{}}>{loginId}</small>
 				</Typography>
@@ -84,14 +82,7 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 
 	const menuOptions = [
 		{ label: '직위 변경', onClick: () => console.log('직위 변경 클릭') },
-		{ label: '직책 변경', onClick: () => console.log('직책 변경 클릭') },
 		{ label: '직급 변경', onClick: () => console.log('직급 변경 클릭') },
-		{
-			label: '계정상태 변경',
-			onClick: () => {
-				console.log('계정상태 변경 클릭');
-			},
-		},
 	];
 
 	return (

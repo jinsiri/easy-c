@@ -28,7 +28,7 @@ export const MEMBER_FORM_CONFIG: { title: string; fields: MemberFieldDef[] }[] =
 			{ key: 'memberNm', label: '이름', required: true },
 			{ key: 'employeeId', label: '사번', required: true },
 			{ key: 'extensionNumber', label: '대표전화' },
-			{ key: 'departmentPosition', label: '부서/직책' },
+			{ key: 'deptMemberMapList', label: '부서/직책' },
 			{ key: 'jobPosition', label: '직위', type: 'select' },
 			{ key: 'jobGrade', label: '직급', type: 'select' },
 			{ key: 'jobRole', label: '직무', type: 'select' },
@@ -183,6 +183,11 @@ export const MEMBER_FORM_CONFIG: { title: string; fields: MemberFieldDef[] }[] =
 			{ key: 'accountNumber', label: '계좌번호' },
 		],
 	},
+];
+
+export const DEPT_COLS: MemberColDef[] = [
+	{ key: 'deptNm', label: '부서', type: 'text' },
+	{ key: 'jobTitleNm', label: '직책', type: 'text' },
 ];
 
 export const CAREER_COLS: MemberColDef[] = [

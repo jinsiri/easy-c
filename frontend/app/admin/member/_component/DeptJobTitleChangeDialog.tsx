@@ -5,11 +5,11 @@ import CommonTreeview from '@/app/_component/Tree';
 import { DeptResponseDto } from '@/type/dept';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
 import { Grid, MenuItem, Select, Typography } from '@mui/material';
+import { SelectChangeEvent } from '@/node_modules/@mui/material/Select/SelectInput';
 
 interface Props {
 	value: string;
 	onClose: () => void;
-	memberId: number;
 	deptList: any[];
 	jobTitleList: any[];
 }
@@ -20,26 +20,26 @@ const mapDeptToTree = (dept: DeptResponseDto) => ({
 	label: dept.deptNm,
 });
 
-export default function DeptJobTitleChangeDialog({ value, onClose, memberId, deptList, jobTitleList }: Props) {
+export default function DeptJobTitleChangeDialog({ value, onClose, deptList, jobTitleList }: Props) {
 	const { alert, success } = useDialogStore();
-	const { expandedIds, setExpandedIds, selectedId, setSelectedId, _hasHydrated } = useDeptTreeStore();
+	const { expandedIds, setExpandedIds } = useDeptTreeStore();
 	const [loading, setLoading] = useState(false);
+	const [selectedDeptId, setSelectedDeptId] = useState<number | null>(null);
+	const [selectedJobTitleId, setSelectedJobTitleId] = useState<string>('');
 
-	const handleChange = () => {};
+	const handleChange = (e: SelectChangeEvent) => {
+		setSelectedJobTitleId(e.target.value);
+	};
 
 	const handleSave = async () => {
-		try {
-			setLoading(true);
-			// todo: 부서-직책 매핑데이터 업데이트
-			// await memberService.updatePassword(memberId, password);
-			// await success('비밀번호가 변경되었습니다.');
-			console.log(memberId);
-			onClose();
-		} catch (e: any) {
-			await alert(e?.message ?? '부서/직책 설정에 실패했습니다.');
-		} finally {
-			setLoading(false);
-		}
+		// todo: 부서-직책 매핑데이터 업데이트
+		/**
+		 * validate(현재 화면 기준)
+		 * 전체 데이터와 비교해서 중복인지 체크(부서의 중복만 체크하면 됨)
+		 *
+		 * store
+		 * 매핑 데이터리스트 통째로 서버로 보내서 거기서 유효성 체크
+		 * */
 	};
 
 	return (
@@ -54,10 +54,10 @@ export default function DeptJobTitleChangeDialog({ value, onClose, memberId, dep
 						mapEntityToTree={mapDeptToTree}
 						expandedIds={expandedIds}
 						onExpandedItemsChange={(ids) => setExpandedIds(ids)}
-						selectedId={String(selectedId)}
+						selectedId={String(selectedDeptId)}
 						placeholder='부서명을 검색하세요.'
 						onNodeClick={(node) => {
-							setSelectedId(node.deptId);
+							setSelectedDeptId(node.deptId);
 						}}
 					/>
 				</Grid>
@@ -65,7 +65,7 @@ export default function DeptJobTitleChangeDialog({ value, onClose, memberId, dep
 					<Typography variant={'h6'} sx={{ mb: 2 }}>
 						직책 선택
 					</Typography>
-					<Select displayEmpty value={value ?? ''} sx={{ minWidth: '200px' }} onChange={handleChange}>
+					<Select displayEmpty value={selectedJobTitleId ?? ''} sx={{ minWidth: '200px' }} onChange={handleChange}>
 						<MenuItem value=''>
 							<em style={{ color: '#aaa' }}>미선택</em>
 						</MenuItem>

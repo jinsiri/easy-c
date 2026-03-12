@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, Checkbox, Grid, MenuItem, OutlinedInput, Select, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Button, Checkbox, Chip, Grid, MenuItem, OutlinedInput, Select, Stack, Typography, useTheme } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { CAREER_COLS, LANGUAGE_COLS, MemberFieldDef, QUALIFICATION_COLS, REWARD_COLS } from '@/app/admin/member/_constant/formConst';
 import { getMemberFormSections, getOptions } from '@/app/admin/member/_utils/formUtil';
@@ -25,7 +25,6 @@ const createMemberSchema = z
 		memberNm: z.string().min(1, '직원 이름은 필수입니다.'),
 		employeeId: z.string().min(1, '사번은 필수입니다.'),
 		extensionNumber: z.string().default(''),
-		departmentPosition: z.string().default(''), //todo
 		jobPosition: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 		jobGrade: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 		jobTitle: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
@@ -70,6 +69,7 @@ const createMemberSchema = z
 		accountHolderName: z.string().default(''),
 		accountNumber: z.string().default(''),
 		// 리스트 데이터 (동적 테이블용)
+		deptMemberMapList: z.array(z.any()).default([]),
 		careerList: z.array(z.any()).default([]),
 		rewardDisciplineList: z.array(z.any()).default([]),
 		qualificationList: z.array(z.any()).default([]),
@@ -86,7 +86,6 @@ const updateMemberSchema = z.object({
 	memberNm: z.string().min(1, '직원 이름은 필수입니다.'),
 	employeeId: z.string().min(1, '사번은 필수입니다.'),
 	extensionNumber: z.string().default(''),
-	departmentPosition: z.string().default(''), //todo
 	jobPosition: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 	jobGrade: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
 	jobTitle: z.preprocess((val) => (val === '' ? undefined : Number(val)), z.number().optional()),
@@ -131,6 +130,7 @@ const updateMemberSchema = z.object({
 	accountHolderName: z.string().default(''),
 	accountNumber: z.string().default(''),
 	// 리스트 데이터 (동적 테이블용)
+	deptMemberMapList: z.array(z.any()).default([]),
 	careerList: z.array(z.any()).default([]),
 	rewardDisciplineList: z.array(z.any()).default([]),
 	qualificationList: z.array(z.any()).default([]),
@@ -184,24 +184,36 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 	}, [initialData, reset]);
 
 	const renderField = useCallback(
-		(field: MemberFieldDef) => {
-			return (
-				<Controller
-					name={field.key as any}
-					control={control}
-					render={({ field: { onChange, value, onBlur }, fieldState: { error } }) => {
-						const commonProps = {
-							size: 'small' as const,
-							sx: { width: '100%' },
-							error: !!error,
-							onBlur,
-						};
+		(field: MemberFieldDef) => (
+			<Controller
+				name={field.key as any}
+				control={control}
+				render={({ field: { onChange, value, onBlur }, fieldState: { error } }) => {
+					const isError = !!error;
+					const isReadOnly = field.readOnly;
+					const commonProps = {
+						size: 'small' as const,
+						sx: {
+							width: '100%',
+							backgroundColor: isReadOnly ? theme.palette.action.hover : 'inherit',
+						},
+						error: isError,
+						onBlur,
+						readOnly: field.readOnly,
+					};
 
-						return (
-							<Box sx={{ width: '100%' }}>
-								{field.type === 'checkbox' ? (
-									<Checkbox checked={value === 'true' || value === true} onChange={(e) => onChange(e.target.checked ? 'true' : '')} />
-								) : field.type === 'select' ? (
+					const renderInput = () => {
+						switch (field.type) {
+							case 'checkbox':
+								return (
+									<Checkbox
+										checked={Boolean(value === 'true' || value === true)}
+										onChange={(e) => onChange(e.target.checked ? 'true' : '')}
+									/>
+								);
+
+							case 'select':
+								return (
 									<Select {...commonProps} displayEmpty value={value ?? ''} onChange={onChange}>
 										<MenuItem value=''>
 											<em style={{ color: '#aaa' }}>선택</em>
@@ -212,20 +224,25 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 											</MenuItem>
 										))}
 									</Select>
-								) : (
-									<OutlinedInput {...commonProps} type={field.type ?? 'text'} value={value ?? ''} onChange={onChange} />
-								)}
-								{error && (
-									<Typography variant='caption' color='error' sx={{ mt: 0.5, display: 'block' }}>
-										{error.message}
-									</Typography>
-								)}
-							</Box>
-						);
-					}}
-				/>
-			);
-		},
+								);
+							default:
+								return <OutlinedInput {...commonProps} type={field.type ?? 'text'} value={value ?? ''} onChange={onChange} />;
+						}
+					};
+
+					return (
+						<Box sx={{ width: '100%' }}>
+							{renderInput()}
+							{isError && (
+								<Typography variant='caption' color='error' sx={{ mt: 0.5, display: 'block' }}>
+									{error.message}
+								</Typography>
+							)}
+						</Box>
+					);
+				}}
+			/>
+		),
 		[control, memberBundle],
 	);
 
@@ -242,7 +259,6 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 			{deptJobTitleDialogOpen && (
 				<DeptJobTitleChangeDialog
-					memberId={memberId ?? 0}
 					value={''} // todo: 뎁트잡타이틀맵아이디
 					onClose={() => setDeptJobTitleDialogOpen(false)}
 					deptList={memberBundle.deptList}
@@ -280,17 +296,7 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 							}}
 						>
 							{section.fields.map((field) => {
-								return field.key === 'departmentPosition' ? (
-									<Box
-										key={field.key}
-										sx={{ display: 'flex', alignItems: 'center', flexBasis: '33.33%', padding: '0.5rem 1rem', minWidth: '18rem' }}
-									>
-										<Box sx={{ width: '8rem', flexShrink: 0 }}>부서/직책</Box>
-										<Button variant='outlined' onClick={() => setDeptJobTitleDialogOpen(true)}>
-											부서/직책 설정
-										</Button>
-									</Box>
-								) : (
+								return (
 									<Box
 										key={field.key}
 										sx={{
@@ -299,7 +305,6 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 											flexBasis: field.wide ? '66.66%' : '33.33%',
 											padding: '0.5rem 1rem',
 											minWidth: '18rem',
-											whiteSpace: 'nowrap',
 										}}
 									>
 										<Box sx={{ width: '8rem', flexShrink: 0 }}>
@@ -310,7 +315,15 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 												</Box>
 											)}
 										</Box>
-										<Box sx={{ width: 'calc(100% - 8rem)' }}>{renderField(field)}</Box>
+										<Box sx={{ width: 'calc(100% - 8rem)' }}>
+											{field.key === 'deptMemberMapList' ? (
+												<Button variant='outlined' onClick={() => setDeptJobTitleDialogOpen(true)}>
+													부서/직책 설정
+												</Button>
+											) : (
+												renderField(field)
+											)}
+										</Box>
 									</Box>
 								);
 							})}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Box, Checkbox, Grid, List, ListItem, OutlinedInput, Typography, useTheme } from '@mui/material';
+import { Box, Checkbox, Chip, Grid, List, ListItem, OutlinedInput, Typography, useTheme } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { memberService } from '@/app/services/memberService';
 import { useContainerSize } from '@/app/_hooks/useContainerSize';
@@ -14,7 +14,7 @@ import { getDisplayValue, transformGridData } from '@/app/admin/member/_utils/fo
 const memberInfoFields: { key: string; label: string }[] = [
 	{ key: 'memberNm', label: '직원 이름' },
 	{ key: 'employeeId', label: '사번' },
-	{ key: 'departmentPosition', label: '부서/직책' }, // TODO: 부서/직책 필드 추가 필요
+	{ key: 'deptMemberMapList', label: '부서/직책' },
 	{ key: 'jobPosition', label: '직위' },
 	{ key: 'jobGrade', label: '직급' },
 	{ key: 'jobRole', label: '직무' },
@@ -86,6 +86,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 	const { targetRef, width } = useContainerSize();
 
 	const [memberInfo, setMemberInfo] = useState<any>({});
+	const [deptMemberMapInfo, setDeptMemberMapInfo] = useState<any[]>([]);
 	const [basicInfo, setBasicInfo] = useState<any>({});
 	const [personalInfo, setPersonalInfo] = useState<any>({});
 	const [careerInfo, setCareerInfo] = useState<any[]>([]);
@@ -103,6 +104,11 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 					.getMember(memberId)
 					.then((res) => setMemberInfo(res))
 					.catch((err) => console.error('기본 인사정보 조회 실패:', err)),
+
+				memberService
+					.getDeptMemberMapInfo(memberId)
+					.then((res) => setDeptMemberMapInfo(res))
+					.catch((err) => console.error('부서 정보 조회 실패:', err)),
 
 				memberService
 					.getMemberBasicInfo(memberId)
@@ -278,7 +284,24 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 										}}
 									>
 										<Box sx={{ width: '6rem', textWrap: 'nowrap', fontSize: '0.875rem', color: theme.palette.grey[700] }}>{label}</Box>
-										<Box sx={{ width: 'calc(100% - 6rem)', textWrap: 'nowrap' }}>{displayValue}</Box>
+										<Box sx={{ width: 'calc(100% - 6rem)', textWrap: 'nowrap' }}>
+											{key === 'deptMemberMapList' ? (
+												<>
+													{deptMemberMapInfo.length !== 0
+														? deptMemberMapInfo.map((m) => (
+																<Chip
+																	label={`${m.deptNm} - ${m.jobTitleNm}`}
+																	variant='outlined'
+																	color={'primary'}
+																	size={'small'}
+																/>
+															))
+														: '-'}
+												</>
+											) : (
+												<>{displayValue}</>
+											)}
+										</Box>
 									</ListItem>
 								);
 							})}

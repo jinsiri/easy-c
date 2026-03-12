@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.easyc.common.audit.activity.AuditAction;
 import org.easyc.common.dto.BulkDeleteRequestDto;
+import org.easyc.deptMemberMap.dto.DeptMemberMapResponseDto;
+import org.easyc.deptMemberMap.service.DeptMemberMapService;
 import org.easyc.member.dto.*;
 import org.easyc.member.service.MemberService;
 import org.springframework.security.core.Authentication;
@@ -17,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final DeptMemberMapService deptMemberMapService;
 
     // 테스트용으로 사용
     @GetMapping("/me")
@@ -69,6 +72,17 @@ public class MemberController {
     }
 
     /**
+     * 인사정보 조회 - 멤버 부서 정보
+
+     * @param memberId 조회할 멤버 ID
+     * @return 멤버의 부서 정보 리스트 (DeptMemberMapResponseDto)
+     */
+    @GetMapping("/{memberId}/depts")
+    public List<DeptMemberMapResponseDto> getDeptMemberMapInfo(@PathVariable Long memberId) {
+        return deptMemberMapService.findByMemberId(memberId);
+    }
+
+    /**
      * 인사정보 조회 - 기본정보 탭
 
      * @param memberId 조회할 멤버 ID
@@ -89,7 +103,6 @@ public class MemberController {
     public MemberPersonalResponseDto getMemberPersonalInfo(@PathVariable Long memberId) {
         return memberService.getMemberPersonalInfo(memberId);
     }
-
 
     /**
      * 인사정보 조회 - 경력 탭

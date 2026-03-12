@@ -28,7 +28,7 @@ public class MemberJoinRequestDto { //회원가입 등 비밀번호 필요할 �
     private Long jobPositionId;
     private Long jobGradeId;
     private Long jobRoleId;
-    private List<DeptMemberMapRequestDto> deptMemberMapDto;
+    private List<DeptMemberMapRequestDto> deptMemberMapList;
 
     public MemberJoinRequestDto(String loginId, String password, String memberNm, String memberNmEn, MemberRole memberRole) {
         this.loginId = loginId;
