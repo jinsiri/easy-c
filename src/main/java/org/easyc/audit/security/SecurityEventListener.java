@@ -7,6 +7,7 @@ import org.easyc.audit.security.constant.SecurityEventType;
 import org.easyc.audit.security.entity.SecurityLog;
 import org.easyc.audit.security.repository.SecurityLogRepository;
 import org.easyc.audit.support.RequestAuditUtils;
+import org.easyc.common.constant.DeviceType;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
@@ -41,6 +42,7 @@ public class SecurityEventListener {
     public void onLoginSuccess(AuthenticationSuccessEvent event) {
         Authentication auth = event.getAuthentication();
         HttpServletRequest req = RequestAuditUtils.currentRequestOrNull();
+        String userAgent = RequestAuditUtils.resolveUserAgent(req);
 
         safeSave(SecurityLog.builder()
                 .registerIp(RequestAuditUtils.resolveIp(req))
@@ -48,7 +50,8 @@ public class SecurityEventListener {
                 .loginId(auth.getName())
                 .requestId(RequestAuditUtils.resolveRequestId(req))
                 .ip(RequestAuditUtils.resolveIp(req))
-                .userAgent(RequestAuditUtils.resolveUserAgent(req))
+                .userAgent(userAgent)
+                .deviceType(resolveDeviceType(userAgent))
                 .uri(req != null ? req.getRequestURI() : null)
                 .detail(null)
                 .build());
@@ -58,6 +61,7 @@ public class SecurityEventListener {
     public void onLoginFailure(AbstractAuthenticationFailureEvent event) {
         Authentication auth = event.getAuthentication();
         HttpServletRequest req = RequestAuditUtils.currentRequestOrNull();
+        String userAgent = RequestAuditUtils.resolveUserAgent(req);
 
         // 시도한 loginId는 principal에 담겨 있음 (UsernamePasswordAuthenticationToken)
         Object principal = auth.getPrincipal();
@@ -72,7 +76,8 @@ public class SecurityEventListener {
                 .loginId(loginId)
                 .requestId(RequestAuditUtils.resolveRequestId(req))
                 .ip(RequestAuditUtils.resolveIp(req))
-                .userAgent(RequestAuditUtils.resolveUserAgent(req))
+                .userAgent(userAgent)
+                .deviceType(resolveDeviceType(userAgent))
                 .uri(req != null ? req.getRequestURI() : null)
                 .detail(detail)
                 .build());
@@ -82,6 +87,7 @@ public class SecurityEventListener {
     public void onAccessDenied(AuthorizationDeniedEvent<?> event) {
         Authentication auth = event.getAuthentication().get();
         HttpServletRequest req = RequestAuditUtils.currentRequestOrNull();
+        String userAgent = RequestAuditUtils.resolveUserAgent(req);
 
         // 비인증 사용자(AnonymousAuthenticationToken)는 loginId null 처리
         String loginId = (auth instanceof AnonymousAuthenticationToken) ? null : auth.getName();
@@ -92,10 +98,19 @@ public class SecurityEventListener {
                 .loginId(loginId)
                 .requestId(RequestAuditUtils.resolveRequestId(req))
                 .ip(RequestAuditUtils.resolveIp(req))
-                .userAgent(RequestAuditUtils.resolveUserAgent(req))
+                .userAgent(userAgent)
+                .deviceType(resolveDeviceType(userAgent))
                 .uri(req != null ? req.getRequestURI() : null)
                 .detail(null)
                 .build());
+    }
+
+    private String resolveDeviceType(String userAgent) {
+        if (userAgent == null) return DeviceType.UNKNOWN.name();
+        String ua = userAgent.toLowerCase();
+        return (ua.contains("mobile") || ua.contains("android") || ua.contains("iphone"))
+                ? DeviceType.MOBILE.name()
+                : DeviceType.DESKTOP.name();
     }
 
     private void safeSave(SecurityLog securityLog) {

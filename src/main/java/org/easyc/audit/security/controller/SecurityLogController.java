@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.easyc.common.dto.AuditUser;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
+import java.util.List;
+
 /**
  * 보안 로그 REST API 컨트롤러
  *
@@ -34,5 +39,36 @@ public class SecurityLogController {
         return securityLogRepository.findAll(
                 PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registerDate"))
         ).map(SecurityLogResponseDto::from);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/recent-logins")
+    public List<SecurityLogResponseDto> getRecentLogins(
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        return securityLogRepository
+                .findByEventTypeInOrderByRegisterDateDesc(
+                        List.of("LOGIN_SUCCESS", "LOGIN_FAILURE"),
+                        PageRequest.of(0, limit)
+                )
+                .stream()
+                .map(SecurityLogResponseDto::from)
+                .toList();
+    }
+
+    @GetMapping("/my-logins")
+    public List<SecurityLogResponseDto> getMyLogins(
+            @AuthenticationPrincipal AuditUser user,
+            @RequestParam(defaultValue = "5") int limit
+    ) {
+        return securityLogRepository
+                .findByLoginIdAndEventTypeInOrderByRegisterDateDesc(
+                        user.getLoginId(),
+                        List.of("LOGIN_SUCCESS", "LOGIN_FAILURE"),
+                        PageRequest.of(0, limit)
+                )
+                .stream()
+                .map(SecurityLogResponseDto::from)
+                .toList();
     }
 }

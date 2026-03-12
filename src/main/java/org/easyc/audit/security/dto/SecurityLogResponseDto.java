@@ -17,6 +17,7 @@ public class SecurityLogResponseDto {
     private String loginId;
     private String ip;
     private String userAgent;
+    private String deviceType;
     private String uri;
     private String detail;
     private String requestId;
@@ -29,6 +30,7 @@ public class SecurityLogResponseDto {
                 .loginId(log.getLoginId())
                 .ip(log.getIp())
                 .userAgent(log.getUserAgent())
+                .deviceType(log.getDeviceType())
                 .uri(log.getUri())
                 .detail(log.getDetail())
                 .requestId(log.getRequestId())

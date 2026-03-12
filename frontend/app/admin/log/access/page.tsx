@@ -47,12 +47,18 @@ const colDefs: ColDef<Record<string, any>>[] = [
 	},
 ];
 
+const PAGE_SIZE_OPTIONS = [20, 50, 100];
+
 export default function AdminAccessLogsPage() {
 	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
+	const [page, setPage] = useState(0);
+	const [pageSize, setPageSize] = useState(50);
+	const [totalElements, setTotalElements] = useState(0);
 
 	useEffect(() => {
-		accessLogService.getAccessLogs().then((res) => {
-			const data = (res as any)?.content ?? res ?? [];
+		accessLogService.getAccessLogs(page, pageSize).then((res: any) => {
+			setTotalElements(res?.totalElements ?? 0);
+			const data = res?.content ?? [];
 			setRowData(
 				data.map((log: AccessLogResponseDto) => ({
 					...log,
@@ -63,13 +69,24 @@ export default function AdminAccessLogsPage() {
 				})),
 			);
 		});
-	}, []);
+	}, [page, pageSize]);
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
 			<PathBreadcrumbs />
-			<Box sx={{ flexGrow: 1, width: '100%' }}>
-				<CustomAgGridComp rowData={rowData} colDefs={colDefs} pagination={true} />
+			<Box sx={{ flexGrow: 1, width: '100%', minHeight: 0 }}>
+				<CustomAgGridComp
+					rowData={rowData}
+					colDefs={colDefs}
+					serverPagination={{
+						page,
+						pageSize,
+						totalElements,
+						pageSizeOptions: PAGE_SIZE_OPTIONS,
+						onPageChange: setPage,
+						onPageSizeChange: setPageSize,
+					}}
+				/>
 			</Box>
 		</Box>
 	);

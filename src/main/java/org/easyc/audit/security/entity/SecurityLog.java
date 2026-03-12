@@ -41,4 +41,7 @@ public class SecurityLog extends BaseLogEntity {
 
     @Column(length = 500)
     private String detail;         // 실패 이유 (BadCredentials, DisabledException 등)
+
+    @Column(length = 20)
+    private String deviceType;     // MOBILE / DESKTOP / UNKNOWN
 }
