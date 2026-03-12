@@ -8,6 +8,7 @@ import { MemberResponseDto, memberService } from '@/app/services/memberService';
 import { CellClickedEvent, ColDef, FirstDataRenderedEvent, ICellRendererParams } from 'ag-grid-community';
 import MemberDetail from '@/app/admin/member/_component/MemberDetail';
 import { useRouter } from 'next/navigation';
+import DropdownButton from '@/app/_component/DropdownButton';
 
 interface Props {
 	deptId: number;
@@ -81,6 +82,18 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 		params.api.setFocusedCell(0, 'photoUrl');
 	};
 
+	const menuOptions = [
+		{ label: '직위 변경', onClick: () => console.log('직위 변경 클릭') },
+		{ label: '직책 변경', onClick: () => console.log('직책 변경 클릭') },
+		{ label: '직급 변경', onClick: () => console.log('직급 변경 클릭') },
+		{
+			label: '계정상태 변경',
+			onClick: () => {
+				console.log('계정상태 변경 클릭');
+			},
+		},
+	];
+
 	return (
 		<>
 			<Stack direction='row' spacing={1} alignItems={'center'} sx={{ py: 2 }}>
@@ -91,9 +104,7 @@ export default function AdminDeptDetailView({ deptId = 1 }: Props) {
 						input: { 'aria-label': 'controlled' },
 					}}
 				/>
-				<Button variant='contained' size='small'>
-					직위 변경
-				</Button>
+				<DropdownButton initialLabel='일괄 변경' variant={'contained'} color={'primary'} options={menuOptions} />
 				<Button variant='contained' size='small'>
 					부서장 위임
 				</Button>
