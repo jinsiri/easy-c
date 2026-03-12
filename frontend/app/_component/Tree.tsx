@@ -109,23 +109,28 @@ const HighlightText = ({ text, highlight }: { text: string; highlight: string })
 	);
 };
 
-const RecursiveTreeItem = <T,>({ nodes, searchTerm }: { nodes: TreeNode<T>[]; searchTerm: string }) => {
+const RecursiveTreeItem = <T,>({ nodes, searchTerm, disabledIds }: { nodes: TreeNode<T>[]; searchTerm: string; disabledIds: string[] }) => {
 	return (
 		<>
-			{nodes.map((node) => (
-				<CustomTreeItem
-					key={String(node.id)}
-					itemId={String(node.id)}
-					label={
-						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<Box sx={{ display: 'flex', mr: 1, '& svg': { fontSize: '1.125rem' } }}>{getIconByDataType((node as any).dataType)}</Box>
-							<HighlightText text={`${node.label}${node.treeChildCount ? `(${node.treeChildCount})` : ''}`} highlight={searchTerm} />
-						</Box>
-					}
-				>
-					{node.children.length > 0 && <RecursiveTreeItem nodes={node.children} searchTerm={searchTerm} />}
-				</CustomTreeItem>
-			))}
+			{nodes.map((node) => {
+				const isDisabled = disabledIds.includes(String(node.id));
+
+				return (
+					<CustomTreeItem
+						key={String(node.id)}
+						itemId={String(node.id)}
+						disabled={isDisabled}
+						label={
+							<Box sx={{ display: 'flex', alignItems: 'center' }}>
+								<Box sx={{ display: 'flex', mr: 1, '& svg': { fontSize: '1.125rem' } }}>{getIconByDataType((node as any).dataType)}</Box>
+								<HighlightText text={`${node.label}${node.treeChildCount ? `(${node.treeChildCount})` : ''}`} highlight={searchTerm} />
+							</Box>
+						}
+					>
+						{node.children.length > 0 && <RecursiveTreeItem nodes={node.children} searchTerm={searchTerm} disabledIds={disabledIds} />}
+					</CustomTreeItem>
+				);
+			})}
 		</>
 	);
 };
@@ -136,6 +141,7 @@ interface Props<T> {
 	selectedId?: number | string;
 	onNodeClick?: (node: TreeNode<T>) => void;
 	expandedIds?: string[];
+	disabledIds?: string[];
 	onExpandedItemsChange?: (itemIds: string[]) => void;
 	placeholder?: string;
 }
@@ -146,6 +152,7 @@ export default function CommonTreeview<T>({
 	selectedId,
 	onNodeClick,
 	expandedIds,
+	disabledIds = [],
 	onExpandedItemsChange,
 	placeholder = '검색어를 입력하세요.',
 }: Props<T>) {
@@ -207,7 +214,7 @@ export default function CommonTreeview<T>({
 					expandIcon: ChevronRight,
 				}}
 			>
-				<RecursiveTreeItem nodes={treeStructure} searchTerm={searchTerm} />
+				<RecursiveTreeItem nodes={treeStructure} searchTerm={searchTerm} disabledIds={disabledIds} />
 			</SimpleTreeView>
 		</Box>
 	);

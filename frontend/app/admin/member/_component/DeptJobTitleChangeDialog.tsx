@@ -1,17 +1,19 @@
-import { useDialogStore } from '@/store/useDialogStore';
-import { useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
+import { Box, Chip, Grid, IconButton, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material/Select';
+import { ArrowDownward, ArrowForward } from '@mui/icons-material';
+
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import CommonTreeview from '@/app/_component/Tree';
-import { DeptResponseDto } from '@/type/dept';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
-import { Grid, MenuItem, Select, Typography } from '@mui/material';
-import { SelectChangeEvent } from '@/node_modules/@mui/material/Select/SelectInput';
+import { DeptResponseDto } from '@/type/dept';
 
 interface Props {
-	value: string;
 	onClose: () => void;
 	deptList: any[];
 	jobTitleList: any[];
+	initialDeptMaps: any[];
+	setDeptMemberMap: any;
 }
 
 const mapDeptToTree = (dept: DeptResponseDto) => ({
@@ -20,61 +22,154 @@ const mapDeptToTree = (dept: DeptResponseDto) => ({
 	label: dept.deptNm,
 });
 
-export default function DeptJobTitleChangeDialog({ value, onClose, deptList, jobTitleList }: Props) {
-	const { alert, success } = useDialogStore();
+export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleList, initialDeptMaps, setDeptMemberMap }: Props) {
+	const theme = useTheme();
+	const isDownMd = useMediaQuery(theme.breakpoints.down('md'));
+	const addedElIdxRef = useRef<number>(0);
 	const { expandedIds, setExpandedIds } = useDeptTreeStore();
-	const [loading, setLoading] = useState(false);
-	const [selectedDeptId, setSelectedDeptId] = useState<number | null>(null);
-	const [selectedJobTitleId, setSelectedJobTitleId] = useState<string>('');
+	const [updatedList, setUpdatedList] = useState<any[]>(initialDeptMaps);
+	const [editingId, setEditingId] = useState<string | number | null>(null);
+	const [selection, setSelection] = useState({
+		deptId: null as number | null,
+		deptNm: '',
+		jobTitleId: '',
+		jobTitleNm: '',
+	});
 
-	const handleChange = (e: SelectChangeEvent) => {
-		setSelectedJobTitleId(e.target.value);
+	const addedDeptIds = useMemo(() => updatedList.map((item) => String(item.deptId)), [updatedList]);
+
+	const handleSave = () => {
+		setDeptMemberMap('deptMemberMapList', updatedList);
+		onClose();
 	};
 
-	const handleSave = async () => {
-		// todo: 부서-직책 매핑데이터 업데이트
-		/**
-		 * validate(현재 화면 기준)
-		 * 전체 데이터와 비교해서 중복인지 체크(부서의 중복만 체크하면 됨)
-		 *
-		 * store
-		 * 매핑 데이터리스트 통째로 서버로 보내서 거기서 유효성 체크
-		 * */
+	const handleJobTitleChange = (e: SelectChangeEvent) => {
+		const titleId = e.target.value;
+		const targetTitle = jobTitleList.find((t) => t.jobTitleId === titleId);
+
+		setSelection((prev) => ({
+			...prev,
+			jobTitleId: titleId,
+			jobTitleNm: targetTitle ? targetTitle.jobTitleNm : '',
+		}));
+	};
+
+	const resetSelection = () => {
+		setSelection({ deptId: null, deptNm: '', jobTitleId: '', jobTitleNm: '' });
+		setEditingId(null);
+	};
+
+	const selectAddedDeptMemberMap = (deptMemberMapId: string | number) => {
+		const targetMap = updatedList.find((m) => m.deptMemberMapId === deptMemberMapId);
+		if (!targetMap) return;
+
+		setEditingId(deptMemberMapId);
+		setSelection({
+			deptId: targetMap.deptId,
+			deptNm: targetMap.deptNm,
+			jobTitleId: targetMap.jobTitleId || '',
+			jobTitleNm: targetMap.jobTitleNm || '',
+		});
+	};
+
+	const handleAddOrUpdate = () => {
+		if (!selection.deptId) return;
+
+		if (editingId) {
+			setUpdatedList((prev) => prev.map((item) => (item.deptMemberMapId === editingId ? { ...item, ...selection } : item)));
+		} else {
+			setUpdatedList((prev) => [
+				...prev,
+				{
+					deptMemberMapId: `new_${addedElIdxRef.current++}`,
+					...selection,
+				},
+			]);
+		}
+		resetSelection();
+	};
+
+	const removeMap = (id: string | number) => {
+		setUpdatedList((prev) => prev.filter((m) => m.deptMemberMapId !== id));
 	};
 
 	return (
-		<BaseDialog title='부서/직책 설정' confirmLabel={loading ? '변경 중...' : '변경'} onConfirm={handleSave} onClose={onClose} maxWidth='xs' fullWidth>
-			<Grid container spacing={4} direction='column'>
-				<Grid>
-					<Typography variant={'h6'} sx={{ mb: 2 }}>
-						부서 선택
-					</Typography>
-					<CommonTreeview
-						rawData={deptList || []}
-						mapEntityToTree={mapDeptToTree}
-						expandedIds={expandedIds}
-						onExpandedItemsChange={(ids) => setExpandedIds(ids)}
-						selectedId={String(selectedDeptId)}
-						placeholder='부서명을 검색하세요.'
-						onNodeClick={(node) => {
-							setSelectedDeptId(node.deptId);
-						}}
-					/>
+		<BaseDialog title='부서/직책 설정' confirmLabel='확인' onConfirm={handleSave} onClose={onClose} maxWidth='md' fullWidth>
+			<Grid container spacing={4} alignItems='stretch'>
+				<Grid size={{ xs: 12, md: 5 }}>
+					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+						<Box>
+							<Typography variant='h6' sx={{ mb: 1.5 }}>
+								부서 선택
+								<Box component='span' sx={{ color: 'error.main' }}>
+									*
+								</Box>
+							</Typography>
+							<CommonTreeview
+								rawData={deptList || []}
+								mapEntityToTree={mapDeptToTree}
+								expandedIds={expandedIds}
+								onExpandedItemsChange={setExpandedIds}
+								selectedId={String(selection.deptId)}
+								disabledIds={addedDeptIds}
+								onNodeClick={(node) => {
+									if (addedDeptIds.includes(String(node.deptId))) return;
+									setSelection((prev) => ({ ...prev, deptId: node.deptId, deptNm: node.deptNm }));
+								}}
+							/>
+						</Box>
+
+						<Box>
+							<Typography variant='h6' sx={{ mb: 1.5 }}>
+								직책 선택
+							</Typography>
+							<Select displayEmpty fullWidth value={selection.jobTitleId} onChange={handleJobTitleChange}>
+								<MenuItem value=''>
+									<em style={{ color: '#aaa' }}>미선택</em>
+								</MenuItem>
+								{jobTitleList?.map((opt) => (
+									<MenuItem key={opt.jobTitleId} value={opt.jobTitleId}>
+										{opt.jobTitleNm}
+									</MenuItem>
+								))}
+							</Select>
+						</Box>
+					</Box>
 				</Grid>
-				<Grid>
-					<Typography variant={'h6'} sx={{ mb: 2 }}>
-						직책 선택
+
+				<Grid size={{ xs: 12, md: 2 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<IconButton
+						className={selection.deptId ? 'contained-primary' : 'contained-primary disabled'}
+						sx={{ ml: 1 }}
+						disabled={!selection.deptId}
+						onClick={handleAddOrUpdate}
+					>
+						{isDownMd ? <ArrowDownward /> : <ArrowForward />}
+					</IconButton>
+				</Grid>
+
+				<Grid size={{ xs: 12, md: 5 }}>
+					<Typography variant='h6' sx={{ mb: 1.5 }}>
+						연결된 부서-직책
 					</Typography>
-					<Select displayEmpty value={selectedJobTitleId ?? ''} sx={{ minWidth: '200px' }} onChange={handleChange}>
-						<MenuItem value=''>
-							<em style={{ color: '#aaa' }}>미선택</em>
-						</MenuItem>
-						{jobTitleList?.map((opt: any) => (
-							<MenuItem key={opt.jobTitleId} value={opt.jobTitleId}>
-								{opt.jobTitleNm}
-							</MenuItem>
+					<Box sx={{ minHeight: '200px', p: 2, border: '1px dashed #ccc', borderRadius: 2 }}>
+						{updatedList.length === 0 && (
+							<Typography variant='body2' color='text.secondary' sx={{ textAlign: 'center', mt: 4 }}>
+								선택된 항목이 없습니다.
+							</Typography>
+						)}
+						{updatedList.map((m) => (
+							<Chip
+								key={m.deptMemberMapId}
+								label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''}`}
+								color='primary'
+								variant='outlined'
+								onClick={() => selectAddedDeptMemberMap(m.deptMemberMapId)}
+								onDelete={() => removeMap(m.deptMemberMapId)}
+								sx={{ m: 0.5 }}
+							/>
 						))}
-					</Select>
+					</Box>
 				</Grid>
 			</Grid>
 		</BaseDialog>

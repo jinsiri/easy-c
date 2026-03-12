@@ -32,6 +32,10 @@ const IconButton = (theme: Theme) => ({
 					'&.light': {
 						backgroundColor: theme.palette.primary.light,
 					},
+
+					'&.disabled': {
+						backgroundColor: theme.palette.grey['700'],
+					},
 				},
 
 				'&.circle-primary': {

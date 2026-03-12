@@ -95,7 +95,7 @@ export default function MemberEditPage() {
 					accountNumber: toFormValue(m.accountNumber),
 
 					// 리스트 데이터 변환
-					deptMemberMapList: (deptMemberMapRes as any[]).map((item) => toFormRow(item, DEPT_COLS)), //todo: check
+					deptMemberMapList: deptMemberMapRes, //todo: check
 					careerList: (careerRes as any[]).map((item) => toFormRow(item, CAREER_COLS)),
 					rewardDisciplineList: (rewardRes as any[]).map((item) => toFormRow(item, REWARD_COLS)),
 					qualificationList: (qualRes as any[]).map((item) => toFormRow(item, QUALIFICATION_COLS)),

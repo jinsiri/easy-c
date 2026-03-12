@@ -153,23 +153,17 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 	const theme = useTheme();
 
 	const [saving, setSaving] = useState(false);
-	const [deptJobTitleDialogOpen, setDeptJobTitleDialogOpen] = useState(false);
+	const [deptMemberMapDialogOpen, setDeptMemberMapDialogOpen] = useState(false);
 	const [pwDialogOpen, setPwDialogOpen] = useState(false);
 	const [memberBundle, setMemberBundle] = useState<MemberBundleResponseDto>({});
-
 	const currentSchema = isEdit ? updateMemberSchema : createMemberSchema;
 	const formSections = useMemo(() => getMemberFormSections(isEdit ? 'edit' : 'create'), [isEdit]);
-
-	const {
-		reset,
-		control,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<MemberFormValues>({
+	const { reset, control, handleSubmit, watch, setValue } = useForm<MemberFormValues>({
 		resolver: zodResolver(currentSchema) as any,
 		mode: 'onBlur',
 		defaultValues: initialData || {},
 	});
+	const currentDepts = watch('deptMemberMapList');
 
 	useEffect(() => {
 		const fetchBundle = async () => {
@@ -257,12 +251,13 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-			{deptJobTitleDialogOpen && (
+			{deptMemberMapDialogOpen && (
 				<DeptJobTitleChangeDialog
-					value={''} // todo: 뎁트잡타이틀맵아이디
-					onClose={() => setDeptJobTitleDialogOpen(false)}
+					onClose={() => setDeptMemberMapDialogOpen(false)}
 					deptList={memberBundle.deptList}
 					jobTitleList={memberBundle.jobTitleList}
+					initialDeptMaps={currentDepts}
+					setDeptMemberMap={setValue}
 				/>
 			)}
 			{isEdit && memberId && pwDialogOpen && <PasswordChangeDialog onClose={() => setPwDialogOpen(false)} memberId={memberId} />}
@@ -317,7 +312,7 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 										</Box>
 										<Box sx={{ width: 'calc(100% - 8rem)' }}>
 											{field.key === 'deptMemberMapList' ? (
-												<Button variant='outlined' onClick={() => setDeptJobTitleDialogOpen(true)}>
+												<Button variant='outlined' onClick={() => setDeptMemberMapDialogOpen(true)}>
 													부서/직책 설정
 												</Button>
 											) : (
