@@ -50,7 +50,7 @@ export default function Header(props: propsType) {
 	};
 
 	const list = [
-		{ title: '내 정보', icon: <ContactsRounded />, component: Link, url: '/management/user' },
+		{ title: '내 정보', icon: <ContactsRounded />, component: Link, url: '/humanResources/user' },
 		{ title: loginId ? '로그아웃' : '로그인', icon: loginId ? <LogoutRounded /> : <LoginRounded />, component: 'button', onClick: handleLogout },
 	];
 
