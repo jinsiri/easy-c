@@ -234,7 +234,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 								<Button variant='outlined' onClick={() => router.push(`/admin/dept/list/assign?deptId=${selectedId}`)}>
 									부서원 추가
 								</Button>
-								<Button variant='outlined'>일괄 등록</Button>
+								{/*<Button variant='outlined'>일괄 등록</Button>*/}
 							</Stack>
 						</Stack>
 						<CommonTabs tabs={deptTabs} containerSx={{ display: 'flex', flexDirection: 'column', padding: '0 1.125rem' }} />
