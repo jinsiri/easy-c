@@ -81,7 +81,7 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 			setUpdatedList((prev) => [
 				...prev,
 				{
-					deptMemberMapId: `new_${addedElIdxRef.current++}`,
+					deptMemberMapId: --addedElIdxRef.current,
 					...selection,
 				},
 			]);
@@ -90,7 +90,20 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 	};
 
 	const removeMap = (id: string | number) => {
-		setUpdatedList((prev) => prev.filter((m) => m.deptMemberMapId !== id));
+		setUpdatedList((prev) => {
+			const target = prev.find((m) => m.deptMemberMapId === id);
+			if (!target) return prev;
+
+			if (typeof id === 'number' && id < 0) {
+				return prev.filter((m) => m.deptMemberMapId !== id);
+			}
+
+			return prev.map((m) => (m.deptMemberMapId === id ? { ...m, deleted: true } : m));
+		});
+
+		if (editingId === id) {
+			resetSelection();
+		}
 	};
 
 	return (
@@ -158,17 +171,19 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 								선택된 항목이 없습니다.
 							</Typography>
 						)}
-						{updatedList.map((m) => (
-							<Chip
-								key={m.deptMemberMapId}
-								label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''}`}
-								color='primary'
-								variant='outlined'
-								onClick={() => selectAddedDeptMemberMap(m.deptMemberMapId)}
-								onDelete={() => removeMap(m.deptMemberMapId)}
-								sx={{ m: 0.5 }}
-							/>
-						))}
+						{updatedList
+							.filter((m) => !m.deleted)
+							.map((m) => (
+								<Chip
+									key={m.deptMemberMapId}
+									label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''}`}
+									color='primary'
+									variant='outlined'
+									onClick={() => selectAddedDeptMemberMap(m.deptMemberMapId)}
+									onDelete={() => removeMap(m.deptMemberMapId)}
+									sx={{ m: 0.5 }}
+								/>
+							))}
 					</Box>
 				</Grid>
 			</Grid>
