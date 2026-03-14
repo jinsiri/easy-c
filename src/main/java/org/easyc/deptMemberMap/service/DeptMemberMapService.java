@@ -34,6 +34,30 @@ public class DeptMemberMapService {
     }
 
     @Transactional
+    public void assignDeptsToMember(Long memberId, List<DeptMemberMapRequestDto> dtos) {
+        for (DeptMemberMapRequestDto dto : dtos) {
+            if (dto.getDeptMemberMapId() == null || dto.getDeptMemberMapId() < 0) {
+                DeptMemberMap newMap = DeptMemberMap.builder()
+                        .memberId(memberId)
+                        .deptId(dto.getDeptId())
+                        .jobTitleId(dto.getJobTitleId())
+                        .build();
+                deptMemberMapRepository.save(newMap);
+            }
+            else {
+                DeptMemberMap map = deptMemberMapRepository.findById(dto.getDeptMemberMapId())
+                        .orElseThrow(() -> new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND));
+
+                if (dto.isDeleted()) {
+                    map.delete();
+                } else {
+                    map.updateInfo(dto.getDeptId(), dto.getJobTitleId());
+                }
+            }
+        }
+    }
+
+    @Transactional
     public void assignMembersToDept(DeptMemberMapRequestDto dto) {
         if (dto.getMemberIds() != null && !dto.getMemberIds().isEmpty()) {
             List<DeptMemberMap> newMappings = dto.getMemberIds().stream()

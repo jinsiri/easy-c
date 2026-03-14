@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
+import org.easyc.deptMemberMap.service.DeptMemberMapService;
 import org.easyc.member.dto.*;
 import org.easyc.member.entity.*;
 import org.easyc.member.repository.*;
@@ -38,6 +39,7 @@ public class MemberService {
     private final MemberJobGradeMapService memberJobGradeMapService;
     private final MemberJobRoleMapService memberJobRoleMapService;
     private final MemberJobPositionMapService memberJobPositionMapService;
+    private final DeptMemberMapService deptMemberMapService;
 
     // 로그인 아이디 중복 체크
     public boolean isLoginIdDuplicate(String loginId) {
@@ -189,6 +191,7 @@ public class MemberService {
 
     @Transactional
     public void createMember(MemberJoinRequestDto requestDto,
+                             MemberOrgSettingRequestDto memberOrgSettingRequestDto,
                              MemberProfileRequestDto profileRequestDto,
                              MemberPersonalRequestDto personalRequestDto,
                              List<MemberCareerRequestDto> careerDtos,
@@ -202,16 +205,20 @@ public class MemberService {
                 )
         );
 
-        if(requestDto.getJobPositionId() != null) {
-            memberJobPositionMapService.assignJobPosition(member.getMemberId(), requestDto.getJobPositionId());
+        if(memberOrgSettingRequestDto.getJobPositionId() != null) {
+            memberJobPositionMapService.assignJobPosition(member.getMemberId(), memberOrgSettingRequestDto.getJobPositionId());
         }
 
-        if(requestDto.getJobGradeId() != null) {
-            memberJobGradeMapService.assignJobGrade(member.getMemberId(), requestDto.getJobGradeId());
+        if(memberOrgSettingRequestDto.getJobGradeId() != null) {
+            memberJobGradeMapService.assignJobGrade(member.getMemberId(), memberOrgSettingRequestDto.getJobGradeId());
         }
 
-        if(requestDto.getJobRoleId() != null) {
-            memberJobRoleMapService.assignJobRole(member.getMemberId(), requestDto.getJobRoleId());
+        if(memberOrgSettingRequestDto.getJobRoleId() != null) {
+            memberJobRoleMapService.assignJobRole(member.getMemberId(), memberOrgSettingRequestDto.getJobRoleId());
+        }
+
+        if(memberOrgSettingRequestDto.getDeptMemberMapList() != null) {
+            deptMemberMapService.assignDeptsToMember(member.getMemberId(), memberOrgSettingRequestDto.getDeptMemberMapList());
         }
 
         MemberProfile profile = MemberProfile.of(member, profileRequestDto);
@@ -265,6 +272,10 @@ public class MemberService {
 
         if(dto.getJobRoleId() != null) {
             memberJobRoleMapService.assignJobRole(member.getMemberId(), dto.getJobRoleId());
+        }
+
+        if(dto.getDeptMemberMapList() != null) {
+            deptMemberMapService.assignDeptsToMember(member.getMemberId(), dto.getDeptMemberMapList());
         }
 
         MemberProfile profile = memberProfileRepository.findById(memberId)

@@ -291,7 +291,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 														? deptMemberMapInfo.map((m) => (
 																<Chip
 																	key={m.deptMemberMapId}
-																	label={`${m.deptNm} - ${m.jobTitleNm}`}
+																	label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''}`}
 																	variant='outlined'
 																	color={'primary'}
 																	size={'small'}

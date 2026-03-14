@@ -31,7 +31,7 @@ public class DeptMemberMapResponseDto extends BaseDto {
                 .jobTitleId(map.getJobTitleId())
                 .deptRole(map.getDeptRole())
                 .deptNm(map.getDept().getDeptNm())
-                .jobTitleNm(map.getJobTitle().getJobTitleNm())
+                .jobTitleNm(map.getJobTitle() != null ? map.getJobTitle().getJobTitleNm() : null)
                 .build();
     }
 

@@ -62,6 +62,14 @@ public class EasycApplication {
 				role
 		);
 
+        MemberOrgSettingRequestDto orgSettingDto =
+                new MemberOrgSettingRequestDto(
+                        null,
+                        null,
+                        null,
+                        null
+                );
+
 
 		MemberProfileRequestDto profileDto =
 				new MemberProfileRequestDto(
@@ -155,6 +163,6 @@ public class EasycApplication {
 				)
 		);
 
-		memberService.createMember(adminDto, profileDto, personalDto, careers, rewardDisciplines, qualifications, languages);
+		memberService.createMember(adminDto, orgSettingDto, profileDto, personalDto, careers, rewardDisciplines, qualifications, languages);
 	}
 }

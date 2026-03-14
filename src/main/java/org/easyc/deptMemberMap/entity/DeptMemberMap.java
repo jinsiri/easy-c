@@ -8,12 +8,14 @@ import org.easyc.dept.entity.Dept;
 import org.easyc.deptMemberMap.constant.DeptRole;
 import org.easyc.jobTitle.entity.JobTitle;
 import org.easyc.member.entity.Member;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class DeptMemberMap extends BaseEntity {
     @Id
     @SequenceGenerator(name="dept_member_map_seq", sequenceName="dept_member_map_seq", allocationSize=1)
@@ -46,4 +48,14 @@ public class DeptMemberMap extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_title_id", insertable = false, updatable = false)
     private JobTitle jobTitle;
+
+
+    public void delete() {
+        super.delete();
+    }
+
+    public void updateInfo(Long deptId, Long jobTitleId) {
+        this.deptId = deptId;
+        this.jobTitleId = jobTitleId;
+    }
 }

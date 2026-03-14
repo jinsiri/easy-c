@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface DeptMemberMapRepository extends JpaRepository<DeptMemberMap, Long> {
+    List<DeptMemberMap> findByMemberId(Long memberId);
+
     @Query("SELECT dmm FROM DeptMemberMap dmm " +
             "LEFT JOIN FETCH dmm.dept " +
             "LEFT JOIN FETCH dmm.jobTitle " +

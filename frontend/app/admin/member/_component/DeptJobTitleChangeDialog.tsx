@@ -107,8 +107,6 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 		}
 	};
 
-	console.log(updatedList);
-
 	return (
 		<BaseDialog title='부서/직책 설정' confirmLabel='확인' onConfirm={handleSave} onClose={onClose} maxWidth='md' fullWidth>
 			<Grid container spacing={4} alignItems='stretch'>
@@ -144,7 +142,7 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 									<em style={{ color: '#aaa' }}>미선택</em>
 								</MenuItem>
 								{jobTitleList?.map((opt) => (
-									<MenuItem key={opt.jobTitleId} value={opt.jobTitleId}>
+									<MenuItem key={'jobTitle_' + opt.jobTitleId} value={opt.jobTitleId}>
 										{opt.jobTitleNm}
 									</MenuItem>
 								))}
@@ -178,7 +176,7 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 							.filter((m) => !m.deleted)
 							.map((m) => (
 								<Chip
-									key={m.deptMemberMapId}
+									key={'memberMap_' + m.deptMemberMapId}
 									label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''}`}
 									color='primary'
 									variant='outlined'

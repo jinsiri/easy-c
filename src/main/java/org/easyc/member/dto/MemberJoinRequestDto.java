@@ -2,12 +2,9 @@ package org.easyc.member.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import org.easyc.deptMemberMap.dto.DeptMemberMapRequestDto;
 import org.easyc.member.constant.AccountStatus;
 import org.easyc.member.constant.MemberRole;
 import org.easyc.member.entity.Member;
-
-import java.util.List;
 
 @Getter
 public class MemberJoinRequestDto { //회원가입 등 비밀번호 필요할 때 사용
@@ -23,12 +20,6 @@ public class MemberJoinRequestDto { //회원가입 등 비밀번호 필요할 �
     private String memberNmEn; // 영문 이름
     private MemberRole memberRole;
     private AccountStatus accountStatus;
-
-    // ── 조직 관련 ──
-    private Long jobPositionId;
-    private Long jobGradeId;
-    private Long jobRoleId;
-    private List<DeptMemberMapRequestDto> deptMemberMapList;
 
     public MemberJoinRequestDto(String loginId, String password, String memberNm, String memberNmEn, MemberRole memberRole) {
         this.loginId = loginId;
