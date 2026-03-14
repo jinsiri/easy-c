@@ -25,7 +25,8 @@ const mapDeptToTree = (dept: DeptResponseDto) => ({
 export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleList, initialDeptMaps, setDeptMemberMap }: Props) {
 	const theme = useTheme();
 	const isDownMd = useMediaQuery(theme.breakpoints.down('md'));
-	const addedElIdxRef = useRef<number>(0);
+	const minId = Math.min(0, ...initialDeptMaps.map((m) => Number(m.deptMemberMapId)).filter((id) => id < 0));
+	const addedElIdxRef = useRef<number>(minId - 1);
 	const { expandedIds, setExpandedIds } = useDeptTreeStore();
 	const [updatedList, setUpdatedList] = useState<any[]>(initialDeptMaps);
 	const [editingId, setEditingId] = useState<string | number | null>(null);
@@ -81,7 +82,7 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 			setUpdatedList((prev) => [
 				...prev,
 				{
-					deptMemberMapId: --addedElIdxRef.current,
+					deptMemberMapId: addedElIdxRef.current--,
 					...selection,
 				},
 			]);
@@ -105,6 +106,8 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 			resetSelection();
 		}
 	};
+
+	console.log(updatedList);
 
 	return (
 		<BaseDialog title='부서/직책 설정' confirmLabel='확인' onConfirm={handleSave} onClose={onClose} maxWidth='md' fullWidth>
