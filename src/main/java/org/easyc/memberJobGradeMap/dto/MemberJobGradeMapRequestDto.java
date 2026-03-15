@@ -4,6 +4,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.dto.BaseDto;
 
+import java.util.Set;
+
 @Getter
 @SuperBuilder
 @AllArgsConstructor
@@ -13,4 +15,6 @@ public class MemberJobGradeMapRequestDto extends BaseDto {
     private Long memberJobGradeMapId;
     private Long memberId;
     private Long jobGradeId;
+
+    private Set<Long> memberIds;
 }

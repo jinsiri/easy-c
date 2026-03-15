@@ -5,14 +5,18 @@ import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.jobGrade.repository.JobGradeRepository;
 import org.easyc.member.repository.MemberRepository;
+import org.easyc.memberJobGradeMap.dto.MemberJobGradeMapRequestDto;
 import org.easyc.memberJobGradeMap.dto.MemberJobGradeMapResponseDto;
 import org.easyc.memberJobGradeMap.entity.MemberJobGradeMap;
 import org.easyc.memberJobGradeMap.repository.MemberJobGradeMapRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -60,5 +64,21 @@ public class MemberJobGradeMapService {
         if (!memberRepository.existsById(memberId) || !jobGradeRepository.existsById(jobGradeId)) {
             throw new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND);
         }
+    }
+
+    @Transactional
+    public void changeJobGradeBulk(MemberJobGradeMapRequestDto dto) {
+        Set<Long> memberIds = dto.getMemberIds();
+        repository.bulkDeleteByMemberIds(memberIds);
+
+        List<MemberJobGradeMap> newMappings = memberIds.stream()
+                .map(memberId -> MemberJobGradeMap.builder()
+                        .memberId(memberId)
+                        .jobGradeId(dto.getJobGradeId())
+                        .deleted(false)
+                        .build())
+                .collect(Collectors.toList());
+
+        repository.saveAll(newMappings);
     }
 }
