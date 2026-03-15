@@ -58,8 +58,14 @@ const LoginPage = () => {
 				}}
 			>
 				<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 4 }}>
-					<Box display='flex' flexDirection='column' alignItems='center' justifyContent={'center'} sx={{ bgcolor: 'grey.500', minHeight: '72px' }}>
-						로고
+					<Box
+						display='flex'
+						flexDirection='column'
+						alignItems='center'
+						justifyContent={'center'}
+						sx={{ height: '14vh', overflow: 'hidden', '& img': { maxHeight: '100%' } }}
+					>
+						<img src={'/images/easyc_logo.png'} alt={'Logo'} />
 					</Box>
 					<Box component={'form'} onSubmit={handleLogin} sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 1 }}>
 						<TextField
