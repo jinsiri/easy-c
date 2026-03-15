@@ -263,8 +263,17 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 						border: `1px solid ${theme.palette.primary.main}`,
 					}}
 				>
-					<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '15%', minWidth: '9rem' }}>
-						<Box sx={{ width: '6rem', height: '6rem', borderRadius: '1rem', backgroundColor: theme.palette.grey[500] }}></Box>
+					<Box
+						sx={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							width: '15%',
+							minWidth: '9rem',
+							overflow: 'hidden',
+						}}
+					>
+						<img src={'/images/blank_profile.png'} alt={'프로필'} style={{ maxWidth: '70%', borderRadius: '50%', objectFit: 'cover' }} />
 					</Box>
 					<Box sx={{ width: 'calc(80% - 1rem)', marginLeft: '1rem' }}>
 						<List sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', width: '100%' }}>
@@ -291,7 +300,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 														? deptMemberMapInfo.map((m) => (
 																<Chip
 																	key={m.deptMemberMapId}
-																	label={`${m.deptNm} - ${m.jobTitleNm}`}
+																	label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''}`}
 																	variant='outlined'
 																	color={'primary'}
 																	size={'small'}

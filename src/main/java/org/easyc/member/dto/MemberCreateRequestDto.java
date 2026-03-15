@@ -2,6 +2,7 @@ package org.easyc.member.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.easyc.deptMemberMap.dto.DeptMemberMapRequestDto;
 import org.easyc.member.constant.*;
 
 import java.time.LocalDate;
@@ -17,6 +18,12 @@ public class MemberCreateRequestDto {
     private String memberNm;
     private String memberNmEn;
     private MemberRole memberRole;
+
+    // ── MemberOrgSettingRequestDto 필드 ──
+    private Long jobPositionId;
+    private Long jobGradeId;
+    private Long jobRoleId;
+    private List<DeptMemberMapRequestDto> deptMemberMapList;
 
     // ── MemberProfileRequestDto 필드 ──
     private String employeeId;
@@ -62,6 +69,15 @@ public class MemberCreateRequestDto {
                 this.memberNm,
                 this.memberNmEn,
                 this.memberRole != null ? this.memberRole : MemberRole.ROLE_USER
+        );
+    }
+
+    public MemberOrgSettingRequestDto toOrgSettingDto() {
+        return new MemberOrgSettingRequestDto(
+                this.jobPositionId,
+                this.jobGradeId,
+                this.jobRoleId,
+                this.deptMemberMapList
         );
     }
 

@@ -158,6 +158,7 @@ public class MemberController {
     public void createMember(@RequestBody MemberCreateRequestDto dto) {
         memberService.createMember(
                 dto.toJoinDto(),
+                dto.toOrgSettingDto(),
                 dto.toProfileDto(),
                 dto.toPersonalDto(),
                 dto.getCareerListOrEmpty(),

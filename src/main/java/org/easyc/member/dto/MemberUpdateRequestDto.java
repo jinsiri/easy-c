@@ -53,7 +53,7 @@ public class MemberUpdateRequestDto {
     private Long jobPositionId;
     private Long jobGradeId;
     private Long jobRoleId;
-    private List<DeptMemberMapRequestDto> deptMemberMapDto;
+    private List<DeptMemberMapRequestDto> deptMemberMapList;
 
     // ── 리스트 ──
     private List<MemberCareerRequestDto>           careerList;

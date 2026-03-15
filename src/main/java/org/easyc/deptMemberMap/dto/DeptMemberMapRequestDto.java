@@ -18,6 +18,7 @@ public class DeptMemberMapRequestDto extends BaseDto {
     private Long memberId;
     private Long jobTitleId;
     private DeptRole deptRole;
+    private boolean isPrimary;
 
     private Set<Long> memberIds;
 
@@ -28,6 +29,7 @@ public class DeptMemberMapRequestDto extends BaseDto {
                 .memberId(deptMemberMapRequestDto.getMemberId())
                 .jobTitleId(deptMemberMapRequestDto.getJobTitleId())
                 .deptRole(deptMemberMapRequestDto.getDeptRole())
+                .isPrimary(deptMemberMapRequestDto.isPrimary())
                 .build();
     }
 }

@@ -47,7 +47,6 @@ export default function AdminDeptRolePage() {
 
 	const deleteMembers = async () => {
 		const selectedRows = gridRef.current?.api.getSelectedRows() || [];
-		selectedRows.forEach((row: any) => console.log(row));
 		const memberIds = selectedRows.map((row: any) => row.memberId);
 
 		await memberService
