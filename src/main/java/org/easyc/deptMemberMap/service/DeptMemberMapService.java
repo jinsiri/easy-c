@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
+import org.easyc.deptMemberMap.constant.DeptRole;
 import org.easyc.deptMemberMap.dto.DeptMemberMapRequestDto;
 import org.easyc.deptMemberMap.dto.DeptMemberMapResponseDto;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
@@ -51,7 +52,7 @@ public class DeptMemberMapService {
                 if (dto.isDeleted()) {
                     map.delete();
                 } else {
-                    map.updateInfo(dto.getDeptId(), dto.getJobTitleId());
+                    map.updateInfo(dto.getDeptId(), dto.getJobTitleId(), DeptRole.MEMBER);
                 }
             }
         }
@@ -69,5 +70,22 @@ public class DeptMemberMapService {
 
             deptMemberMapRepository.saveAll(newMappings);
         }
+    }
+
+
+    @Transactional
+    public void assignDeptRole(DeptMemberMapRequestDto dto) {
+        DeptMemberMap map = deptMemberMapRepository.findByDeptIdAndMemberId(dto.getDeptId(), dto.getMemberId())
+                .orElseThrow(() -> new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND));
+
+        Optional<DeptMemberMap> storedRoleOpt = deptMemberMapRepository.findByDeptIdAndDeptRole(dto.getDeptId(), dto.getDeptRole());
+
+        storedRoleOpt.ifPresent(storedRole -> {
+            if (!storedRole.getMemberId().equals(dto.getMemberId())) {
+                storedRole.updateDeptRole(DeptRole.MEMBER);
+            }
+        });
+
+        map.updateDeptRole(dto.getDeptRole());
     }
 }

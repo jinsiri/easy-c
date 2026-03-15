@@ -1,9 +1,12 @@
 package org.easyc.member.repository;
 
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.easyc.deptMemberMap.constant.DeptRole;
 import org.easyc.member.dto.MemberLightResponseDto;
 import org.easyc.member.dto.QMemberLightResponseDto;
 import org.springframework.stereotype.Repository;
@@ -27,6 +30,11 @@ import static org.easyc.memberJobPositionMap.entity.QMemberJobPositionMap.member
 public class MemberRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
+    NumberExpression<Integer> roleOrder = new CaseBuilder()
+            .when(deptMemberMap.deptRole.eq(DeptRole.MANAGER)).then(1)
+            .when(deptMemberMap.deptRole.eq(DeptRole.SUB_MANAGER)).then(2)
+            .otherwise(3);
+
     public List<MemberLightResponseDto> findLightMembers() {
         List<MemberLightResponseDto> flatResults = queryFactory
                 .select(new QMemberLightResponseDto(
@@ -41,6 +49,7 @@ public class MemberRepositoryCustom {
                         memberProfile.employmentStatus,
                         memberPersonal.phoneNumber,
                         dept.deptNm,
+                        deptMemberMap.deptRole,
                         jobTitle.jobTitleNm,
                         jobPosition.jobPositionNm,
                         member.deleted,
@@ -61,6 +70,10 @@ public class MemberRepositoryCustom {
                 .leftJoin(memberJobPositionMap).on(member.memberId.eq(memberJobPositionMap.memberId), memberJobPositionMap.deleted.isFalse())
                 .leftJoin(jobPosition).on(memberJobPositionMap.jobPositionId.eq(jobPosition.jobPositionId))
                 .where(member.deleted.isFalse())
+                .orderBy(
+                        roleOrder.asc(),
+                        jobPosition.jobPositionLevel.asc()
+                )
                 .fetch();
 
         Map<Long, MemberLightResponseDto> map = new LinkedHashMap<>();
@@ -68,7 +81,7 @@ public class MemberRepositoryCustom {
             MemberLightResponseDto mainDto = map.computeIfAbsent(dto.getMemberId(), id -> dto);
 
             if (mainDto != dto) {
-                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle());
+                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle(), dto.getDeptRole());
             }
         }
 
@@ -92,6 +105,7 @@ public class MemberRepositoryCustom {
                         memberProfile.employmentStatus,
                         memberPersonal.phoneNumber,
                         dept.deptNm,
+                        deptMemberMap.deptRole,
                         jobTitle.jobTitleNm,
                         jobPosition.jobPositionNm,
                         member.deleted,
@@ -115,6 +129,10 @@ public class MemberRepositoryCustom {
                         member.deleted.isFalse(),
                         deptMemberMap.memberId.isNull()
                 )
+                .orderBy(
+                        roleOrder.asc(),
+                        jobPosition.jobPositionLevel.asc()
+                )
                 .fetch();
 
         Map<Long, MemberLightResponseDto> map = new LinkedHashMap<>();
@@ -122,7 +140,7 @@ public class MemberRepositoryCustom {
             MemberLightResponseDto mainDto = map.computeIfAbsent(dto.getMemberId(), id -> dto);
 
             if (mainDto != dto) {
-                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle());
+                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle(),dto.getDeptRole());
             }
         }
 
@@ -151,6 +169,7 @@ public class MemberRepositoryCustom {
                         memberProfile.employmentStatus,
                         memberPersonal.phoneNumber,
                         dept.deptNm,
+                        deptMemberMap.deptRole,
                         jobTitle.jobTitleNm,
                         jobPosition.jobPositionNm,
                         member.deleted,
@@ -174,6 +193,10 @@ public class MemberRepositoryCustom {
                         member.deleted.isFalse(),
                         member.memberId.notIn(memberIdsInDept)
                 )
+                .orderBy(
+                        roleOrder.asc(),
+                        jobPosition.jobPositionLevel.asc()
+                )
                 .fetch();
 
         Map<Long, MemberLightResponseDto> map = new LinkedHashMap<>();
@@ -181,7 +204,7 @@ public class MemberRepositoryCustom {
             MemberLightResponseDto mainDto = map.computeIfAbsent(dto.getMemberId(), id -> dto);
 
             if (mainDto != dto) {
-                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle());
+                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle(), dto.getDeptRole());
             }
         }
 
@@ -203,6 +226,7 @@ public class MemberRepositoryCustom {
                         memberProfile.employmentStatus,
                         memberPersonal.phoneNumber,
                         dept.deptNm,
+                        deptMemberMap.deptRole,
                         jobTitle.jobTitleNm,
                         jobPosition.jobPositionNm,
                         member.deleted,
@@ -228,6 +252,10 @@ public class MemberRepositoryCustom {
                         member.deleted.isFalse(),
                         dept.deptId.eq(targetDeptId)
                 )
+                .orderBy(
+                        roleOrder.asc(),
+                        jobPosition.jobPositionLevel.asc()
+                )
                 .fetch();
 
         Map<Long, MemberLightResponseDto> map = new LinkedHashMap<>();
@@ -235,7 +263,7 @@ public class MemberRepositoryCustom {
             MemberLightResponseDto mainDto = map.computeIfAbsent(dto.getMemberId(), id -> dto);
 
             if (mainDto != dto) {
-                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle());
+                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle(), dto.getDeptRole());
             }
         }
 

@@ -63,9 +63,11 @@ const DropdownButton = ({ initialLabel, options, startIcon, variant = 'outlined'
 				onClose={handleClose}
 				anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
 				transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-				PaperProps={{
-					elevation: 4,
-					sx: { mt: 0.5, minWidth: 150, borderRadius: '4px' },
+				slotProps={{
+					paper: {
+						elevation: 4,
+						sx: { mt: 0.5, minWidth: 150, borderRadius: '4px' },
+					},
 				}}
 			>
 				{options.map((option, index) => (

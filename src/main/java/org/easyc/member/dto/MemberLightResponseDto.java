@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import org.easyc.common.dto.AuditUser;
 import org.easyc.common.dto.BaseDto;
 import org.easyc.common.support.EnumOptionMapper;
+import org.easyc.deptMemberMap.constant.DeptRole;
 import org.easyc.member.constant.AccountStatus;
 import org.easyc.member.constant.EmploymentStatus;
 import org.easyc.member.constant.EmploymentType;
@@ -37,6 +38,7 @@ public class MemberLightResponseDto extends BaseDto {
     private String phoneNumber;
     // role
     private String deptNm;
+    private DeptRole deptRole;
     private String jobTitle;
     private String jobPosition;
     private String JobGrade;
@@ -53,12 +55,11 @@ public class MemberLightResponseDto extends BaseDto {
             Long memberId, String memberNm, String loginId, MemberRole memberRole, AccountStatus accountStatus,
             String employeeId, String email, EmploymentType employmentType, EmploymentStatus employmentStatus,
             String phoneNumber,
-            String deptNm, String jobTitle, String jobPosition,
+            String deptNm, DeptRole deptRole, String jobTitle, String jobPosition,
             boolean deleted, boolean active,
-            LocalDateTime registerDate, String registerIp, AuditUser registerUser, //String registerId, String registerNm,
-            LocalDateTime lastUpdateDate, String lastUpdateIp, AuditUser lastUpdateUser //String lastUpdateId, String lastUpdateNm
+            LocalDateTime registerDate, String registerIp, AuditUser registerUser,
+            LocalDateTime lastUpdateDate, String lastUpdateIp, AuditUser lastUpdateUser
     ) {
-//        super(deleted, active, registerDate, registerIp, registerUser, lastUpdateDate, lastUpdateIp, lastUpdateId, lastUpdateNm);
         super(deleted, active, registerDate, registerIp, registerUser, lastUpdateDate, lastUpdateIp, lastUpdateUser);
 
         this.deptInfoSet = new LinkedHashSet<>();
@@ -75,16 +76,26 @@ public class MemberLightResponseDto extends BaseDto {
         this.phoneNumber = phoneNumber;
         this.jobPosition = jobPosition;
         this.deptNm = deptNm;
+        this.deptRole = deptRole;
+
         if (deptNm != null) {
             this.deptNms.add(deptNm);
         }
-        this.addDeptInfo(deptNm, jobTitle);
+
+        this.addDeptInfo(deptNm, jobTitle, deptRole);
     }
 
-    public void addDeptInfo(String deptNm, String jobTitle) {
+    public void addDeptInfo(String deptNm, String jobTitle, DeptRole deptRole) {
         if (deptNm != null) {
-            String info = (jobTitle != null && !jobTitle.isEmpty()) ? String.format("%s(%s)", deptNm, jobTitle) : deptNm;
-            this.deptInfoSet.add(info);
+            StringBuilder sb = new StringBuilder(deptNm);
+            if ((jobTitle != null && !jobTitle.isEmpty()) || (deptRole != null)) {
+                sb.append("(");
+                if (jobTitle != null) sb.append(jobTitle);
+                if (jobTitle != null && deptRole != null) sb.append("/");
+                if (deptRole != null) sb.append(deptRole);
+                sb.append(")");
+            }
+            this.deptInfoSet.add(sb.toString());
         }
     }
 
