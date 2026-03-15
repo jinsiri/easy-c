@@ -82,7 +82,6 @@ export default function AttendanceUserDetailModal({
 				workDate: dayjs(data.workDate).format('YYYY-MM-DD HH:mm'),
 			});
 
-			console.log(res);
 			setAttendanceData(res);
 		} finally {
 			setLoader(false);
@@ -102,6 +101,8 @@ export default function AttendanceUserDetailModal({
 
 			if (confirm('요청이 성공적으로 등록되었습니다.')) {
 				resetModalData();
+
+				router.refresh();
 				router.back();
 			}
 		} finally {

@@ -2,6 +2,7 @@ package org.easyc.attendance.repository;
 
 import org.easyc.attendance.entity.AttendancePolicyMap;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -16,4 +17,7 @@ public interface AttendancePolicyMapRepository extends JpaRepository<AttendanceP
     List<Object[]> countGroupByAttendancePolicyId();
 
     List<AttendancePolicyMap> findAllByMemberIdIsIn(List<Long> memberIdList);
+
+    @Modifying
+    void deleteByAttendancePolicyId(Long policyId);
 }

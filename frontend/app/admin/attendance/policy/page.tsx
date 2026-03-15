@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -10,7 +10,7 @@ import useModalStore from '@/store/useModalStore';
 
 /** MUI */
 import { Box, Button, Grid, IconButton, Typography, Chip } from '@mui/material';
-import { DeleteRounded, BorderColorRounded, Policy } from '@mui/icons-material';
+import { DeleteRounded, BorderColorRounded } from '@mui/icons-material';
 import { grey } from '@mui/material/colors';
 
 /** Custom */
@@ -29,6 +29,7 @@ interface listCollector {
 
 export default function AttendancePolicyPage() {
 	const router = useRouter();
+	const pathName = usePathname();
 	const { loader, setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 
@@ -83,7 +84,7 @@ export default function AttendancePolicyPage() {
 
 	useEffect(() => {
 		getAttendancePolicyData();
-	}, []);
+	}, [pathName]);
 
 	const getAttendancePolicyData = async () => {
 		if (!loader) setLoader(true);

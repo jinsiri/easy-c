@@ -67,6 +67,7 @@ export default function AttendancePolicyModal() {
 			await attendancePolicyService.savePolicyMemberMapping(req);
 			if (confirm('근로자가 성공적으로 적용되었습니다.')) {
 				resetModalData();
+				router.refresh();
 				router.back();
 			}
 		}

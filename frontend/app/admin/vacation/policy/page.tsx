@@ -1,10 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useState, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 /** Lib */
-import dayjs from 'dayjs';
 import useLoaderStore from '@/store/useLoaderStore';
 import useModalStore from '@/store/useModalStore';
 
@@ -26,39 +25,46 @@ interface listCollector {
 	valueFormatter?: (data: VacationPolicyDto) => ReactNode;
 }
 
-const list: listCollector[] = [
-	{ name: '휴가생성 기준', key: 'vacationPolicyType', valueFormatter: (data) => <Box>{VACATIONPOLICYTYPE[data.vacationPolicyType] + ' 기준'}</Box> },
-	{ name: '휴가사용 단위', key: 'vacationPolicyUnit', valueFormatter: (data) => <Box>{VACATIONPOLICYUNIT[data.vacationPolicyUnit]}</Box> },
-	{
-		name: '내년연차 사용',
-		key: 'nextYearLeaveUsed',
-		valueFormatter: (data) => <Box>{data.nextYearLeaveUsed ? <CheckRounded fontSize='small' /> : <CloseRounded fontSize='small' />}</Box>,
-	},
-
-	{
-		name: '적용 근로자(명)',
-		key: 'mappingUserCount',
-		valueFormatter: (data) => (
-			<Box>
-				{data.mappingUserCount ?? '-'}명{' '}
-				<IconButton sx={{ color: grey[500] }} onClick={(e) => {}}>
-					<BorderColorRounded sx={{ fontSize: '1rem' }} />
-				</IconButton>
-			</Box>
-		),
-	},
-];
-
 export default function VacationPolicyPage() {
 	const router = useRouter();
+	const pathName = usePathname();
 	const { loader, setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 
 	const [policyData, setPolicyData] = useState<VacationPolicyDto[]>([]);
 
+	const list: listCollector[] = [
+		{ name: '휴가생성 기준', key: 'vacationPolicyType', valueFormatter: (data) => <Box>{VACATIONPOLICYTYPE[data.vacationPolicyType] + ' 기준'}</Box> },
+		{ name: '휴가사용 단위', key: 'vacationPolicyUnit', valueFormatter: (data) => <Box>{VACATIONPOLICYUNIT[data.vacationPolicyUnit]}</Box> },
+		{
+			name: '내년연차 사용',
+			key: 'nextYearLeaveUsed',
+			valueFormatter: (data) => <Box>{data.nextYearLeaveUsed ? <CheckRounded fontSize='small' /> : <CloseRounded fontSize='small' />}</Box>,
+		},
+
+		{
+			name: '적용 근로자(명)',
+			key: 'mappingUserCount',
+			valueFormatter: (data) => (
+				<Box>
+					{data.mappingUserCount ?? '-'}명{' '}
+					<IconButton
+						sx={{ color: grey[500] }}
+						onClick={(e) => {
+							setModalData({ policyId: data.vacationPolicyId });
+							router.push('/admin/vacation/policy/modal');
+						}}
+					>
+						<BorderColorRounded sx={{ fontSize: '1rem' }} />
+					</IconButton>
+				</Box>
+			),
+		},
+	];
+
 	useEffect(() => {
 		getVacationPolicyData();
-	}, []);
+	}, [pathName]);
 
 	const getVacationPolicyData = async () => {
 		if (!loader) setLoader(true);

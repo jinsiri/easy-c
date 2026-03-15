@@ -1,13 +1,21 @@
 package org.easyc.vacation.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import org.easyc.attendance.dto.AttendancePolicyMemberRequestDto;
+import org.easyc.attendance.entity.AttendancePolicyMap;
+import org.easyc.member.repository.MemberRepositoryCustom;
 import org.easyc.vacation.dto.VacationPolicyDto;
+import org.easyc.vacation.dto.VacationPolicyMemberDto;
+import org.easyc.vacation.dto.VacationPolicyMemberRequestDto;
 import org.easyc.vacation.entity.VacationPolicy;
+import org.easyc.vacation.entity.VacationPolicyMap;
 import org.easyc.vacation.repository.VacationPolicyMapRepository;
 import org.easyc.vacation.repository.VacationPolicyRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +26,7 @@ public class VacationPolicyService {
 
     private final VacationPolicyRepository vacationPolicyRepository;
     private final VacationPolicyMapRepository vacationPolicyMapRepository;
+    private final MemberRepositoryCustom memberRepositoryCustom;
 
     public List<VacationPolicyDto> getAllPolicy (){
         List<VacationPolicy> policyList = vacationPolicyRepository.findAllByActiveTrueOrderByVacationPolicyIdAsc();
@@ -50,5 +59,36 @@ public class VacationPolicyService {
     }
 
 
+    public List<VacationPolicyMemberDto> getPolicyMemberData() {
+        return memberRepositoryCustom.findVacationPolicyMembers();
 
+    }
+
+    @Transactional
+    public void savePolicyMemberMapping(VacationPolicyMemberRequestDto request) {
+        Long policyId = request.getPolicyId();
+        List<Long> memberIdList = request.getMemberIdList();
+
+        //기존 데이터 삭제
+        vacationPolicyMapRepository.deleteByVacationPolicyId(policyId);
+
+        //선택한 멤버 데이터 수정
+        List<VacationPolicyMap> mapList = vacationPolicyMapRepository.findAllByMemberIdIsIn(memberIdList);
+        Map<Long, VacationPolicyMap> map = mapList.stream().collect(Collectors.toMap(VacationPolicyMap::getMemberId, g -> g));
+
+        List<VacationPolicyMap> resultList = new ArrayList<>();
+        for(Long id : memberIdList){
+            VacationPolicyMap a = new VacationPolicyMap();
+
+            if(map.containsKey(id)){
+                a = map.get(id);
+            }
+
+            a.setVacationPolicyId(policyId);
+            a.setMemberId(id);
+            resultList.add(a);
+        }
+
+        vacationPolicyMapRepository.saveAll(resultList);
+    }
 }

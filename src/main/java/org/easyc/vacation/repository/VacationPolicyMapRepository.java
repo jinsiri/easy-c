@@ -4,6 +4,7 @@ import org.easyc.attendance.entity.AttendancePolicyMap;
 import org.easyc.vacation.entity.VacationPolicy;
 import org.easyc.vacation.entity.VacationPolicyMap;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +18,8 @@ public interface VacationPolicyMapRepository extends JpaRepository<VacationPolic
     @Query("SELECT a.vacationPolicyId, count(a) FROM VacationPolicyMap a GROUP BY a.vacationPolicyId")
     List<Object[]> countGroupByVacationPolicyId();
 
+    List<VacationPolicyMap> findAllByMemberIdIsIn(List<Long> memberIdList);
+
+    @Modifying
+    void deleteByVacationPolicyId(Long policyId);
 }

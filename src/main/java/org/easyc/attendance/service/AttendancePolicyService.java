@@ -1,5 +1,6 @@
 package org.easyc.attendance.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.easyc.attendance.dto.AttendancePolicyDto;
 import org.easyc.attendance.dto.AttendancePolicyMemberDto;
@@ -61,10 +62,15 @@ public class AttendancePolicyService {
         return memberRepositoryCustom.findApplicationPolicyMembers();
     }
 
+    @Transactional
     public void savePolicyMemberMapping(AttendancePolicyMemberRequestDto request) {
         Long policyId = request.getPolicyId();
         List<Long> memberIdList = request.getMemberIdList();
 
+        //기존 데이터 삭제
+        attendancePolicyMapRepository.deleteByAttendancePolicyId(policyId);
+
+        //선택한 멤버 데이터 수정
         List<AttendancePolicyMap> mapList = attendancePolicyMapRepository.findAllByMemberIdIsIn(memberIdList);
         Map<Long, AttendancePolicyMap> map = mapList.stream().collect(Collectors.toMap(AttendancePolicyMap::getMemberId, g -> g));
 

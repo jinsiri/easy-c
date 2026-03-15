@@ -13,6 +13,8 @@ import org.easyc.attendance.dto.AttendancePolicyMemberDto;
 import org.easyc.attendance.dto.QAttendancePolicyMemberDto;
 import org.easyc.member.dto.MemberLightResponseDto;
 import org.easyc.member.dto.QMemberLightResponseDto;
+import org.easyc.vacation.dto.QVacationPolicyMemberDto;
+import org.easyc.vacation.dto.VacationPolicyMemberDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -30,6 +32,8 @@ import static org.easyc.member.entity.QMember.member;
 import static org.easyc.member.entity.QMemberPersonal.memberPersonal;
 import static org.easyc.member.entity.QMemberProfile.memberProfile;
 import static org.easyc.memberJobPositionMap.entity.QMemberJobPositionMap.memberJobPositionMap;
+import static org.easyc.vacation.entity.QVacationPolicy.vacationPolicy;
+import static org.easyc.vacation.entity.QVacationPolicyMap.vacationPolicyMap;
 
 @RequiredArgsConstructor
 @Repository
@@ -321,6 +325,7 @@ public class MemberRepositoryCustom {
                 .leftJoin(attendancePolicy)
                 .on(attendancePolicyMap.attendancePolicyId.eq(attendancePolicy.attendancePolicyId))
                 .where(member.deleted.isFalse())
+                .orderBy(member.memberId.asc())
                 .fetch();
 
         Map<Long, AttendancePolicyMemberDto> map = new LinkedHashMap<>();
@@ -334,6 +339,68 @@ public class MemberRepositoryCustom {
 
         List<AttendancePolicyMemberDto> result = new ArrayList<>(map.values());
         result.forEach(AttendancePolicyMemberDto::finalizeDisplayInfo);
+
+        return result;
+    }
+
+    public List<VacationPolicyMemberDto> findVacationPolicyMembers() {
+        List<VacationPolicyMemberDto> flatResults = queryFactory
+                .select(new QVacationPolicyMemberDto(
+                        member.memberId,
+                        member.memberNm,
+                        member.loginId,
+                        member.memberRole,
+                        member.accountStatus,
+                        memberProfile.employeeId,
+                        memberProfile.email,
+                        memberProfile.employmentType,
+                        memberProfile.employmentStatus,
+                        memberPersonal.phoneNumber,
+                        dept.deptNm,
+                        deptMemberMap.deptRole,
+                        jobTitle.jobTitleNm,
+                        jobPosition.jobPositionNm,
+                        member.deleted,
+                        member.active,
+                        member.registerDate,
+                        member.registerIp,
+                        member.registerUser,
+                        member.lastUpdateDate,
+                        member.lastUpdateIp,
+                        member.lastUpdateUser,
+                        vacationPolicy.vacationPolicyId,
+                        vacationPolicy.vacationPolicyName
+                ))
+                .from(member)
+                .leftJoin(memberProfile).on(member.memberId.eq(memberProfile.memberId))
+                .leftJoin(memberPersonal).on(member.memberId.eq(memberPersonal.memberId))
+                .leftJoin(deptMemberMap)
+                .on(member.memberId.eq(deptMemberMap.memberId),
+                        deptMemberMap.deleted.isFalse(),
+                        deptMemberMap.isPrimary.isTrue())
+                .leftJoin(dept).on(deptMemberMap.deptId.eq(dept.deptId))
+                .leftJoin(jobTitle).on(deptMemberMap.jobTitleId.eq(jobTitle.jobTitleId))
+                .leftJoin(memberJobPositionMap).on(member.memberId.eq(memberJobPositionMap.memberId), memberJobPositionMap.deleted.isFalse())
+                .leftJoin(jobPosition).on(memberJobPositionMap.jobPositionId.eq(jobPosition.jobPositionId))
+                .leftJoin(vacationPolicyMap)
+                .on(member.memberId.eq(vacationPolicyMap.memberId))
+                .leftJoin(vacationPolicy)
+                .on(vacationPolicyMap.vacationPolicyId.eq(vacationPolicy.vacationPolicyId))
+                .where(member.deleted.isFalse())
+                .orderBy(member.memberId.asc())
+                .fetch();
+
+        Map<Long, VacationPolicyMemberDto> map = new LinkedHashMap<>();
+        for (VacationPolicyMemberDto dto : flatResults) {
+            VacationPolicyMemberDto mainDto = map.computeIfAbsent(dto.getMemberId(), id -> dto);
+
+            if (mainDto != dto) {
+                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle(), dto.getDeptRole());
+            }
+        }
+
+        List<VacationPolicyMemberDto> result = new ArrayList<>(map.values());
+        result.forEach(VacationPolicyMemberDto::finalizeDisplayInfo);
 
         return result;
     }

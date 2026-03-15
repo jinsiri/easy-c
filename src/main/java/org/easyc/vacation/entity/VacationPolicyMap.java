@@ -1,16 +1,14 @@
 package org.easyc.vacation.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.easyc.attendance.entity.AttendancePolicy;
 import org.easyc.member.entity.Member;
 
 @Entity
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class VacationPolicyMap {

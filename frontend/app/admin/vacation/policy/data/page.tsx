@@ -221,9 +221,6 @@ export default function VacationPolicyDataPage() {
 						<FormWrapper label='내년 연차 사용'>
 							<Controller name='nextYearLeaveUsed' control={control} render={({ field }) => <Switch defaultChecked {...field} />} />
 						</FormWrapper>
-						<FormWrapper label='적용 근로자'>
-							<Button variant='outlined'>근로자 적용</Button>
-						</FormWrapper>
 					</Grid>
 					<Grid sx={{ display: 'flex', justifyContent: 'center', gap: 3 }}>
 						<Button variant='text' onClick={handleClose} size='large'>
