@@ -2,7 +2,7 @@ package org.easyc.dept.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.easyc.common.audit.activity.AuditAction;
+import org.easyc.audit.activity.annotation.AuditAction;
 import org.easyc.dept.dto.DeptRequestDto;
 import org.easyc.dept.dto.DeptResponseDto;
 import org.easyc.dept.entity.Dept;

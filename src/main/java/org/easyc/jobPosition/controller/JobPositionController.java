@@ -2,7 +2,7 @@ package org.easyc.jobPosition.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.easyc.common.audit.activity.AuditAction;
+import org.easyc.audit.activity.annotation.AuditAction;
 import org.easyc.common.dto.BulkDeleteRequestDto;
 import org.easyc.jobPosition.dto.JobPositionRequestDto;
 import org.easyc.jobPosition.dto.JobPositionResponseDto;

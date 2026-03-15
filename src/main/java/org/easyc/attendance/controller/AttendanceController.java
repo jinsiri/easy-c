@@ -1,19 +1,17 @@
 package org.easyc.attendance.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.easyc.attendance.dto.*;
-import org.easyc.attendance.entity.Attendance;
-import org.easyc.common.audit.activity.AuditAction;
+import org.easyc.audit.activity.annotation.AuditAction;
+import org.easyc.attendance.dto.AttendanceCalendarResponseDto;
+import org.easyc.attendance.dto.AttendanceRequestDto;
+import org.easyc.attendance.dto.AttendanceResponseDto;
+import org.easyc.attendance.dto.AttendanceSaveRequestDto;
 import org.easyc.attendance.service.AttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
-import static org.easyc.common.util.utilFunc.getClientIp;
 
 @RestController
 @RequiredArgsConstructor

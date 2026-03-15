@@ -13,7 +13,7 @@ export interface ActivityLogResponseDto {
 	requestId: string | null;
 	ip: string;
 	userAgent: string | null;
-	result: string;        // S / F
+	result: string;
 	status: number | null;
 	message: string | null;
 }
@@ -26,7 +26,23 @@ export interface PageResponse<T> {
 	size: number;
 }
 
+export interface ActivityLogFilter {
+	loginId?: string;
+	actionCode?: string;
+	result?: string;
+	fromDate?: string;
+	toDate?: string;
+}
+
+const toQuery = (params: Record<string, any>) =>
+	Object.entries(params)
+		.filter(([, v]) => v !== '' && v != null)
+		.map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+		.join('&');
+
 export const activityLogService = {
-	getActivityLogs: (page = 0, size = 200) =>
-		axiosConfig.get<PageResponse<ActivityLogResponseDto>>(`/api/activity-logs?page=${page}&size=${size}`),
+	getActivityLogs: (page = 0, size = 50, filter: ActivityLogFilter = {}) =>
+		axiosConfig.get<PageResponse<ActivityLogResponseDto>>(
+			`/api/activity-logs?page=${page}&size=${size}&${toQuery(filter)}`,
+		),
 };

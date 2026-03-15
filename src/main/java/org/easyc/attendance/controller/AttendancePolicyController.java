@@ -1,10 +1,8 @@
 package org.easyc.attendance.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.common.audit.activity.AuditAction;
+import org.easyc.audit.activity.annotation.AuditAction;
 import org.easyc.attendance.dto.AttendancePolicyDto;
-import org.easyc.attendance.entity.AttendancePolicy;
-import org.easyc.attendance.repository.AttendancePolicyRepository;
 import org.easyc.attendance.service.AttendancePolicyService;
 import org.springframework.web.bind.annotation.*;
 

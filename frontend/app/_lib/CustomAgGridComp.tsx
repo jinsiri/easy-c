@@ -20,6 +20,7 @@ import {
 	IsRowSelectable as IsRowSelectableType,
 } from 'ag-grid-community';
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react';
+import AgStylePagination, { ServerPaginationConfig } from './AgStylePagination';
 
 // Ag-grid Row selection 옵션 추가
 export type RowSelectionMode = 'single' | 'multiple' | 'none';
@@ -44,6 +45,7 @@ interface propsType extends AgGridReactProps {
 	rowData: Record<string, any>[];
 	colDefs: ColDef<Record<string, any>>[];
 	pagination?: boolean;
+	serverPagination?: ServerPaginationConfig;
 	rowSelectionMode?: 'single' | 'multiple' | 'none';
 	enableClickSelection?: boolean;
 	isRowSelectable?: IsRowSelectableType;
@@ -61,6 +63,7 @@ const CustomAgGridComp = forwardRef(
 			rowData,
 			colDefs,
 			pagination = true,
+			serverPagination,
 			rowSelectionMode = 'none',
 			enableClickSelection = false,
 			isRowSelectable,
@@ -138,24 +141,27 @@ const CustomAgGridComp = forwardRef(
 		}, []);
 
 		return (
-			<Box sx={{ width: '100%', height: '100%' }}>
-				<AgGridReact
-					{...props}
-					ref={gridRef}
-					theme={gridTheme}
-					rowData={rowData}
-					columnDefs={finalColDefs}
-					rowSelection={rowSelection}
-					pagination={pagination}
-					rowDragManaged={isReorderMode}
-					suppressRowDrag={!isReorderMode}
-					animateRows={animateRows}
-					onGridReady={onGridReadyEvent}
-					onGridSizeChanged={onGridSizeChanged}
-					onRowDragEnd={onRowDragEnd}
-					onCellClicked={onCellClicked}
-					onCellDoubleClicked={onCellDoubleClicked}
-				/>
+			<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+				<Box sx={{ flex: 1, minHeight: 0 }}>
+					<AgGridReact
+						{...props}
+						ref={gridRef}
+						theme={gridTheme}
+						rowData={rowData}
+						columnDefs={finalColDefs}
+						rowSelection={rowSelection}
+						pagination={serverPagination ? false : pagination}
+						rowDragManaged={isReorderMode}
+						suppressRowDrag={!isReorderMode}
+						animateRows={animateRows}
+						onGridReady={onGridReadyEvent}
+						onGridSizeChanged={onGridSizeChanged}
+						onRowDragEnd={onRowDragEnd}
+						onCellClicked={onCellClicked}
+						onCellDoubleClicked={onCellDoubleClicked}
+					/>
+				</Box>
+				{serverPagination && <AgStylePagination {...serverPagination} />}
 			</Box>
 		);
 	},

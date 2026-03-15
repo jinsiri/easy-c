@@ -1,5 +1,11 @@
 /** MUI */
-import { AccountTree, WorkHistoryRounded, CalendarMonthRounded, BeachAccessRounded } from '@mui/icons-material';
+import {
+	AccountTree,
+	WorkHistoryRounded,
+	CalendarMonthRounded,
+	BeachAccessRounded,
+	ChangeHistory, ChangeHistoryRounded, HistoryRounded
+} from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '@/type/types';
@@ -53,24 +59,6 @@ const AdminMenuItem: menuType[] = [
 						title: '팝업 공지 설정',
 						type: '2depth',
 						url: '/popup',
-					},
-					{
-						id: 'admin-normal-accesslogs',
-						title: '접근 이력',
-						type: '2depth',
-						url: '/accesslogs',
-					},
-					{
-						id: 'admin-normal-securitylogs',
-						title: '보안 이력',
-						type: '2depth',
-						url: '/securitylogs',
-					},
-					{
-						id: 'admin-normal-activitylogs',
-						title: '활동 이력',
-						type: '2depth',
-						url: '/activitylogs',
 					},
 				],
 			},
@@ -153,6 +141,34 @@ const AdminMenuItem: menuType[] = [
 						type: '2depth',
 						url: '/application',
 					},
+				],
+			},
+			{
+				id: 'admin-log',
+				title: '이력 관리',
+				type: '1depth',
+				url: '/log',
+				icon: HistoryRounded,
+				children: [
+					{
+						id: 'admin-log-access',
+						title: '접근 이력',
+						type: '2depth',
+						url: '/access',
+					},
+					{
+						id: 'admin-log-security',
+						title: '보안 이력',
+						type: '2depth',
+						url: '/security',
+					},
+					{
+						id: 'admin-log-activity',
+						title: '활동 이력',
+						type: '2depth',
+						url: '/activity',
+					},
+
 				],
 			},
 			/*{

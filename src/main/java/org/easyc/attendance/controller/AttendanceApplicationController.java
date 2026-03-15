@@ -2,7 +2,7 @@ package org.easyc.attendance.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.easyc.common.audit.activity.AuditAction;
+import org.easyc.audit.activity.annotation.AuditAction;
 import org.easyc.attendance.dto.*;
 import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.attendance.service.AttendanceApplicationService;

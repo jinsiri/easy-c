@@ -2,8 +2,6 @@ package org.easyc.vacation.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.easyc.attendance.dto.ExcelAttendanceApplicationDto;
-import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.common.audit.activity.AuditAction;
 import org.easyc.excel.dto.ExcelRequestDto;
