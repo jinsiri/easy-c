@@ -19,6 +19,7 @@ public class DeptMemberMapResponseDto extends BaseDto {
     private Long memberId;
     private Long jobTitleId;
     private DeptRole deptRole;
+    private boolean isPrimary;
 
     private String deptNm;
     private String jobTitleNm;
@@ -30,6 +31,7 @@ public class DeptMemberMapResponseDto extends BaseDto {
                 .memberId(map.getMemberId())
                 .jobTitleId(map.getJobTitleId())
                 .deptRole(map.getDeptRole())
+                .isPrimary(map.isPrimary())
                 .deptNm(map.getDept().getDeptNm())
                 .jobTitleNm(map.getJobTitle() != null ? map.getJobTitle().getJobTitleNm() : null)
                 .build();

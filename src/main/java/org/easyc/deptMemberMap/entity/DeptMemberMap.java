@@ -34,6 +34,10 @@ public class DeptMemberMap extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private DeptRole deptRole;
 
+    // 주요 부서 여부
+    @Column(name="is_primary")
+    private boolean isPrimary = false;
+
     // 읽기 전용 - 부서
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dept_id", insertable = false, updatable = false)
