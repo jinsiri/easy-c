@@ -8,7 +8,7 @@ import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.attendance.service.AttendanceCompanyService;
 import org.easyc.attendance.service.AttendanceService;
-import org.easyc.common.audit.activity.AuditAction;
+import org.easyc.audit.activity.annotation.AuditAction;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.excel.dto.ExcelRequestDto;
 import org.easyc.util.ExcelUtil;
