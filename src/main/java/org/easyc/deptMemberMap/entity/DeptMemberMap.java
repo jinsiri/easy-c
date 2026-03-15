@@ -58,8 +58,13 @@ public class DeptMemberMap extends BaseEntity {
         super.delete();
     }
 
-    public void updateInfo(Long deptId, Long jobTitleId) {
+    public void updateInfo(Long deptId, Long jobTitleId, DeptRole deptRole) {
         this.deptId = deptId;
         this.jobTitleId = jobTitleId;
+        this.deptRole = deptRole;
+    }
+
+    public void updateDeptRole(DeptRole deptRole) {
+        this.deptRole = deptRole;
     }
 }

@@ -18,4 +18,9 @@ public class DeptMemberMapController {
     public void assignMembersToDept(@RequestBody DeptMemberMapRequestDto dto) {
         deptMemberMapService.assignMembersToDept(dto);
     }
+
+    @PostMapping("/assign-role")
+    public void assignDeptRole(@RequestBody DeptMemberMapRequestDto dto) {
+        deptMemberMapService.assignDeptRole(dto);
+    }
 }
