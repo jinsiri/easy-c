@@ -1,16 +1,12 @@
 package org.easyc.vacation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.attendance.constant.WorkStatus;
 import org.easyc.common.dto.SearchRequestDto;
-import org.easyc.member.entity.Member;
 import org.easyc.member.entity.MemberProfile;
 import org.easyc.member.repository.MemberProfileRepository;
-import org.easyc.member.repository.MemberRepository;
 import org.easyc.vacation.constant.TransactionType;
 import org.easyc.vacation.constant.VacationCategory;
 import org.easyc.vacation.constant.VacationPolicyType;
-import org.easyc.vacation.dto.VacationPolicyDto;
 import org.easyc.vacation.dto.VacationResponseDto;
 import org.easyc.vacation.entity.Vacation;
 import org.easyc.vacation.entity.VacationHistory;
@@ -28,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

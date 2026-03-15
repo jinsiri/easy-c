@@ -17,7 +17,7 @@ export interface AttendanceCompanyResponseDto {
 }
 
 // API 정의
-export const attendancePolicyService = {
+export const attendanceCompanyService = {
 	getAttendanceCompanyOnedayData: (req: AttendanceCompanyRequestDto) => axiosConfig.post<AttendanceCompanyResponseDto>('/api/attendance/company/oneday', req),
 	getAttendanceCompanySearch: (req: AttendanceCompanyRequestDto) => axiosConfig.post<AttendanceDayResDto[]>('/api/attendance/company/search', req),
 };

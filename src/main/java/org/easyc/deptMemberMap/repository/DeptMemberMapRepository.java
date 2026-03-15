@@ -23,4 +23,10 @@ public interface DeptMemberMapRepository extends JpaRepository<DeptMemberMap, Lo
             "LEFT JOIN FETCH dmm.jobTitle " +
             "WHERE dmm.memberId = :memberId")
     List<DeptMemberMap> findAllByMemberIdWithFetchJoin(@Param("memberId") Long memberId);
+
+    @Query("SELECT dmm FROM DeptMemberMap dmm " +
+            "LEFT JOIN FETCH dmm.dept " +
+            "LEFT JOIN FETCH dmm.jobTitle " +
+            "WHERE dmm.memberId = :memberId AND dmm.isPrimary = true ORDER BY dmm.deptMemberMapId ASC Limit 1")
+    DeptMemberMap findOneByMemberIdWithFetchJoinPrimaryTrue(@Param("memberId") Long memberId);
 }

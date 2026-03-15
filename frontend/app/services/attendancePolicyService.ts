@@ -40,9 +40,17 @@ export interface AttendancePolicyDto {
 	mappingUserCount?: number;
 }
 
+export interface AttendancePolicyMappingRequestDto {
+	policyId: number;
+	memberIdList: number[];
+}
+
 // API 정의
 export const attendancePolicyService = {
 	getAttendancePolicyData: () => axiosConfig.get<AttendancePolicyDto[]>('/api/attendance/policy/all'),
 	saveAttendancePolicyData: (req: AttendancePolicyDto) => axiosConfig.post<AttendancePolicyDto[]>('/api/attendance/policy/save', req),
 	delteAttendancePolicyData: (id: string) => axiosConfig.delete<AttendancePolicyDto[]>(`/api/attendance/policy/delete?target=${id}`),
+
+	getPolicyMemberData: () => axiosConfig.get<Record<string, any>[]>('/api/attendance/policy/member'),
+	savePolicyMemberMapping: (req: AttendancePolicyMappingRequestDto) => axiosConfig.post('/api/attendance/policy/mapping', req),
 };

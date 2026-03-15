@@ -1,14 +1,13 @@
 package org.easyc.vacation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.attendance.service.AttendanceService;
 import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.dto.SearchRequestDto;
-import org.easyc.member.entity.Member;
+import org.easyc.deptMemberMap.entity.DeptMemberMap;
+import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.vacation.constant.VacationCategory;
-import org.easyc.vacation.constant.VacationType;
 import org.easyc.vacation.dto.VacationApplicationDto;
 import org.easyc.vacation.dto.VacationApplicationResponseDto;
 import org.easyc.vacation.entity.Vacation;
@@ -34,13 +33,15 @@ public class VacationApplicationService {
     private final MemberRepository memberRepository;
     private final VacationHistoryRepository vacationHistoryRepository;
     private final AttendanceService attendanceService;
+    private final DeptMemberMapRepository deptMemberMapRepository;
 
     public void saveVacationApplication(VacationApplicationDto request) {
-        Member member = memberRepository.findByMemberId(request.getMemberId()).orElse(null);
+        DeptMemberMap deptMemberMap = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(request.getMemberId());
+
         VacationApplication application = request.returnEntity();
-        application.setMemberNm(member.getMemberNm());
-        application.setDeptNm("인사팀");
-        application.setJobGrade("과장");
+        application.setMemberNm(deptMemberMap.getMember().getMemberNm());
+        application.setDeptNm(deptMemberMap.getDept().getDeptNm());
+        application.setJobGrade(deptMemberMap.getJobTitle().getJobTitleNm());
 
         vacationApplicationRepository.save(application);
     }

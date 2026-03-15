@@ -1,10 +1,7 @@
 package org.easyc.vacation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.attendance.dto.AttendancePolicyDto;
-import org.easyc.attendance.entity.AttendancePolicy;
-import org.easyc.attendance.repository.AttendancePolicyMapRepository;
-import org.easyc.attendance.repository.AttendancePolicyRepository;
+
 import org.easyc.vacation.dto.VacationPolicyDto;
 import org.easyc.vacation.entity.VacationPolicy;
 import org.easyc.vacation.repository.VacationPolicyMapRepository;

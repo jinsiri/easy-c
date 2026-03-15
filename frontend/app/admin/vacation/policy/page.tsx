@@ -38,7 +38,14 @@ const list: listCollector[] = [
 	{
 		name: '적용 근로자(명)',
 		key: 'mappingUserCount',
-		valueFormatter: (data) => <Box>{data.mappingUserCount ?? '-'}명</Box>,
+		valueFormatter: (data) => (
+			<Box>
+				{data.mappingUserCount ?? '-'}명{' '}
+				<IconButton sx={{ color: grey[500] }} onClick={(e) => {}}>
+					<BorderColorRounded sx={{ fontSize: '1rem' }} />
+				</IconButton>
+			</Box>
+		),
 	},
 ];
 
@@ -127,12 +134,7 @@ export default function VacationPolicyPage() {
 								}}
 							>
 								{idx === 0 ? (
-									<>
-										<Chip label='기본정책' variant='outlined' color='primary' size='small' />
-										<IconButton sx={{ color: grey[500] }} onClick={(e) => onClickUpdateButton(e, item)}>
-											<BorderColorRounded sx={{ fontSize: '1rem' }} />
-										</IconButton>
-									</>
+									<Chip label='기본정책' variant='outlined' color='primary' size='small' />
 								) : (
 									<>
 										<IconButton sx={{ color: grey[500] }} onClick={(e) => onClickUpdateButton(e, item)}>

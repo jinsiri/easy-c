@@ -1,14 +1,14 @@
 package org.easyc.attendance.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.easyc.dept.entity.Dept;
+import org.easyc.member.entity.Member;
 
 @Entity
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttendancePolicyMap {
@@ -28,5 +28,15 @@ public class AttendancePolicyMap {
 
     @Builder.Default
     private boolean deleted = false;
+
+    // 읽기 전용 - 멤버
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", insertable = false, updatable = false)
+    private Member member;
+
+    // 읽기 전용 - 근태정책
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attendance_policy_id", insertable = false, updatable = false)
+    private AttendancePolicy attendancePolicy;
 
 }

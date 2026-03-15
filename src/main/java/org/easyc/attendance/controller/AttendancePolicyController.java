@@ -2,12 +2,15 @@ package org.easyc.attendance.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.easyc.audit.activity.annotation.AuditAction;
+import org.easyc.attendance.dto.AttendancePolicyMemberDto;
+import org.easyc.attendance.dto.AttendancePolicyMemberRequestDto;
 import org.easyc.attendance.dto.AttendancePolicyDto;
 import org.easyc.attendance.service.AttendancePolicyService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,5 +39,15 @@ public class AttendancePolicyController {
         Long id = Long.parseLong(idStr);
 
         attendancePolicyService.deletePolicyData(id);
+    }
+
+    @GetMapping("/member")
+    public List<AttendancePolicyMemberDto> getPolicyMemberData() {
+        return attendancePolicyService.getPolicyMemberData();
+    }
+
+    @PostMapping("/mapping")
+    public void savePolicyMemberMapping(@RequestBody AttendancePolicyMemberRequestDto request) {
+        attendancePolicyService.savePolicyMemberMapping(request);
     }
 }

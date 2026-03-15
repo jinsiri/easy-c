@@ -8,11 +8,9 @@ import org.easyc.attendance.repository.*;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
-import org.easyc.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
