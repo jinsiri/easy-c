@@ -1,11 +1,5 @@
 /** MUI */
-import {
-	AccountTree,
-	WorkHistoryRounded,
-	CalendarMonthRounded,
-	BeachAccessRounded,
-	ChangeHistory, ChangeHistoryRounded, HistoryRounded
-} from '@mui/icons-material';
+import { AccountTree, WorkHistoryRounded, CalendarMonthRounded, BeachAccessRounded, HistoryRounded } from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '@/type/types';
@@ -17,7 +11,7 @@ const AdminMenuItem: menuType[] = [
 		type: '',
 		url: '/admin',
 		children: [
-			{
+			/*{
 				id: 'admin-normal',
 				title: '기본 관리',
 				type: '1depth',
@@ -61,7 +55,7 @@ const AdminMenuItem: menuType[] = [
 						url: '/popup',
 					},
 				],
-			},
+			},*/
 			{
 				id: 'admin-dept',
 				title: '조직 관리',
@@ -168,7 +162,6 @@ const AdminMenuItem: menuType[] = [
 						type: '2depth',
 						url: '/activity',
 					},
-
 				],
 			},
 			/*{

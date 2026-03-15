@@ -24,12 +24,12 @@ const MainMenuItem: menuType[] = [
 						type: '2depth',
 						url: '/user',
 					},
-					{
+					/*{
 						id: 'main-humanResources-salary',
 						title: '내 급여 조회',
 						type: '2depth',
 						url: '/salary',
-					},
+					},*/
 				],
 			},
 			{
@@ -161,7 +161,7 @@ const MainMenuItem: menuType[] = [
 		title: '내 정보',
 		type: '',
 		url: '/management/user',
-	}
+	},
 ];
 
 export default MainMenuItem;
