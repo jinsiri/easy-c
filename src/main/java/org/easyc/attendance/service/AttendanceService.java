@@ -8,9 +8,14 @@ import org.easyc.attendance.repository.*;
 import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
+import org.easyc.deptMemberMap.entity.DeptMemberMap;
+import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
 import org.easyc.member.entity.Member;
+import org.easyc.member.entity.MemberProfile;
 import org.easyc.member.repository.MemberProfileRepository;
 import org.easyc.member.repository.MemberRepository;
+import org.easyc.memberJobGradeMap.entity.MemberJobGradeMap;
+import org.easyc.memberJobGradeMap.repository.MemberJobGradeMapRepository;
 import org.easyc.vacation.constant.VacationType;
 import org.easyc.vacation.entity.VacationApplication;
 import org.springframework.stereotype.Service;
@@ -28,9 +33,9 @@ public class AttendanceService {
     private final AttendancePolicyMapRepository attendancePolicyMapRepository;
     private final HolidayCalendarRepository holidayCalendarRepository;
     private final AttendanceApplicationRepository attendanceApplicationRepository;
-    private final MemberProfileRepository memberProfileRepository;
     private final MemberRepository memberRepository;
-
+    private final DeptMemberMapRepository deptMemberMapRepository;
+    private final MemberJobGradeMapRepository memberJobGradeMapRepository;
 
     public AttendanceDayResponseDto getAttendanceUserData(AttendanceRequestDto req) {
         LocalDate workDate =  req.getWorkDate().toLocalDate();
@@ -205,7 +210,7 @@ public class AttendanceService {
 
 
     public Attendance makeNewAttendance(Long memberId, LocalDate workDate, AttendancePolicy targetPolicy) {
-        Member member = memberRepository.findByMemberId(memberId).orElse(null);
+        DeptMemberMap deptMemberMaps = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(memberId);
 
         if(targetPolicy == null){
             targetPolicy = findAttendancePolicy(memberId);
@@ -213,9 +218,9 @@ public class AttendanceService {
 
         Attendance result = Attendance.builder()
                             .memberId(memberId)
-                            .memberNm(member.getMemberNm())
-                            .deptNm("인사팀")
-                            .jobGrade("과장")
+                            .memberNm(deptMemberMaps.getMember().getMemberNm())
+                            .deptNm(deptMemberMaps.getDept().getDeptNm())
+                            .jobGrade(deptMemberMaps.getJobTitle().getJobTitleNm())
                             .attendancePolicyName(targetPolicy.getAttendancePolicyName())
                             .workDate(workDate)
                             .build();
