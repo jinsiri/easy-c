@@ -11,6 +11,8 @@ import { useRouter } from 'next/navigation';
 import DropdownButton from '@/app/_component/DropdownButton';
 import { useDialogStore } from '@/store/useDialogStore';
 import { deptService } from '@/app/services/deptService';
+import BatchJobUpdateDialog from '@/app/admin/dept/_component/BatchJobUpdateDialog';
+import { RoleCategory } from '@/constant/deptConst';
 
 interface Props {
 	deptId: number;
@@ -19,7 +21,6 @@ interface Props {
 type DeptRole = 'MANAGER' | 'SUB_MANAGER' | 'MEMBER';
 
 export default function AdminDeptDetailView({ deptId }: Props) {
-	const router = useRouter();
 	const { alert, confirm } = useDialogStore();
 	const theme = useTheme();
 	const gridRef = useRef<AgGridReact>(null);
@@ -27,6 +28,8 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 	const [selectedId, setSelectedId] = useState();
 	const [checkedMemberIds, setCheckedMemberIds] = useState<number[]>([]);
 	const [deptMembers, setDeptMembers] = useState<MemberResponseDto[]>([]);
+	const [selectedCategory, setSelectedCategory] = useState<RoleCategory>('POSITION');
+	const [openUpdateModal, setOpenUpdateModal] = useState(false);
 
 	const PhotoRenderer = (params: ICellRendererParams) => {
 		const photo = params.value ? params.value : '/images/blank_profile.png';
@@ -97,10 +100,6 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 		fetchMembersMappedToDeptId(deptId);
 	}, [deptId]);
 
-	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setChecked(event.target.checked);
-	};
-
 	const handleCellClicked = (params: CellClickedEvent) => {
 		setSelectedId(params.data.memberId);
 	};
@@ -168,33 +167,33 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 		if (!(await validateSelection())) return;
 
 		// 메서드 호출: 부서 아이디, 멤버아이디, 바꿀 부서 아이디
+		console.info('작업중인 메서드!');
 	};
 
-	const openChangeRankModal = async (category: string) => {
+	const openChangeRankModal = async (category: RoleCategory) => {
 		if (!(await validateSelection())) return;
 
-		// todo: memberId, jobTitle은 deptId도 가져가야함
-		switch (category) {
-			case 'jobPosition':
-				break;
-			case 'jobGrade':
-				break;
-			case 'jobRole':
-				break;
-			case 'jobTitle':
-				break;
-		}
+		setSelectedCategory(category);
+		setOpenUpdateModal(true);
 	};
 
 	const menuOptions = [
-		{ label: '직위 변경', onClick: () => openChangeRankModal('jobPosition') },
-		{ label: '직급 변경', onClick: () => openChangeRankModal('jobGrade') },
-		{ label: '직무 변경', onClick: () => openChangeRankModal('jobRole') },
-		{ label: '직책 변경', onClick: () => openChangeRankModal('jobTitle') },
+		{ label: '직위 변경', onClick: () => openChangeRankModal('POSITION') },
+		{ label: '직급 변경', onClick: () => openChangeRankModal('GRADE') },
+		{ label: '직무 변경', onClick: () => openChangeRankModal('ROLE') },
 	];
 
 	return (
 		<>
+			{openUpdateModal && (
+				<BatchJobUpdateDialog
+					category={selectedCategory}
+					checkedIds={checkedMemberIds}
+					onClose={() => setOpenUpdateModal(false)}
+					reloadList={() => fetchMembersMappedToDeptId(deptId)}
+				/>
+			)}
+
 			<Stack direction='row' spacing={1} alignItems={'center'} sx={{ py: 2 }}>
 				<Checkbox
 					checked={checked}

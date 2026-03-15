@@ -22,6 +22,18 @@ export interface DeptMemberMapRequestDto {
 	[key: string]: any;
 }
 
+export interface MemberJobPositionMapRequestDto {
+	[key: string]: any;
+}
+
+export interface MemberJobGradeMapRequestDto {
+	[key: string]: any;
+}
+
+export interface MemberJobRoleMapRequestDto {
+	[key: string]: any;
+}
+
 export const deptService = {
 	getDeptList: () => axiosConfig.get<DeptResponseDto[]>(`/api/dept/tree`),
 
@@ -53,4 +65,10 @@ export const deptService = {
 	getJobRoles: () => axiosConfig.get<JobRoleResponseDto[]>(`/api/job-roles`),
 	deleteJobRoles: (requestDto: BulkDeleteRequestDto) => axiosConfig.delete(`/api/job-roles`, { data: requestDto }),
 	updateJobRoleOrders: (dtos: JobRoleRequestDto[]) => axiosConfig.post(`/api/job-roles/update-orders`, dtos),
+
+	// 일괄 수정
+	changeJobPositionBulk: (dto: MemberJobPositionMapRequestDto) => axiosConfig.post(`/api/member-position-map/bulk-update`, dto),
+	changeJobGradeBulk: (dto: MemberJobGradeMapRequestDto) => axiosConfig.post(`/api/member-grade-map/bulk-update`, dto),
+	changeJobRoleBulk: (dto: MemberJobRoleMapRequestDto) => axiosConfig.post(`/api/member-role-map/bulk-update`, dto),
+	changeJobTitleBulk: (dto: DeptMemberMapRequestDto) => axiosConfig.post(`/api/dept-member-map/bulk-update`, dto), //todo
 };
