@@ -52,6 +52,11 @@ public enum CustomExceptionCode {
     MEMBER_JOB_DUPLICATE_CODE(HttpStatus.BAD_REQUEST, "이미 존재하는 코드입니다."),
     MEMBER_JOB_NOT_FOUND(HttpStatus.NOT_FOUND, "관련 정보를 찾을 수 없습니다."),
 
+    // ========== Board (게시판) ==========
+    BOARD_POST_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
+    BOARD_POST_DELETED(HttpStatus.NOT_FOUND, "삭제된 게시글입니다."),
+    BOARD_POST_DELETE_DENIED(HttpStatus.FORBIDDEN, "본인 게시글만 삭제할 수 있습니다."),
+
     // ========== Attendance (근태) ==========
     ATTENDANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "근태 정보를 찾을 수 없습니다."),
 

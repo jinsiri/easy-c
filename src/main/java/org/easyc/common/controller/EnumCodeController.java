@@ -3,6 +3,7 @@ package org.easyc.common.controller;
 import lombok.RequiredArgsConstructor;
 import org.easyc.common.dto.EnumOption;
 import org.easyc.common.support.EnumOptionMapper;
+import org.easyc.board.constant.BoardCategory;
 import org.easyc.member.constant.EmploymentStatus;
 import org.easyc.member.constant.Nationality;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,15 @@ public class EnumCodeController {
         return enumOptionMapper.toOptions(
                 Nationality.class,
                 "nationality",
+                locale
+        );
+    }
+
+    @GetMapping("/board-category")
+    public List<EnumOption> boardCategory(Locale locale) {
+        return enumOptionMapper.toOptions(
+                BoardCategory.class,
+                "board.category",
                 locale
         );
     }

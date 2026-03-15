@@ -1,5 +1,5 @@
 /** MUI */
-import { AssignmentIndRounded, WorkHistoryRounded, BeachAccessRounded } from '@mui/icons-material';
+import { AssignmentIndRounded, WorkHistoryRounded, BeachAccessRounded, AssignmentRounded } from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '@/type/types';
@@ -59,6 +59,27 @@ const MainMenuItem: menuType[] = [
 						title: '내 휴가 정보',
 						type: '2depth',
 						url: '/user',
+					},
+				],
+			},
+			{
+				id: 'main-board',
+				title: '게시판',
+				type: '1depth',
+				url: '/board',
+				icon: AssignmentRounded,
+				children: [
+					{
+						id: 'main-board-notice',
+						title: '공지사항',
+						type: '2depth',
+						url: '/notice',
+					},
+					{
+						id: 'main-board-general',
+						title: '자유게시판',
+						type: '2depth',
+						url: '/general',
 					},
 				],
 			},
@@ -140,7 +161,7 @@ const MainMenuItem: menuType[] = [
 		title: '내 정보',
 		type: '',
 		url: '/management/user',
-		}
+	}
 ];
 
 export default MainMenuItem;
