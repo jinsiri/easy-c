@@ -8,7 +8,7 @@ import duration from 'dayjs/plugin/duration';
 
 /** MUI */
 import { Box, Button, Grid, IconButton, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
-import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
+import { ArrowLeftRounded, ArrowRightRounded, DownloadRounded } from '@mui/icons-material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
@@ -20,9 +20,11 @@ import { WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
 import { formatMinutes } from '@/utils/commonFunc';
+import { downloadExcel } from '@/utils/excelDownloadFunc';
 
 /** Type / Interface */
 import { workStatus, workType } from '@/type/types';
+import { ExcelRequestDto } from '@/type/interface';
 import { AttendanceDayResDto } from '@/app/services/attendanceService';
 import { AttendanceCompanyRequestDto, AttendanceCompanyResponseDto, attendancePolicyService } from '@/app/services/attendanceCompanyService';
 
@@ -143,6 +145,25 @@ export default function AttendanceCompanyPage() {
 		}
 	};
 
+	const onClickExcel = () => {
+		setLoader(true);
+
+		try {
+			const req: ExcelRequestDto = {
+				fileName: '전사근태내역',
+				search: {
+					workDate: calendarDate.format('YYYY-MM-DD'),
+					searchCategory: searchCategory,
+					searchValue: searchValue,
+				},
+			};
+
+			downloadExcel('/api/attendance/company/excel', req);
+		} finally {
+			setLoader(false);
+		}
+	};
+
 	const onChangeDatePicker = useCallback(
 		(value) => {
 			if (value != null) {
@@ -257,6 +278,9 @@ export default function AttendanceCompanyPage() {
 					{changeSearchCategoryContents}
 					<Button variant='contained' onClick={onClickSearch}>
 						검색
+					</Button>
+					<Button variant='contained' color='info' startIcon={<DownloadRounded />} onClick={onClickExcel}>
+						엑셀 다운로드
 					</Button>
 				</Grid>
 				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
