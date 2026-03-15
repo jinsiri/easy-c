@@ -135,6 +135,12 @@ const MainMenuItem: menuType[] = [
 			},*/
 		],
 	},
+	{
+		id: 'main-management-user',
+		title: '내 정보',
+		type: '',
+		url: '/management/user',
+		}
 ];
 
 export default MainMenuItem;
