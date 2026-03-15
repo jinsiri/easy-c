@@ -1,11 +1,14 @@
 package org.easyc.member.repository;
 
+
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.easyc.deptMemberMap.constant.DeptRole;
+
 import org.easyc.attendance.dto.AttendancePolicyMemberDto;
 import org.easyc.attendance.dto.QAttendancePolicyMemberDto;
 import org.easyc.member.dto.MemberLightResponseDto;
@@ -288,6 +291,7 @@ public class MemberRepositoryCustom {
                         memberProfile.employmentStatus,
                         memberPersonal.phoneNumber,
                         dept.deptNm,
+                        deptMemberMap.deptRole,
                         jobTitle.jobTitleNm,
                         jobPosition.jobPositionNm,
                         member.deleted,

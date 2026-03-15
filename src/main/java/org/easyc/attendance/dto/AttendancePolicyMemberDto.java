@@ -14,6 +14,7 @@ import org.easyc.attendance.entity.AttendancePolicy;
 import org.easyc.attendance.entity.QAttendancePolicy;
 import org.easyc.common.dto.AuditUser;
 import org.easyc.common.dto.BaseDto;
+import org.easyc.deptMemberMap.constant.DeptRole;
 import org.easyc.member.constant.AccountStatus;
 import org.easyc.member.constant.EmploymentStatus;
 import org.easyc.member.constant.EmploymentType;
@@ -40,7 +41,7 @@ public class AttendancePolicyMemberDto extends MemberLightResponseDto {
             Long memberId, String memberNm, String loginId, MemberRole memberRole, AccountStatus accountStatus,
             String employeeId, String email, EmploymentType employmentType, EmploymentStatus employmentStatus,
             String phoneNumber,
-            String deptNm, String jobTitle, String jobPosition,
+            String deptNm, DeptRole deptRole, String jobTitle, String jobPosition,
             boolean deleted, boolean active,
             LocalDateTime registerDate, String registerIp, AuditUser registerUser,
             LocalDateTime lastUpdateDate, String lastUpdateIp, AuditUser lastUpdateUser,
@@ -49,7 +50,7 @@ public class AttendancePolicyMemberDto extends MemberLightResponseDto {
     ) {
         super(memberId,memberNm,loginId,memberRole,accountStatus,
                 employeeId, email, employmentType, employmentStatus,
-                phoneNumber, deptNm, jobTitle, jobPosition,
+                phoneNumber, deptNm, deptRole, jobTitle, jobPosition,
                 deleted, active, registerDate, registerIp, registerUser, lastUpdateDate, lastUpdateIp, lastUpdateUser);
         this.attendancePolicyId = attendancePolicyId;
         this.attendancePolicyName = attendancePolicyName;
