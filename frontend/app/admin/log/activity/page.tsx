@@ -1,23 +1,13 @@
 'use client';
 
-/** MUI */
 import { Box } from '@mui/material';
-
-/** Ag Grid */
 import { ColDef, ValueFormatterParams } from 'ag-grid-community';
-
-/** React */
-import { useEffect, useState } from 'react';
-
-/** Lib */
+import { useCallback, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import CustomAgGridComp from '../../../_lib/CustomAgGridComp';
-
-/** Components */
 import PathBreadcrumbs from '../../../_component/PathBreadcrumbs';
-
-/** Services */
-import { activityLogService, ActivityLogResponseDto } from '../../../services/activityLogService';
+import { activityLogService, ActivityLogResponseDto, ActivityLogFilter } from '../../../services/activityLogService';
+import LogFilterForm, { LogFilterField, LogFilterValues } from '../_component/LogFilterForm';
 
 const colDefs: ColDef<Record<string, any>>[] = [
 	{
@@ -48,6 +38,21 @@ const colDefs: ColDef<Record<string, any>>[] = [
 	{ field: 'message', headerName: '메시지', minWidth: 200, flex: 1 },
 ];
 
+const FILTER_FIELDS: LogFilterField[] = [
+	{ key: 'loginId', label: '로그인 ID', type: 'text' },
+	{ key: 'actionCode', label: '행위 코드', type: 'text' },
+	{
+		key: 'result',
+		label: '결과',
+		type: 'select',
+		options: [
+			{ value: 'S', label: '성공' },
+			{ value: 'F', label: '실패' },
+		],
+	},
+];
+
+const INIT_FILTER: LogFilterValues = { loginId: '', actionCode: '', result: '', fromDate: '', toDate: '' };
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
 
 export default function AdminActivityLogsPage() {
@@ -55,13 +60,14 @@ export default function AdminActivityLogsPage() {
 	const [page, setPage] = useState(0);
 	const [pageSize, setPageSize] = useState(50);
 	const [totalElements, setTotalElements] = useState(0);
+	const [filter, setFilter] = useState<LogFilterValues>(INIT_FILTER);
+	const [appliedFilter, setAppliedFilter] = useState<ActivityLogFilter>({});
 
-	useEffect(() => {
-		activityLogService.getActivityLogs(page, pageSize).then((res: any) => {
+	const fetchData = useCallback((p: number, size: number, f: ActivityLogFilter) => {
+		activityLogService.getActivityLogs(p, size, f).then((res: any) => {
 			setTotalElements(res?.totalElements ?? 0);
-			const data = res?.content ?? [];
 			setRowData(
-				data.map((log: ActivityLogResponseDto) => ({
+				(res?.content ?? []).map((log: ActivityLogResponseDto) => ({
 					...log,
 					loginId: log.loginId ?? '-',
 					memberNm: log.memberNm ?? '-',
@@ -71,11 +77,40 @@ export default function AdminActivityLogsPage() {
 				})),
 			);
 		});
-	}, [page, pageSize]);
+	}, []);
+
+	useEffect(() => {
+		fetchData(page, pageSize, appliedFilter);
+	}, [page, pageSize, appliedFilter, fetchData]);
+
+	const handleSearch = () => {
+		const f: ActivityLogFilter = {
+			loginId: filter.loginId || undefined,
+			actionCode: filter.actionCode || undefined,
+			result: filter.result || undefined,
+			fromDate: filter.fromDate || undefined,
+			toDate: filter.toDate || undefined,
+		};
+		setAppliedFilter(f);
+		setPage(0);
+	};
+
+	const handleReset = () => {
+		setFilter(INIT_FILTER);
+		setAppliedFilter({});
+		setPage(0);
+	};
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
 			<PathBreadcrumbs />
+			<LogFilterForm
+				fields={FILTER_FIELDS}
+				values={filter}
+				onChange={setFilter}
+				onSearch={handleSearch}
+				onReset={handleReset}
+			/>
 			<Box sx={{ flexGrow: 1, width: '100%', minHeight: 0 }}>
 				<CustomAgGridComp
 					rowData={rowData}
@@ -86,7 +121,7 @@ export default function AdminActivityLogsPage() {
 						totalElements,
 						pageSizeOptions: PAGE_SIZE_OPTIONS,
 						onPageChange: setPage,
-						onPageSizeChange: setPageSize,
+						onPageSizeChange: (s) => { setPageSize(s); setPage(0); },
 					}}
 				/>
 			</Box>

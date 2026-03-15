@@ -1,23 +1,13 @@
 'use client';
 
-/** MUI */
 import { Box } from '@mui/material';
-
-/** Ag Grid */
 import { ColDef, ValueFormatterParams } from 'ag-grid-community';
-
-/** React */
-import { useEffect, useState } from 'react';
-
-/** Lib */
+import { useCallback, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import CustomAgGridComp from '../../../_lib/CustomAgGridComp';
-
-/** Components */
 import PathBreadcrumbs from '../../../_component/PathBreadcrumbs';
-
-/** Services */
-import { accessLogService, AccessLogResponseDto } from '../../../services/accessLogService';
+import { accessLogService, AccessLogResponseDto, AccessLogFilter } from '../../../services/accessLogService';
+import LogFilterForm, { LogFilterField, LogFilterValues } from '../_component/LogFilterForm';
 
 const colDefs: ColDef<Record<string, any>>[] = [
 	{
@@ -47,6 +37,34 @@ const colDefs: ColDef<Record<string, any>>[] = [
 	},
 ];
 
+const FILTER_FIELDS: LogFilterField[] = [
+	{ key: 'loginId', label: '로그인 ID', type: 'text' },
+	{
+		key: 'method',
+		label: 'HTTP 메서드',
+		type: 'select',
+		options: [
+			{ value: 'GET', label: 'GET' },
+			{ value: 'POST', label: 'POST' },
+			{ value: 'PUT', label: 'PUT' },
+			{ value: 'DELETE', label: 'DELETE' },
+		],
+	},
+	{ key: 'uri', label: 'URI', type: 'text' },
+	{ key: 'status', label: '상태코드', type: 'text' },
+	{
+		key: 'deviceType',
+		label: '기기',
+		type: 'select',
+		options: [
+			{ value: 'DESKTOP', label: 'Desktop' },
+			{ value: 'MOBILE', label: 'Mobile' },
+			{ value: 'UNKNOWN', label: 'Unknown' },
+		],
+	},
+];
+
+const INIT_FILTER: LogFilterValues = { loginId: '', method: '', uri: '', status: '', deviceType: '', fromDate: '', toDate: '' };
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
 
 export default function AdminAccessLogsPage() {
@@ -54,13 +72,14 @@ export default function AdminAccessLogsPage() {
 	const [page, setPage] = useState(0);
 	const [pageSize, setPageSize] = useState(50);
 	const [totalElements, setTotalElements] = useState(0);
+	const [filter, setFilter] = useState<LogFilterValues>(INIT_FILTER);
+	const [appliedFilter, setAppliedFilter] = useState<AccessLogFilter>({});
 
-	useEffect(() => {
-		accessLogService.getAccessLogs(page, pageSize).then((res: any) => {
+	const fetchData = useCallback((p: number, size: number, f: AccessLogFilter) => {
+		accessLogService.getAccessLogs(p, size, f).then((res: any) => {
 			setTotalElements(res?.totalElements ?? 0);
-			const data = res?.content ?? [];
 			setRowData(
-				data.map((log: AccessLogResponseDto) => ({
+				(res?.content ?? []).map((log: AccessLogResponseDto) => ({
 					...log,
 					loginId: log.loginId ?? '-',
 					memberNm: log.memberNm ?? '-',
@@ -69,11 +88,42 @@ export default function AdminAccessLogsPage() {
 				})),
 			);
 		});
-	}, [page, pageSize]);
+	}, []);
+
+	useEffect(() => {
+		fetchData(page, pageSize, appliedFilter);
+	}, [page, pageSize, appliedFilter, fetchData]);
+
+	const handleSearch = () => {
+		const f: AccessLogFilter = {
+			loginId: filter.loginId || undefined,
+			method: filter.method || undefined,
+			uri: filter.uri || undefined,
+			status: filter.status || undefined,
+			deviceType: filter.deviceType || undefined,
+			fromDate: filter.fromDate || undefined,
+			toDate: filter.toDate || undefined,
+		};
+		setAppliedFilter(f);
+		setPage(0);
+	};
+
+	const handleReset = () => {
+		setFilter(INIT_FILTER);
+		setAppliedFilter({});
+		setPage(0);
+	};
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
 			<PathBreadcrumbs />
+			<LogFilterForm
+				fields={FILTER_FIELDS}
+				values={filter}
+				onChange={setFilter}
+				onSearch={handleSearch}
+				onReset={handleReset}
+			/>
 			<Box sx={{ flexGrow: 1, width: '100%', minHeight: 0 }}>
 				<CustomAgGridComp
 					rowData={rowData}
@@ -84,7 +134,7 @@ export default function AdminAccessLogsPage() {
 						totalElements,
 						pageSizeOptions: PAGE_SIZE_OPTIONS,
 						onPageChange: setPage,
-						onPageSizeChange: setPageSize,
+						onPageSizeChange: (s) => { setPageSize(s); setPage(0); },
 					}}
 				/>
 			</Box>

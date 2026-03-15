@@ -25,7 +25,25 @@ export interface PageResponse<T> {
 	size: number;
 }
 
+export interface AccessLogFilter {
+	loginId?: string;
+	method?: string;
+	uri?: string;
+	status?: string;
+	deviceType?: string;
+	fromDate?: string;
+	toDate?: string;
+}
+
+const toQuery = (params: Record<string, any>) =>
+	Object.entries(params)
+		.filter(([, v]) => v !== '' && v != null)
+		.map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+		.join('&');
+
 export const accessLogService = {
-	getAccessLogs: (page = 0, size = 200) =>
-		axiosConfig.get<PageResponse<AccessLogResponseDto>>(`/api/access-logs?page=${page}&size=${size}`),
+	getAccessLogs: (page = 0, size = 50, filter: AccessLogFilter = {}) =>
+		axiosConfig.get<PageResponse<AccessLogResponseDto>>(
+			`/api/access-logs?page=${page}&size=${size}&${toQuery(filter)}`,
+		),
 };
