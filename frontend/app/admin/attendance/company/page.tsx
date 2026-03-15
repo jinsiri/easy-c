@@ -26,7 +26,7 @@ import { downloadExcel } from '@/utils/excelDownloadFunc';
 import { workStatus, workType } from '@/type/types';
 import { ExcelRequestDto } from '@/type/interface';
 import { AttendanceDayResDto } from '@/app/services/attendanceService';
-import { AttendanceCompanyRequestDto, AttendanceCompanyResponseDto, attendancePolicyService } from '@/app/services/attendanceCompanyService';
+import { AttendanceCompanyRequestDto, AttendanceCompanyResponseDto, attendanceCompanyService } from '@/app/services/attendanceCompanyService';
 
 dayjs.extend(duration);
 
@@ -108,7 +108,7 @@ export default function AttendanceCompanyPage() {
 		setLoader(true);
 
 		try {
-			const res: AttendanceCompanyResponseDto = await attendancePolicyService.getAttendanceCompanyOnedayData({
+			const res: AttendanceCompanyResponseDto = await attendanceCompanyService.getAttendanceCompanyOnedayData({
 				workDate: calendarDate.format('YYYY-MM-DD'),
 			});
 
@@ -138,7 +138,7 @@ export default function AttendanceCompanyPage() {
 				searchValue: searchValue,
 			};
 
-			const res: AttendanceDayResDto[] = await attendancePolicyService.getAttendanceCompanySearch(req);
+			const res: AttendanceDayResDto[] = await attendanceCompanyService.getAttendanceCompanySearch(req);
 			setRowData(res);
 		} finally {
 			setLoader(false);

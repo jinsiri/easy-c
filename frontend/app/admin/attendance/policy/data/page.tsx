@@ -459,9 +459,6 @@ export default function AttendancePolicyDataPage() {
 								</FormWrapper>
 							</AccordionDetails>
 						</Accordion>
-						<FormWrapper label='적용 근로자'>
-							<Button variant='outlined'>근로자 적용</Button>
-						</FormWrapper>
 					</Grid>
 					<Grid sx={{ display: 'flex', justifyContent: 'center', gap: 3 }}>
 						<Button variant='text' onClick={handleClose} size='large'>

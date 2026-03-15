@@ -14,4 +14,6 @@ public interface AttendancePolicyMapRepository extends JpaRepository<AttendanceP
 
     @Query("SELECT a.attendancePolicyId, count(a) FROM AttendancePolicyMap a GROUP BY a.attendancePolicyId")
     List<Object[]> countGroupByAttendancePolicyId();
+
+    List<AttendancePolicyMap> findAllByMemberIdIsIn(List<Long> memberIdList);
 }

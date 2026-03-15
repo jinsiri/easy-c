@@ -10,7 +10,7 @@ import useModalStore from '@/store/useModalStore';
 
 /** MUI */
 import { Box, Button, Grid, IconButton, Typography, Chip } from '@mui/material';
-import { DeleteRounded, BorderColorRounded } from '@mui/icons-material';
+import { DeleteRounded, BorderColorRounded, Policy } from '@mui/icons-material';
 import { grey } from '@mui/material/colors';
 
 /** Custom */
@@ -27,45 +27,59 @@ interface listCollector {
 	valueFormatter?: (data: AttendancePolicyDto) => ReactNode;
 }
 
-const list: listCollector[] = [
-	{ name: '근로타입', key: 'attendanceType', valueFormatter: (data) => <Box>{ATTENDANCETYPE[data.attendanceType as attendanceType]}</Box> },
-	{ name: '정산기간', key: 'settlementPeriod', valueFormatter: (data) => <Box>{SETTLEMENTPERIOD[data.settlementPeriod as settlementPeriod]}</Box> },
-	{ name: '근로규칙', key: 'worktimeRule', valueFormatter: (data) => <Box>{WORKTIMERULE[data.worktimeRule]}</Box> },
-	{
-		name: '근무요일',
-		key: 'workDayOfWeek',
-		valueFormatter: (data) => {
-			const formatArray = data.workDayOfWeek?.map((item) => WORKDAYOFWEEKNUMBER[item]);
-			return <Typography>{formatArray.join(',')}</Typography>;
-		},
-	},
-	{
-		name: '근로시간',
-		key: 'workTime',
-		valueFormatter: (data) => (
-			<Box>
-				{data.startTime ? dayjs(data.startTime, 'HH:mm').format('HH:mm') : '-'} ~ {data.endTime ? dayjs(data.endTime, 'HH:mm').format('HH:mm') : '-'}
-			</Box>
-		),
-	},
-	{
-		name: '근태 허용 시간(분)',
-		key: 'allowMarginMinute',
-		valueFormatter: (data) => <Box>{data.allowMarginMinute}분</Box>,
-	},
-	{
-		name: '적용 근로자(명)',
-		key: 'mappingUserCount',
-		valueFormatter: (data) => <Box>{data.mappingUserCount ?? '-'}명</Box>,
-	},
-];
-
 export default function AttendancePolicyPage() {
 	const router = useRouter();
 	const { loader, setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 
 	const [policyData, setPolicyData] = useState<AttendancePolicyDto[]>([]);
+
+	const list: listCollector[] = [
+		{ name: '근로타입', key: 'attendanceType', valueFormatter: (data) => <Box>{ATTENDANCETYPE[data.attendanceType as attendanceType]}</Box> },
+		{ name: '정산기간', key: 'settlementPeriod', valueFormatter: (data) => <Box>{SETTLEMENTPERIOD[data.settlementPeriod as settlementPeriod]}</Box> },
+		{ name: '근로규칙', key: 'worktimeRule', valueFormatter: (data) => <Box>{WORKTIMERULE[data.worktimeRule]}</Box> },
+		{
+			name: '근무요일',
+			key: 'workDayOfWeek',
+			valueFormatter: (data) => {
+				const formatArray = data.workDayOfWeek?.map((item) => WORKDAYOFWEEKNUMBER[item]);
+				return <Typography>{formatArray.join(',')}</Typography>;
+			},
+		},
+		{
+			name: '근로시간',
+			key: 'workTime',
+			valueFormatter: (data) => (
+				<Box>
+					{data.startTime ? dayjs(data.startTime, 'HH:mm').format('HH:mm') : '-'} ~{' '}
+					{data.endTime ? dayjs(data.endTime, 'HH:mm').format('HH:mm') : '-'}
+				</Box>
+			),
+		},
+		{
+			name: '근태 허용 시간(분)',
+			key: 'allowMarginMinute',
+			valueFormatter: (data) => <Box>{data.allowMarginMinute}분</Box>,
+		},
+		{
+			name: '적용 근로자(명)',
+			key: 'mappingUserCount',
+			valueFormatter: (data) => (
+				<Box>
+					{data.mappingUserCount ?? '-'}명{' '}
+					<IconButton
+						sx={{ color: grey[500] }}
+						onClick={(e) => {
+							setModalData({ policyId: data.attendancePolicyId });
+							router.push('/admin/attendance/policy/modal');
+						}}
+					>
+						<BorderColorRounded sx={{ fontSize: '1rem' }} />
+					</IconButton>
+				</Box>
+			),
+		},
+	];
 
 	useEffect(() => {
 		getAttendancePolicyData();
@@ -143,12 +157,7 @@ export default function AttendancePolicyPage() {
 								}}
 							>
 								{idx === 0 ? (
-									<>
-										<Chip label='기본정책' variant='outlined' color='primary' size='small' />
-										<IconButton sx={{ color: grey[500] }} onClick={(e) => onClickUpdateButton(e, item)}>
-											<BorderColorRounded sx={{ fontSize: '1rem' }} />
-										</IconButton>
-									</>
+									<Chip label='기본정책' variant='outlined' color='primary' size='small' />
 								) : (
 									<>
 										<IconButton sx={{ color: grey[500] }} onClick={(e) => onClickUpdateButton(e, item)}>

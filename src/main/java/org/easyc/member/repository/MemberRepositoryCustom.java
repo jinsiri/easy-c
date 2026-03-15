@@ -4,6 +4,8 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.easyc.attendance.dto.AttendancePolicyMemberDto;
+import org.easyc.attendance.dto.QAttendancePolicyMemberDto;
 import org.easyc.member.dto.MemberLightResponseDto;
 import org.easyc.member.dto.QMemberLightResponseDto;
 import org.springframework.stereotype.Repository;
@@ -13,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.easyc.attendance.entity.QAttendancePolicy.attendancePolicy;
+import static org.easyc.attendance.entity.QAttendancePolicyMap.attendancePolicyMap;
 import static org.easyc.dept.entity.QDept.dept;
 import static org.easyc.deptMemberMap.entity.QDeptMemberMap.deptMemberMap;
 import static org.easyc.jobPosition.entity.QJobPosition.jobPosition;
@@ -224,6 +228,7 @@ public class MemberRepositoryCustom {
                 .leftJoin(jobTitle).on(deptMemberMap.jobTitleId.eq(jobTitle.jobTitleId))
                 .leftJoin(memberJobPositionMap).on(member.memberId.eq(memberJobPositionMap.memberId), memberJobPositionMap.deleted.isFalse())
                 .leftJoin(jobPosition).on(memberJobPositionMap.jobPositionId.eq(jobPosition.jobPositionId))
+                // policy
                 .where(
                         member.deleted.isFalse(),
                         dept.deptId.eq(targetDeptId)
@@ -240,5 +245,65 @@ public class MemberRepositoryCustom {
         }
 
         return new ArrayList<>(map.values());
+    }
+
+    public List<AttendancePolicyMemberDto> findApplicationPolicyMembers() {
+        List<AttendancePolicyMemberDto> flatResults = queryFactory
+                .select(new QAttendancePolicyMemberDto(
+                        member.memberId,
+                        member.memberNm,
+                        member.loginId,
+                        member.memberRole,
+                        member.accountStatus,
+                        memberProfile.employeeId,
+                        memberProfile.email,
+                        memberProfile.employmentType,
+                        memberProfile.employmentStatus,
+                        memberPersonal.phoneNumber,
+                        dept.deptNm,
+                        jobTitle.jobTitleNm,
+                        jobPosition.jobPositionNm,
+                        member.deleted,
+                        member.active,
+                        member.registerDate,
+                        member.registerIp,
+                        member.registerUser,
+                        member.lastUpdateDate,
+                        member.lastUpdateIp,
+                        member.lastUpdateUser,
+                        attendancePolicy.attendancePolicyId,
+                        attendancePolicy.attendancePolicyName
+                ))
+                .from(member)
+                .leftJoin(memberProfile).on(member.memberId.eq(memberProfile.memberId))
+                .leftJoin(memberPersonal).on(member.memberId.eq(memberPersonal.memberId))
+                .leftJoin(deptMemberMap)
+                .on(member.memberId.eq(deptMemberMap.memberId),
+                        deptMemberMap.deleted.isFalse(),
+                        deptMemberMap.isPrimary.isTrue())
+                .leftJoin(dept).on(deptMemberMap.deptId.eq(dept.deptId))
+                .leftJoin(jobTitle).on(deptMemberMap.jobTitleId.eq(jobTitle.jobTitleId))
+                .leftJoin(memberJobPositionMap).on(member.memberId.eq(memberJobPositionMap.memberId), memberJobPositionMap.deleted.isFalse())
+                .leftJoin(jobPosition).on(memberJobPositionMap.jobPositionId.eq(jobPosition.jobPositionId))
+                .leftJoin(attendancePolicyMap)
+                .on(member.memberId.eq(attendancePolicyMap.memberId))
+                .leftJoin(attendancePolicy)
+                .on(attendancePolicyMap.attendancePolicyId.eq(attendancePolicy.attendancePolicyId))
+                .where(member.deleted.isFalse())
+                .fetch();
+
+        Map<Long, AttendancePolicyMemberDto> map = new LinkedHashMap<>();
+        for (AttendancePolicyMemberDto dto : flatResults) {
+            AttendancePolicyMemberDto mainDto = map.computeIfAbsent(dto.getMemberId(), id -> dto);
+
+            if (mainDto != dto) {
+                mainDto.addDeptInfo(dto.getDeptNm(), dto.getJobTitle());
+            }
+        }
+
+        List<AttendancePolicyMemberDto> result = new ArrayList<>(map.values());
+        result.forEach(AttendancePolicyMemberDto::finalizeDisplayInfo);
+
+        return result;
     }
 }

@@ -8,7 +8,6 @@ import { SxProps, Theme } from '@mui/material/styles';
 export interface BaseDialogProps {
 	title: string;
 	children: React.ReactNode;
-
 	className?: string;
 	loading?: boolean;
 	onConfirm?: () => void;
