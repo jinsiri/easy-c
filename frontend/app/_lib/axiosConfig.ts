@@ -100,10 +100,24 @@ axiosConfig.interceptors.response.use(
 		return response.data;
 	},
 	async (error) => {
-		const { alert } = useDialogStore.getState();
-		const originalRequest = error.config;
 		const status = error.response?.status;
 		const apiResponse = error.response?.data;
+		const originalRequest = error.config;
+
+		// 서버 환경
+		const errorMessage = apiResponse?.message;
+		if (typeof window === 'undefined') {
+			const errorInfo = {
+				message: errorMessage === 'OK' ? '접근 권한이 없습니다.' : errorMessage,
+				status: status,
+				isAuthError: status === 401 || status === 403,
+			};
+
+			return Promise.reject(JSON.stringify(errorInfo));
+		}
+
+		// 클라이언트 환경
+		const { alert } = useDialogStore.getState();
 
 		// AccessToken 만료 처리
 		if (
