@@ -35,7 +35,10 @@ export interface MemberJobRoleMapRequestDto {
 }
 
 export const deptService = {
-	getDeptList: () => axiosConfig.get<DeptResponseDto[]>(`/api/dept/tree`),
+	getDeptTree: (includeMembers = false) =>
+		axiosConfig.get<DeptResponseDto[]>(`/api/dept/tree`, {
+			params: { includeMembers },
+		}),
 
 	// 부서원 일괄 추가
 	assignMembersToDept: (dto: DeptMemberMapRequestDto) => axiosConfig.post(`/api/dept-member-map/assign`, dto),

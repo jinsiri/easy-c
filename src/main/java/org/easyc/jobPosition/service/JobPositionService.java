@@ -27,7 +27,6 @@ public class JobPositionService {
         return jobPositionRepositoryCustom.findAllWithMemberCountOrderByLevel();
     }
 
-    @Transactional(readOnly = true)
     public JobPositionResponseDto findById(Long id) {
         JobPosition position = jobPositionRepository.findById(id)
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_JOB_NOT_FOUND));

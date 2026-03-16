@@ -7,12 +7,17 @@ import org.easyc.dept.dto.DeptRequestDto;
 import org.easyc.dept.dto.DeptResponseDto;
 import org.easyc.dept.entity.Dept;
 import org.easyc.dept.repository.DeptRepository;
+import org.easyc.deptMemberMap.dto.DeptMemberFlatDto;
+import org.easyc.deptMemberMap.dto.DeptMemberMapResponseDto;
 import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
-import org.easyc.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.easyc.common.util.treeFunc.calculateOrder;
 import static org.easyc.common.util.treeFunc.incrementSortCode;
@@ -22,17 +27,32 @@ import static org.easyc.common.util.treeFunc.incrementSortCode;
 @Transactional
 public class DeptService {
     private final DeptRepository deptRepository;
-    private final MemberRepository memberRepository;
     private final DeptMemberMapRepository deptMemberMapRepository;
 
     public List<DeptResponseDto> getDeptTree () {
         List<Dept> depts = deptRepository.findAllByOrderByTreeSortCodeAsc();
 
-//        List<Dept> allDepts = deptRepository.findAllByOrderByTreeSortCodeAsc();
-//        List<DeptMemberMap> allDeptMemberMap = deptMemberMapRepository.findAll();
-//        Map<String, DeptResponseDto> nodes = new HashMap<>();
-
         return DeptResponseDto.fromEntityList(depts);
+    }
+
+    public List<DeptResponseDto> getDeptTreeWithMembers () {
+        List<Dept> depts = deptRepository.findAllByOrderByTreeSortCodeAsc();
+
+        Map<Long, List<DeptMemberMapResponseDto>> groupedMembers = deptMemberMapRepository.findAllActiveDeptMembers().stream()
+                .map(DeptMemberFlatDto::fromFlatDto)
+                .collect(Collectors.groupingBy(DeptMemberMapResponseDto::getDeptId));
+
+        return depts.stream()
+                .map(dept -> {
+                    DeptResponseDto dto = DeptResponseDto.fromEntity(dept);
+                    List<DeptMemberMapResponseDto> members = groupedMembers.getOrDefault(dept.getDeptId(), new ArrayList<>());
+
+                    members.sort(Comparator.comparingInt(DeptMemberMapResponseDto::getJobPositionLevel));
+
+                    dto.setDeptMembers(members);
+                    return dto;
+                })
+                .toList();
     }
 
     public DeptResponseDto findById (Long id) {

@@ -1,6 +1,7 @@
 package org.easyc.deptMemberMap.repository;
 
 import org.easyc.deptMemberMap.constant.DeptRole;
+import org.easyc.deptMemberMap.dto.DeptMemberFlatDto;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -35,6 +36,16 @@ public interface DeptMemberMapRepository extends JpaRepository<DeptMemberMap, Lo
     @Query("SELECT d.memberId FROM DeptMemberMap d " +
             "WHERE d.deptId = :targetDeptId AND d.memberId IN :memberIds AND d.deleted = false")
     List<Long> findExistingMemberIds(Long targetDeptId, Set<Long> memberIds);
+
+    @Query("SELECT new org.easyc.deptMemberMap.dto.DeptMemberFlatDto(" +
+            "dm.deptId, m.memberId, m.memberNm, jp.jobPositionNm, " +
+            "COALESCE(jp.jobPositionLevel, 999)) " +
+            "FROM DeptMemberMap dm " +
+            "JOIN dm.member m " +
+            "LEFT JOIN MemberJobPositionMap mjp ON m.memberId = mjp.memberId " +
+            "LEFT JOIN mjp.jobPosition jp " +
+            "WHERE m.deleted = false")
+    List<DeptMemberFlatDto> findAllActiveDeptMembers();
 
     @Modifying
     @Query("UPDATE DeptMemberMap d SET d.deleted = true " +

@@ -9,6 +9,7 @@ import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import java.util.List;
 
 @Getter
+@Setter
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,8 +22,11 @@ public class DeptMemberMapResponseDto extends BaseDto {
     private DeptRole deptRole;
     private boolean isPrimary;
 
+    private String memberNm;
     private String deptNm;
     private String jobTitleNm;
+    private String jobPositionNm;
+    private int jobPositionLevel;
 
     public static DeptMemberMapResponseDto fromEntity(DeptMemberMap map) {
         return DeptMemberMapResponseDto.builder()
@@ -34,6 +38,7 @@ public class DeptMemberMapResponseDto extends BaseDto {
                 .isPrimary(map.isPrimary())
                 .deptNm(map.getDept().getDeptNm())
                 .jobTitleNm(map.getJobTitle() != null ? map.getJobTitle().getJobTitleNm() : null)
+                .memberNm(map.getMember().getMemberNm() != null ? map.getMember().getMemberNm() : null)
                 .build();
     }
 

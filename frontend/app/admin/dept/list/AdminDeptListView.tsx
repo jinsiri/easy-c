@@ -8,13 +8,13 @@ import CommonTabs from '@/app/_component/CommonTabs';
 import CommonTreeview from '@/app/_component/Tree';
 import { useRouter } from 'next/navigation';
 import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import axiosConfig from '@/app/_lib/axiosConfig';
 import { useDialogStore } from '@/store/useDialogStore';
 import { useDeptForm } from '@/app/admin/dept/_hooks/useDeptForm';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
-import { mapDeptToTree } from '@/app/admin/dept/_utils/deptUtil';
+import { mapDeptToTree, mapOrgToTree } from '@/app/admin/dept/_utils/deptUtil';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -91,6 +91,16 @@ export default function AdminDeptListView({ dbData }: Props) {
 	const { expandedIds, setExpandedIds, selectedId, setSelectedId, _hasHydrated } = useDeptTreeStore();
 	const rootId = dbData?.[0]?.deptId ? dbData[0].deptId : null;
 	const selectedDept = dbData.find((d) => d.deptId === Number(selectedId)) ?? dbData[0];
+	const flatRawData = useMemo(() => {
+		const result: any[] = [];
+		dbData.forEach((dept) => {
+			result.push(dept);
+			if (dept.deptMembers) {
+				result.push(...dept.deptMembers);
+			}
+		});
+		return result;
+	}, [dbData]);
 
 	const deptTabs = [
 		{
@@ -197,8 +207,8 @@ export default function AdminDeptListView({ dbData }: Props) {
 
 					<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
 						<CommonTreeview
-							rawData={dbData || []}
-							mapEntityToTree={mapDeptToTree}
+							rawData={flatRawData || []}
+							mapEntityToTree={mapOrgToTree}
 							expandedIds={expandedIds}
 							onExpandedItemsChange={(ids) => setExpandedIds(ids)}
 							selectedId={String(selectedId)}

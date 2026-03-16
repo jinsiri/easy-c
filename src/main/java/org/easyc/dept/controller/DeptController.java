@@ -21,17 +21,13 @@ public class DeptController {
     private final DeptService deptService;
 
     @GetMapping("/tree")
-    public ResponseEntity<List<DeptResponseDto>> getOrgTree() {
-        log.info("조직도 트리 조회 요청 시작");
-
-        try {
-            List<DeptResponseDto> tree = deptService.getDeptTree();
-            log.info("조직도 트리 조회 성공 (루트 노드 수: {})", tree.size());
-            return ResponseEntity.ok(tree);
-        } catch (Exception e) {
-            log.error("조직도 조회 중 오류 발생: ", e);
-            return ResponseEntity.internalServerError().build();
+    public List<DeptResponseDto> getOrgTree(
+            @RequestParam(value = "includeMembers", defaultValue = "false") boolean includeMembers
+    ) {
+        if (includeMembers) {
+            return deptService.getDeptTreeWithMembers();
         }
+        return deptService.getDeptTree();
     }
 
     @GetMapping("/{id}")

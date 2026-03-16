@@ -11,11 +11,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.List;
 
 @Repository
 public interface MemberJobPositionMapRepository extends JpaRepository<MemberJobPositionMap, Long> {
     @EntityGraph(attributePaths = {"jobPosition"})
     Optional<MemberJobPositionMap> findByMemberId(Long memberId);
+
+    @Query("SELECT mjp.memberId AS memberId, jp.jobPositionNm AS jobPositionNm, jp.jobPositionLevel AS jobPositionLevel " +
+            "FROM MemberJobPositionMap mjp " +
+            "JOIN mjp.jobPosition jp " +
+            "WHERE mjp.memberId IN :memberIds " +
+            "ORDER BY jp.jobPositionLevel ASC")
+    List<MemberJobPositionMap> findAllByMemberIdIn(@Param("memberIds") Set<Long> memberIds);
 
     @Modifying
     @Transactional
