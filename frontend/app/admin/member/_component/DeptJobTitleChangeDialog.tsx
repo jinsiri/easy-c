@@ -127,7 +127,6 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 								selectedId={String(selection.deptId)}
 								disabledIds={addedDeptIds}
 								onNodeClick={(node) => {
-									if (addedDeptIds.includes(String(node.deptId))) return;
 									setSelection((prev) => ({ ...prev, deptId: node.deptId, deptNm: node.deptNm }));
 								}}
 							/>

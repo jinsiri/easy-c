@@ -119,13 +119,16 @@ const RecursiveTreeItem = <T,>({ nodes, searchTerm, disabledIds }: { nodes: Tree
 					<CustomTreeItem
 						key={String(node.id)}
 						itemId={String(node.id)}
-						disabled={isDisabled}
 						label={
 							<Box sx={{ display: 'flex', alignItems: 'center' }}>
 								<Box sx={{ display: 'flex', mr: 1, '& svg': { fontSize: '1.125rem' } }}>{getIconByDataType((node as any).dataType)}</Box>
 								<HighlightText text={`${node.label}${node.treeChildCount ? `(${node.treeChildCount})` : ''}`} highlight={searchTerm} />
 							</Box>
 						}
+						sx={{
+							pointerEvents: isDisabled ? 'none' : 'auto',
+							color: isDisabled ? theme.palette.grey[500] + ' !important' : theme.palette.grey[200],
+						}}
 					>
 						{node.children.length > 0 && <RecursiveTreeItem nodes={node.children} searchTerm={searchTerm} disabledIds={disabledIds} />}
 					</CustomTreeItem>
@@ -193,7 +196,7 @@ export default function CommonTreeview<T>({
 					}
 				}}
 				onSelectedItemsChange={(_, itemId) => {
-					if (!itemId) return;
+					if (!itemId || disabledIds.includes(itemId)) return;
 
 					if (onNodeClick) {
 						const findNode = (nodes: TreeNode<T>[]): TreeNode<T> | undefined => {
