@@ -21,6 +21,8 @@ public class DeptMemberMapRequestDto extends BaseDto {
     private boolean isPrimary;
 
     private Set<Long> memberIds;
+    private Long prevDeptId;
+    private Long targetDeptId;
 
     public DeptMemberMap toEntity(DeptMemberMapRequestDto deptMemberMapRequestDto) {
         return DeptMemberMap.builder()

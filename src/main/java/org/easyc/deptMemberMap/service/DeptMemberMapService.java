@@ -72,6 +72,39 @@ public class DeptMemberMapService {
         }
     }
 
+    @Transactional
+    public void reassignMembersToDept(DeptMemberMapRequestDto dto) {
+        if (dto.getMemberIds() == null || dto.getMemberIds().isEmpty()) {
+            return;
+        }
+
+        deptMemberMapRepository.deleteSpecificMapping(
+            dto.getPrevDeptId(),
+            dto.getMemberIds()
+        );
+
+        List<Long> existingMemberIds = deptMemberMapRepository.findExistingMemberIds(
+            dto.getTargetDeptId(),
+            dto.getMemberIds()
+        );
+
+        List<Long> targetMemberIds = dto.getMemberIds().stream()
+            .filter(id -> !existingMemberIds.contains(id))
+            .toList();
+
+        if (!targetMemberIds.isEmpty()) {
+            List<DeptMemberMap> newMappings = targetMemberIds.stream()
+                .map(memberId -> DeptMemberMap.builder()
+                    .deptId(dto.getTargetDeptId())
+                    .memberId(memberId)
+                    .deleted(false)
+                    .build())
+                .collect(Collectors.toList());
+
+            deptMemberMapRepository.saveAll(newMappings);
+        }
+    }
+
 
     @Transactional
     public void assignDeptRole(DeptMemberMapRequestDto dto) {

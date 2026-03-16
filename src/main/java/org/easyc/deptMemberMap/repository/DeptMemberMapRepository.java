@@ -3,12 +3,14 @@ package org.easyc.deptMemberMap.repository;
 import org.easyc.deptMemberMap.constant.DeptRole;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface DeptMemberMapRepository extends JpaRepository<DeptMemberMap, Long> {
@@ -29,4 +31,13 @@ public interface DeptMemberMapRepository extends JpaRepository<DeptMemberMap, Lo
             "LEFT JOIN FETCH dmm.jobTitle " +
             "WHERE dmm.memberId = :memberId AND dmm.isPrimary = true ORDER BY dmm.deptMemberMapId ASC Limit 1")
     DeptMemberMap findOneByMemberIdWithFetchJoinPrimaryTrue(@Param("memberId") Long memberId);
+
+    @Query("SELECT d.memberId FROM DeptMemberMap d " +
+            "WHERE d.deptId = :targetDeptId AND d.memberId IN :memberIds AND d.deleted = false")
+    List<Long> findExistingMemberIds(Long targetDeptId, Set<Long> memberIds);
+
+    @Modifying
+    @Query("UPDATE DeptMemberMap d SET d.deleted = true " +
+            "WHERE d.deptId = :prevDeptId AND d.memberId IN :memberIds AND d.deleted = false")
+    void deleteSpecificMapping(Long prevDeptId, Set<Long> memberIds);
 }
