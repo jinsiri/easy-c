@@ -10,6 +10,7 @@ import org.easyc.dept.service.DeptService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -21,13 +22,18 @@ public class DeptController {
     private final DeptService deptService;
 
     @GetMapping("/tree")
-    public List<DeptResponseDto> getOrgTree(
-            @RequestParam(value = "includeMembers", defaultValue = "false") boolean includeMembers
-    ) {
+    public List<?> getOrgTree(@RequestParam boolean includeMembers) {
+        List<Object> result = new ArrayList<>();
+
         if (includeMembers) {
-            return deptService.getDeptTreeWithMembers();
+            List<Object> data = deptService.getDeptTreeWithMembers();
+            result.addAll(data);
+        } else {
+            List<DeptResponseDto> data = deptService.getDeptTree();
+            result.addAll(data);
         }
-        return deptService.getDeptTree();
+
+        return result;
     }
 
     @GetMapping("/{id}")

@@ -1,11 +1,9 @@
-'use client';
-
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { TextField, Box, InputAdornment, alpha, Typography } from '@mui/material';
 import theme from '@/theme/Theme';
-import { AccountBox, Business, ChevronRight, ExpandMore, Person, Search } from '@mui/icons-material';
+import { AccountBox, Business, ChevronRight, ExpandMore, Search } from '@mui/icons-material';
 import { styled } from '@mui/system';
 
 export type TreeData<T> = T & {

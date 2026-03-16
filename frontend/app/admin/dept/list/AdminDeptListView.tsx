@@ -91,16 +91,6 @@ export default function AdminDeptListView({ dbData }: Props) {
 	const { expandedIds, setExpandedIds, selectedId, setSelectedId, _hasHydrated } = useDeptTreeStore();
 	const rootId = dbData?.[0]?.deptId ? dbData[0].deptId : null;
 	const selectedDept = dbData.find((d) => d.deptId === Number(selectedId)) ?? dbData[0];
-	const flatRawData = useMemo(() => {
-		const result: any[] = [];
-		dbData.forEach((dept) => {
-			result.push(dept);
-			if (dept.deptMembers) {
-				result.push(...dept.deptMembers);
-			}
-		});
-		return result;
-	}, [dbData]);
 
 	const deptTabs = [
 		{
@@ -207,7 +197,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 
 					<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
 						<CommonTreeview
-							rawData={flatRawData || []}
+							rawData={dbData || []}
 							mapEntityToTree={mapOrgToTree}
 							expandedIds={expandedIds}
 							onExpandedItemsChange={(ids) => setExpandedIds(ids)}
