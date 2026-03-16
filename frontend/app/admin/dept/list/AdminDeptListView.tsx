@@ -14,6 +14,7 @@ import { useDialogStore } from '@/store/useDialogStore';
 import { useDeptForm } from '@/app/admin/dept/_hooks/useDeptForm';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
+import { mapDeptToTree } from '@/app/admin/dept/_utils/deptUtil';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -82,12 +83,6 @@ function DeptManageComp({ deptId, items }: { deptId: number; items: InfoItem[] }
 
 	return isEdit ? <EditDeptForm deptId={deptId} handleEdit={handleEdit} /> : <InfoList deptId={deptId} items={items} handleEdit={handleEdit} />;
 }
-
-const mapDeptToTree = (dept: DeptResponseDto) => ({
-	...dept,
-	id: dept.deptId,
-	label: dept.deptNm,
-});
 
 export default function AdminDeptListView({ dbData }: Props) {
 	const router = useRouter();

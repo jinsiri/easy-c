@@ -6,7 +6,7 @@ import { ArrowDownward, ArrowForward } from '@mui/icons-material';
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import CommonTreeview from '@/app/_component/Tree';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
-import { DeptResponseDto } from '@/type/dept';
+import { mapDeptToTree } from '@/app/admin/dept/_utils/deptUtil';
 
 interface Props {
 	onClose: () => void;
@@ -15,12 +15,6 @@ interface Props {
 	initialDeptMaps: any[];
 	setDeptMemberMap: any;
 }
-
-const mapDeptToTree = (dept: DeptResponseDto) => ({
-	...dept,
-	id: dept.deptId,
-	label: dept.deptNm,
-});
 
 export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleList, initialDeptMaps, setDeptMemberMap }: Props) {
 	const theme = useTheme();
