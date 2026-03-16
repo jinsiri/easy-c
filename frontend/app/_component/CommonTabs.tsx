@@ -2,7 +2,7 @@
 
 import { SxProps } from '@mui/system';
 import { Theme } from '@mui/material/styles';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 import { Box, Tab, Tabs, useTheme } from '@mui/material';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import { ColDef } from 'ag-grid-community';
@@ -25,13 +25,20 @@ interface CommonTabsProps {
 
 export default function CommonTabs({ tabs, defaultTab = 0, containerSx, value: parentValue, onChange }: CommonTabsProps) {
 	const theme = useTheme();
-	const [localTab, setLocalTab] = useState(defaultTab);
+	const [activeTab, setActiveTab] = useState(defaultTab);
 
-	const activeTab = parentValue !== undefined ? parentValue : localTab;
+	useEffect(() => {
+		if (parentValue !== undefined) {
+			setActiveTab(parentValue);
+		}
+	}, [parentValue]);
 
 	const handleChange = (e: SyntheticEvent, newValue: number) => {
-		if (onChange) onChange(e, newValue);
-		setLocalTab(newValue);
+		setActiveTab(newValue);
+
+		if (onChange) {
+			onChange(e, newValue);
+		}
 	};
 
 	return (

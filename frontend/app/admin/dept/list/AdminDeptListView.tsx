@@ -91,6 +91,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 	const { expandedIds, setExpandedIds, selectedId, setSelectedId, _hasHydrated } = useDeptTreeStore();
 	const rootId = dbData?.[0]?.deptId ? dbData[0].deptId : null;
 	const selectedDept = dbData.find((d) => d.deptId === Number(selectedId)) ?? dbData[0];
+	const [activeTab, setActiveTab] = useState(0);
 
 	const deptTabs = [
 		{
@@ -201,9 +202,14 @@ export default function AdminDeptListView({ dbData }: Props) {
 							mapEntityToTree={mapOrgToTree}
 							expandedIds={expandedIds}
 							onExpandedItemsChange={(ids) => setExpandedIds(ids)}
-							selectedId={String(selectedId)}
+							selectedId={selectedId ? `dept-${selectedId}` : undefined}
 							placeholder='부서명을 검색하세요.'
 							onNodeClick={(node) => {
+								if (node.dataType === 'deptMember') {
+									setActiveTab(1);
+								} else {
+									setActiveTab(0);
+								}
 								setSelectedId(node.deptId);
 							}}
 						/>
@@ -232,7 +238,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 								{/*<Button variant='outlined'>일괄 등록</Button>*/}
 							</Stack>
 						</Stack>
-						<CommonTabs tabs={deptTabs} containerSx={{ display: 'flex', flexDirection: 'column', padding: '0 1.125rem' }} />
+						<CommonTabs tabs={deptTabs} value={activeTab} containerSx={{ display: 'flex', flexDirection: 'column', padding: '0 1.125rem' }} />
 					</Box>
 				</Grid>
 			</Grid>
