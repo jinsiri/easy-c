@@ -85,7 +85,7 @@ export default function Header(props: propsType) {
 						<FormatIndentIncrease className='svg-small' />
 					</IconButton>*/}
 					{memberRole && memberRole === 'ROLE_ADMIN' && (
-						<Button component={Link} href='/admin/normal/setting' variant='outlined' startIcon={<ManageAccountsRounded />}>
+						<Button component={Link} href='/admin/dept/list' variant='outlined' startIcon={<ManageAccountsRounded />}>
 							관리자 모드
 						</Button>
 					)}
