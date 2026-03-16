@@ -224,7 +224,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 					</Box>
 
 					<Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
-						<Stack alignItems={'flex-end'} sx={{ mb: 2 }}>
+						<Stack alignItems={'flex-end'}>
 							<Stack direction={'row'} spacing={1}>
 								<Button variant='outlined' onClick={() => router.push(`/admin/dept/list/assign?deptId=${selectedId}`)}>
 									부서원 추가
