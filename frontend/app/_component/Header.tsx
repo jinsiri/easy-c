@@ -105,7 +105,7 @@ export default function Header(props: propsType) {
 														return (
 															<ListItemButton
 																key={item.title}
-																component={item.component}
+																component={item.component as any}
 																{...(item.component === Link && item.url ? { href: item.url } : {})}
 																sx={{ width: '100%' }}
 																onClick={item.onClick}
