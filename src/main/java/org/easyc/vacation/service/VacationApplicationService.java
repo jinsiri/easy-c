@@ -3,19 +3,26 @@ package org.easyc.vacation.service;
 import lombok.RequiredArgsConstructor;
 import org.easyc.attendance.service.AttendanceService;
 import org.easyc.common.constant.BasicStatus;
+import org.easyc.common.dto.PageRequestDto;
+import org.easyc.common.dto.PageResponseDto;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.vacation.constant.VacationCategory;
+import org.easyc.vacation.dto.VacationAppSearchRequestDto;
 import org.easyc.vacation.dto.VacationApplicationDto;
 import org.easyc.vacation.dto.VacationApplicationResponseDto;
+import org.easyc.vacation.dto.VacationHistorySearchRequestDto;
 import org.easyc.vacation.entity.Vacation;
 import org.easyc.vacation.entity.VacationApplication;
 import org.easyc.vacation.entity.VacationHistory;
+import org.easyc.vacation.repository.VacationApplicationRepositoryCustom;
 import org.easyc.vacation.repository.VacationHistoryRepository;
 import org.easyc.vacation.repository.VacationRepository;
 import org.easyc.vacation.repository.VacationApplicationRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -30,10 +37,10 @@ public class VacationApplicationService {
 
     private final VacationApplicationRepository vacationApplicationRepository;
     private final VacationRepository vacationRepository;
-    private final MemberRepository memberRepository;
     private final VacationHistoryRepository vacationHistoryRepository;
     private final AttendanceService attendanceService;
     private final DeptMemberMapRepository deptMemberMapRepository;
+    private final VacationApplicationRepositoryCustom vacationApplicationRepositoryCustom;
 
     public void saveVacationApplication(VacationApplicationDto request) {
         DeptMemberMap deptMemberMap = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(request.getMemberId());
@@ -81,28 +88,18 @@ public class VacationApplicationService {
 
     public VacationApplicationResponseDto findUserVacationApplicationData(Long memberId){
         VacationApplicationResponseDto result = new VacationApplicationResponseDto();
-
         LocalDate todayDate = LocalDate.now();
-        Vacation targetVacation = vacationRepository.findAllByMemberIdAndExpireDateAfter(memberId, todayDate).orElse(null);
-        if(targetVacation != null){
-            LocalDate accrualDate = targetVacation.getAccrualDate();
-            LocalDate expireDate = targetVacation.getExpireDate();
 
-            List<VacationApplication> vacationApplications = vacationApplicationRepository.findAllByMemberIdAndStartDateBetween(memberId, accrualDate, expireDate);
-            List<VacationApplication> planVacation = new ArrayList<>();
-            List<VacationApplication> endVacation = new ArrayList<>();
+        // 1. 예정된 휴가 조회 (최대 10개, 날짜 가까운 순)
+        List<VacationApplication> planVacation = vacationApplicationRepository
+                .findTop10ByMemberIdAndStartDateGreaterThanEqualOrderByStartDateAsc(memberId, todayDate);
 
-            for(VacationApplication vacationApplication : vacationApplications){
-                if(vacationApplication.getStartDate().isBefore(todayDate)){
-                    endVacation.add(vacationApplication);
-                }else{
-                    planVacation.add(vacationApplication);
-                }
-            }
+        // 2. 지난 휴가 조회 (최대 10개, 최신순)
+        List<VacationApplication> endVacation = vacationApplicationRepository
+                .findTop10ByMemberIdAndStartDateBeforeOrderByStartDateDesc(memberId, todayDate);
 
-            result.setPlanVacation(planVacation);
-            result.setEndVacation(endVacation);
-        }
+        result.setPlanVacation(planVacation);
+        result.setEndVacation(endVacation);
 
         return result;
     }
@@ -168,9 +165,11 @@ public class VacationApplicationService {
             attendanceService.saveVacationAttendance(request);
         }
         return Map.of("vacationHistory", newHistory, "vacation", targetVacation);
-
     }
+    
 
-
-
+    public PageResponseDto<VacationApplication> searchUserVacationApplicationData(PageRequestDto<VacationAppSearchRequestDto> request, String type) {
+        Pageable pageable = PageRequest.of(request.getNumber(), request.getSize());
+        return new PageResponseDto<VacationApplication>(vacationApplicationRepositoryCustom.searchUserApp(request.getRequest(), pageable, type));
+    }
 }

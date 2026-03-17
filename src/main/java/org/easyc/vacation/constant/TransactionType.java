@@ -12,9 +12,10 @@ public enum TransactionType implements EnumInterface {
     public String formatViewText() {
         switch (this){
             case USE: return "사용";
-            case CANCEL: return "취소";
+            case CANCEL: return "사용취소";
             case EXPIRE: return "만료";
             default: return "지급";
         }
     }
+
 }

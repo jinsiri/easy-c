@@ -155,7 +155,7 @@ public class VacationPolicyService {
                                 .memberId(vh.getMemberId())
                                 .vacationCategory(vh.getVacationCategory())
                                 .transactionType(TransactionType.EXPIRE)
-                                .day(vh.getDay())
+                                .day(vh.getDay() * -1)
                                 .accrualDate(today)
                                 .expireDate(today)
                                 .vacationDesc("기존 연차 만료 - 정책 변경 (" + vh.getVacationDesc() + ")")

@@ -1,5 +1,5 @@
 /** MUI */
-import { Box, useTheme } from '@mui/material';
+import { Box } from '@mui/material';
 
 interface SettingLayoutElementProps {
 	subtitle: string;
@@ -7,8 +7,6 @@ interface SettingLayoutElementProps {
 }
 
 export default function SettingLayoutElement({ subtitle, children }: SettingLayoutElementProps) {
-	const theme = useTheme();
-
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 			<Box sx={{ fontSize: '0.875rem' }}>{subtitle}</Box>

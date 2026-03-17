@@ -96,7 +96,10 @@ export default function VacationPolicyDataPage() {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
 			<PathBreadcrumbs sx={{ padding: '0 1.5rem' }} />
-			<Box sx={{ flexWrap: 'wrap', flexDirection: 'row', padding: '0 1.5rem' }}>
+			<Box sx={{ flexWrap: 'wrap', flexDirection: 'column', padding: '0 1.5rem' }}>
+				<Button startIcon={<ArrowBackRounded fontSize='small' />} onClick={handleClose} sx={{ mb: '0.5rem' }}>
+					뒤로 가기
+				</Button>
 				<Grid
 					container
 					sx={{
@@ -111,9 +114,6 @@ export default function VacationPolicyDataPage() {
 					}}
 				>
 					<Grid sx={{ display: 'flex', justifyContent: 'row', alignItems: 'center', gap: 1 }}>
-						<IconButton onClick={handleClose}>
-							<ArrowBackRounded fontSize='small' />
-						</IconButton>
 						<Typography variant='h5'>{target == null ? '휴가정책 생성' : '휴가정책 수정'} </Typography>
 					</Grid>
 					<Grid>

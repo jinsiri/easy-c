@@ -1,11 +1,13 @@
 package org.easyc.vacation.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.dto.PageRequestDto;
+import org.easyc.common.dto.PageResponseDto;
 import org.easyc.common.dto.SearchRequestDto;
-import org.easyc.vacation.dto.VacationPolicyDto;
+import org.easyc.vacation.dto.VacationHistorySearchRequestDto;
 import org.easyc.vacation.dto.VacationResponseDto;
 import org.easyc.vacation.entity.Vacation;
-import org.easyc.vacation.service.VacationPolicyService;
+import org.easyc.vacation.entity.VacationHistory;
 import org.easyc.vacation.service.VacationService;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,5 +36,12 @@ public class VacationController {
         List<Vacation> result = vacationService.getVacationCompanySearch(request);
         return result;
     }
+
+    @PostMapping("/history")
+    public PageResponseDto<VacationHistory> searchVacationHistoryData(@RequestBody PageRequestDto<VacationHistorySearchRequestDto> request) {
+        return vacationService.searchVacationHistoryData(request);
+    }
+
+
 
 }

@@ -3,13 +3,14 @@ package org.easyc.vacation.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.easyc.audit.activity.annotation.AuditAction;
+import org.easyc.common.dto.PageRequestDto;
+import org.easyc.common.dto.PageResponseDto;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.excel.dto.ExcelRequestDto;
 import org.easyc.util.ExcelUtil;
-import org.easyc.vacation.dto.ExcelVacationApplicationDto;
-import org.easyc.vacation.dto.VacationApplicationDto;
-import org.easyc.vacation.dto.VacationApplicationResponseDto;
+import org.easyc.vacation.dto.*;
 import org.easyc.vacation.entity.VacationApplication;
+import org.easyc.vacation.entity.VacationHistory;
 import org.easyc.vacation.service.VacationApplicationService;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,6 +78,11 @@ public class VacationApplicationController {
                 ExcelVacationApplicationDto.class,
                 list
         );
+    }
+
+    @PostMapping("/user/search")
+    public PageResponseDto<VacationApplication> searchUserVacationApplicationPlanData(@RequestParam("type") String type, @RequestBody PageRequestDto<VacationAppSearchRequestDto> request) {
+        return vacationApplicationService.searchUserVacationApplicationData(request, type);
     }
 
 }

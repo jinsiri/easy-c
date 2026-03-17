@@ -1,26 +1,29 @@
 package org.easyc.vacation.service;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.dto.PageRequestDto;
+import org.easyc.common.dto.PageResponseDto;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.member.entity.MemberProfile;
 import org.easyc.member.repository.MemberProfileRepository;
 import org.easyc.vacation.constant.TransactionType;
 import org.easyc.vacation.constant.VacationCategory;
 import org.easyc.vacation.constant.VacationPolicyType;
+import org.easyc.vacation.dto.VacationHistorySearchRequestDto;
 import org.easyc.vacation.dto.VacationResponseDto;
 import org.easyc.vacation.entity.Vacation;
 import org.easyc.vacation.entity.VacationHistory;
 import org.easyc.vacation.entity.VacationPolicy;
 import org.easyc.vacation.entity.VacationPolicyMap;
-import org.easyc.vacation.repository.VacationHistoryRepository;
-import org.easyc.vacation.repository.VacationPolicyMapRepository;
-import org.easyc.vacation.repository.VacationPolicyRepository;
-import org.easyc.vacation.repository.VacationRepository;
+import org.easyc.vacation.repository.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class VacationService {
     private final MemberProfileRepository memberProfileRepository;
     private final VacationRepository vacationRepository;
     private final VacationHistoryRepository vacationHistoryRepository;
+    private final VacationHistoryRepositoryCustom vacationHistoryRepositoryCustom;
 
     public VacationResponseDto getVacation(Long memberId){
         LocalDate today = LocalDate.now();
@@ -64,7 +68,7 @@ public class VacationService {
 
         //4. 데이터 있는데 추가 필요한 경우 - 1년 미만에 입사일 기준이거나 회계일기준인데 해가 바뀌지 않아서 달마다 연차 하나씩 부여
         else{
-            vacationHistoryList = vacationHistoryRepository.findAllByMemberIdAndTransactionTypeEqualsAndActiveTrue(memberId, TransactionType.GRANT);
+            vacationHistoryList = vacationHistoryRepository.findTop10ByMemberIdAndAccrualDateBetweenAndActiveTrueOrderByAccrualDateDesc(memberId, LocalDate.of(today.getYear(), 1, 1), LocalDate.of(today.getYear(), 12, 31));
 
             LocalDate resignationDate = memberProfile.getResignationDate();
             long workingYears = ChronoUnit.YEARS.between(resignationDate, today);
@@ -88,8 +92,12 @@ public class VacationService {
                                 "1년 미만 월차"
                         );
 
-                        vacationHistoryList.add(vacationHistoryRepository.save(newHistory));
-                        vacation = makeVacation(memberProfile, vacationPolicy, vacationHistoryList);
+
+                        vacationHistoryList.add(0, vacationHistoryRepository.save(newHistory));
+
+                        Vacation newVacation = makeVacation(memberProfile, vacationPolicy, vacationHistoryList);
+                        newVacation.setVacationId(vacation.getVacationId());
+                        vacation = vacationRepository.save(newVacation);;
                     }
                 }
             }
@@ -97,11 +105,18 @@ public class VacationService {
 
         VacationResponseDto result = new VacationResponseDto();
         result.setVacation(vacation);
-        result.setHistory(vacationHistoryList);
+        result.setHistory(
+                vacationHistoryList.stream()
+                        .limit(10)
+                        .collect(Collectors.toList())
+        );
 
         return result;
     }
 
+    public List<VacationHistory> getVacationHistoryData(Long memberId) {
+        return null;
+    }
 
     public List<Vacation> getVacationCompanySearch(SearchRequestDto request){
         String searchCategory = request.getSearchCategory();
@@ -342,5 +357,11 @@ public class VacationService {
             case SPECIAL:   specialVacation += amount;   break;
             default:        annualVacation += amount;    break;
         }
+    }
+
+
+    public PageResponseDto<VacationHistory> searchVacationHistoryData(PageRequestDto<VacationHistorySearchRequestDto> request) {
+        Pageable pageable = PageRequest.of(request.getNumber(), request.getSize());
+        return new PageResponseDto<VacationHistory>(vacationHistoryRepositoryCustom.search(request.getRequest(), pageable));
     }
 }
