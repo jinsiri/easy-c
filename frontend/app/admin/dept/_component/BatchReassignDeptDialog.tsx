@@ -22,7 +22,7 @@ export default function BatchReassignDeptDialog({ prevDeptId, checkedIds, onClos
 	const [selectedId, setSelectedId] = useState<string>('');
 
 	const fetchDepts = useCallback(async () => {
-		const res = await deptService.getDeptList();
+		const res = await deptService.getDeptTree();
 		setDeptList(res || []);
 	}, []);
 
