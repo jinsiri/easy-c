@@ -164,6 +164,7 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 		defaultValues: initialData || {},
 	});
 	const currentDepts = watch('deptMemberMapList');
+	const employmentStatus = watch('employmentStatus');
 
 	useEffect(() => {
 		const fetchBundle = async () => {
@@ -177,6 +178,13 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 		}
 	}, [initialData, reset]);
 
+	useEffect(() => {
+		if (employmentStatus !== 'RESIGNED') {
+			// 재직 상태가 퇴사가 아니면 퇴사일 필드를 빈 값으로 초기화
+			setValue('resignationDate', '');
+		}
+	}, [employmentStatus, setValue]);
+
 	const renderField = useCallback(
 		(field: MemberFieldDef) => (
 			<Controller
@@ -184,7 +192,11 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 				control={control}
 				render={({ field: { onChange, value, onBlur }, fieldState: { error } }) => {
 					const isError = !!error;
-					const isReadOnly = field.readOnly;
+					let isReadOnly = field.readOnly;
+					if (field.key === 'resignationDate') {
+						isReadOnly = employmentStatus !== 'RESIGNED';
+					}
+
 					const commonProps = {
 						size: 'small' as const,
 						sx: {
@@ -194,6 +206,7 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 						error: isError,
 						onBlur,
 						readOnly: field.readOnly,
+						disabled: isReadOnly,
 					};
 
 					const renderInput = () => {
@@ -237,7 +250,7 @@ export default function MemberFormContainer({ isEdit = false, initialData, membe
 				}}
 			/>
 		),
-		[control, memberBundle],
+		[control, memberBundle, employmentStatus],
 	);
 
 	const onInternalSubmit = async (data: MemberFormValues) => {

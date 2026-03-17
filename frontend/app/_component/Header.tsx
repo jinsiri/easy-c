@@ -85,7 +85,7 @@ export default function Header(props: propsType) {
 						<FormatIndentIncrease className='svg-small' />
 					</IconButton>*/}
 					{memberRole && memberRole === 'ROLE_ADMIN' && (
-						<Button component={Link} href='/admin/normal/setting' variant='outlined' startIcon={<ManageAccountsRounded />}>
+						<Button component={Link} href='/admin/dept/list' target={'_blank'} variant='outlined' startIcon={<ManageAccountsRounded />}>
 							관리자 모드
 						</Button>
 					)}
@@ -105,7 +105,7 @@ export default function Header(props: propsType) {
 														return (
 															<ListItemButton
 																key={item.title}
-																component={item.component}
+																component={item.component as any}
 																{...(item.component === Link && item.url ? { href: item.url } : {})}
 																sx={{ width: '100%' }}
 																onClick={item.onClick}

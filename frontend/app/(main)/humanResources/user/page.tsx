@@ -12,7 +12,7 @@ export default function HumanResourceUserPage() {
 	const storedId = secureLocalStorage.getItem('memberId');
 
 	useEffect(() => {
-		if (!storedId) router.push('/member/login');
+		if (!storedId) router.push('/login');
 	}, [storedId]);
 
 	return (

@@ -7,12 +7,12 @@ import { AgGridReact } from 'ag-grid-react';
 import { MemberResponseDto, memberService } from '@/app/services/memberService';
 import { CellClickedEvent, ColDef, FirstDataRenderedEvent, ICellRendererParams, SelectionChangedEvent } from 'ag-grid-community';
 import MemberDetail from '@/app/admin/member/_component/MemberDetail';
-import { useRouter } from 'next/navigation';
 import DropdownButton from '@/app/_component/DropdownButton';
 import { useDialogStore } from '@/store/useDialogStore';
 import { deptService } from '@/app/services/deptService';
 import BatchJobUpdateDialog from '@/app/admin/dept/_component/BatchJobUpdateDialog';
 import { RoleCategory } from '@/constant/deptConst';
+import BatchReassignDeptDialog from '@/app/admin/dept/_component/BatchReassignDeptDialog';
 
 interface Props {
 	deptId: number;
@@ -30,6 +30,7 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 	const [deptMembers, setDeptMembers] = useState<MemberResponseDto[]>([]);
 	const [selectedCategory, setSelectedCategory] = useState<RoleCategory>('POSITION');
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
+	const [openReassignModal, setOpenReassignModal] = useState(false);
 
 	const PhotoRenderer = (params: ICellRendererParams) => {
 		const photo = params.value ? params.value : '/images/blank_profile.png';
@@ -163,11 +164,10 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 		await fetchMembersMappedToDeptId(deptId);
 	};
 
-	const reassignDept = async () => {
+	const openReassignDept = async () => {
 		if (!(await validateSelection())) return;
 
-		// 메서드 호출: 부서 아이디, 멤버아이디, 바꿀 부서 아이디
-		console.info('작업중인 메서드!');
+		setOpenReassignModal(true);
 	};
 
 	const openChangeRankModal = async (category: RoleCategory) => {
@@ -194,6 +194,8 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 				/>
 			)}
 
+			{openReassignModal && <BatchReassignDeptDialog prevDeptId={deptId} checkedIds={checkedMemberIds} onClose={() => setOpenReassignModal(false)} />}
+
 			<Stack direction='row' spacing={1} alignItems={'center'} sx={{ py: 2 }}>
 				<Checkbox
 					checked={checked}
@@ -206,7 +208,7 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 				<Button variant='contained' size='small' onClick={assignDeptHead}>
 					부서장 위임
 				</Button>
-				<Button variant='contained' size='small' onClick={reassignDept}>
+				<Button variant='contained' size='small' onClick={openReassignDept}>
 					부서 이동
 				</Button>
 			</Stack>

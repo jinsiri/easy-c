@@ -35,13 +35,19 @@ export interface MemberJobRoleMapRequestDto {
 }
 
 export const deptService = {
-	getDeptList: () => axiosConfig.get<DeptResponseDto[]>(`/api/dept/tree`),
+	getDeptTree: (includeMembers = false) =>
+		axiosConfig.get<DeptResponseDto[]>(`/api/dept/tree`, {
+			params: { includeMembers },
+		}),
 
 	// 부서원 일괄 추가
 	assignMembersToDept: (dto: DeptMemberMapRequestDto) => axiosConfig.post(`/api/dept-member-map/assign`, dto),
 
 	// 부서 내 역할(부서장, 부부서장, ...) 위임
 	assignDeptRole: (dto: DeptMemberMapRequestDto) => axiosConfig.post(`/api/dept-member-map/assign-role`, dto),
+
+	// 부서 이동
+	reassignDept: (dto: DeptMemberMapRequestDto) => axiosConfig.post(`/api/dept-member-map/reassign`, dto),
 
 	// 직위
 	getJobPositions: () => axiosConfig.get<JobPositionResponseDto[]>(`/api/job-positions`),

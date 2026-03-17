@@ -1,15 +1,9 @@
-'use client';
-
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import { MenuItem, Select } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { JobPositionResponseDto } from '@/type/dept';
 import {
 	DeptMemberMapRequestDto,
 	deptService,
-	JobGradeRequestDto,
-	JobPositionRequestDto,
-	JobRoleRequestDto,
 	MemberJobGradeMapRequestDto,
 	MemberJobPositionMapRequestDto,
 	MemberJobRoleMapRequestDto,

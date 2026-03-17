@@ -8,12 +8,13 @@ import CommonTabs from '@/app/_component/CommonTabs';
 import CommonTreeview from '@/app/_component/Tree';
 import { useRouter } from 'next/navigation';
 import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import axiosConfig from '@/app/_lib/axiosConfig';
 import { useDialogStore } from '@/store/useDialogStore';
 import { useDeptForm } from '@/app/admin/dept/_hooks/useDeptForm';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
+import { mapDeptToTree, mapOrgToTree } from '@/app/admin/dept/_utils/deptUtil';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -83,12 +84,6 @@ function DeptManageComp({ deptId, items }: { deptId: number; items: InfoItem[] }
 	return isEdit ? <EditDeptForm deptId={deptId} handleEdit={handleEdit} /> : <InfoList deptId={deptId} items={items} handleEdit={handleEdit} />;
 }
 
-const mapDeptToTree = (dept: DeptResponseDto) => ({
-	...dept,
-	id: dept.deptId,
-	label: dept.deptNm,
-});
-
 export default function AdminDeptListView({ dbData }: Props) {
 	const router = useRouter();
 	const theme = useTheme();
@@ -96,6 +91,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 	const { expandedIds, setExpandedIds, selectedId, setSelectedId, _hasHydrated } = useDeptTreeStore();
 	const rootId = dbData?.[0]?.deptId ? dbData[0].deptId : null;
 	const selectedDept = dbData.find((d) => d.deptId === Number(selectedId)) ?? dbData[0];
+	const [activeTab, setActiveTab] = useState(0);
 
 	const deptTabs = [
 		{
@@ -203,12 +199,17 @@ export default function AdminDeptListView({ dbData }: Props) {
 					<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
 						<CommonTreeview
 							rawData={dbData || []}
-							mapEntityToTree={mapDeptToTree}
+							mapEntityToTree={mapOrgToTree}
 							expandedIds={expandedIds}
 							onExpandedItemsChange={(ids) => setExpandedIds(ids)}
-							selectedId={String(selectedId)}
+							selectedId={selectedId ? `dept-${selectedId}` : undefined}
 							placeholder='부서명을 검색하세요.'
 							onNodeClick={(node) => {
+								if (node.dataType === 'deptMember') {
+									setActiveTab(1);
+								} else {
+									setActiveTab(0);
+								}
 								setSelectedId(node.deptId);
 							}}
 						/>
@@ -229,7 +230,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 					</Box>
 
 					<Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
-						<Stack alignItems={'flex-end'} sx={{ mb: 2 }}>
+						<Stack alignItems={'flex-end'}>
 							<Stack direction={'row'} spacing={1}>
 								<Button variant='outlined' onClick={() => router.push(`/admin/dept/list/assign?deptId=${selectedId}`)}>
 									부서원 추가
@@ -237,7 +238,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 								{/*<Button variant='outlined'>일괄 등록</Button>*/}
 							</Stack>
 						</Stack>
-						<CommonTabs tabs={deptTabs} containerSx={{ display: 'flex', flexDirection: 'column', padding: '0 1.125rem' }} />
+						<CommonTabs tabs={deptTabs} value={activeTab} containerSx={{ display: 'flex', flexDirection: 'column', padding: '0 1.125rem' }} />
 					</Box>
 				</Grid>
 			</Grid>

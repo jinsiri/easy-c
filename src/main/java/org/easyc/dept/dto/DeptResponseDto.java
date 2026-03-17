@@ -4,12 +4,14 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.dto.BaseTreeDto;
 import org.easyc.dept.entity.Dept;
+import org.easyc.deptMemberMap.dto.DeptMemberMapResponseDto;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
+@Setter
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,7 +29,7 @@ public class DeptResponseDto extends BaseTreeDto {
     private String deptCode;
     private String deptEmail;
 
-    private List<DeptResponseDto> children = new ArrayList<>();
+    private List<DeptMemberMapResponseDto> deptMembers = new ArrayList<>();
 
     public static DeptResponseDto fromEntity(Dept dept) {
         return DeptResponseDto.builder()

@@ -7,6 +7,7 @@ export interface DeptResponseDto extends BaseTreeDto {
 	deptCode: string;
 	deptEmail: string | null;
 	dataType: string;
+	deptMembers: [];
 }
 
 export interface JobPositionResponseDto extends BaseDto {

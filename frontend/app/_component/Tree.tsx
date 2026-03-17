@@ -1,11 +1,9 @@
-'use client';
-
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
-import { TextField, Box, InputAdornment, alpha } from '@mui/material';
+import { TextField, Box, InputAdornment, alpha, Typography } from '@mui/material';
 import theme from '@/theme/Theme';
-import { AccountBox, Business, ChevronRight, ExpandMore, Person, Search } from '@mui/icons-material';
+import { AccountBox, Business, ChevronRight, ExpandMore, Search } from '@mui/icons-material';
 import { styled } from '@mui/system';
 
 export type TreeData<T> = T & {
@@ -20,28 +18,36 @@ export type TreeNode<T> = TreeData<T> & {
 	children: TreeNode<T>[];
 };
 
-const getIconByDataType = (type: string) => {
-	switch (type) {
-		case 'dept':
-			return <Business />;
-		case 'deptMember':
-			return <AccountBox />;
-		default:
-			return null;
-	}
-};
+interface CustomTreeItemProps {
+	isDisabled?: boolean;
+}
 
-const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
+const CustomTreeItem = styled(TreeItem, {
+	shouldForwardProp: (prop) => prop !== 'isDisabled',
+})<CustomTreeItemProps>(({ theme, isDisabled }) => ({
 	color: theme.palette.grey[200],
-	[`& .${treeItemClasses.content}`]: {
+	...theme.applyStyles('light', {
+		color: theme.palette.grey[800],
+	}),
+
+	[`& > .${treeItemClasses.content}`]: {
 		borderRadius: theme.spacing(0.5),
 		padding: theme.spacing(0.5, 1),
 		margin: theme.spacing(0.2, 0),
+		pointerEvents: isDisabled ? 'none' : 'auto',
+		opacity: isDisabled ? 0.6 : 1,
+		cursor: isDisabled ? 'default' : 'pointer',
+
+		'&:hover': {
+			backgroundColor: isDisabled ? 'transparent !important' : undefined,
+		},
 		[`& .${treeItemClasses.label}`]: {
-			fontSize: '0.8rem',
+			fontSize: '0.75rem',
 			fontWeight: 500,
+			color: isDisabled ? `${theme.palette.grey[500]} !important` : 'inherit',
 		},
 	},
+
 	[`& .${treeItemClasses.iconContainer}`]: {
 		borderRadius: '50%',
 		backgroundColor: theme.palette.primary.dark,
@@ -52,15 +58,14 @@ const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
 		...theme.applyStyles('dark', {
 			color: theme.palette.primary.contrastText,
 		}),
+		pointerEvents: 'auto',
 	},
+
 	[`& .${treeItemClasses.groupTransition}`]: {
 		marginLeft: 15,
 		paddingLeft: 18,
 		borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
 	},
-	...theme.applyStyles('light', {
-		color: theme.palette.grey[800],
-	}),
 }));
 
 export const buildTree = <T,>(data: TreeData<T>[]): TreeNode<T>[] => {
@@ -91,6 +96,17 @@ export const buildTree = <T,>(data: TreeData<T>[]): TreeNode<T>[] => {
 	return roots;
 };
 
+const getIconByDataType = (type: string) => {
+	switch (type) {
+		case 'dept':
+			return <Business />;
+		case 'deptMember':
+			return <AccountBox />;
+		default:
+			return null;
+	}
+};
+
 const HighlightText = ({ text, highlight }: { text: string; highlight: string }) => {
 	if (!highlight.trim()) return <>{text}</>;
 	const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
@@ -113,21 +129,37 @@ const RecursiveTreeItem = <T,>({ nodes, searchTerm, disabledIds }: { nodes: Tree
 	return (
 		<>
 			{nodes.map((node) => {
-				const isDisabled = disabledIds.includes(String(node.id));
+				const nodeIdString = String(node.id);
+				const isDisabled = disabledIds.includes(nodeIdString);
 
 				return (
 					<CustomTreeItem
-						key={String(node.id)}
-						itemId={String(node.id)}
-						disabled={isDisabled}
+						key={nodeIdString}
+						itemId={nodeIdString}
+						isDisabled={isDisabled}
 						label={
 							<Box sx={{ display: 'flex', alignItems: 'center' }}>
-								<Box sx={{ display: 'flex', mr: 1, '& svg': { fontSize: '1.125rem' } }}>{getIconByDataType((node as any).dataType)}</Box>
-								<HighlightText text={`${node.label}${node.treeChildCount ? `(${node.treeChildCount})` : ''}`} highlight={searchTerm} />
+								<Box
+									sx={{
+										display: 'flex',
+										mr: 1,
+										'& svg': {
+											fontSize: '1.125rem',
+											color: isDisabled ? theme.palette.grey[500] : 'inherit',
+										},
+									}}
+								>
+									{getIconByDataType((node as any).dataType)}
+								</Box>
+								<Typography>
+									<HighlightText text={`${node.label}${node.treeChildCount ? `(${node.treeChildCount})` : ''}`} highlight={searchTerm} />
+								</Typography>
 							</Box>
 						}
 					>
-						{node.children.length > 0 && <RecursiveTreeItem nodes={node.children} searchTerm={searchTerm} disabledIds={disabledIds} />}
+						{node.children && node.children.length > 0 && (
+							<RecursiveTreeItem nodes={node.children} searchTerm={searchTerm} disabledIds={disabledIds} />
+						)}
 					</CustomTreeItem>
 				);
 			})}
@@ -164,7 +196,17 @@ export default function CommonTreeview<T>({
 	}, [rawData, mapEntityToTree]);
 
 	return (
-		<Box sx={{ '& input': { fontSize: '.875rem' }, '& .MuiTreeItem-label ': { fontSize: '.875rem' } }}>
+		<Box
+			sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				height: '100%',
+				minHeight: '200px',
+				maxHeight: '58vh',
+				'& input': { fontSize: '.875rem' },
+				'& .MuiTreeItem-label ': { fontSize: '.875rem' },
+			}}
+		>
 			<TextField
 				fullWidth
 				variant='outlined'
@@ -180,7 +222,7 @@ export default function CommonTreeview<T>({
 					},
 				}}
 				onChange={(e) => setSearchTerm(e.target.value)}
-				sx={{ mb: 2 }}
+				sx={{ mb: 2, flexShrink: 0 }}
 			/>
 
 			<SimpleTreeView
@@ -193,7 +235,7 @@ export default function CommonTreeview<T>({
 					}
 				}}
 				onSelectedItemsChange={(_, itemId) => {
-					if (!itemId) return;
+					if (!itemId || disabledIds.includes(itemId)) return;
 
 					if (onNodeClick) {
 						const findNode = (nodes: TreeNode<T>[]): TreeNode<T> | undefined => {
@@ -213,6 +255,7 @@ export default function CommonTreeview<T>({
 					collapseIcon: ExpandMore,
 					expandIcon: ChevronRight,
 				}}
+				sx={{ flexGrow: 1, pr: 1, overflowY: 'auto' }}
 			>
 				<RecursiveTreeItem nodes={treeStructure} searchTerm={searchTerm} disabledIds={disabledIds} />
 			</SimpleTreeView>
