@@ -42,7 +42,7 @@ const CustomTreeItem = styled(TreeItem, {
 			backgroundColor: isDisabled ? 'transparent !important' : undefined,
 		},
 		[`& .${treeItemClasses.label}`]: {
-			fontSize: '0.8rem',
+			fontSize: '0.75rem',
 			fontWeight: 500,
 			color: isDisabled ? `${theme.palette.grey[500]} !important` : 'inherit',
 		},
@@ -196,7 +196,17 @@ export default function CommonTreeview<T>({
 	}, [rawData, mapEntityToTree]);
 
 	return (
-		<Box sx={{ '& input': { fontSize: '.875rem' }, '& .MuiTreeItem-label ': { fontSize: '.875rem' } }}>
+		<Box
+			sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				height: '100%',
+				minHeight: '200px',
+				maxHeight: '58vh',
+				'& input': { fontSize: '.875rem' },
+				'& .MuiTreeItem-label ': { fontSize: '.875rem' },
+			}}
+		>
 			<TextField
 				fullWidth
 				variant='outlined'
@@ -212,7 +222,7 @@ export default function CommonTreeview<T>({
 					},
 				}}
 				onChange={(e) => setSearchTerm(e.target.value)}
-				sx={{ mb: 2 }}
+				sx={{ mb: 2, flexShrink: 0 }}
 			/>
 
 			<SimpleTreeView
@@ -245,6 +255,7 @@ export default function CommonTreeview<T>({
 					collapseIcon: ExpandMore,
 					expandIcon: ChevronRight,
 				}}
+				sx={{ flexGrow: 1, pr: 1, overflowY: 'auto' }}
 			>
 				<RecursiveTreeItem nodes={treeStructure} searchTerm={searchTerm} disabledIds={disabledIds} />
 			</SimpleTreeView>
