@@ -5,6 +5,9 @@ import lombok.*;
 import org.easyc.dept.entity.Dept;
 import org.easyc.member.entity.Member;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Builder
 @Getter
@@ -23,11 +26,15 @@ public class AttendancePolicyMap {
     @Column(name = "member_id")
     private Long memberId;
 
-    @Column(name = "login_id")
-    private String loginId;
+    @Column(name = "apply_start")
+    private LocalDate applyStart;
 
+    @Column(name = "apply_end")
+    private LocalDate applyEnd;
+
+    @Column(name="actived")
     @Builder.Default
-    private boolean deleted = false;
+    private boolean actived = false;
 
     // 읽기 전용 - 멤버
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,5 +45,11 @@ public class AttendancePolicyMap {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attendance_policy_id", insertable = false, updatable = false)
     private AttendancePolicy attendancePolicy;
+
+    // 정책 종료 메서드
+    public void deactivate() {
+        this.applyEnd = LocalDate.now();
+        this.actived = false;
+    }
 
 }

@@ -82,9 +82,9 @@ public class VacationApplicationService {
     public VacationApplicationResponseDto findUserVacationApplicationData(Long memberId){
         VacationApplicationResponseDto result = new VacationApplicationResponseDto();
 
-        Vacation targetVacation = vacationRepository.findAllByMemberId(memberId).orElse(null);
+        LocalDate todayDate = LocalDate.now();
+        Vacation targetVacation = vacationRepository.findAllByMemberIdAndExpireDateAfter(memberId, todayDate).orElse(null);
         if(targetVacation != null){
-            LocalDate todayDate = LocalDate.now();
             LocalDate accrualDate = targetVacation.getAccrualDate();
             LocalDate expireDate = targetVacation.getExpireDate();
 
@@ -142,7 +142,7 @@ public class VacationApplicationService {
     }
 
     public Map<String, Object> approveVacationData(VacationApplication request) {
-        Vacation targetVacation = vacationRepository.findAllByMemberId(request.getMemberId()).orElse(null);
+        Vacation targetVacation = vacationRepository.findAllByMemberIdAndExpireDateAfter(request.getMemberId(), LocalDate.now()).orElse(null);
         VacationHistory newHistory = null;
 
         if(targetVacation != null){

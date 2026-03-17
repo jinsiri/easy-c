@@ -5,6 +5,9 @@ import lombok.*;
 import org.easyc.attendance.entity.AttendancePolicy;
 import org.easyc.member.entity.Member;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Builder
 @Getter
@@ -23,8 +26,15 @@ public class VacationPolicyMap {
     @Column(name = "member_id")
     private Long memberId;
 
+    @Column(name = "apply_start")
+    private LocalDate applyStart;
+
+    @Column(name = "apply_end")
+    private LocalDate applyEnd;
+
+    @Column(name="actived")
     @Builder.Default
-    private boolean deleted = false;
+    private boolean actived = false;
 
     // 읽기 전용 - 멤버
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,5 +45,11 @@ public class VacationPolicyMap {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vacation_policy_id", insertable = false, updatable = false)
     private VacationPolicy vacationPolicy;
+
+    // 정책 종료 메서드
+    public void deactivate() {
+        this.applyEnd = LocalDate.now();
+        this.actived = false;
+    }
 
 }

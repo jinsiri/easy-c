@@ -68,15 +68,17 @@ export default function AttendancePolicyPage() {
 			valueFormatter: (data) => (
 				<Box>
 					{data.mappingUserCount ?? '-'}명{' '}
-					<IconButton
-						sx={{ color: grey[500] }}
-						onClick={(e) => {
-							setModalData({ policyId: data.attendancePolicyId });
-							router.push('/admin/attendance/policy/modal');
-						}}
-					>
-						<BorderColorRounded sx={{ fontSize: '1rem' }} />
-					</IconButton>
+					{data.attendancePolicyId !== 1 && (
+						<IconButton
+							sx={{ color: grey[500] }}
+							onClick={(e) => {
+								setModalData({ policyId: data.attendancePolicyId });
+								router.push('/admin/attendance/policy/modal');
+							}}
+						>
+							<BorderColorRounded sx={{ fontSize: '1rem' }} />
+						</IconButton>
+					)}
 				</Box>
 			),
 		},

@@ -1,25 +1,35 @@
 package org.easyc.vacation.repository;
 
-import org.easyc.attendance.entity.AttendancePolicyMap;
 import org.easyc.vacation.entity.VacationPolicy;
 import org.easyc.vacation.entity.VacationPolicyMap;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface VacationPolicyMapRepository extends JpaRepository<VacationPolicyMap, Long> {
-    Optional<VacationPolicyMap> findTopByMemberIdAndDeletedFalseOrderByMappingIdDesc(Long memberId);
+    List<VacationPolicyMap> findAllByVacationPolicyIdAndActivedTrue(Long policyId);
+    List<VacationPolicyMap> findAllByMemberIdIsInAndActivedTrue(List<Long> updateList);
 
-    @Query("SELECT a.vacationPolicyId, count(a) FROM VacationPolicyMap a GROUP BY a.vacationPolicyId")
+    @Query("""
+        SELECT v.vacationPolicyId, count(v)
+        FROM VacationPolicyMap v
+        WHERE v.actived = true
+        GROUP BY v.vacationPolicyId
+    """)
     List<Object[]> countGroupByVacationPolicyId();
 
-    List<VacationPolicyMap> findAllByMemberIdIsIn(List<Long> memberIdList);
+    @Query("""
+        SELECT p
+        FROM VacationPolicyMap v
+        JOIN VacationPolicy p
+        ON v.vacationPolicyId = p.vacationPolicyId
+        WHERE v.actived = true AND v.memberId = :memberId
+    """)
+    Optional<VacationPolicy> findPolicyByMemberIdAndActivedTrue(Long memberId);
 
-    @Modifying
-    void deleteByVacationPolicyId(Long policyId);
 }

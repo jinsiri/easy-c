@@ -48,15 +48,17 @@ export default function VacationPolicyPage() {
 			valueFormatter: (data) => (
 				<Box>
 					{data.mappingUserCount ?? '-'}명{' '}
-					<IconButton
-						sx={{ color: grey[500] }}
-						onClick={(e) => {
-							setModalData({ policyId: data.vacationPolicyId });
-							router.push('/admin/vacation/policy/modal');
-						}}
-					>
-						<BorderColorRounded sx={{ fontSize: '1rem' }} />
-					</IconButton>
+					{data.vacationPolicyId !== 1 && (
+						<IconButton
+							sx={{ color: grey[500] }}
+							onClick={(e) => {
+								setModalData({ policyId: data.vacationPolicyId });
+								router.push('/admin/vacation/policy/modal');
+							}}
+						>
+							<BorderColorRounded sx={{ fontSize: '1rem' }} />
+						</IconButton>
+					)}
 				</Box>
 			),
 		},
@@ -142,14 +144,9 @@ export default function VacationPolicyPage() {
 								{idx === 0 ? (
 									<Chip label='기본정책' variant='outlined' color='primary' size='small' />
 								) : (
-									<>
-										<IconButton sx={{ color: grey[500] }} onClick={(e) => onClickUpdateButton(e, item)}>
-											<BorderColorRounded sx={{ fontSize: '1rem' }} />
-										</IconButton>
-										<IconButton sx={{ color: grey[500] }} onClick={(e) => onClickDeleteButton(e, item)}>
-											<DeleteRounded sx={{ fontSize: '1rem' }} />
-										</IconButton>
-									</>
+									<IconButton sx={{ color: grey[500] }} onClick={(e) => onClickDeleteButton(e, item)}>
+										<DeleteRounded sx={{ fontSize: '1rem' }} />
+									</IconButton>
 								)}
 							</Box>
 							<Box sx={{ px: '1.5rem', paddingBottom: '2rem' }}>

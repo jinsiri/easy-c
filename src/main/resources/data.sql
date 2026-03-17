@@ -61,8 +61,8 @@ SELECT setval(
 );
 
 --근태 맵핑 데이터 세팅
-INSERT INTO attendance_policy_map (mapping_id, attendance_policy_id, member_id, login_id, deleted)
-SELECT 1, 1, 1, 'admin', false
+INSERT INTO attendance_policy_map (mapping_id, attendance_policy_id, member_id, apply_start, apply_end, actived)
+SELECT 1, 1, 1, '1900-01-01', null, true
 WHERE NOT EXISTS (
     SELECT 1 FROM attendance_policy_map
 );
@@ -93,7 +93,7 @@ VALUES (
     1,
     '기본 휴가 정책',
     null,
-    'WORKING_DAY',
+    'FINANCIAL_DAY',
     '0.5',
     true,
     true,
@@ -109,8 +109,8 @@ SELECT setval(
 );
 
 --휴가정책 맵핑 데이터 세팅
-INSERT INTO vacation_policy_map (mapping_id, vacation_policy_id, member_id, deleted)
-SELECT 1, 1, 1, false
+INSERT INTO vacation_policy_map (mapping_id, vacation_policy_id, member_id, apply_start, apply_end, actived)
+SELECT 1, 1, 1, '1900-01-01', null, true
 WHERE NOT EXISTS (
     SELECT 1 FROM vacation_policy_map
 );

@@ -2,7 +2,6 @@ package org.easyc.attendance.repository;
 
 import org.easyc.attendance.entity.AttendancePolicyMap;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -11,13 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface AttendancePolicyMapRepository extends JpaRepository<AttendancePolicyMap, Long> {
-    Optional<AttendancePolicyMap> findTopByMemberIdAndDeletedFalseOrderByMappingIdDesc(Long memberId);
+    Optional<AttendancePolicyMap> findTopByMemberIdAndActivedTrueOrderByMappingIdDesc(Long memberId);
+    List<AttendancePolicyMap> findAllByAttendancePolicyIdAndActivedTrue(Long policyId);
 
-    @Query("SELECT a.attendancePolicyId, count(a) FROM AttendancePolicyMap a GROUP BY a.attendancePolicyId")
+    @Query("SELECT a.attendancePolicyId, count(a) FROM AttendancePolicyMap a WHERE a.actived = true GROUP BY a.attendancePolicyId")
     List<Object[]> countGroupByAttendancePolicyId();
 
-    List<AttendancePolicyMap> findAllByMemberIdIsIn(List<Long> memberIdList);
-
-    @Modifying
-    void deleteByAttendancePolicyId(Long policyId);
+    List<AttendancePolicyMap> findAllByMemberIdIsInAndActivedTrue(List<Long> memberIdList);
 }

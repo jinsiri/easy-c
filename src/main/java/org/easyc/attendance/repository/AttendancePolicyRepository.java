@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface AttendancePolicyRepository extends JpaRepository<AttendancePolicy, Long> {
-    Optional<AttendancePolicy> findByAttendancePolicyId(Long attendancePolicyId);
+    Optional<AttendancePolicy> findByAttendancePolicyIdAndActiveTrue(Long attendancePolicyId);
     List<AttendancePolicy> findAllByActiveTrueOrderByAttendancePolicyIdAsc();
 
 }
