@@ -194,14 +194,7 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 				/>
 			)}
 
-			{openReassignModal && (
-				<BatchReassignDeptDialog
-					prevDeptId={deptId}
-					checkedIds={checkedMemberIds}
-					onClose={() => setOpenReassignModal(false)}
-					reloadList={() => fetchMembersMappedToDeptId(deptId)}
-				/>
-			)}
+			{openReassignModal && <BatchReassignDeptDialog prevDeptId={deptId} checkedIds={checkedMemberIds} onClose={() => setOpenReassignModal(false)} />}
 
 			<Stack direction='row' spacing={1} alignItems={'center'} sx={{ py: 2 }}>
 				<Checkbox

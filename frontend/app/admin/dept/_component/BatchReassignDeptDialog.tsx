@@ -6,15 +6,16 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { deptService } from '@/app/services/deptService';
 import { useDialogStore } from '@/store/useDialogStore';
 import { mapDeptToTree } from '@/app/admin/dept/_utils/deptUtil';
+import { useRouter } from 'next/navigation';
 
 interface BatchReassignDialogProps {
 	prevDeptId: number;
 	checkedIds: number[];
 	onClose: () => void;
-	reloadList: () => void;
 }
 
-export default function BatchReassignDeptDialog({ prevDeptId, checkedIds, onClose, reloadList }: BatchReassignDialogProps) {
+export default function BatchReassignDeptDialog({ prevDeptId, checkedIds, onClose }: BatchReassignDialogProps) {
+	const router = useRouter();
 	const { alert, success } = useDialogStore();
 	const { expandedIds, setExpandedIds } = useDeptTreeStore();
 	const [loading, setLoading] = useState(false);
@@ -50,7 +51,7 @@ export default function BatchReassignDeptDialog({ prevDeptId, checkedIds, onClos
 
 			await deptService.reassignDept(payload);
 			await success('이동되었습니다.');
-			reloadList();
+			router.refresh();
 			onClose();
 		} catch (e: any) {
 			await alert('부서 이동에 실패했습니다.');
