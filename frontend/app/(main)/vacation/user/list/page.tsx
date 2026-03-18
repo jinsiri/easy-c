@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import secureLocalStorage from 'react-secure-storage';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -9,8 +10,8 @@ import dayjs from 'dayjs';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
-import { Box, Grid, Button, Typography, IconButton } from '@mui/material';
-import { ArrowBackRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded } from '@mui/icons-material';
+import { Box, Grid, Button } from '@mui/material';
+import { ArrowBackRounded } from '@mui/icons-material';
 
 /** Ag Grid */
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
@@ -27,6 +28,7 @@ import { TRANSACTIONTYPE, VACATIONCATEGORY } from '@/constant/vacationConst';
 import { colDefs, historyColDefs } from '@/constant/vacationColDef';
 import { vacationService, VacationHistorySearchRequestDto, VacationHistoryDto } from '@/app/services/vacationService';
 import { vacationApplicationService, VacationAppSearchRequestDto, vacationApplicationDataDto } from '@/app/services/vacationApplicationService';
+import { FilterRef } from '@/app/_component/layoutElement/DetailSearchFilterComp';
 
 const historyFieldDefault: FilterValues = {
 	startDate: dayjs().startOf('year'),
@@ -164,7 +166,8 @@ export default function VacationUserListPage() {
 	const type = searchParam.get('type');
 	const { loader, setLoader } = useLoaderStore();
 
-	const [toggleActive, setToggleActive] = useState(true);
+	const detailSearchFilterRef = useRef<FilterRef>(null);
+
 	const [gridColDef, setGridColDef] = useState(historyColDefs);
 	const [gridData, setGridData] = useState<Record<string, any>[]>([]);
 	const [page, setPage] = useState(0);
@@ -172,15 +175,18 @@ export default function VacationUserListPage() {
 	const [totalElements, setTotalElements] = useState(0);
 
 	useEffect(() => {
-		if (type === 'planVacation') {
-			setGridColDef(colDefs);
-			getListData({ ...applicationFieldDefault, startDate: dayjs() });
-		} else if (type === 'endVacation') {
-			setGridColDef(colDefs);
-			getListData({ ...applicationFieldDefault, endDate: dayjs() });
+		setGridColDef(type === 'vacationHistory' ? historyColDefs : colDefs);
+
+		if (detailSearchFilterRef.current) {
+			getListData(detailSearchFilterRef.current.getFilterValues());
 		} else {
-			setGridColDef(historyColDefs);
-			getListData(historyFieldDefault);
+			if (type === 'planVacation') {
+				getListData({ ...applicationFieldDefault, startDate: dayjs() });
+			} else if (type === 'endVacation') {
+				getListData({ ...applicationFieldDefault, endDate: dayjs() });
+			} else {
+				getListData(historyFieldDefault);
+			}
 		}
 	}, [type]);
 
@@ -195,6 +201,7 @@ export default function VacationUserListPage() {
 
 			if (type === 'vacationHistory') {
 				const _request: VacationHistorySearchRequestDto = {
+					memberId: Number(secureLocalStorage.getItem('memberId')),
 					startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
 					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
 					transactionType: data.transactionType,
@@ -207,6 +214,7 @@ export default function VacationUserListPage() {
 				setTotalElements(res.totalElements);
 			} else {
 				const _request: VacationAppSearchRequestDto = {
+					memberId: Number(secureLocalStorage.getItem('memberId')),
 					startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
 					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
 					status: data.status,
@@ -239,23 +247,9 @@ export default function VacationUserListPage() {
 				</Button>
 			</Box>
 			<Grid container sx={{ flexGrow: 1, flexDirection: 'column', width: '100%', height: 'auto', backgroundColor: 'grey.50' }}>
-				<Box
-					sx={{
-						display: 'flex',
-						flexDirection: 'row',
-						justifyContent: 'space-between',
-						alignItems: 'center',
-						width: '100%',
-						padding: '1rem 1.5rem 0',
-					}}
-				>
-					<Typography variant='subtitle1'>연차 내역</Typography>
-					<IconButton size='small' onClick={(e) => setToggleActive((prev) => !prev)}>
-						{toggleActive ? <KeyboardArrowUpRounded /> : <KeyboardArrowDownRounded />}
-					</IconButton>
-				</Box>
 				<DetailSearchFilterComp
-					isOpen={toggleActive}
+					ref={detailSearchFilterRef}
+					title={'연차 내역'}
 					fields={type === 'vacationHistory' ? detailHistorySearchFields : detailAppSearchFields}
 					fieldDefault={
 						type === 'planVacation'

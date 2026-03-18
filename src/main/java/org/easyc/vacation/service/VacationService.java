@@ -9,13 +9,13 @@ import org.easyc.member.repository.MemberProfileRepository;
 import org.easyc.vacation.constant.TransactionType;
 import org.easyc.vacation.constant.VacationCategory;
 import org.easyc.vacation.constant.VacationPolicyType;
+import org.easyc.vacation.dto.VacationAppSearchRequestDto;
+import org.easyc.vacation.dto.VacationCompanySearchRequestDto;
 import org.easyc.vacation.dto.VacationHistorySearchRequestDto;
 import org.easyc.vacation.dto.VacationResponseDto;
-import org.easyc.vacation.entity.Vacation;
-import org.easyc.vacation.entity.VacationHistory;
-import org.easyc.vacation.entity.VacationPolicy;
-import org.easyc.vacation.entity.VacationPolicyMap;
+import org.easyc.vacation.entity.*;
 import org.easyc.vacation.repository.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +34,7 @@ public class VacationService {
     private final MemberProfileRepository memberProfileRepository;
     private final VacationRepository vacationRepository;
     private final VacationHistoryRepository vacationHistoryRepository;
+    private final VacationRepositoryCustom vacationRepositoryCustom;
     private final VacationHistoryRepositoryCustom vacationHistoryRepositoryCustom;
 
     public VacationResponseDto getVacation(Long memberId){
@@ -114,34 +115,20 @@ public class VacationService {
         return result;
     }
 
-    public List<VacationHistory> getVacationHistoryData(Long memberId) {
-        return null;
+    public PageResponseDto<Vacation> getVacationCompanySearch(VacationCompanySearchRequestDto request, Pageable pageable){
+        return new PageResponseDto<Vacation>(vacationRepositoryCustom.search(request, pageable));
     }
 
-    public List<Vacation> getVacationCompanySearch(SearchRequestDto request){
-        String searchCategory = request.getSearchCategory();
-        String searchValue = request.getSearchValue();
-
-        List<Vacation> vacationList = new ArrayList<>();
-        if(searchValue== null || searchValue.equals("")){
-            vacationList = vacationRepository.findAll();
-        }else{
-            switch (searchCategory){
-                case "memberNm":
-                    vacationList = vacationRepository.findAllByMemberNmContainsAndExpireDateAfter(searchValue, LocalDate.now());
-                    break;
-
-                case "depthNm":
-                    vacationList = vacationRepository.findAllByDeptNmAndExpireDateAfter(searchValue, LocalDate.now());
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        return vacationList;
+    public List<Vacation> excelVacationCompany(VacationCompanySearchRequestDto request, Pageable pageable) {
+        Page<Vacation> searchList = vacationRepositoryCustom.search(request, pageable);
+        return searchList.getContent();
     }
+
+    public PageResponseDto<VacationHistory> searchVacationHistoryData(VacationHistorySearchRequestDto request, Pageable pageable) {
+        return new PageResponseDto<VacationHistory>(vacationHistoryRepositoryCustom.search(request, pageable));
+    }
+
+
 
     public Vacation makeVacation (MemberProfile targetMemberProfile, VacationPolicy targetVacationPolicy, List<VacationHistory> vh){
         LocalDate resignationDate = targetMemberProfile.getResignationDate();
@@ -360,8 +347,5 @@ public class VacationService {
     }
 
 
-    public PageResponseDto<VacationHistory> searchVacationHistoryData(PageRequestDto<VacationHistorySearchRequestDto> request) {
-        Pageable pageable = PageRequest.of(request.getNumber(), request.getSize());
-        return new PageResponseDto<VacationHistory>(vacationHistoryRepositoryCustom.search(request.getRequest(), pageable));
-    }
+
 }

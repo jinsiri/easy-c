@@ -8,6 +8,7 @@ import org.easyc.common.dto.PageResponseDto;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
+import org.easyc.excel.dto.ExcelRequestDto;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.vacation.constant.VacationCategory;
 import org.easyc.vacation.dto.VacationAppSearchRequestDto;
@@ -21,6 +22,7 @@ import org.easyc.vacation.repository.VacationApplicationRepositoryCustom;
 import org.easyc.vacation.repository.VacationHistoryRepository;
 import org.easyc.vacation.repository.VacationRepository;
 import org.easyc.vacation.repository.VacationApplicationRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -51,39 +53,6 @@ public class VacationApplicationService {
         application.setJobGrade(deptMemberMap.getJobTitle().getJobTitleNm());
 
         vacationApplicationRepository.save(application);
-    }
-
-    public List<VacationApplication> searchVacationApplicationData(SearchRequestDto request) {
-        String searchCategory = request.getSearchCategory();
-        String searchValue = request.getSearchValue();
-
-        List<VacationApplication> vacationList = new ArrayList<>();
-
-        if(searchValue== null || searchValue.equals("")  || searchValue.equals("all")){
-            vacationList = vacationApplicationRepository.findAllByDeletedFalseOrderByRegisterDateAsc();
-        }else{
-            switch (searchCategory){
-                case "memberNm":
-                    vacationList = vacationApplicationRepository.findAllByMemberNmContainsAndActiveTrueOrderByVacationApplicationIdAsc(searchValue);
-                    break;
-
-                case "depthNm":
-                    vacationList = vacationApplicationRepository.findAllByDeptNmContainsAndActiveTrueOrderByVacationApplicationIdAsc(searchValue);
-                    break;
-
-                case "workDate":
-                    LocalDate workDate = LocalDate.parse(searchValue, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                    vacationList = vacationApplicationRepository.findAllByStartDateLessThanEqualAndEndDateGreaterThanEqualAndActiveTrueOrderByVacationApplicationIdAsc(workDate, workDate);
-                    break;
-
-                default: //처리상태
-
-                    vacationList = vacationApplicationRepository.findAllByStatusAndActiveTrueOrderByVacationApplicationIdAsc(BasicStatus.valueOf(searchValue));
-                    break;
-            }
-        }
-
-        return vacationList;
     }
 
     public VacationApplicationResponseDto findUserVacationApplicationData(Long memberId){
@@ -166,10 +135,18 @@ public class VacationApplicationService {
         }
         return Map.of("vacationHistory", newHistory, "vacation", targetVacation);
     }
-    
 
-    public PageResponseDto<VacationApplication> searchUserVacationApplicationData(PageRequestDto<VacationAppSearchRequestDto> request, String type) {
-        Pageable pageable = PageRequest.of(request.getNumber(), request.getSize());
-        return new PageResponseDto<VacationApplication>(vacationApplicationRepositoryCustom.searchUserApp(request.getRequest(), pageable, type));
+    public PageResponseDto<VacationApplication> searchVacationApplicationData(VacationAppSearchRequestDto request, Pageable pageable) {
+        return new PageResponseDto<VacationApplication>(vacationApplicationRepositoryCustom.searchApp(request, pageable));
     }
+
+    public PageResponseDto<VacationApplication> searchUserVacationApplicationData(VacationAppSearchRequestDto request,Pageable pageable, String type) {
+        return new PageResponseDto<VacationApplication>(vacationApplicationRepositoryCustom.searchUserApp(request, pageable, type));
+    }
+
+    public List<VacationApplication> excelVacationApplication(VacationAppSearchRequestDto request, Pageable pageable) {
+        Page<VacationApplication> searchList = vacationApplicationRepositoryCustom.searchApp(request, pageable);
+        return searchList.getContent();
+    }
+
 }

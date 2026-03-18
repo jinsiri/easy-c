@@ -32,7 +32,6 @@ public class Vacation {
     @Column(name = "job_grade")
     private String jobGrade;
 
-
     @Column(name = "vacation_policy_name")
     private String vacationPolicyName;
 

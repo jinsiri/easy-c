@@ -15,6 +15,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class VacationHistorySearchRequestDto {
+    private Long memberId;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 

@@ -6,13 +6,18 @@ import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.attendance.entity.AttendancePolicy;
 import org.easyc.attendance.repository.AttendanceApplicationRepository;
+import org.easyc.attendance.repository.AttendanceApplicationRepositoryCustom;
 import org.easyc.attendance.repository.AttendanceRepository;
 import org.easyc.common.constant.BasicStatus;
+import org.easyc.common.dto.PageResponseDto;
 import org.easyc.common.dto.SearchRequestDto;
 
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
 import org.easyc.member.repository.MemberRepository;
+import org.easyc.vacation.entity.VacationApplication;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,10 +30,11 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AttendanceApplicationService {
     private final AttendanceApplicationRepository attendanceApplicationRepository;
-    private final MemberRepository memberRepository;
     private final AttendanceRepository attendanceRepository;
     private final AttendanceService attendanceService;
     private final DeptMemberMapRepository deptMemberMapRepository;
+
+    private final AttendanceApplicationRepositoryCustom attendanceApplicationRepositoryCustom;
 
     public List<AttendanceApplication> getAllAttendanceApplication (){
         return attendanceApplicationRepository.findAll();
@@ -55,36 +61,13 @@ public class AttendanceApplicationService {
         attendanceApplicationRepository.save(attendanceApplication);
     }
 
-    public List<AttendanceApplication> searchAttendanceApplication(SearchRequestDto request){
-        String searchCategory = request.getSearchCategory();
-        String searchValue = request.getSearchValue();
+    public PageResponseDto<AttendanceApplication> searchAttendanceApplication(AttendanceAppSearchRequestDto request, Pageable pageable){
+        return new PageResponseDto<AttendanceApplication>(attendanceApplicationRepositoryCustom.searchApp(request, pageable));
+    }
 
-        List<AttendanceApplication> applicationList = new ArrayList<>();
-
-        if(searchValue== null || searchValue.equals("") || searchValue.equals("all")){
-            applicationList = attendanceApplicationRepository.findAllByActiveTrueOrderByAttendanceApplicationIdAsc();
-        }else{
-            switch (searchCategory){
-                case "memberNm":
-                    applicationList = attendanceApplicationRepository.findAllByMemberNmContainsAndActiveTrueOrderByAttendanceApplicationIdAsc(searchValue);
-                    break;
-
-                case "depthNm":
-                    applicationList = attendanceApplicationRepository.findAllByDeptNmContainsAndActiveTrueOrderByAttendanceApplicationIdAsc(searchValue);
-                    break;
-
-                case "workDate":
-                    LocalDate workDate = LocalDate.parse(searchValue, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                    applicationList = attendanceApplicationRepository.findAllByWorkDateAndActiveTrueOrderByAttendanceApplicationIdAsc(workDate);
-                    break;
-
-                default: //처리상태
-                    applicationList = attendanceApplicationRepository.findAllByStatusAndActiveTrueOrderByAttendanceApplicationIdAsc(BasicStatus.valueOf(searchValue));
-                    break;
-            }
-        }
-
-        return applicationList;
+    public List<AttendanceApplication> excelAttendanceApplication(AttendanceAppSearchRequestDto request, Pageable pageable){
+        Page<AttendanceApplication> searchList = attendanceApplicationRepositoryCustom.searchApp(request, pageable);
+        return searchList.getContent();
     }
 
     public void approveAttendanceApplicationData(List<AttendanceApplication> request){

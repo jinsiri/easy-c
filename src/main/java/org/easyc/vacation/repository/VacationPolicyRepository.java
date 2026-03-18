@@ -13,6 +13,5 @@ import java.util.Optional;
 public interface VacationPolicyRepository extends JpaRepository<VacationPolicy, Long> {
     Optional<VacationPolicy> findByVacationPolicyIdAndActiveTrue(Long vacationPolicyId);
     List<VacationPolicy> findAllByActiveTrueOrderByVacationPolicyIdAsc();
-
     List<VacationPolicy> findAllByVacationPolicyIdInAndActiveTrue(Collection<Long> vacationPolicyIds);
 }

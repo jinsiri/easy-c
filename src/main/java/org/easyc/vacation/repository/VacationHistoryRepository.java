@@ -17,7 +17,5 @@ import java.util.stream.Collectors;
 @Repository
 public interface VacationHistoryRepository extends JpaRepository<VacationHistory, Long> {
     List<VacationHistory> findAllByMemberIdInAndAccrualDateBetweenAndActiveTrue(Collection<Long> memberIdList, LocalDate startDate, LocalDate endDate);
-    List<VacationHistory> findAllByMemberIdAndAccrualDateBetweenAndActiveTrueOrderByVacationId(Long memberId, LocalDate startDate, LocalDate endDate);
-
     List<VacationHistory> findTop10ByMemberIdAndAccrualDateBetweenAndActiveTrueOrderByAccrualDateDesc(Long memberId, LocalDate startDate, LocalDate endDate);
 }

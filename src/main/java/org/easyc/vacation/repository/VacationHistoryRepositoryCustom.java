@@ -33,7 +33,9 @@ public class VacationHistoryRepositoryCustom {
     public Page<VacationHistory> search(VacationHistorySearchRequestDto req, Pageable pageable) {
         List<VacationHistory> content = queryFactory
                 .selectFrom(vacationHistory)
-                .where(dateGoe(req.getStartDate()),
+                .where(
+                        memberIdEq(req.getMemberId()),
+                        dateGoe(req.getStartDate()),
                         dateLt(req.getEndDate()),
                         transactionTypeEq(req.getTransactionType()),
                         vacationCategoryEq(req.getVacationCategory()),
@@ -46,7 +48,9 @@ public class VacationHistoryRepositoryCustom {
         Long total = queryFactory
                 .select(vacationHistory.count())
                 .from(vacationHistory)
-                .where(dateGoe(req.getStartDate()),
+                .where(
+                        memberIdEq(req.getMemberId()),
+                        dateGoe(req.getStartDate()),
                         dateLt(req.getEndDate()),
                         transactionTypeEq(req.getTransactionType()),
                         vacationCategoryEq(req.getVacationCategory()),
@@ -55,6 +59,11 @@ public class VacationHistoryRepositoryCustom {
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
+
+    private BooleanExpression memberIdEq(Long memberId) {
+        return memberId != null ? vacationHistory.memberId.eq(memberId) : null;
+    }
+
 
     private BooleanExpression vacationCategoryEq(String vacationCategory) {
         VacationCategory type = vacationCategory != null ?

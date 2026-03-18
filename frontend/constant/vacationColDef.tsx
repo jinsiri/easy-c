@@ -19,11 +19,19 @@ export const colDefs: ColDef<Record<string, any>>[] = [
 	{
 		field: 'status',
 		headerName: '상태',
-		cellRenderer: (data) => (
-			<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-				{data.value ? <GridStatusComp status={data.value} /> : '-'}
-			</Box>
-		),
+		cellStyle: {
+			display: 'flex',
+			justifyContents: 'center',
+			alignItems: 'center',
+		},
+		cellRenderer: (data) => {
+			return data.value ? <GridStatusComp status={data.value} /> : '-';
+		},
+	},
+	{
+		field: 'registerDate',
+		headerName: '휴가신청일',
+		valueFormatter: (param) => (param.value ? dayjs(param.value).format('YYYY-MM-DD') : '-'),
 	},
 	{
 		field: 'vacationType',
@@ -36,18 +44,13 @@ export const colDefs: ColDef<Record<string, any>>[] = [
 	},
 	{
 		field: 'time',
-		headerName: '휴가 기간',
-		cellRenderer: (param) => (
-			<Box sx={{ display: 'flex', flexDirection: 'row', py: '6px' }}>
-				<Typography>{param.data.startDate ? dayjs(param.data.startDate).format('YYYY-MM-DD') : '-'}</Typography>
-				{param.data.endDate && (
-					<>
-						<Typography>~</Typography>
-						<Typography>{dayjs(param.data.endDate).format('YYYY-MM-DD')}</Typography>
-					</>
-				)}
-			</Box>
-		),
+		headerName: '휴가기간',
+		flex: 3,
+		valueFormatter: (param) => {
+			const start = param.data?.startDate ? dayjs(param.data.startDate).format('YYYY-MM-DD') : '-';
+			const end = param.data?.endDate ? ` ~ ${dayjs(param.data.endDate).format('YYYY-MM-DD')}` : '';
+			return start + end;
+		},
 	},
 ];
 

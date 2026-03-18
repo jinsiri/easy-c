@@ -13,10 +13,6 @@ import java.util.Optional;
 @Repository
 public interface VacationRepository extends JpaRepository<Vacation, Long> {
     Optional<Vacation> findAllByMemberIdAndExpireDateAfter(Long memberId, LocalDate today);
-    List<Vacation> findAllByDeptNmAndExpireDateAfter(String searchValue, LocalDate today);
-    List<Vacation> findAllByMemberNmContainsAndExpireDateAfter(String searchValue, LocalDate today);
-
     Optional<Vacation> findAllByYearAndMemberId(Integer year, Long memberId);
-
     List<Vacation> findAllByMemberIdIsInAndYear(Collection<Long> memberIds, Integer year);
 }

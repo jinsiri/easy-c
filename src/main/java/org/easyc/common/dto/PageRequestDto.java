@@ -9,6 +9,6 @@ import lombok.Setter;
 
 public class PageRequestDto<T> {
     private T request;
-    private Integer number = 0;
+    private Integer number = 1;
     private Integer size = 50;
 }

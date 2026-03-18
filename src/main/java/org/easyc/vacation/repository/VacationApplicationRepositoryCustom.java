@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.easyc.vacation.entity.QVacationApplication.vacationApplication;
-import static org.easyc.vacation.entity.QVacationHistory.vacationHistory;
 
 
 @Repository
@@ -31,10 +30,51 @@ public class VacationApplicationRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    public Page<VacationApplication> searchUserApp(VacationAppSearchRequestDto req, Pageable pageable, String type) {
+    public Page<VacationApplication> searchApp(VacationAppSearchRequestDto req, Pageable pageable) {
+        //등록일 기준으로 기간 검색
         List<VacationApplication> content = queryFactory
                 .selectFrom(vacationApplication)
-                .where(dateGoe(req.getStartDate()),
+                .where(
+                        registerDateGoe(req.getStartDate()),
+                        registerDateLt(req.getEndDate()),
+                        statusEq(req.getStatus()),
+                        vacationTypeEq(req.getVacationType()),
+                        durationGoe(req.getVacationStart()),
+                        durationLoe(req.getVacationEnd()),
+                        deptNmContains(req.getDeptNm()),
+                        memberNmContains(req.getMemberNm())
+                )
+                .orderBy(vacationApplication.registerDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = queryFactory
+                .select(vacationApplication.count())
+                .from(vacationApplication)
+                .where(
+                        registerDateGoe(req.getStartDate()),
+                        registerDateLt(req.getEndDate()),
+                        statusEq(req.getStatus()),
+                        vacationTypeEq(req.getVacationType()),
+                        durationGoe(req.getVacationStart()),
+                        durationLoe(req.getVacationEnd()),
+                        deptNmContains(req.getDeptNm()),
+                        memberNmContains(req.getMemberNm())
+                )
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+
+    public Page<VacationApplication> searchUserApp(VacationAppSearchRequestDto req, Pageable pageable, String type) {
+        //휴가일 기준으로 기간 검색
+        List<VacationApplication> content = queryFactory
+                .selectFrom(vacationApplication)
+                .where(
+                        memberIdEq(req.getMemberId()),
+                        dateGoe(req.getStartDate()),
                         dateLt(req.getEndDate()),
                         statusEq(req.getStatus()),
                         vacationTypeEq(req.getVacationType()),
@@ -48,7 +88,9 @@ public class VacationApplicationRepositoryCustom {
         Long total = queryFactory
                 .select(vacationApplication.count())
                 .from(vacationApplication)
-                .where(dateGoe(req.getStartDate()),
+                .where(
+                        memberIdEq(req.getMemberId()),
+                        dateGoe(req.getStartDate()),
                         dateLt(req.getEndDate()),
                         statusEq(req.getStatus()),
                         vacationTypeEq(req.getVacationType()),
@@ -58,6 +100,11 @@ public class VacationApplicationRepositoryCustom {
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
+
+    private BooleanExpression memberIdEq(Long memberId) {
+        return memberId != null ? vacationApplication.memberId.eq(memberId) : null;
+    }
+
 
     private BooleanExpression statusEq(String status) {
         BasicStatus type = status != null ?
@@ -98,5 +145,22 @@ public class VacationApplicationRepositoryCustom {
     private BooleanExpression dateLt(LocalDate end) {
         return end != null ? vacationApplication.startDate.lt(end) : null;
     }
+
+    private BooleanExpression registerDateGoe(LocalDate start) {
+        return start != null ? vacationApplication.registerDate.goe(start.atStartOfDay()) : null;
+    }
+
+    private BooleanExpression registerDateLt(LocalDate end) {
+        return end != null ? vacationApplication.registerDate.lt(end.atStartOfDay()) : null;
+    }
+
+    private BooleanExpression deptNmContains(String depthNm) {
+        return StringUtils.hasText(depthNm) ? vacationApplication.deptNm.containsIgnoreCase(depthNm) : null;
+    }
+
+    private BooleanExpression memberNmContains(String memberNm) {
+        return StringUtils.hasText(memberNm) ? vacationApplication.memberNm.containsIgnoreCase(memberNm) : null;
+    }
+
 }
 

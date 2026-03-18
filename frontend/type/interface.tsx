@@ -21,9 +21,9 @@ export interface PageResponse<T> {
 	size: number;
 }
 
-export interface ExcelRequestDto {
+export interface ExcelRequestDto<T> {
 	fileName: string;
-	search?: SearchRequestDto;
+	request?: T;
 }
 
 export interface FilterField {

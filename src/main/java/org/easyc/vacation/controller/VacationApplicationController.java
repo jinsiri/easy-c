@@ -12,6 +12,8 @@ import org.easyc.vacation.dto.*;
 import org.easyc.vacation.entity.VacationApplication;
 import org.easyc.vacation.entity.VacationHistory;
 import org.easyc.vacation.service.VacationApplicationService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -45,26 +47,17 @@ public class VacationApplicationController {
 
     @AuditAction(code = "VACATION_APP_SEARCH", name = "휴가 신청 내역 검색", targetType = "VACATION_APP")
     @PostMapping("/search")
-    public List<VacationApplication> searchVacationApplicationData(@RequestBody SearchRequestDto request) {
-        return vacationApplicationService.searchVacationApplicationData(request);
-    }
-
-    @AuditAction(code = "VACATION_APP_APPROVE", name = "휴가 신청 승인", targetType = "VACATION_APP")
-    @PostMapping("/approve")
-    public void approveVacationApplicationData(@RequestBody List<VacationApplication> request) {
-        vacationApplicationService.approveVacationApplicationData(request);
-    }
-
-    @AuditAction(code = "VACATION_APP_REJECT", name = "휴가 신청 반려", targetType = "VACATION_APP")
-    @PostMapping("/reject")
-    public void rejectVacationApplicationData(@RequestBody  List<VacationApplication> request) {
-        vacationApplicationService.rejectVacationApplicationData(request);
+    public PageResponseDto<VacationApplication> searchVacationApplicationData(@RequestBody PageRequestDto<VacationAppSearchRequestDto> request) {
+        Pageable pageable = PageRequest.of(request.getNumber(), request.getSize());
+        return vacationApplicationService.searchVacationApplicationData(request.getRequest(), pageable);
     }
 
     @AuditAction(code = "VACATION_APP_EXCELDOWN", name = "휴가 신청 엑셀 다운로드", targetType = "VACATION_APP")
     @PostMapping("/excel")
-    public void excelVacationApplication(HttpServletResponse response, @RequestBody ExcelRequestDto request) throws Exception {
-        List<VacationApplication> searchList = vacationApplicationService.searchVacationApplicationData(request.getSearch());
+    public void excelVacationApplication(HttpServletResponse response, @RequestBody ExcelRequestDto<VacationAppSearchRequestDto> request) throws Exception {
+        Pageable pageable = PageRequest.of(1, 1000);
+        List<VacationApplication> searchList = vacationApplicationService.excelVacationApplication(request.getRequest(), pageable);
+
         List<ExcelVacationApplicationDto> list = new ArrayList<>();
 
         for (VacationApplication vacationApplication : searchList) {
@@ -80,9 +73,22 @@ public class VacationApplicationController {
         );
     }
 
+    @AuditAction(code = "VACATION_APP_APPROVE", name = "휴가 신청 승인", targetType = "VACATION_APP")
+    @PostMapping("/approve")
+    public void approveVacationApplicationData(@RequestBody List<VacationApplication> request) {
+        vacationApplicationService.approveVacationApplicationData(request);
+    }
+
+    @AuditAction(code = "VACATION_APP_REJECT", name = "휴가 신청 반려", targetType = "VACATION_APP")
+    @PostMapping("/reject")
+    public void rejectVacationApplicationData(@RequestBody  List<VacationApplication> request) {
+        vacationApplicationService.rejectVacationApplicationData(request);
+    }
+
     @PostMapping("/user/search")
-    public PageResponseDto<VacationApplication> searchUserVacationApplicationPlanData(@RequestParam("type") String type, @RequestBody PageRequestDto<VacationAppSearchRequestDto> request) {
-        return vacationApplicationService.searchUserVacationApplicationData(request, type);
+    public PageResponseDto<VacationApplication> searchUserVacationApplicationData(@RequestParam("type") String type, @RequestBody PageRequestDto<VacationAppSearchRequestDto> request) {
+        Pageable pageable = PageRequest.of(request.getNumber(), request.getSize());
+        return vacationApplicationService.searchUserVacationApplicationData(request.getRequest(), pageable, type);
     }
 
 }

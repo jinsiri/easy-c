@@ -11,6 +11,8 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 public class VacationAppSearchRequestDto {
+    private Long memberId;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
@@ -18,7 +20,14 @@ public class VacationAppSearchRequestDto {
     private LocalDate endDate;
 
     private String status;
+
     private String vacationType;
+
     private String vacationStart;
+
     private String vacationEnd;
+
+    private String deptNm;
+
+    private String memberNm;
 }
