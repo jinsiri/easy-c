@@ -23,7 +23,7 @@ export default function AdminSidebar(props: propsType) {
 				width: drawerOpen ? '19rem' : '4rem',
 				height: '100%',
 				transition: 'all easeInOut 0.5s',
-				zIndex: 500,
+				zIndex: 200,
 			}}
 		>
 			<Box sx={{ width: '100%', height: headerHeight }}></Box>

@@ -40,7 +40,7 @@ export default function Sidebar(props: propsType) {
 				width: sidebarWidth,
 				height: '100%',
 				transition: 'all easeInOut 0.5s',
-				zIndex: 100,
+				zIndex: 200,
 			}}
 		>
 			<Box sx={{ width: '100%', height: headerHeight }}></Box>

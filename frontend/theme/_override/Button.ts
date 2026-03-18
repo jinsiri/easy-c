@@ -33,7 +33,7 @@ const Button = (theme: Theme) => ({
 			},
 			sizeSmall: {
 				fontSize: '0.75rem',
-				padding: '0.5rem 0.25rem',
+				padding: '0.375rem 0.5rem',
 			},
 			sizeMedium: {
 				minHeight: '2.25rem',

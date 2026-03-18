@@ -60,7 +60,7 @@ export default function CommonTabs({ tabs, defaultTab = 0, containerSx, value: p
 						<CustomAgGridComp rowData={tabs[activeTab].rowData} colDefs={tabs[activeTab].colDefs} />
 					</Box>
 				) : (
-					<>{tabs[activeTab].content}</>
+					<Box sx={{ padding: '1rem 1.5rem' }}>{tabs[activeTab].content}</Box>
 				)}
 			</Box>
 		</>
