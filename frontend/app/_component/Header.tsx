@@ -62,10 +62,12 @@ export default function Header(props: propsType) {
 				display: 'flex',
 				justifyContent: 'space-between',
 				alignItems: 'center',
+				position: 'relative',
 				width: '100%',
 				height: headerHeight,
 				padding: '0 1rem',
 				borderRadius: 0,
+				zIndex: 100,
 			}}
 		>
 			<Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -75,15 +77,6 @@ export default function Header(props: propsType) {
 			</Box>
 			<Box>
 				<Stack direction={'row'} spacing={'0.75rem'} sx={{ height: '100%', alignItems: 'center' }}>
-					{/*<IconButton className='contained-primary'>
-						<FormatIndentIncrease className='svg-small' />
-					</IconButton>
-					<IconButton className='contained-primary'>
-						<FormatIndentIncrease className='svg-small' />
-					</IconButton>
-					<IconButton className='contained-primary'>
-						<FormatIndentIncrease className='svg-small' />
-					</IconButton>*/}
 					{memberRole && memberRole === 'ROLE_ADMIN' && (
 						<Button component={Link} href='/admin/dept/list' target={'_blank'} variant='outlined' startIcon={<ManageAccountsRounded />}>
 							관리자 모드

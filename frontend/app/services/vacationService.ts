@@ -56,7 +56,6 @@ export interface VacationHistorySearchRequestDto {
 // API 정의
 export const vacationService = {
 	getVacationData: (encodedMemberId: string) => axiosConfig.get<VacationResponseDto>(`/api/vacation/data?target=${encodedMemberId}`),
-
 	searchVacationData: (request: PageRequest<VacationCompanySearchRequestDto>) =>
 		axiosConfig.post<PageResponse<VacationDataDto>>(`/api/vacation/search`, request),
 	searchVacationHistoryData: (request: PageRequest<VacationHistorySearchRequestDto>) =>

@@ -157,9 +157,9 @@ export default function VacationCompanyPage() {
 	}, []);
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'grey.50' }}>
 			<Box sx={{ padding: '0 1.5rem' }}>
-				<PathBreadcrumbs />
+				<PathBreadcrumbs sx={{ mb: 0 }} />
 			</Box>
 			<Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
 				<Grid size={12} sx={{ backgroundColor: 'grey.50' }}>

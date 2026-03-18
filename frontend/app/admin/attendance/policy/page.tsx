@@ -130,7 +130,7 @@ export default function AttendancePolicyPage() {
 	);
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'grey.50' }}>
 			<PathBreadcrumbs sx={{ padding: '0 1.5rem' }}>
 				<Button variant='contained' sx={{ height: 'auto' }} onClick={() => router.push('/admin/attendance/policy/data')}>
 					정책 추가

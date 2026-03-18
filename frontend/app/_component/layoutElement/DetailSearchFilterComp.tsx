@@ -254,7 +254,7 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 								초기화
 							</Button>
 							{isExcel && (
-								<Button variant='contained' color='info' startIcon={<DownloadRounded />} onClick={handleExcelDown} sx={{ ml: '0.5rem' }}>
+								<Button variant='contained' color='secondary' startIcon={<DownloadRounded />} onClick={handleExcelDown} sx={{ ml: '0.5rem' }}>
 									엑셀 다운
 								</Button>
 							)}

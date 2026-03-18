@@ -9,21 +9,7 @@ import useModalStore from '@/store/useModalStore';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
-import {
-	Box,
-	Button,
-	Typography,
-	Grid,
-	Select,
-	MenuItem,
-	FormControl,
-	FormLabel,
-	FormControlLabel,
-	RadioGroup,
-	Radio,
-	IconButton,
-	Switch,
-} from '@mui/material';
+import { Box, Button, Typography, Grid, Select, MenuItem, FormControl, FormLabel, FormControlLabel, RadioGroup, Radio, Switch } from '@mui/material';
 
 import { ArrowBackRounded } from '@mui/icons-material';
 
@@ -94,7 +80,7 @@ export default function VacationPolicyDataPage() {
 	};
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'grey.50' }}>
 			<PathBreadcrumbs sx={{ padding: '0 1.5rem' }} />
 			<Box sx={{ flexWrap: 'wrap', flexDirection: 'column', padding: '0 1.5rem' }}>
 				<Button startIcon={<ArrowBackRounded fontSize='small' />} onClick={handleClose} sx={{ mb: '0.5rem' }}>
@@ -108,8 +94,7 @@ export default function VacationPolicyDataPage() {
 						width: '100%',
 						padding: '2rem',
 						borderRadius: '2rem',
-						border: '1px solid',
-						borderColor: 'grey.200',
+						backgroundColor: 'background.default',
 						gap: 3,
 					}}
 				>

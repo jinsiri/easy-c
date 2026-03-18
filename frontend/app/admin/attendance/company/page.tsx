@@ -211,9 +211,9 @@ export default function AttendanceCompanyPage() {
 	);
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'grey.50' }}>
 			<Box sx={{ padding: '0 1.5rem' }}>
-				<PathBreadcrumbs />
+				<PathBreadcrumbs sx={{ mb: 0 }} />
 			</Box>
 			<Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
 				<Grid size={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: '1rem' }}>
@@ -261,15 +261,26 @@ export default function AttendanceCompanyPage() {
 					sx={{
 						display: 'flex',
 						flexDirection: 'row',
-						alignItems: 'flex-start',
+						alignItems: 'stretch',
 						height: 'auto',
 						padding: '0 1.5rem',
-						mb: '1rem',
 						gap: '1rem',
 					}}
 				>
 					{unNomalList.map((item, idx) => (
-						<Box key={idx} sx={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '1rem', bgcolor: 'grey.50', borderRadius: '1rem' }}>
+						<Box
+							key={idx}
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								flex: 1,
+								padding: '1rem',
+								bgcolor: 'background.default',
+								borderRadius: '1rem',
+								border: '1px solid',
+								borderColor: 'grey.200',
+							}}
+						>
 							<Box sx={{ width: '100%' }}>{item.label}</Box>
 							<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', width: '100%' }}>
 								<Typography variant='h4'>{countData[item.key]}</Typography>
