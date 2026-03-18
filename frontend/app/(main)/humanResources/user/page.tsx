@@ -5,7 +5,7 @@ import secureLocalStorage from 'react-secure-storage';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
-import { Box, Button, Grid } from '@mui/material';
+import { Box, Button } from '@mui/material';
 
 export default function HumanResourceUserPage() {
 	const router = useRouter();

@@ -89,10 +89,10 @@ export default function Header(props: propsType) {
 								<IconButton className='circle-primary' {...bindToggle(popupState)}>
 									<PersonOutlineRounded />
 								</IconButton>
-								<Popper {...bindPopper(popupState)} placement='bottom-end' transition>
+								<Popper {...bindPopper(popupState)} placement='bottom-end' transition sx={{ zIndex: 500 }}>
 									{({ TransitionProps }) => (
 										<Fade {...TransitionProps} timeout={350}>
-											<Paper sx={{ bgcolor: '#fff', zIndex: 1000 }}>
+											<Paper sx={{ position: 'relative', bgcolor: 'background.default' }} elevation={3}>
 												<List>
 													{list.map((item) => {
 														return (
