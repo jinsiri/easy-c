@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import secureLocalStorage from 'react-secure-storage';
 
-import { Box, Button, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, TextField, Typography, InputAdornment, IconButton, OutlinedInput } from '@mui/material';
+import { VisibilityOff, Visibility } from '@mui/icons-material';
 
 import { authService } from '@/app/services/authService';
 import { encryptRSA } from '@/utils/crypto';
@@ -15,6 +16,17 @@ const LoginPage = () => {
 
 	const [memberId, setMemberId] = useState('');
 	const [password, setPassword] = useState('');
+	const [showPassword, setShowPassword] = useState(false);
+
+	const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+	};
+
+	const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+	};
 
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -85,7 +97,7 @@ const LoginPage = () => {
 						/>
 						<TextField
 							label='Password'
-							type='password'
+							type={showPassword ? 'text' : 'password'}
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
 							fullWidth
@@ -95,6 +107,22 @@ const LoginPage = () => {
 							slotProps={{
 								inputLabel: {
 									shrink: true,
+								},
+								input: {
+									endAdornment: (
+										<InputAdornment position='end'>
+											<IconButton
+												aria-label={showPassword ? 'hide the password' : 'display the password'}
+												onClick={handleClickShowPassword}
+												onMouseDown={handleMouseDownPassword}
+												onMouseUp={handleMouseUpPassword}
+												edge='end'
+												sx={{ mr: 0 }}
+											>
+												{showPassword ? <VisibilityOff /> : <Visibility />}
+											</IconButton>
+										</InputAdornment>
+									),
 								},
 							}}
 						/>
