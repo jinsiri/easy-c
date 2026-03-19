@@ -62,10 +62,12 @@ export default function Header(props: propsType) {
 				display: 'flex',
 				justifyContent: 'space-between',
 				alignItems: 'center',
+				position: 'relative',
 				width: '100%',
 				height: headerHeight,
 				padding: '0 1rem',
 				borderRadius: 0,
+				zIndex: 100,
 			}}
 		>
 			<Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -75,17 +77,8 @@ export default function Header(props: propsType) {
 			</Box>
 			<Box>
 				<Stack direction={'row'} spacing={'0.75rem'} sx={{ height: '100%', alignItems: 'center' }}>
-					{/*<IconButton className='contained-primary'>
-						<FormatIndentIncrease className='svg-small' />
-					</IconButton>
-					<IconButton className='contained-primary'>
-						<FormatIndentIncrease className='svg-small' />
-					</IconButton>
-					<IconButton className='contained-primary'>
-						<FormatIndentIncrease className='svg-small' />
-					</IconButton>*/}
 					{memberRole && memberRole === 'ROLE_ADMIN' && (
-						<Button component={Link} href='/admin/normal/setting' variant='outlined' startIcon={<ManageAccountsRounded />}>
+						<Button component={Link} href='/admin/dept/list' target={'_blank'} variant='outlined' startIcon={<ManageAccountsRounded />}>
 							관리자 모드
 						</Button>
 					)}
@@ -96,16 +89,16 @@ export default function Header(props: propsType) {
 								<IconButton className='circle-primary' {...bindToggle(popupState)}>
 									<PersonOutlineRounded />
 								</IconButton>
-								<Popper {...bindPopper(popupState)} placement='bottom-end' transition>
+								<Popper {...bindPopper(popupState)} placement='bottom-end' transition sx={{ zIndex: 500 }}>
 									{({ TransitionProps }) => (
 										<Fade {...TransitionProps} timeout={350}>
-											<Paper sx={{ bgcolor: '#fff', zIndex: 1000 }}>
+											<Paper sx={{ position: 'relative', bgcolor: 'background.default' }} elevation={3}>
 												<List>
 													{list.map((item) => {
 														return (
 															<ListItemButton
 																key={item.title}
-																component={item.component}
+																component={item.component as any}
 																{...(item.component === Link && item.url ? { href: item.url } : {})}
 																sx={{ width: '100%' }}
 																onClick={item.onClick}

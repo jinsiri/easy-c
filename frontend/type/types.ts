@@ -16,6 +16,7 @@ export type worktimeRule = 'CAP_AT_40' | 'ALWAYS_40' | 'BY_WORK_DAYS';
 export type workType = 'NORMAL' | 'WEEKEND' | 'HOLIDAY';
 export type workStatus = 'PRESENT' | 'LATE' | 'EARLY_LEAVE' | 'ABSENT' | 'VACATION' | 'OUTSIDE' | 'BUSINESS_TRIP' | 'UNNORMAL_START' | 'UNNORMAL_END';
 
+export type transactionType = 'GRANT' | 'USE' | 'CANCEL' | 'EXPIRE';
 export type vacationPolicyType = 'WORKING_DAY' | 'FINANCIAL_DAY';
 export type vacationType = 'FULL' | 'HALF_AM' | 'HALF_PM' | 'SICK_LEAVE' | 'SPECIAL_LEAVE' | 'HOLIDAY';
 export type vacationCategory = 'ANNUAL' | 'SICK' | 'SPECIAL' | 'HOLIDAY' | 'CARRYOVER';

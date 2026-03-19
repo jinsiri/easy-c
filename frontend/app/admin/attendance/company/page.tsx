@@ -1,14 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
 /** Lib */
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
 /** MUI */
-import { Box, Button, Grid, IconButton, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
-import { ArrowLeftRounded, ArrowRightRounded, DownloadRounded } from '@mui/icons-material';
+import { Box, Grid, IconButton, Typography } from '@mui/material';
+import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
@@ -16,17 +16,23 @@ import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
-import { WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
+import DetailSearchFilterComp from '@/app/_component/layoutElement/DetailSearchFilterComp';
+import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
+
 import { formatMinutes } from '@/utils/commonFunc';
 import { downloadExcel } from '@/utils/excelDownloadFunc';
 
 /** Type / Interface */
+import { WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
+import { PAGE_SIZE_OPTIONS } from '@/constant/commonConst';
+
+import { FilterField, FilterValues, PageRequest } from '@/type/interface';
 import { workStatus, workType } from '@/type/types';
 import { ExcelRequestDto } from '@/type/interface';
-import { AttendanceDayResDto } from '@/app/services/attendanceService';
-import { AttendanceCompanyRequestDto, AttendanceCompanyResponseDto, attendanceCompanyService } from '@/app/services/attendanceCompanyService';
+import { attendanceCompanyService, AttendanceCompanySearchRequestDto, AttendanceCompanySearchResponseDto } from '@/app/services/attendanceCompanyService';
+import { FilterRef } from '@/app/_component/layoutElement/DetailSearchFilterComp';
 
 dayjs.extend(duration);
 
@@ -38,14 +44,52 @@ const unNomalList = [
 	{ key: 'changeRequestCount', label: '정정신청' },
 ];
 
+const applicationFieldDefault: FilterValues = {
+	startDate: dayjs(),
+	endDate: dayjs(),
+	deptNm: '',
+	memberNm: '',
+	workType: 'all',
+	workStatus: 'all',
+};
+
+const detailAppSearchFields: FilterField[] = [
+	{
+		key: 'workType',
+		label: '근로타입',
+		type: 'select',
+		options: Object.entries(WORKTYPE).map(([key, value]) => ({
+			label: value,
+			value: String(key),
+		})),
+	},
+	{
+		key: 'workStatus',
+		label: '근로상태',
+		type: 'select',
+		options: Object.entries(WORKSTATUS).map(([key, value]) => ({
+			label: value,
+			value: String(key),
+		})),
+	},
+	{
+		key: 'deptNm',
+		label: '부서명',
+		type: 'text',
+	},
+	{
+		key: 'memberNm',
+		label: '근로자명',
+		type: 'text',
+	},
+];
+
 export default function AttendanceCompanyPage() {
 	const { setLoader } = useLoaderStore();
 
-	const [searchCategory, setSearchCategory] = useState<string>('memberNm');
-	const [searchValue, setSearchValue] = useState<string>('');
+	const detailSearchFilterRef = useRef<FilterRef>(null);
 
 	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
-	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
 	const [countData, setCountData] = useState<Record<string, number>>({
 		allCount: 0,
 		lateCount: 0,
@@ -53,65 +97,34 @@ export default function AttendanceCompanyPage() {
 		absentCount: 0,
 		changeRequestCount: 0,
 	});
-
-	const colDefs: ColDef<Record<string, any>>[] = [
-		{ field: 'workDate', headerName: '근무일', flex: 1 },
-		{
-			field: 'member',
-			headerName: '근무자',
-			flex: 1,
-			cellRenderer: (param) => {
-				const deptNm = param.data?.deptNm;
-				const jobGrade = param.data?.jobGrade;
-
-				return (
-					<Box sx={{ py: '6px' }}>
-						<Typography>{param.data.memberNm}</Typography>
-						<Typography variant='body2'>{deptNm && jobGrade ? deptNm + ' / ' + jobGrade : '-'}</Typography>
-						<Typography>{param.data.attendancePolicyName}</Typography>
-					</Box>
-				);
-			},
-		},
-		{
-			field: 'workType',
-			headerName: '근로타입',
-			flex: 1,
-			valueFormatter: (param) => (param.data ? WORKTYPE[param.data.workType as workType] : '-'),
-		},
-		{
-			field: 'workStatus',
-			headerName: '근로상태',
-			flex: 1,
-			valueFormatter: (param) => (param.data ? WORKSTATUS[param.data.workStatus as workStatus] : '-'),
-		},
-		{
-			field: 'time',
-			headerName: '근로시간',
-			flex: 3,
-			cellRenderer: (param) => (
-				<Box sx={{ py: '6px' }}>
-					<Typography>총 근로시간(분): {formatMinutes(param.data.fullTime)}</Typography>
-
-					<Typography>출근시간: {param.data.startTime ? dayjs(param.data.startTime).format('HH:mm') : '-'}</Typography>
-					<Typography>퇴근시간: {param.data.endTime ? dayjs(param.data.endTime).format('HH:mm') : '-'}</Typography>
-				</Box>
-			),
-		},
-	];
+	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
+	const [page, setPage] = useState(0);
+	const [pageSize, setPageSize] = useState(50);
+	const [totalElements, setTotalElements] = useState(0);
 
 	useEffect(() => {
-		getAttendanceCompanyOnedayData();
+		if (detailSearchFilterRef.current) {
+			onClickSearch(detailSearchFilterRef.current.getFilterValues());
+		} else {
+			onClickSearch(applicationFieldDefault);
+		}
 	}, [calendarDate]);
 
-	const getAttendanceCompanyOnedayData = async () => {
+	const onClickSearch = useCallback(async (data: FilterValues) => {
 		setLoader(true);
 
 		try {
-			const res: AttendanceCompanyResponseDto = await attendanceCompanyService.getAttendanceCompanyOnedayData({
-				workDate: calendarDate.format('YYYY-MM-DD'),
-			});
+			const req: PageRequest<AttendanceCompanySearchRequestDto> = {
+				number: page,
+				size: pageSize,
+				request: {
+					...data,
+					startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
+					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
+				},
+			};
 
+			const res: AttendanceCompanySearchResponseDto = await attendanceCompanyService.searchVacationApplication(req);
 			setCountData({
 				allCount: res.allCount,
 				lateCount: res.lateCount,
@@ -120,41 +133,24 @@ export default function AttendanceCompanyPage() {
 				changeRequestCount: res.changeRequestCount,
 			});
 
-			setRowData(res.dayData);
-			setSearchCategory('memberNm');
-			setSearchValue('');
+			console.log(res);
+			setRowData(res.dayData.content);
+			setTotalElements(res.dayData.totalElements);
 		} finally {
 			setLoader(false);
 		}
-	};
+	}, []);
 
-	const onClickSearch = async () => {
+	const onClickExcel = useCallback(async (data: FilterValues) => {
 		setLoader(true);
 
 		try {
-			const req: AttendanceCompanyRequestDto = {
-				workDate: calendarDate.format('YYYY-MM-DD'),
-				searchCategory: searchCategory,
-				searchValue: searchValue,
-			};
-
-			const res: AttendanceDayResDto[] = await attendanceCompanyService.getAttendanceCompanySearch(req);
-			setRowData(res);
-		} finally {
-			setLoader(false);
-		}
-	};
-
-	const onClickExcel = () => {
-		setLoader(true);
-
-		try {
-			const req: ExcelRequestDto = {
+			const req: ExcelRequestDto<AttendanceCompanySearchRequestDto> = {
 				fileName: '전사근태내역',
-				search: {
-					workDate: calendarDate.format('YYYY-MM-DD'),
-					searchCategory: searchCategory,
-					searchValue: searchValue,
+				request: {
+					...data,
+					startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
+					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
 				},
 			};
 
@@ -162,7 +158,7 @@ export default function AttendanceCompanyPage() {
 		} finally {
 			setLoader(false);
 		}
-	};
+	}, []);
 
 	const onChangeDatePicker = useCallback(
 		(value) => {
@@ -173,53 +169,54 @@ export default function AttendanceCompanyPage() {
 		[calendarDate],
 	);
 
-	const handleChangeSearchCategory = useCallback(
-		(event: SelectChangeEvent) => {
-			const targetValue = event.target.value;
-
-			if (searchCategory !== targetValue) {
-				switch (targetValue) {
-					case 'workStatus':
-						setSearchValue('PRESENT');
-						break;
-					default:
-						setSearchValue('');
-				}
-
-				setSearchCategory(targetValue);
-			}
-		},
-		[searchCategory],
+	const colDefs: ColDef<Record<string, any>>[] = useMemo(
+		() => [
+			{ field: 'workDate', headerName: '근무일', flex: 1 },
+			{
+				field: 'member',
+				headerName: '근무자',
+				cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
+				cellRenderer: (params: any) => {
+					const { deptNm, jobGrade, memberNm, vacationPolicyName } = params.data || {};
+					return <GridMemberComp memberNm={memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={vacationPolicyName} />;
+				},
+			},
+			{
+				field: 'workType',
+				headerName: '근로타입',
+				flex: 1,
+				valueFormatter: (param) => (param.data ? WORKTYPE[param.data.workType as workType] : '-'),
+			},
+			{
+				field: 'workStatus',
+				headerName: '근로상태',
+				flex: 1,
+				valueFormatter: (param) => (param.data ? WORKSTATUS[param.data.workStatus as workStatus] : '-'),
+			},
+			{
+				field: 'time',
+				headerName: '근로시간',
+				flex: 3,
+				cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
+				cellRenderer: (param) => (
+					<Box>
+						<Typography>총 근로시간(분): {formatMinutes(param.data.fullTime)}</Typography>
+						<Typography>출근시간: {param.data.startTime ? dayjs(param.data.startTime).format('HH:mm') : '-'}</Typography>
+						<Typography>퇴근시간: {param.data.endTime ? dayjs(param.data.endTime).format('HH:mm') : '-'}</Typography>
+					</Box>
+				),
+			},
+		],
+		[],
 	);
 
-	const onChangeValue = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
-		setSearchValue(event.target.value);
-	}, []);
-
-	const changeSearchCategoryContents = useMemo(() => {
-		switch (searchCategory) {
-			case 'workStatus':
-				return (
-					<Select name={'workStatus'} value={searchValue} onChange={onChangeValue} size='small' sx={{ minWidth: '10rem', marginRight: '0.5rem' }}>
-						{Object.entries(WORKSTATUS).map(([key, value]) => (
-							<MenuItem key={key} value={key}>
-								{value}
-							</MenuItem>
-						))}
-					</Select>
-				);
-			default:
-				return <TextField variant='outlined' size='small' value={searchValue} onChange={onChangeValue} />;
-		}
-	}, [searchCategory, searchValue]);
-
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'grey.50' }}>
 			<Box sx={{ padding: '0 1.5rem' }}>
-				<PathBreadcrumbs />
+				<PathBreadcrumbs sx={{ mb: 0 }} />
 			</Box>
 			<Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
-				<Grid size={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+				<Grid size={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: '1rem' }}>
 					<IconButton
 						sx={{
 							display: 'flex',
@@ -259,32 +256,68 @@ export default function AttendanceCompanyPage() {
 						<ArrowRightRounded sx={{ fontSize: '1.5rem' }} />
 					</IconButton>
 				</Grid>
-				<Grid sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 1, padding: '0.5rem 1.5rem' }}>
+				<Grid
+					size={12}
+					sx={{
+						display: 'flex',
+						flexDirection: 'row',
+						alignItems: 'stretch',
+						height: 'auto',
+						padding: '0 1.5rem',
+						gap: '1rem',
+					}}
+				>
 					{unNomalList.map((item, idx) => (
-						<Box key={idx} sx={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '1rem', bgcolor: 'grey.50', borderRadius: '1rem' }}>
+						<Box
+							key={idx}
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								flex: 1,
+								padding: '1rem',
+								bgcolor: 'background.default',
+								borderRadius: '1rem',
+								border: '1px solid',
+								borderColor: 'grey.200',
+							}}
+						>
 							<Box sx={{ width: '100%' }}>{item.label}</Box>
-							<Box sx={{ display: 'flex', justifyContent: 'end', width: '100%' }}>
+							<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', width: '100%' }}>
 								<Typography variant='h4'>{countData[item.key]}</Typography>
 							</Box>
 						</Box>
 					))}
 				</Grid>
-				<Grid sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', alignItems: 'center', padding: '0.5rem 1.5rem', gap: '0.5rem' }}>
-					<Select id='demo-simple-select' value={searchCategory} onChange={handleChangeSearchCategory} size='small'>
-						<MenuItem value={'depthNm'}>부서명</MenuItem>
-						<MenuItem value={'memberNm'}>근무자</MenuItem>
-						<MenuItem value={'workStatus'}>근로상태</MenuItem>
-					</Select>
-					{changeSearchCategoryContents}
-					<Button variant='contained' onClick={onClickSearch}>
-						검색
-					</Button>
-					<Button variant='contained' color='info' startIcon={<DownloadRounded />} onClick={onClickExcel}>
-						엑셀 다운로드
-					</Button>
+				<Grid size={12} sx={{ backgroundColor: 'grey.50' }}>
+					<DetailSearchFilterComp
+						ref={detailSearchFilterRef}
+						fields={detailAppSearchFields}
+						fieldDefault={applicationFieldDefault}
+						isExcel={true}
+						isDate={false}
+						onSearch={onClickSearch}
+						onReset={() => {}}
+						onClickExcelDown={onClickExcel}
+					/>
 				</Grid>
-				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='none' rowHeight={80} />
+				<Grid size={12} sx={{ flexDirection: 'column', flexGrow: 1 }}>
+					<CustomAgGridComp
+						rowData={rowData}
+						colDefs={colDefs}
+						rowSelectionMode='none'
+						rowHeight={80}
+						serverPagination={{
+							page,
+							pageSize,
+							totalElements,
+							pageSizeOptions: PAGE_SIZE_OPTIONS,
+							onPageChange: setPage,
+							onPageSizeChange: (s) => {
+								setPageSize(s);
+								setPage(0);
+							},
+						}}
+					/>
 				</Grid>
 			</Grid>
 		</Box>

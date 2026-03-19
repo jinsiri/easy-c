@@ -331,8 +331,8 @@ public class AttendanceService {
     }
 
     public AttendancePolicy findAttendancePolicy(Long memberId) {
-        AttendancePolicyMap attendancePolicyMap = attendancePolicyMapRepository.findTopByMemberIdAndDeletedFalseOrderByMappingIdDesc(memberId).orElse(null);
-        AttendancePolicy attendancePolicy = attendancePolicyRepository.findByAttendancePolicyId(attendancePolicyMap != null ? attendancePolicyMap.getAttendancePolicyId() : 1).orElseThrow();
+        AttendancePolicyMap attendancePolicyMap = attendancePolicyMapRepository.findTopByMemberIdAndActivedTrueOrderByMappingIdDesc(memberId).orElse(null);
+        AttendancePolicy attendancePolicy = attendancePolicyRepository.findByAttendancePolicyIdAndActiveTrue(attendancePolicyMap != null ? attendancePolicyMap.getAttendancePolicyId() : 1).orElseThrow();
         return attendancePolicy;
     }
 

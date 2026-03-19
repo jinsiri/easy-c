@@ -1,114 +1,37 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import secureLocalStorage from 'react-secure-storage';
 
 /** Lib */
-import dayjs from 'dayjs';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
-import { Box, Typography, Grid, useTheme } from '@mui/material';
+import { Box, Button, Typography, Grid, useTheme } from '@mui/material';
 
 /** Ag Grid */
-import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import VacationComp from '@/app/_component/layoutElement/VacationComp';
-import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
 
 import CustomEchartComp from '@/app/_lib/CustomEchartComp';
 
 /** Type / Interface */
-import { vacationType } from '@/type/types';
-
 import { vacationService, VacationDataDto, VacationHistoryDto } from '@/app/services/vacationService';
 import { vacationApplicationDataDto, vacationApplicationService } from '@/app/services/vacationApplicationService';
-import { VACATIONTYPE } from '@/constant/attendanceConst';
-import { VACATIONCATEGORY } from '@/constant/vacationConst';
+import { colDefs, historyColDefs } from '@/constant/vacationColDef';
 
 const vacationTypeList = [
 	{ key: 'planVacation', label: '예정 휴가' },
 	{ key: 'endVacation', label: '종료 휴가' },
 ];
 
-const colDefs: ColDef<Record<string, any>>[] = [
-	{
-		field: 'status',
-		headerName: '상태',
-		flex: 1,
-		cellRenderer: (data) => (
-			<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-				{data.value ? <GridStatusComp status={data.value} /> : '-'}
-			</Box>
-		),
-	},
-	{
-		field: 'vacationType',
-		headerName: '휴가종류',
-		flex: 2,
-		valueFormatter: (data) => (data.value ? VACATIONTYPE[data.value as vacationType] : '-'),
-	},
-	{
-		field: 'vacationDuration',
-		headerName: '휴가일',
-		flex: 1,
-	},
-	{
-		field: 'time',
-		headerName: '휴가기간',
-		flex: 3,
-		cellRenderer: (param) => (
-			<Box sx={{ display: 'flex', flexDirection: 'row', py: '6px' }}>
-				<Typography>{param.data.startDate ? dayjs(param.data.startDate).format('YYYY-MM-DD') : '-'}</Typography>
-				{param.data.endDate && (
-					<>
-						<Typography>~</Typography>
-						<Typography>{dayjs(param.data.endDate).format('YYYY-MM-DD')}</Typography>
-					</>
-				)}
-			</Box>
-		),
-	},
-];
-
-const historyColDefs: ColDef<Record<string, any>>[] = [
-	{
-		field: 'vacationCategory',
-		headerName: '휴가 종류',
-		flex: 2,
-		valueFormatter: (param) => (param.value ? VACATIONCATEGORY[param.value] : '-'),
-	},
-	{
-		field: 'day',
-		headerName: '휴가일',
-		flex: 1,
-	},
-	{
-		field: 'time',
-		headerName: '휴가 지급일',
-		cellRenderer: (param) => (
-			<Box sx={{ display: 'flex', flexDirection: 'row', py: '6px' }}>
-				<Typography>{param.data ? dayjs(param.data.accrualDate).format('YYYY-MM-DD') : '-'}</Typography>
-			</Box>
-		),
-	},
-	{
-		field: 'time',
-		headerName: '휴가 만료일',
-		cellRenderer: (param) => (
-			<Box sx={{ display: 'flex', flexDirection: 'row', py: '6px' }}>
-				<Typography>{param.data ? dayjs(param.data.expireDate).format('YYYY-MM-DD') : '-'}</Typography>
-			</Box>
-		),
-	},
-];
-
 export default function VacationUserPage() {
 	const theme = useTheme();
+	const router = useRouter();
 	const pathname = usePathname();
 	const { loader, setLoader } = useLoaderStore();
 
@@ -222,7 +145,6 @@ export default function VacationUserPage() {
 				setPlanVacationList(res.planVacation);
 				setEndVacationList(res.endVacation);
 			}
-		} catch (error: any) {
 		} finally {
 			setLoader(false);
 		}
@@ -283,11 +205,12 @@ export default function VacationUserPage() {
 							borderRadius: '1rem',
 						}}
 					>
-						<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0.5rem 0.5rem 1rem' }}>
+						<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 1rem' }}>
 							<Typography variant='subtitle1'>연차 내역</Typography>
+							<Button onClick={(e) => router.push(`/vacation/user/list?type=vacationHistory`)}>상세보기</Button>
 						</Box>
 						<Box sx={{ flexGrow: 1, minHeight: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
-							<CustomAgGridComp rowData={vacationHistory} colDefs={historyColDefs} rowSelectionMode='none' />
+							<CustomAgGridComp rowData={vacationHistory} colDefs={historyColDefs} rowSelectionMode='none' pagination={false} />
 						</Box>
 					</Box>
 				</Grid>
@@ -305,14 +228,16 @@ export default function VacationUserPage() {
 								borderRadius: '1rem',
 							}}
 						>
-							<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0.5rem 0.5rem 1rem' }}>
+							<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 1rem' }}>
 								<Typography variant='subtitle1'>{item.label}</Typography>
+								<Button onClick={(e) => router.push(`/vacation/user/list?type=${item.key}`)}>상세보기</Button>
 							</Box>
 							<Box sx={{ flexGrow: 1, minHeight: '15rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
 								<CustomAgGridComp
 									rowData={item.key === 'planVacation' ? planVacationList : endVacationList}
 									colDefs={colDefs}
 									rowSelectionMode='none'
+									pagination={false}
 								/>
 							</Box>
 						</Box>

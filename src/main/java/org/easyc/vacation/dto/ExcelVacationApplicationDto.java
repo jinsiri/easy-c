@@ -3,17 +3,13 @@ package org.easyc.vacation.dto;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.format.DateTimeFormat;
 import lombok.Data;
-import org.easyc.attendance.constant.WorkStatus;
-import org.easyc.attendance.entity.AttendanceApplication;
 import org.easyc.common.constant.BasicStatus;
 import org.easyc.excel.converter.EnumConverter;
-import org.easyc.excel.converter.LocalTimeConverter;
 import org.easyc.excel.dto.ExcelEnumDropdown;
 import org.easyc.vacation.constant.VacationType;
 import org.easyc.vacation.entity.VacationApplication;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Data
 public class ExcelVacationApplicationDto {
@@ -35,7 +31,7 @@ public class ExcelVacationApplicationDto {
     private VacationType vacationType;
 
     @ExcelProperty(value = "휴가기간(일)", index = 5)
-    private Integer vacationDuration;
+    private Double vacationDuration;
 
     @ExcelProperty(value = "휴가 시작일", index = 6)
     @DateTimeFormat("yyyy-MM-dd")

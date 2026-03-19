@@ -32,7 +32,6 @@ public class AttendanceDayResponseDto {
     private WorkType workType;
     private WorkStatus workStatus;
     private VacationType vacationType;
-    //private Long changeRequestId; todo 없어진 거 맞는지 확인
     private String detail;
     private List<AttendanceApplication> applicationList;
 

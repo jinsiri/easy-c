@@ -32,7 +32,6 @@ public class Vacation {
     @Column(name = "job_grade")
     private String jobGrade;
 
-
     @Column(name = "vacation_policy_name")
     private String vacationPolicyName;
 
@@ -40,11 +39,14 @@ public class Vacation {
     @Column(name = "vacation_policy_type")
     private VacationPolicyType vacationPolicyType;
 
+    @Column(name = "year")
+    private Integer year; //연차 해당 연도
+
     @Column(name = "accrual_date")
-    private LocalDate accrualDate; //연차부여일
+    private LocalDate accrualDate; //연차부여일-삭제할지 고민중
 
     @Column(name = "expire_date")
-    private LocalDate expireDate; //만료일
+    private LocalDate expireDate; //만료일-삭제할지 고민중
 
     @Column(name = "years_of_service") //근속 년수
     private Long yearsOfService;

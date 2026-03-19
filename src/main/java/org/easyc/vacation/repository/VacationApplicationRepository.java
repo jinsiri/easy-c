@@ -10,14 +10,6 @@ import java.util.List;
 
 @Repository
 public interface VacationApplicationRepository extends JpaRepository<VacationApplication, Long> {
-    List<VacationApplication> findAllByMemberIdAndStartDateBetween(Long memberId, LocalDate startDate, LocalDate endDate);
-    List<VacationApplication> findAllByDeletedFalseOrderByRegisterDateAsc();
-
-    List<VacationApplication> findAllByMemberNmContainsAndActiveTrueOrderByVacationApplicationIdAsc(String searchValue);
-
-    List<VacationApplication> findAllByStatusAndActiveTrueOrderByVacationApplicationIdAsc(BasicStatus basicStatus);
-
-    List<VacationApplication> findAllByDeptNmContainsAndActiveTrueOrderByVacationApplicationIdAsc(String searchValue);
-
-    List<VacationApplication> findAllByStartDateLessThanEqualAndEndDateGreaterThanEqualAndActiveTrueOrderByVacationApplicationIdAsc(LocalDate workDate1, LocalDate workDate2);
+    List<VacationApplication> findTop10ByMemberIdAndStartDateGreaterThanEqualOrderByStartDateAsc(Long memberId, LocalDate todayDate);
+    List<VacationApplication> findTop10ByMemberIdAndStartDateBeforeOrderByStartDateDesc(Long memberId, LocalDate todayDate);
 }

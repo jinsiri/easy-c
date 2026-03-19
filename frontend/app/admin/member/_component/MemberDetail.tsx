@@ -250,8 +250,8 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 	];
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-			<Box sx={{ flexShrink: 0, width: '100%', mb: '1rem' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+			<Box sx={{ flexShrink: 0, width: '100%', mb: '1rem', padding: '0 1.5rem' }}>
 				<Box
 					ref={targetRef}
 					sx={{
@@ -325,8 +325,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 					display: 'flex',
 					flexDirection: 'column',
 					marginTop: '-1px',
-					height: '40vh',
-					minHeight: '400px',
+					//height: '40vh',
 					overflowY: 'auto',
 				}}
 			/>

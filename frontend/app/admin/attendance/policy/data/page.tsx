@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 /** Lib */
@@ -25,7 +25,6 @@ import {
 	FormControlLabel,
 	RadioGroup,
 	Radio,
-	IconButton,
 } from '@mui/material';
 
 import { ExpandMoreRounded, ArrowBackRounded } from '@mui/icons-material';
@@ -123,9 +122,12 @@ export default function AttendancePolicyDataPage() {
 	};
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'grey.50' }}>
 			<PathBreadcrumbs sx={{ padding: '0 1.5rem' }} />
-			<Box sx={{ flexWrap: 'wrap', flexDirection: 'row', padding: '0 1.5rem' }}>
+			<Box sx={{ flexWrap: 'wrap', flexDirection: 'column', padding: '0 1.5rem' }}>
+				<Button startIcon={<ArrowBackRounded fontSize='small' />} onClick={handleClose} sx={{ mb: '0.5rem' }}>
+					뒤로 가기
+				</Button>
 				<Grid
 					container
 					sx={{
@@ -134,18 +136,14 @@ export default function AttendancePolicyDataPage() {
 						width: '100%',
 						padding: '2rem',
 						borderRadius: '2rem',
-						border: '1px solid',
-						borderColor: 'grey.200',
+						backgroundColor: 'background.default',
 						gap: 3,
 					}}
 				>
-					<Grid sx={{ display: 'flex', justifyContent: 'row', alignItems: 'center', gap: 1 }}>
-						<IconButton onClick={handleClose}>
-							<ArrowBackRounded fontSize='small' />
-						</IconButton>
+					<Grid size={12} sx={{ display: 'flex', justifyContent: 'row', alignItems: 'center', gap: 1 }}>
 						<Typography variant='h5'>{target == null ? '근태정책 생성' : '근태정책 수정'} </Typography>
 					</Grid>
-					<Grid>
+					<Grid size={12}>
 						<FormItem
 							name='attendancePolicyName'
 							label='근태정책 이름'
@@ -182,7 +180,12 @@ export default function AttendancePolicyDataPage() {
 								)}
 							/>
 						</FormWrapper>
-						<Accordion slotProps={{ heading: { component: 'h4' } }} className='accordion-custom' sx={{ mb: '1rem' }} defaultExpanded={true}>
+						<Accordion
+							slotProps={{ heading: { component: 'h4' } }}
+							className='accordion-custom'
+							sx={{ mb: '1rem', border: '1px solid', borderColor: 'grey.200' }}
+							defaultExpanded={true}
+						>
 							<AccordionSummary expandIcon={<ExpandMoreRounded />} sx={{ py: 1, px: 3 }}>
 								<Typography sx={{ fontWeight: 500, color: 'grey.700' }}>상세 근로 데이터</Typography>
 							</AccordionSummary>
@@ -460,7 +463,7 @@ export default function AttendancePolicyDataPage() {
 							</AccordionDetails>
 						</Accordion>
 					</Grid>
-					<Grid sx={{ display: 'flex', justifyContent: 'center', gap: 3 }}>
+					<Grid size={12} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 3 }}>
 						<Button variant='text' onClick={handleClose} size='large'>
 							닫기
 						</Button>

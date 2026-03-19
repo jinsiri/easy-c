@@ -345,7 +345,7 @@ export default function AttendanceUserPage() {
 								<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 									<Typography variant='h6' sx={{ color: 'primary.main' }}>
 										{formatMinutes(
-											attendanceData.effectiveWorkTime && attendanceData.effectiveWorkDay >= attendanceData.workDay
+											attendanceData.effectiveWorkTime && attendanceData.effectiveWorkTime >= attendanceData.workTime
 												? attendanceData.effectiveWorkTime - attendanceData.workTime
 												: 0,
 										)}

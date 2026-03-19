@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -10,7 +10,7 @@ import useModalStore from '@/store/useModalStore';
 
 /** MUI */
 import { Box, Button, Grid, IconButton, Typography, Chip } from '@mui/material';
-import { DeleteRounded, BorderColorRounded, Policy } from '@mui/icons-material';
+import { DeleteRounded, BorderColorRounded } from '@mui/icons-material';
 import { grey } from '@mui/material/colors';
 
 /** Custom */
@@ -29,6 +29,7 @@ interface listCollector {
 
 export default function AttendancePolicyPage() {
 	const router = useRouter();
+	const pathName = usePathname();
 	const { loader, setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 
@@ -67,15 +68,17 @@ export default function AttendancePolicyPage() {
 			valueFormatter: (data) => (
 				<Box>
 					{data.mappingUserCount ?? '-'}명{' '}
-					<IconButton
-						sx={{ color: grey[500] }}
-						onClick={(e) => {
-							setModalData({ policyId: data.attendancePolicyId });
-							router.push('/admin/attendance/policy/modal');
-						}}
-					>
-						<BorderColorRounded sx={{ fontSize: '1rem' }} />
-					</IconButton>
+					{data.attendancePolicyId !== 1 && (
+						<IconButton
+							sx={{ color: grey[500] }}
+							onClick={(e) => {
+								setModalData({ policyId: data.attendancePolicyId });
+								router.push('/admin/attendance/policy/modal');
+							}}
+						>
+							<BorderColorRounded sx={{ fontSize: '1rem' }} />
+						</IconButton>
+					)}
 				</Box>
 			),
 		},
@@ -83,7 +86,7 @@ export default function AttendancePolicyPage() {
 
 	useEffect(() => {
 		getAttendancePolicyData();
-	}, []);
+	}, [pathName]);
 
 	const getAttendancePolicyData = async () => {
 		if (!loader) setLoader(true);
@@ -127,7 +130,7 @@ export default function AttendancePolicyPage() {
 	);
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'grey.50' }}>
 			<PathBreadcrumbs sx={{ padding: '0 1.5rem' }}>
 				<Button variant='contained' sx={{ height: 'auto' }} onClick={() => router.push('/admin/attendance/policy/data')}>
 					정책 추가

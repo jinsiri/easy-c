@@ -7,7 +7,7 @@ const PickersTextField = (theme: Theme) => ({
 				'& .MuiPickersSectionList-root': {
 					width: 'auto',
 					minWidth: '7rem',
-					padding: '0.625rem 0',
+					padding: '0.5rem 0',
 				},
 			},
 		},

@@ -6,7 +6,7 @@ import org.easyc.common.dto.SearchRequestDto;
 
 @Getter
 @NoArgsConstructor
-public class ExcelRequestDto {
+public class ExcelRequestDto<T> {
     private String fileName;
-    private SearchRequestDto search;
+    private T request;
 }

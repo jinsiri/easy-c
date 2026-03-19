@@ -10,6 +10,7 @@ import org.easyc.dept.service.DeptService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -21,17 +22,18 @@ public class DeptController {
     private final DeptService deptService;
 
     @GetMapping("/tree")
-    public ResponseEntity<List<DeptResponseDto>> getOrgTree() {
-        log.info("조직도 트리 조회 요청 시작");
+    public List<?> getOrgTree(@RequestParam boolean includeMembers) {
+        List<Object> result = new ArrayList<>();
 
-        try {
-            List<DeptResponseDto> tree = deptService.getDeptTree();
-            log.info("조직도 트리 조회 성공 (루트 노드 수: {})", tree.size());
-            return ResponseEntity.ok(tree);
-        } catch (Exception e) {
-            log.error("조직도 조회 중 오류 발생: ", e);
-            return ResponseEntity.internalServerError().build();
+        if (includeMembers) {
+            List<Object> data = deptService.getDeptTreeWithMembers();
+            result.addAll(data);
+        } else {
+            List<DeptResponseDto> data = deptService.getDeptTree();
+            result.addAll(data);
         }
+
+        return result;
     }
 
     @GetMapping("/{id}")

@@ -1,4 +1,11 @@
-import { vacationPolicyType, vacationCategory } from '@/type/types';
+import { vacationPolicyType, vacationCategory, transactionType } from '@/type/types';
+
+export const TRANSACTIONTYPE: Record<transactionType, string> = {
+	GRANT: '지급',
+	USE: '사용',
+	CANCEL: '사용취소',
+	EXPIRE: '만료',
+};
 
 export const VACATIONCATEGORY: Record<vacationCategory, string> = {
 	ANNUAL: '연차',

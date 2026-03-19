@@ -11,7 +11,6 @@ import dayjs from 'dayjs';
 
 /** Custom */
 import ColTitleAndText from '../_component/layoutElement/ColTitleAndText';
-import AttendanceComp from '../_component/layoutElement/AttendanceComp';
 
 /** Services */
 import { securityLogService, SecurityLogResponseDto } from '../services/securityLogService';
@@ -27,7 +26,7 @@ export default function Home() {
 
 	useEffect(() => {
 		securityLogService.getMyLogins(5).then((res: any) => {
-			setMyLogins(Array.isArray(res) ? res : res?.data ?? []);
+			setMyLogins(Array.isArray(res) ? res : (res?.data ?? []));
 		});
 	}, []);
 
@@ -96,11 +95,11 @@ export default function Home() {
 							backgroundColor: 'grey.50',
 						}}
 					>
-						<Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: 'grey.700', mb: 1 }}>
-							최근 로그인 이력
-						</Typography>
+						<Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: 'grey.700', mb: 1 }}>최근 로그인 이력</Typography>
 						{myLogins.length === 0 ? (
-							<Typography variant="body2" color="text.secondary">데이터가 없습니다.</Typography>
+							<Typography variant='body2' color='text.secondary'>
+								데이터가 없습니다.
+							</Typography>
 						) : (
 							myLogins.map((log, idx) => (
 								<Box key={log.id}>
@@ -109,13 +108,13 @@ export default function Home() {
 										<Chip
 											label={EVENT_LABEL[log.eventType]?.label ?? log.eventType}
 											color={EVENT_LABEL[log.eventType]?.color ?? 'default'}
-											size="small"
+											size='small'
 											sx={{ fontSize: '0.7rem', height: 20, minWidth: 40 }}
 										/>
-										<Typography variant="caption" color="text.secondary" sx={{ flex: 1, minWidth: 0 }} noWrap>
+										<Typography variant='caption' color='text.secondary' sx={{ flex: 1, minWidth: 0 }} noWrap>
 											{log.ip} · {log.deviceType ?? '-'}
 										</Typography>
-										<Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+										<Typography variant='caption' color='text.secondary' sx={{ flexShrink: 0 }}>
 											{dayjs(log.registerDate).format('MM-DD HH:mm')}
 										</Typography>
 									</Box>

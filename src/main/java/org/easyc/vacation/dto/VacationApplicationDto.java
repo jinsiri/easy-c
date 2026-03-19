@@ -20,7 +20,7 @@ public class VacationApplicationDto {
 
     @Enumerated(EnumType.STRING)
     private VacationType vacationType;
-    private Integer vacationDuration;
+    private Double vacationDuration;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;

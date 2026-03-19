@@ -1,5 +1,5 @@
 /** MUI */
-import { AccountTree, WorkHistoryRounded, CalendarMonthRounded, BeachAccessRounded, HistoryRounded } from '@mui/icons-material';
+import { AccountTree, WorkHistoryRounded, BeachAccessRounded, HistoryRounded } from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '@/type/types';

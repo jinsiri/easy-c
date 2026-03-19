@@ -54,6 +54,7 @@ public class DeptMemberMap extends BaseEntity {
     private JobTitle jobTitle;
 
 
+
     public void delete() {
         super.delete();
     }

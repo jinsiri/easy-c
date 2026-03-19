@@ -2,7 +2,7 @@ import { Dayjs } from 'dayjs';
 import axiosConfig from '../_lib/axiosConfig';
 
 import { vacationType } from '@/type/types';
-import { SearchRequestDto } from '@/type/interface';
+import { PageRequest, PageResponse } from '@/type/interface';
 import { BaseDto } from '@/type/base';
 
 export interface vacationApplicationController {
@@ -44,12 +44,29 @@ export interface vacationApplicationListDto {
 	endVacation: vacationApplicationDataDto[];
 }
 
+export interface VacationAppSearchRequestDto {
+	memberId: number | null;
+	startDate?: string | null;
+	endDate?: string | null;
+	status?: string;
+	vacationType?: string;
+	vacationStart?: string;
+	vacationEnd?: string;
+	deptNm?: string;
+	memberNm?: string;
+}
+
 // API 정의
 export const vacationApplicationService = {
 	getUserVacationApplicationData: (encodedMemberId: string) =>
 		axiosConfig.get<vacationApplicationListDto>(`/api/vacation/application/user?target=${encodedMemberId}`),
+
 	saveVacationApplicationData: (req: vacationApplicationDataDto) => axiosConfig.post<void>('/api/vacation/application/save', req),
-	searchVacationApplication: (req: SearchRequestDto) => axiosConfig.post<vacationApplicationDto[]>('/api/vacation/application/search', req),
 	approveAttendanceApplication: (req: vacationApplicationDto[]) => axiosConfig.post<void>('/api/vacation/application/approve', req),
 	rejectAttendanceApplication: (req: vacationApplicationDto[]) => axiosConfig.post<void>('/api/vacation/application/reject', req),
+
+	searchVacationApplication: (request: PageRequest<VacationAppSearchRequestDto>) =>
+		axiosConfig.post<PageResponse<vacationApplicationDataDto>>('/api/vacation/application/search', request),
+	searchUserVacationApplicationData: (request: PageRequest<VacationAppSearchRequestDto>, type: 'plan' | 'end') =>
+		axiosConfig.post<PageResponse<vacationApplicationDataDto>>(`/api/vacation/application/user/search?type=${type}`, request),
 };

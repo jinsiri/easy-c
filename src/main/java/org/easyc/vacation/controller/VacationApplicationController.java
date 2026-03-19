@@ -3,14 +3,17 @@ package org.easyc.vacation.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.easyc.audit.activity.annotation.AuditAction;
+import org.easyc.common.dto.PageRequestDto;
+import org.easyc.common.dto.PageResponseDto;
 import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.excel.dto.ExcelRequestDto;
 import org.easyc.util.ExcelUtil;
-import org.easyc.vacation.dto.ExcelVacationApplicationDto;
-import org.easyc.vacation.dto.VacationApplicationDto;
-import org.easyc.vacation.dto.VacationApplicationResponseDto;
+import org.easyc.vacation.dto.*;
 import org.easyc.vacation.entity.VacationApplication;
+import org.easyc.vacation.entity.VacationHistory;
 import org.easyc.vacation.service.VacationApplicationService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -44,8 +47,30 @@ public class VacationApplicationController {
 
     @AuditAction(code = "VACATION_APP_SEARCH", name = "휴가 신청 내역 검색", targetType = "VACATION_APP")
     @PostMapping("/search")
-    public List<VacationApplication> searchVacationApplicationData(@RequestBody SearchRequestDto request) {
-        return vacationApplicationService.searchVacationApplicationData(request);
+    public PageResponseDto<VacationApplication> searchVacationApplicationData(@RequestBody PageRequestDto<VacationAppSearchRequestDto> request) {
+        Pageable pageable = PageRequest.of(request.getNumber(), request.getSize());
+        return vacationApplicationService.searchVacationApplicationData(request.getRequest(), pageable);
+    }
+
+    @AuditAction(code = "VACATION_APP_EXCELDOWN", name = "휴가 신청 엑셀 다운로드", targetType = "VACATION_APP")
+    @PostMapping("/excel")
+    public void excelVacationApplication(HttpServletResponse response, @RequestBody ExcelRequestDto<VacationAppSearchRequestDto> request) throws Exception {
+        Pageable pageable = PageRequest.of(1, 1000);
+        List<VacationApplication> searchList = vacationApplicationService.excelVacationApplication(request.getRequest(), pageable);
+
+        List<ExcelVacationApplicationDto> list = new ArrayList<>();
+
+        for (VacationApplication vacationApplication : searchList) {
+            list.add(new ExcelVacationApplicationDto(vacationApplication));
+        }
+
+        ExcelUtil.excelDownload(
+                response,
+                request.getFileName(),
+                "vacation_application",
+                ExcelVacationApplicationDto.class,
+                list
+        );
     }
 
     @AuditAction(code = "VACATION_APP_APPROVE", name = "휴가 신청 승인", targetType = "VACATION_APP")
@@ -60,23 +85,10 @@ public class VacationApplicationController {
         vacationApplicationService.rejectVacationApplicationData(request);
     }
 
-    @AuditAction(code = "VACATION_APP_EXCELDOWN", name = "휴가 신청 엑셀 다운로드", targetType = "VACATION_APP")
-    @PostMapping("/excel")
-    public void excelVacationApplication(HttpServletResponse response, @RequestBody ExcelRequestDto request) throws Exception {
-        List<VacationApplication> searchList = vacationApplicationService.searchVacationApplicationData(request.getSearch());
-        List<ExcelVacationApplicationDto> list = new ArrayList<>();
-
-        for (VacationApplication vacationApplication : searchList) {
-            list.add(new ExcelVacationApplicationDto(vacationApplication));
-        }
-
-        ExcelUtil.excelDownload(
-                response,
-                request.getFileName(),
-                "vacation_application",
-                ExcelVacationApplicationDto.class,
-                list
-        );
+    @PostMapping("/user/search")
+    public PageResponseDto<VacationApplication> searchUserVacationApplicationData(@RequestParam("type") String type, @RequestBody PageRequestDto<VacationAppSearchRequestDto> request) {
+        Pageable pageable = PageRequest.of(request.getNumber(), request.getSize());
+        return vacationApplicationService.searchUserVacationApplicationData(request.getRequest(), pageable, type);
     }
 
 }

@@ -1,8 +1,12 @@
 package org.easyc.vacation.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.attendance.dto.AttendancePolicyMemberDto;
+import org.easyc.attendance.dto.AttendancePolicyMemberRequestDto;
 import org.easyc.audit.activity.annotation.AuditAction;
 import org.easyc.vacation.dto.VacationPolicyDto;
+import org.easyc.vacation.dto.VacationPolicyMemberDto;
+import org.easyc.vacation.dto.VacationPolicyMemberRequestDto;
 import org.easyc.vacation.service.VacationPolicyService;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,5 +40,15 @@ public class VacationPolicyController {
         Long id = Long.parseLong(idStr);
 
         vacationPolicyService.deletePolicyData(id);
+    }
+
+    @GetMapping("/member")
+    public List<VacationPolicyMemberDto> getPolicyMemberData() {
+        return vacationPolicyService.getPolicyMemberData();
+    }
+
+    @PostMapping("/mapping")
+    public void savePolicyMemberMapping(@RequestBody VacationPolicyMemberRequestDto request) {
+        vacationPolicyService.savePolicyMemberMapping(request);
     }
 }

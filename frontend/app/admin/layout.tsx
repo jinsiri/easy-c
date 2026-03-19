@@ -31,14 +31,15 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
 				component={'main'}
 				sx={{
 					overflow: 'auto',
+					display: 'flex',
+					flexDirection: 'column',
 					position: 'relative',
 					width: drawerOpen ? 'calc(100vw - 19rem)' : 'calc(100vw - 4rem)',
-					height: '100%',
 					transition: 'all ease 0.3s',
 				}}
 			>
 				<Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} headerHeight={headerHeight}></Header>
-				<Box sx={{ width: '100%', height: `calc(100% - ${headerHeight} - 48px)`, overflowY: 'auto' }}>{children}</Box>
+				<Box sx={{ width: '100%', flexGrow: 1 /*height: `calc(100% - ${headerHeight} - 48px)`*/ }}>{children}</Box>
 				<Footer />
 			</Box>
 		</Box>

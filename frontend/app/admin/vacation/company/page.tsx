@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -9,159 +9,189 @@ import duration from 'dayjs/plugin/duration';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
-import { Box, Button, Grid, Typography, TextField, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
-import { WORKSTATUS } from '@/constant/attendanceConst';
+import { downloadExcel } from '@/utils/excelDownloadFunc';
+
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
+import DetailSearchFilterComp from '@/app/_component/layoutElement/DetailSearchFilterComp';
 
 /** Type / Interface */
-import { VacationDataDto, vacationService } from '@/app/services/vacationService';
-import { SearchRequestDto } from '@/type/interface';
+import { ExcelRequestDto, FilterField, FilterValues, PageRequest, PageResponse } from '@/type/interface';
+import { PAGE_SIZE_OPTIONS } from '@/constant/commonConst';
+import { VacationCompanySearchRequestDto, VacationDataDto, vacationService } from '@/app/services/vacationService';
+import { FilterRef } from '@/app/_component/layoutElement/DetailSearchFilterComp';
 
 dayjs.extend(duration);
+
+const applicationFieldDefault: FilterValues = {
+	startDate: null,
+	endDate: null,
+	deptNm: '',
+	memberNm: '',
+};
+
+const detailAppSearchFields: FilterField[] = [
+	{
+		key: 'deptNm',
+		label: '부서명',
+		type: 'text',
+	},
+	{
+		key: 'memberNm',
+		label: '근로자명',
+		type: 'text',
+	},
+];
 
 export default function VacationCompanyPage() {
 	const { setLoader } = useLoaderStore();
 
-	const [searchCategory, setSearchCategory] = useState<string>('memberNm');
-	const [searchValue, setSearchValue] = useState<string>('');
-	const [rowData, setRowData] = useState<Record<string, any>[]>([]);
+	const detailSearchFilterRef = useRef<FilterRef>(null);
 
-	const colDefs: ColDef<Record<string, any>>[] = [
-		{
-			field: 'member',
-			headerName: '근무자',
-			flex: 2,
-			cellRenderer: (param) => {
-				const deptNm = param.data?.deptNm;
-				const jobGrade = param.data?.jobGrade;
-
-				return (
-					<Box sx={{ py: '6px' }}>
-						<GridMemberComp memberNm={param.data.memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={param.data.vacationPolicyName} />
-					</Box>
-				);
-			},
-		},
-		{
-			field: 'grantedDay',
-			headerName: '전체 휴가',
-		},
-		{
-			field: 'usedDay',
-			headerName: '사용 휴가',
-		},
-
-		{
-			field: 'annualVacation',
-			headerName: '연차',
-		},
-		{
-			field: 'sickVacation',
-			headerName: '병가',
-		},
-		{
-			field: 'holidayVacation',
-			headerName: '휴일연차',
-		},
-		{
-			field: 'specialVacation',
-			headerName: '특별연차',
-		},
-		{
-			field: 'carryOverDay',
-			headerName: '이월연차',
-		},
-		{
-			field: 'detail',
-			headerName: '상세내역',
-		},
-	];
+	const [gridData, setGridData] = useState<Record<string, any>[]>([]);
+	const [page, setPage] = useState(0);
+	const [pageSize, setPageSize] = useState(50);
+	const [totalElements, setTotalElements] = useState(0);
 
 	useEffect(() => {
-		onClickSearch();
+		if (detailSearchFilterRef.current) {
+			onClickSearch(detailSearchFilterRef.current.getFilterValues());
+		} else {
+			onClickSearch(applicationFieldDefault);
+		}
 	}, []);
 
-	const onClickSearch = async () => {
+	const onClickSearch = useCallback(async (data: FilterValues) => {
 		setLoader(true);
 
 		try {
-			const req: SearchRequestDto = {
-				searchCategory: searchCategory,
-				searchValue: searchValue,
+			const req: PageRequest<VacationCompanySearchRequestDto> = {
+				number: page,
+				size: pageSize,
+				request: {
+					...data,
+					year: dayjs().get('year'),
+				},
 			};
 
-			const res: VacationDataDto[] = await vacationService.searchVacationData(req);
-			setRowData(res);
+			const res: PageResponse<VacationDataDto> = await vacationService.searchVacationData(req);
+			setGridData(res.content);
+			setTotalElements(res.totalElements);
 		} finally {
 			setLoader(false);
 		}
-	};
-
-	const handleChangeSearchCategory = useCallback(
-		(event: SelectChangeEvent) => {
-			const targetValue = event.target.value;
-
-			if (searchCategory !== targetValue) {
-				switch (targetValue) {
-					case 'workStatus':
-						setSearchValue('PRESENT');
-						break;
-					default:
-						setSearchValue('');
-				}
-
-				setSearchCategory(targetValue);
-			}
-		},
-		[searchCategory],
-	);
-
-	const onChangeValue = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
-		setSearchValue(event.target.value);
 	}, []);
 
-	const changeSearchCategoryContents = useMemo(() => {
-		switch (searchCategory) {
-			case 'workStatus':
-				return (
-					<Select name={'workStatus'} value={searchValue} onChange={onChangeValue} size='small' sx={{ minWidth: '10rem', marginRight: '0.5rem' }}>
-						{Object.entries(WORKSTATUS).map(([key, value]) => (
-							<MenuItem key={key} value={key}>
-								{value}
-							</MenuItem>
-						))}
-					</Select>
-				);
-			default:
-				return <TextField variant='outlined' size='small' value={searchValue} onChange={onChangeValue} />;
+	const onClickExcel = useCallback(async (data: FilterValues) => {
+		setLoader(true);
+
+		try {
+			const req: ExcelRequestDto<VacationCompanySearchRequestDto> = {
+				fileName: '전사휴가내역',
+				request: {
+					...data,
+					year: dayjs().get('year'),
+				},
+			};
+
+			downloadExcel('/api/vacation/excel', req);
+		} finally {
+			setLoader(false);
 		}
-	}, [searchCategory, searchValue]);
+	}, []);
+
+	const colDefs: ColDef<Record<string, any>>[] = useMemo(() => {
+		return [
+			{
+				field: 'member',
+				headerName: '근무자',
+				flex: 2,
+				cellRenderer: (param) => {
+					const deptNm = param.data?.deptNm;
+					const jobGrade = param.data?.jobGrade;
+
+					return (
+						<Box sx={{ py: '6px' }}>
+							<GridMemberComp memberNm={param.data.memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={param.data.vacationPolicyName} />
+						</Box>
+					);
+				},
+			},
+			{
+				field: 'grantedDay',
+				headerName: '전체 휴가',
+			},
+			{
+				field: 'usedDay',
+				headerName: '사용 휴가',
+			},
+
+			{
+				field: 'annualVacation',
+				headerName: '연차',
+			},
+			{
+				field: 'sickVacation',
+				headerName: '병가',
+			},
+			{
+				field: 'holidayVacation',
+				headerName: '휴일연차',
+			},
+			{
+				field: 'specialVacation',
+				headerName: '특별연차',
+			},
+			{
+				field: 'carryOverDay',
+				headerName: '이월연차',
+			},
+		];
+	}, []);
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'grey.50' }}>
 			<Box sx={{ padding: '0 1.5rem' }}>
-				<PathBreadcrumbs />
+				<PathBreadcrumbs sx={{ mb: 0 }} />
 			</Box>
 			<Grid container sx={{ flexDirection: 'column', flexGrow: 1 }}>
-				<Grid sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', alignItems: 'center', padding: '0.5rem 1.5rem', gap: '0.5rem' }}>
-					<Select id='demo-simple-select' value={searchCategory} onChange={handleChangeSearchCategory} size='small'>
-						<MenuItem value={'depthNm'}>부서명</MenuItem>
-						<MenuItem value={'memberNm'}>근무자</MenuItem>
-					</Select>
-					{changeSearchCategoryContents}
-					<Button variant='contained' onClick={onClickSearch}>
-						검색
-					</Button>
+				<Grid size={12} sx={{ backgroundColor: 'grey.50' }}>
+					<DetailSearchFilterComp
+						ref={detailSearchFilterRef}
+						fields={detailAppSearchFields}
+						fieldDefault={applicationFieldDefault}
+						isExcel={true}
+						isDate={false}
+						onSearch={onClickSearch}
+						onReset={() => {}}
+						onClickExcelDown={onClickExcel}
+					/>
 				</Grid>
-				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp rowData={rowData} colDefs={colDefs} rowSelectionMode='none' rowHeight={80} />
+				<Grid size={12} sx={{ flexDirection: 'column', flexGrow: 1 }}>
+					<CustomAgGridComp
+						rowData={gridData}
+						colDefs={colDefs}
+						rowSelectionMode='none'
+						rowHeight={80}
+						serverPagination={{
+							page,
+							pageSize,
+							totalElements,
+							pageSizeOptions: PAGE_SIZE_OPTIONS,
+							onPageChange: setPage,
+							onPageSizeChange: (s) => {
+								setPageSize(s);
+								setPage(0);
+							},
+						}}
+					/>
 				</Grid>
 			</Grid>
 		</Box>

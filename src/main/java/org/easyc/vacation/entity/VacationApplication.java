@@ -39,7 +39,7 @@ public class VacationApplication extends BaseEntity {
     VacationType vacationType;
 
     @Column(name = "vacation_duration")
-    Integer vacationDuration;
+    Double vacationDuration;
 
     @Column(name = "start_date")
     LocalDate startDate;
