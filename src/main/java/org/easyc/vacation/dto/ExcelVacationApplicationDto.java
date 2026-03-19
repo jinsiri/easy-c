@@ -31,7 +31,7 @@ public class ExcelVacationApplicationDto {
     private VacationType vacationType;
 
     @ExcelProperty(value = "휴가기간(일)", index = 5)
-    private Integer vacationDuration;
+    private Double vacationDuration;
 
     @ExcelProperty(value = "휴가 시작일", index = 6)
     @DateTimeFormat("yyyy-MM-dd")
