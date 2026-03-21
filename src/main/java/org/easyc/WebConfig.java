@@ -21,3 +21,24 @@
 //                .allowCredentials(true); // 쿠키 허용
 //    }
 //}
+
+package org.easyc;
+
+import lombok.RequiredArgsConstructor;
+import org.easyc.audit.access.AccessLogInterceptor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+@RequiredArgsConstructor
+public class WebConfig implements WebMvcConfigurer {
+
+    private final AccessLogInterceptor accessLogInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(accessLogInterceptor)
+                .addPathPatterns("/api/**");
+    }
+}
