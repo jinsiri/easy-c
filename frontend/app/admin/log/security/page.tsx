@@ -12,6 +12,7 @@ import LogFilterForm, { LogFilterField, LogFilterValues } from '../_component/Lo
 const EVENT_TYPE_LABEL: Record<string, { label: string; color: string }> = {
 	LOGIN_SUCCESS: { label: '로그인 성공', color: '#2e7d32' },
 	LOGIN_FAILURE: { label: '로그인 실패', color: '#c62828' },
+	LOGOUT_SUCCESS: { label: '로그아웃', color: '#1565c0' },
 	ACCESS_DENIED: { label: '접근 거부', color: '#e65100' },
 };
 
@@ -48,6 +49,7 @@ const FILTER_FIELDS: LogFilterField[] = [
 		options: [
 			{ value: 'LOGIN_SUCCESS', label: '로그인 성공' },
 			{ value: 'LOGIN_FAILURE', label: '로그인 실패' },
+			{ value: 'LOGOUT_SUCCESS', label: '로그아웃' },
 			{ value: 'ACCESS_DENIED', label: '접근 거부' },
 		],
 	},

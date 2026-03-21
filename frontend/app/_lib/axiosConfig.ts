@@ -119,9 +119,15 @@ axiosConfig.interceptors.response.use(
 		// 클라이언트 환경
 		const { alert } = useDialogStore.getState();
 
+		// 403: 권한 없음 -> 로그인으로 이동
+		if (status === 403 && typeof window !== 'undefined') {
+			window.location.href = '/login';
+			return Promise.reject(error);
+		}
+
 		// AccessToken 만료 처리
 		if (
-			(status === 401 || status === 403) &&
+			status === 401 &&
 			originalRequest &&
 			!originalRequest._retry &&
 			!originalRequest.url?.includes('/api/auth/refresh') &&

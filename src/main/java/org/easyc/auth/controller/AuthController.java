@@ -2,9 +2,11 @@ package org.easyc.auth.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.easyc.audit.security.service.SecurityLogService;
 import org.easyc.auth.dto.LoginRequestDto;
 import org.easyc.auth.dto.LoginResponseDto;
 import org.easyc.auth.jwt.JwtProvider;
+import org.easyc.common.dto.AuditUser;
 import org.easyc.member.entity.Member;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.util.RsaUtil;
@@ -15,7 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -29,6 +34,7 @@ public class AuthController {
     private final RsaUtil rsaUtil;
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
+    private final SecurityLogService securityLogService;
 
 
     @GetMapping("/test")
@@ -112,7 +118,7 @@ public class AuthController {
      * @return
      */
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal AuditUser user, HttpServletRequest request) {
         ResponseCookie clearAccess = ResponseCookie.from("ACCESS_TOKEN", "")
                 .httpOnly(true)
                 .path("/")
@@ -126,6 +132,10 @@ public class AuthController {
                         .path("/api/auth/refresh")
                         .maxAge(0)
                         .build();
+
+        if (user != null) {
+            securityLogService.saveLogout(user.getLoginId(), request);
+        }
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, clearAccess.toString())

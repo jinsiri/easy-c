@@ -58,6 +58,14 @@ public class SecurityConfig {
 //                       .anyRequest().permitAll() // 테스트용
                 )
 
+                // 미인증 요청은 401, 인가 거부는 403
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(401, "Unauthorized"))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendError(403, "Forbidden"))
+                )
+
                 // JWT 필터 추가 - UsernamePasswordAuthenticationFilter 전에 실행
                 // 매 요청마다 쿠키에서 JWT 꺼내서 인증 처리
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
