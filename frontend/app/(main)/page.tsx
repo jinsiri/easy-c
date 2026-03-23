@@ -33,13 +33,11 @@ export default function Home() {
 		securityLogService.getMyLogins(5).then((res: any) => {
 			setMyLogins(Array.isArray(res) ? res : (res?.data ?? []));
 		});
-		boardPostService.findAllNotice().then((res: any) => {
-			const data: BoardPostResponseDto[] = Array.isArray(res) ? res : (res?.data ?? []);
-			setNotices(data.slice(0, 5));
+		boardPostService.findAllNotice(0, 5).then((res: any) => {
+			setNotices(res?.content ?? []);
 		});
-		boardPostService.findAllGeneral().then((res: any) => {
-			const data: BoardPostResponseDto[] = Array.isArray(res) ? res : (res?.data ?? []);
-			setGenerals(data.slice(0, 5));
+		boardPostService.findAllGeneral(0, 5).then((res: any) => {
+			setGenerals(res?.content ?? []);
 		});
 	}, []);
 

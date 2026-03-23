@@ -5,11 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.easyc.board.constant.BoardCategory;
 import org.easyc.board.dto.BoardPostRequestDto;
 import org.easyc.board.dto.BoardPostResponseDto;
+import org.easyc.board.dto.BoardPostSearchCondition;
 import org.easyc.board.entity.BoardPost;
 import org.easyc.board.repository.BoardPostRepository;
+import org.easyc.board.repository.BoardPostRepositoryCustom;
 import org.easyc.common.dto.AuditUser;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,13 +23,25 @@ import java.util.List;
 public class BoardPostService {
 
     private final BoardPostRepository boardPostRepository;
+    private final BoardPostRepositoryCustom boardPostRepositoryCustom;
 
     public List<BoardPostResponseDto> findAll() {
-        return boardPostRepository.findAllByDeletedFalse().stream().map(BoardPostResponseDto::fromEntity).toList();
+        return boardPostRepository.findAllByDeletedFalseOrderByPostIdDesc()
+                .stream()
+                .map(BoardPostResponseDto::fromEntity)
+                .toList();
     }
 
     public List<BoardPostResponseDto> findAllByCategory(BoardCategory category) {
-        return boardPostRepository.findAllByCategoryAndDeletedFalse(category).stream().map(BoardPostResponseDto::fromEntity).toList();
+        return boardPostRepository.findAllByCategoryAndDeletedFalseOrderByPostIdDesc(category)
+                .stream().map(BoardPostResponseDto::fromEntity)
+                .toList();
+    }
+
+    public Page<BoardPostResponseDto> findAllByCategory(BoardCategory category, BoardPostSearchCondition cond, int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        return boardPostRepositoryCustom.search(category, cond, pageable)
+                .map(BoardPostResponseDto::fromEntity);
     }
 
     @Transactional
@@ -33,7 +49,7 @@ public class BoardPostService {
         BoardPost post = boardPostRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.BOARD_POST_NOT_FOUND));
 
-//        삭제된 게시글
+        // 삭제된 게시글
         if (post.isDeleted()) {
             throw new CustomException(CustomExceptionCode.BOARD_POST_DELETED);
         }

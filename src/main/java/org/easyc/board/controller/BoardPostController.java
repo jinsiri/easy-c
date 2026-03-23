@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.easyc.board.constant.BoardCategory;
 import org.easyc.board.dto.BoardPostRequestDto;
 import org.easyc.board.dto.BoardPostResponseDto;
+import org.easyc.board.dto.BoardPostSearchCondition;
 import org.easyc.board.service.BoardPostService;
 import org.easyc.common.dto.AuditUser;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,13 +28,21 @@ public class BoardPostController {
     }
 
     @GetMapping("/notice")
-    public List<BoardPostResponseDto> findAllNotice() {
-        return boardPostService.findAllByCategory(BoardCategory.NOTICE);
+    public Page<BoardPostResponseDto> findAllNotice(
+            @ModelAttribute BoardPostSearchCondition cond,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return boardPostService.findAllByCategory(BoardCategory.NOTICE, cond, page, size);
     }
 
     @GetMapping("/general")
-    public List<BoardPostResponseDto> findAllGeneral() {
-        return boardPostService.findAllByCategory(BoardCategory.GENERAL);
+    public Page<BoardPostResponseDto> findAllGeneral(
+            @ModelAttribute BoardPostSearchCondition cond,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return boardPostService.findAllByCategory(BoardCategory.GENERAL, cond, page, size);
     }
 
     @GetMapping("/{postId}")

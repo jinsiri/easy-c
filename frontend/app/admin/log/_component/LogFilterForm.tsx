@@ -23,9 +23,10 @@ interface Props {
 	onChange: (values: LogFilterValues) => void;
 	onSearch: () => void;
 	onReset: () => void;
+	showDateRange?: boolean;
 }
 
-export default function LogFilterForm({ fields, values, onChange, onSearch, onReset }: Props) {
+export default function LogFilterForm({ fields, values, onChange, onSearch, onReset, showDateRange = true }: Props) {
 	const theme = useTheme();
 
 	const handleChange = (key: string, value: string) => {
@@ -51,24 +52,28 @@ export default function LogFilterForm({ fields, values, onChange, onSearch, onRe
 			}}
 		>
 			{/* 기간 */}
-			<DatePicker
-				label="시작일"
-				value={values.fromDate ? dayjs(values.fromDate) : null}
-				onChange={(v: Dayjs | null) => handleChange('fromDate', v ? v.format('YYYY-MM-DD') : '')}
-				slotProps={{
-					textField: { size: 'small', sx: { '& .MuiOutlinedInput-root': { fontSize: '0.875rem' } } },
-					popper: { placement: 'bottom-start' },
-				}}
-			/>
-			<DatePicker
-				label="종료일"
-				value={values.toDate ? dayjs(values.toDate) : null}
-				onChange={(v: Dayjs | null) => handleChange('toDate', v ? v.format('YYYY-MM-DD') : '')}
-				slotProps={{
-					textField: { size: 'small', sx: { '& .MuiOutlinedInput-root': { fontSize: '0.875rem' } } },
-					popper: { placement: 'bottom-start' },
-				}}
-			/>
+			{showDateRange && (
+				<>
+					<DatePicker
+						label="시작일"
+						value={values.fromDate ? dayjs(values.fromDate) : null}
+						onChange={(v: Dayjs | null) => handleChange('fromDate', v ? v.format('YYYY-MM-DD') : '')}
+						slotProps={{
+							textField: { size: 'small', sx: { '& .MuiOutlinedInput-root': { fontSize: '0.875rem' } } },
+							popper: { placement: 'bottom-start' },
+						}}
+					/>
+					<DatePicker
+						label="종료일"
+						value={values.toDate ? dayjs(values.toDate) : null}
+						onChange={(v: Dayjs | null) => handleChange('toDate', v ? v.format('YYYY-MM-DD') : '')}
+						slotProps={{
+							textField: { size: 'small', sx: { '& .MuiOutlinedInput-root': { fontSize: '0.875rem' } } },
+							popper: { placement: 'bottom-start' },
+						}}
+					/>
+				</>
+			)}
 
 			{/* 동적 필드 */}
 			{fields.map((field) =>

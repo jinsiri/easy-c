@@ -1,5 +1,13 @@
 import axiosConfig from '../_lib/axiosConfig';
 
+export interface PageResponse<T> {
+	content: T[];
+	totalElements: number;
+	totalPages: number;
+	number: number;
+	size: number;
+}
+
 export interface EnumOption {
 	code: string;
 	label: string;
@@ -29,12 +37,18 @@ export interface BoardPostRequestDto {
 	content: string;
 }
 
-export const boardPostService = {
-	findAllNotice: () =>
-		axiosConfig.get<BoardPostResponseDto[]>('/api/board/posts/notice'),
+export interface BoardPostFilter {
+	title?: string;
+	content?: string;
+	author?: string;
+}
 
-	findAllGeneral: () =>
-		axiosConfig.get<BoardPostResponseDto[]>('/api/board/posts/general'),
+export const boardPostService = {
+	findAllNotice: (page = 0, size = 20, filter?: BoardPostFilter) =>
+		axiosConfig.get<PageResponse<BoardPostResponseDto>>('/api/board/posts/notice', { params: { page, size, ...filter } }),
+
+	findAllGeneral: (page = 0, size = 20, filter?: BoardPostFilter) =>
+		axiosConfig.get<PageResponse<BoardPostResponseDto>>('/api/board/posts/general', { params: { page, size, ...filter } }),
 
 	findById: (postId: number) =>
 		axiosConfig.get<BoardPostResponseDto>(`/api/board/posts/${postId}`),

@@ -13,6 +13,8 @@ import dayjs from 'dayjs';
 
 /** Custom */
 import PathBreadcrumbs from '../../../_component/PathBreadcrumbs';
+import { ServerPaginationConfig } from '@/app/_lib/AgStylePagination';
+import LogFilterForm, { LogFilterField, LogFilterValues } from '@/app/admin/log/_component/LogFilterForm';
 
 const colDefs: ColDef<Record<string, any>>[] = [
 	{ field: 'id', headerName: '번호', minWidth: 80, maxWidth: 100 },
@@ -28,12 +30,25 @@ const colDefs: ColDef<Record<string, any>>[] = [
 	{ field: 'viewCount', headerName: '조회수', minWidth: 90, maxWidth: 100 },
 ];
 
+const FILTER_FIELDS: LogFilterField[] = [
+	{ key: 'title', label: '제목', type: 'text' },
+	{ key: 'content', label: '내용', type: 'text' },
+	{ key: 'author', label: '작성자', type: 'text' },
+];
+
+const INIT_FILTER: LogFilterValues = { title: '', content: '', author: '', fromDate: '', toDate: '' };
+
 interface Props {
 	category: 'NOTICE' | 'GENERAL';
 	rowData: Record<string, any>[];
+	serverPagination: ServerPaginationConfig;
+	filter: LogFilterValues;
+	onFilterChange: (v: LogFilterValues) => void;
+	onSearch: () => void;
+	onReset: () => void;
 }
 
-export default function BoardListPage({ category, rowData }: Props) {
+export default function BoardListPage({ category, rowData, serverPagination, filter, onFilterChange, onSearch, onReset }: Props) {
 	const router = useRouter();
 	const isAdmin = secureLocalStorage.getItem('memberRole') === 'ROLE_ADMIN';
 	const canWrite = category === 'GENERAL' || isAdmin;
@@ -45,13 +60,24 @@ export default function BoardListPage({ category, rowData }: Props) {
 					<Button variant="contained" size="small" onClick={() => router.push(`/board/write?category=${category}`)}>등록</Button>
 				)}
 			</PathBreadcrumbs>
+			<LogFilterForm
+				fields={FILTER_FIELDS}
+				values={filter}
+				onChange={onFilterChange}
+				onSearch={onSearch}
+				onReset={onReset}
+				showDateRange={false}
+			/>
 			<Box sx={{ flexGrow: 1, width: '100%', minHeight: 0 }}>
 				<CustomAgGridComp
 					rowData={rowData}
 					colDefs={colDefs}
 					onRowClicked={(e) => router.push(`/board/${e.data.id}`)}
+					serverPagination={serverPagination}
 				/>
 			</Box>
 		</Box>
 	);
 }
+
+export { INIT_FILTER };
