@@ -8,12 +8,14 @@ import { useEffect, useState } from 'react';
 
 /** Lib */
 import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
 
 /** Custom */
 import ColTitleAndText from '../_component/layoutElement/ColTitleAndText';
 
 /** Services */
 import { securityLogService, SecurityLogResponseDto } from '../services/securityLogService';
+import { boardPostService, BoardPostResponseDto } from '../services/boardPostService';
 
 const EVENT_LABEL: Record<string, { label: string; color: 'success' | 'error' }> = {
 	LOGIN_SUCCESS: { label: '성공', color: 'success' },
@@ -22,11 +24,22 @@ const EVENT_LABEL: Record<string, { label: string; color: 'success' | 'error' }>
 
 export default function Home() {
 	const theme = useTheme();
+	const router = useRouter();
 	const [myLogins, setMyLogins] = useState<SecurityLogResponseDto[]>([]);
+	const [notices, setNotices] = useState<BoardPostResponseDto[]>([]);
+	const [generals, setGenerals] = useState<BoardPostResponseDto[]>([]);
 
 	useEffect(() => {
 		securityLogService.getMyLogins(5).then((res: any) => {
 			setMyLogins(Array.isArray(res) ? res : (res?.data ?? []));
+		});
+		boardPostService.findAllNotice().then((res: any) => {
+			const data: BoardPostResponseDto[] = Array.isArray(res) ? res : (res?.data ?? []);
+			setNotices(data.slice(0, 5));
+		});
+		boardPostService.findAllGeneral().then((res: any) => {
+			const data: BoardPostResponseDto[] = Array.isArray(res) ? res : (res?.data ?? []);
+			setGenerals(data.slice(0, 5));
 		});
 	}, []);
 
@@ -122,6 +135,97 @@ export default function Home() {
 							))
 						)}
 					</Box>
+				</Box>
+			</Grid>
+
+			{/* 게시판 위젯 행 */}
+			<Grid sx={{ display: 'flex', gap: '1rem', width: '100%', mt: '1rem' }}>
+				{/* 공지사항 위젯 */}
+				<Box
+					sx={{
+						flex: 1,
+						display: 'flex',
+						flexDirection: 'column',
+						padding: '1rem',
+						borderRadius: '1rem',
+						backgroundColor: 'grey.50',
+					}}
+				>
+					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+						<Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: 'grey.700' }}>공지사항</Typography>
+						<Typography
+							sx={{ fontSize: '0.75rem', color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+							onClick={() => router.push('/board/notice')}
+						>
+							더보기
+						</Typography>
+					</Box>
+					{notices.length === 0 ? (
+						<Typography variant='body2' color='text.secondary'>
+							데이터가 없습니다.
+						</Typography>
+					) : (
+						notices.map((post, idx) => (
+							<Box key={post.id}>
+								{idx > 0 && <Divider sx={{ my: 0.5 }} />}
+								<Box
+									sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', '&:hover': { opacity: 0.7 } }}
+									onClick={() => router.push(`/board/${post.id}`)}
+								>
+									<Typography variant='body2' sx={{ flex: 1, minWidth: 0 }} noWrap>
+										{post.title}
+									</Typography>
+									<Typography variant='caption' color='text.secondary' sx={{ flexShrink: 0 }}>
+										{dayjs(post.registerDate).format('MM-DD')}
+									</Typography>
+								</Box>
+							</Box>
+						))
+					)}
+				</Box>
+
+				{/* 자유게시판 위젯 */}
+				<Box
+					sx={{
+						flex: 1,
+						display: 'flex',
+						flexDirection: 'column',
+						padding: '1rem',
+						borderRadius: '1rem',
+						backgroundColor: 'grey.50',
+					}}
+				>
+					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+						<Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: 'grey.700' }}>자유게시판</Typography>
+						<Typography
+							sx={{ fontSize: '0.75rem', color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+							onClick={() => router.push('/board/general')}
+						>
+							더보기
+						</Typography>
+					</Box>
+					{generals.length === 0 ? (
+						<Typography variant='body2' color='text.secondary'>
+							데이터가 없습니다.
+						</Typography>
+					) : (
+						generals.map((post, idx) => (
+							<Box key={post.id}>
+								{idx > 0 && <Divider sx={{ my: 0.5 }} />}
+								<Box
+									sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', '&:hover': { opacity: 0.7 } }}
+									onClick={() => router.push(`/board/${post.id}`)}
+								>
+									<Typography variant='body2' sx={{ flex: 1, minWidth: 0 }} noWrap>
+										{post.title}
+									</Typography>
+									<Typography variant='caption' color='text.secondary' sx={{ flexShrink: 0 }}>
+										{dayjs(post.registerDate).format('MM-DD')}
+									</Typography>
+								</Box>
+							</Box>
+						))
+					)}
 				</Box>
 			</Grid>
 		</Grid>
