@@ -35,7 +35,7 @@ const historyFieldDefault: FilterValues = {
 	endDate: dayjs().endOf('year'),
 	transactionType: 'all',
 	vacationCategory: 'all',
-	vacationDesc: '',
+	violationReason: '',
 };
 
 const applicationFieldDefault: FilterValues = {
@@ -67,7 +67,7 @@ const detailHistorySearchFields: FilterField[] = [
 		})),
 	},
 	{
-		key: 'vacationDesc',
+		key: 'violationReason',
 		label: '상세',
 		type: 'text',
 	},
@@ -206,7 +206,7 @@ export default function VacationUserListPage() {
 					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
 					transactionType: data.transactionType,
 					vacationCategory: data.vacationCategory,
-					vacationDesc: data.vacationDesc,
+					violationReason: data.violationReason,
 				};
 
 				const res: PageResponse<VacationHistoryDto> = await vacationService.searchVacationHistoryData({ ...req, request: _request });

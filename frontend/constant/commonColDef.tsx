@@ -20,7 +20,7 @@ export const adminBasicColDef: ColDef<Record<string, any>>[] = [
 	{
 		field: 'member',
 		headerName: '근무자',
-		cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
+		cellStyle: { display: 'flex', alignItems: 'center' },
 		cellRenderer: (params: any) => {
 			const { deptNm, jobGrade, memberNm, vacationPolicyName } = params.data || {};
 			return <GridMemberComp memberNm={memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={vacationPolicyName} />;
@@ -43,6 +43,9 @@ export const getAdminBasicDetailColumn = (onClickDetail: (data: any) => void): C
 export const getAdminBasicActionColumn = (onClickAction: (data: any) => void): ColDef => ({
 	field: 'action',
 	headerName: '처리',
-	cellRenderer: GridActionButtonComp,
+	cellRenderer: (params) => {
+		if (params.data.status !== 'PENDING') return null;
+		return <GridActionButtonComp {...params} />;
+	},
 	cellRendererParams: { onClickAction },
 });

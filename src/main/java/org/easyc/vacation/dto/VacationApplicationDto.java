@@ -28,7 +28,7 @@ public class VacationApplicationDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
-    private String vacationReason;
+    private String violationReason;
 
     public VacationApplication returnEntity () {
         VacationApplication entity = new VacationApplication();
@@ -38,7 +38,7 @@ public class VacationApplicationDto {
         entity.setVacationDuration(this.vacationDuration);
         entity.setStartDate(this.startDate);
         entity.setEndDate(this.endDate);
-        entity.setViolationReason(this.vacationReason);
+        entity.setViolationReason(this.violationReason);
 
         return entity;
     }

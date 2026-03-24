@@ -25,6 +25,7 @@ export default function VacationUserModal() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const type = searchParams.get('type');
+	console.log(type);
 
 	const { modalData, resetModalData } = useModalStore();
 
@@ -43,7 +44,7 @@ export default function VacationUserModal() {
 			vacationDuration: '1',
 			startDate: null,
 			endDate: null,
-			vacationReason: '',
+			violationReason: '',
 		},
 	});
 
@@ -58,7 +59,7 @@ export default function VacationUserModal() {
 					vacationDuration: String(modalData.vacationDuration),
 					startDate: modalData.startDate ? dayjs(modalData.startDate) : null,
 					endDate: modalData.endDate ? dayjs(modalData.endDate) : null,
-					vacationReason: modalData.vacationReason,
+					violationReason: modalData.violationReason,
 				});
 			} else {
 				setRemainDay(modalData.remainDay);
@@ -182,12 +183,12 @@ export default function VacationUserModal() {
 				</FormWrapper>
 
 				<FormItem
-					name='vacationReason'
+					name='violationReason'
 					label='휴가 사유'
 					placeholder='휴가 사유를 입력해주세요'
 					required
 					control={control}
-					error={errors.vacationReason?.message}
+					error={errors.violationReason?.message}
 					readOnly={type === 'read'}
 				></FormItem>
 			</Box>

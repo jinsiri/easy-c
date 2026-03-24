@@ -41,7 +41,7 @@ public class VacationHistory extends BaseEntity {
     @Column(name = "expire_date")
     private LocalDate expireDate;
 
-    @Column(name = "vacation_desc")
-    private String vacationDesc;
+    @Column(name = "violation_reason")
+    private String violationReason;
 
 }
