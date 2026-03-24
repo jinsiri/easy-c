@@ -1,6 +1,6 @@
 import axiosConfig from '../_lib/axiosConfig';
 import { vacationPolicyType, vacationCategory, transactionType } from '@/type/types';
-import { SearchRequestDto, PageRequest, PageResponse } from '@/type/interface';
+import {  PageRequest, PageResponse } from '@/type/interface';
 
 export interface VacationDataDto {
 	vacationId: number;
@@ -50,7 +50,7 @@ export interface VacationHistorySearchRequestDto {
 	endDate: string | null;
 	transactionType?: string;
 	vacationCategory?: string;
-	vacationDesc?: string;
+	violationReason?: string;
 }
 
 // API 정의

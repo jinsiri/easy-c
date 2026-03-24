@@ -288,7 +288,7 @@ export default function AttendanceUserPage() {
 					}}
 				>
 					<Box sx={{ width: { sm: '100%', md: '50%' } }}>
-						<AttendanceComp attendanceData={attendanceData} onSuccess={onSuccessEvent} />
+						<AttendanceComp type={null} attendanceData={attendanceData} onSuccess={onSuccessEvent} />
 					</Box>
 					<Box
 						sx={{

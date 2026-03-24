@@ -20,9 +20,16 @@ import { CURRENTSTATE, ATTENDANCETYPE } from '@/constant/attendanceConst';
 
 /** Type / Interface */
 import { attendanceService, AttendanceResDto } from '@/app/services/attendanceService';
-import { attendanceType } from '@/type/types';
 
-export default function AttendanceComp({ attendanceData, onSuccess }: { attendanceData?: AttendanceResDto; onSuccess?: () => void }) {
+export default function AttendanceComp({
+	type,
+	attendanceData,
+	onSuccess,
+}: {
+	type: 'home' | null;
+	attendanceData?: AttendanceResDto;
+	onSuccess?: () => void;
+}) {
 	const router = useRouter();
 	const { loader, setLoader } = useLoaderStore();
 
@@ -112,20 +119,25 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', padding: '1rem 1.5rem' }}>
-			<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-				<LiveClock />
-				<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-					<AccessTimeRounded sx={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} />
-					<Typography variant='subtitle2' whiteSpace='nowrap'>
-						{workData && (
-							<>
-								{ATTENDANCETYPE[workData?.attendanceType]} ({workData.startTime ? dayjs(workData.startTime, 'HH:mm:ss').format('HH:mm') : '-'} ~{' '}
-								{workData.endTime ? dayjs(workData.endTime, 'HH::mm:ss').format('HH:mm') : '-'})
-							</>
-						)}
-					</Typography>
+			{type === 'home' ? (
+				<Typography variant='subtitle1'>근태 관리</Typography>
+			) : (
+				<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+					<LiveClock />
+					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+						<AccessTimeRounded sx={{ width: '1rem', height: '1rem', marginRight: '0.25rem' }} />
+						<Typography variant='subtitle2' whiteSpace='nowrap'>
+							{workData && (
+								<>
+									{ATTENDANCETYPE[workData?.attendanceType]} (
+									{workData.startTime ? dayjs(workData.startTime, 'HH:mm:ss').format('HH:mm') : '-'} ~{' '}
+									{workData.endTime ? dayjs(workData.endTime, 'HH::mm:ss').format('HH:mm') : '-'})
+								</>
+							)}
+						</Typography>
+					</Box>
 				</Box>
-			</Box>
+			)}
 
 			<Box
 				sx={{
@@ -138,30 +150,32 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 				}}
 			>
 				<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', width: '100%', gap: '0.5rem' }}>
-					<Box
-						sx={{
-							display: 'flex',
-							flexDirection: 'row',
-							width: '8rem',
-							justifyContent: 'center',
-							alignItems: 'center',
-							padding: '1rem',
-							borderRadius: '1rem',
-							border: '2px solid',
-							borderColor: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'grey.300',
-							gap: { sm: '0.5rem', md: '1rem', lg: '1.5rem' },
-						}}
-					>
-						<Typography
+					{type !== 'home' && (
+						<Box
 							sx={{
-								fontSize: '1rem',
-								fontWeight: 600,
-								color: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'grey.300',
+								display: 'flex',
+								flexDirection: 'row',
+								maxWidth: '10rem',
+								minWidth: '25%',
+								justifyContent: 'center',
+								alignItems: 'center',
+								borderRadius: '1rem',
+								border: '2px solid',
+								borderColor: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'grey.300',
+								gap: { sm: '0.5rem', md: '1rem', lg: '1.5rem' },
 							}}
 						>
-							{CURRENTSTATE[workingStatus]}
-						</Typography>
-					</Box>
+							<Typography
+								sx={{
+									fontSize: '1rem',
+									fontWeight: 600,
+									color: workingStatus === 'WORKING' ? 'primary.500' : workingStatus === 'AFTER_WORK' ? 'primary.700' : 'grey.300',
+								}}
+							>
+								{CURRENTSTATE[workingStatus]}
+							</Typography>
+						</Box>
+					)}
 					<Box
 						sx={{
 							display: 'flex',
@@ -212,9 +226,11 @@ export default function AttendanceComp({ attendanceData, onSuccess }: { attendan
 					>
 						{activated ? '퇴근하기' : '출근하기'}
 					</Button>
-					<Button variant='outlined' size='large' onClick={() => router.push('/attendance/user/modal?mode=detail')}>
-						근태 수정 요청하기
-					</Button>
+					{type !== 'home' && (
+						<Button variant='outlined' size='large' onClick={() => router.push('/attendance/user/modal?mode=detail')}>
+							근태 수정 요청하기
+						</Button>
+					)}
 				</Box>
 			</Box>
 		</Box>

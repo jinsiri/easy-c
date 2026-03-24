@@ -22,7 +22,7 @@ const vacationList: Record<string, any>[] = [
 	{ key: 'yearsOfService', label: '근속 년수' },
 ];
 
-export default function VacationComp({ vacationData, onSuccess }: { vacationData?: VacationDataDto; onSuccess?: () => void }) {
+export default function VacationComp({ type, vacationData }: { type?: string; vacationData?: VacationDataDto; onSuccess?: () => void }) {
 	const router = useRouter();
 	const { setModalData } = useModalStore();
 
@@ -34,16 +34,20 @@ export default function VacationComp({ vacationData, onSuccess }: { vacationData
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', padding: '1rem 1.5rem', gap: '1rem' }}>
 			<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-				<Typography variant='subtitle2' whiteSpace='nowrap'>
-					{vacationData && vacationData.vacationPolicyType && <> {VACATIONPOLICYTYPE[vacationData.vacationPolicyType]} 기준</>}
-				</Typography>
+				{type === 'home' ? (
+					<Typography variant='subtitle1'>휴가 관리</Typography>
+				) : (
+					<Typography variant='subtitle2' whiteSpace='nowrap'>
+						{vacationData?.vacationPolicyType ? <> {VACATIONPOLICYTYPE[vacationData.vacationPolicyType]} 기준</> : '-'}
+					</Typography>
+				)}
 			</Box>
-			<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: '0.5rem', gap: 1 }}>
+			<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', mt: '0.125rem', gap: 1 }}>
 				{vacationList.map((item, idx) => (
 					<ColTitleAndText
 						key={idx}
 						subtitle={item.label}
-						sx={{ flex: '1', backgroundColor: 'primary.50', borderRadius: '1rem', padding: '0.5rem 0.25rem' }}
+						sx={{ flex: '1', backgroundColor: 'primary.50', borderRadius: '1rem', padding: '1rem 0.25rem' }}
 					>
 						<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 							<Typography variant='h6'>{vacationData ? vacationData[item.key] : '-'}</Typography>

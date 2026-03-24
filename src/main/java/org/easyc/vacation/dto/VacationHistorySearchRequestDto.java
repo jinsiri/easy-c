@@ -25,6 +25,6 @@ public class VacationHistorySearchRequestDto {
 
     private String transactionType;
     private String vacationCategory;
-    private String vacationDesc;
+    private String violationReason;
 
 }

@@ -76,6 +76,9 @@ export const memberService = {
 	// 멤버 부서 정보 조회
 	getDeptMemberMapInfo: (memberId: number) => axiosConfig.get<DeptMemberMapResponseDto[]>(`/api/members/${memberId}/depts`),
 
+	// 멤버 대표 부서 정보 조회
+	getDeptMemberMapInfoPrimary: (memberId: number) => axiosConfig.get<DeptMemberMapResponseDto[]>(`/api/members/${memberId}/depts/primary`),
+
 	// 기본정보 탭 조회
 	getMemberBasicInfo: (memberId: number) => axiosConfig.get<MemberProfileResponseDto>(`/api/members/${memberId}/basic`),
 
