@@ -213,7 +213,7 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 				</Button>
 			</Stack>
 			<Grid container spacing={2} sx={{ flexGrow: 1 }}>
-				<Grid size={{ xs: 12, md: deptMembers?.length !== 0 ? 4 : 12 }} sx={{ height: '100%' }}>
+				<Grid size={{ xs: 12, md: deptMembers?.length !== 0 ? 4 : 12 }} sx={{ minHeight: '50vh' }}>
 					<CustomAgGridComp
 						ref={gridRef}
 						rowData={deptMembers}
