@@ -1,22 +1,18 @@
 package org.easyc.vacation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.easyc.common.dto.PageRequestDto;
 import org.easyc.common.dto.PageResponseDto;
-import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.member.entity.MemberProfile;
 import org.easyc.member.repository.MemberProfileRepository;
 import org.easyc.vacation.constant.TransactionType;
 import org.easyc.vacation.constant.VacationCategory;
 import org.easyc.vacation.constant.VacationPolicyType;
-import org.easyc.vacation.dto.VacationAppSearchRequestDto;
 import org.easyc.vacation.dto.VacationCompanySearchRequestDto;
 import org.easyc.vacation.dto.VacationHistorySearchRequestDto;
 import org.easyc.vacation.dto.VacationResponseDto;
 import org.easyc.vacation.entity.*;
 import org.easyc.vacation.repository.*;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -269,7 +265,7 @@ public class VacationService {
                 .day(days)
                 .accrualDate(accrualDate)
                 .expireDate(expireDate)
-                .vacationDesc(desc)
+                .violationReason(desc)
                 .build();
     }
 

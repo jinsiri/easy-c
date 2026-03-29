@@ -234,7 +234,15 @@ export default function CommonTreeview<T>({
 						onExpandedItemsChange(itemIds);
 					}
 				}}
-				onSelectedItemsChange={(_, itemId) => {
+				onSelectedItemsChange={(event, itemId: string | null) => {
+					if (!event) return;
+
+					const target = event.target as HTMLElement;
+
+					if (target.closest(`.${treeItemClasses.iconContainer}`)) {
+						return;
+					}
+
 					if (!itemId || disabledIds.includes(itemId)) return;
 
 					if (onNodeClick) {

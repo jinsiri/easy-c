@@ -83,6 +83,17 @@ public class MemberController {
     }
 
     /**
+     * 인사정보 조회 - 멤버 부서 정보
+
+     * @param memberId 조회할 멤버 ID
+     * @return 멤버의 부서 정보 리스트 (DeptMemberMapResponseDto)
+     */
+    @GetMapping("/{memberId}/depts/primary")
+    public DeptMemberMapResponseDto findByMemberIdPrimary(@PathVariable Long memberId) {
+        return deptMemberMapService.findByMemberIdPrimary(memberId);
+    }
+
+    /**
      * 인사정보 조회 - 기본정보 탭
 
      * @param memberId 조회할 멤버 ID

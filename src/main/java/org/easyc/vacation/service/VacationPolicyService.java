@@ -3,13 +3,10 @@ package org.easyc.vacation.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import org.easyc.attendance.dto.AttendancePolicyMemberRequestDto;
-import org.easyc.attendance.entity.AttendancePolicyMap;
 import org.easyc.member.entity.MemberProfile;
 import org.easyc.member.repository.MemberProfileRepository;
 import org.easyc.member.repository.MemberRepositoryCustom;
 import org.easyc.vacation.constant.TransactionType;
-import org.easyc.vacation.constant.VacationPolicyType;
 import org.easyc.vacation.dto.VacationPolicyDto;
 import org.easyc.vacation.dto.VacationPolicyMemberDto;
 import org.easyc.vacation.dto.VacationPolicyMemberRequestDto;
@@ -158,7 +155,7 @@ public class VacationPolicyService {
                                 .day(vh.getDay() * -1)
                                 .accrualDate(today)
                                 .expireDate(today)
-                                .vacationDesc("기존 연차 만료 - 정책 변경 (" + vh.getVacationDesc() + ")")
+                                .violationReason("기존 연차 만료 - 정책 변경 (" + vh.getViolationReason() + ")")
                                 .build();
                     })
                     .collect(Collectors.toList());

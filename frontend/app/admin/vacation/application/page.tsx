@@ -243,12 +243,13 @@ export default function VacationApplicationPage() {
 	);
 
 	const colDefs = useMemo(() => {
-		const onClickDetail = (param: any) => {
-			setModalData(param.data);
+		const onClickDetail = (data: any) => {
+			console.log(data);
+			setModalData(data);
 			router.push('/vacation/user/modal?type=read');
 		};
 
-		const clickEvent = async (type: 'reject' | 'approve', data: vacationApplicationDto) => {
+		const onClickEvent = async (type: 'reject' | 'approve', data: vacationApplicationDto) => {
 			if (data !== null) {
 				approveRejectData(type, [data]);
 			}
@@ -276,7 +277,7 @@ export default function VacationApplicationPage() {
 			},
 		];
 
-		return [...adminBasicColDef, ...uniqueCols, getAdminBasicDetailColumn(onClickDetail), getAdminBasicActionColumn(clickEvent)];
+		return [...adminBasicColDef, ...uniqueCols, getAdminBasicDetailColumn(onClickDetail), getAdminBasicActionColumn(onClickEvent)];
 	}, [router, setModalData, approveRejectData]);
 
 	return (

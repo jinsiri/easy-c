@@ -34,6 +34,18 @@ public class DeptMemberMapService {
         return DeptMemberMapResponseDto.fromEntityList(deptMemberMaps);
     }
 
+    public DeptMemberMapResponseDto findByMemberIdPrimary(Long memberId) {
+        if (memberId == null) return null;
+
+        Optional<Member> optionalUser = memberRepository.findById(memberId);
+        optionalUser.orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
+
+        DeptMemberMap deptMemberMaps = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(memberId);
+
+        return DeptMemberMapResponseDto.fromEntity(deptMemberMaps);
+    }
+
+
     @Transactional
     public void assignDeptsToMember(Long memberId, List<DeptMemberMapRequestDto> dtos) {
         for (DeptMemberMapRequestDto dto : dtos) {

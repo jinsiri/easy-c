@@ -3,7 +3,7 @@ import React from 'react';
 /** MUI */
 import { Box, Button } from '@mui/material';
 
-export default function GridActionButtonComp({ params: any }) {
+export default function GridActionButtonComp(params: any) {
 	const { onClickAction } = params;
 
 	return (

@@ -171,7 +171,7 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 		gridRef.current.api.forEachNode((node: any) => updatedRows.push(node.data));
 
 		const config = CATEGORY_CONFIG[targetCategory];
-		const { updateApi, domain, idKey, orderKey } = config;
+		const { updateApi, idKey, orderKey } = config;
 
 		const currentOrderIds = updatedRows.map((row) => row[idKey]);
 		const isNotChanged = JSON.stringify(initialOrder) === JSON.stringify(currentOrderIds);
@@ -281,16 +281,18 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 						</Stack>
 					</Grid>
 				</Grid>
-				<CustomAgGridComp
-					ref={gridRef}
-					rowData={activeCategoryData}
-					colDefs={CATEGORY_CONFIG[category].colDefs}
-					rowSelectionMode={'multiple'}
-					pagination={false}
-					isReorderMode={isReorderMode}
-					animateRows={true}
-					onCellClicked={(params) => goToUpdateRolePage(params, category)}
-				/>
+				<Grid sx={{ minHeight: '50vh' }}>
+					<CustomAgGridComp
+						ref={gridRef}
+						rowData={activeCategoryData}
+						colDefs={CATEGORY_CONFIG[category].colDefs}
+						rowSelectionMode={'multiple'}
+						pagination={false}
+						isReorderMode={isReorderMode}
+						animateRows={true}
+						onCellClicked={(params) => goToUpdateRolePage(params, category)}
+					/>
+				</Grid>
 			</Grid>
 
 			{category !== 'ROLE' && (
@@ -311,6 +313,7 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 							xs: 12,
 							lg: 3,
 						}}
+						sx={{ display: 'flex', flexGrow: 1, flexDirection: 'column' }}
 					>
 						<Grid container justifyContent={'space-between'} alignItems={'center'} sx={{ mb: 1 }}>
 							<Grid>
@@ -347,7 +350,15 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 								</Stack>
 							</Grid>
 						</Grid>
-						<CustomAgGridComp ref={templateRef} rowData={currentData} colDefs={templateColDefs} rowSelectionMode={'multiple'} pagination={false} />
+						<Grid sx={{ minHeight: '50vh' }}>
+							<CustomAgGridComp
+								ref={templateRef}
+								rowData={currentData}
+								colDefs={templateColDefs}
+								rowSelectionMode={'multiple'}
+								pagination={false}
+							/>
+						</Grid>
 					</Grid>
 				</>
 			)}

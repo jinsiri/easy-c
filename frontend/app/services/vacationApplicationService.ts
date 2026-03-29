@@ -7,10 +7,10 @@ import { BaseDto } from '@/type/base';
 
 export interface vacationApplicationController {
 	vacationType: vacationType;
-	vacationDuration: string;
+	vacationDuration?: string;
 	startDate?: Dayjs | null;
 	endDate?: Dayjs | null;
-	vacationReason?: string;
+	violationReason?: string;
 }
 
 export interface vacationApplicationDto extends BaseDto {
@@ -19,11 +19,11 @@ export interface vacationApplicationDto extends BaseDto {
 	memberNm?: string;
 	deptNm?: string;
 	jobGrade?: string;
-	vacationType: vacationType;
-	vacationDuration: number;
+	vacationType?: vacationType;
+	vacationDuration?: number;
 	startDate?: string;
 	endDate?: string | null;
-	vacationReason?: string;
+	violationReason?: string;
 	status?: string;
 }
 
@@ -31,11 +31,11 @@ export interface vacationApplicationDataDto {
 	memberId?: number;
 	deptNm?: string;
 	jobGrade?: string;
-	vacationType: vacationType;
-	vacationDuration: number;
+	vacationType?: vacationType;
+	vacationDuration?: number;
 	startDate?: string;
 	endDate?: string | null;
-	vacationReason?: string;
+	violationReason?: string;
 	status?: string;
 }
 

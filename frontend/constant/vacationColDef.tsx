@@ -4,9 +4,6 @@ import { ColDef } from 'ag-grid-community';
 /** Lib */
 import dayjs from 'dayjs';
 
-/** Mui */
-import { Box, Typography } from '@mui/material';
-
 /** Custom */
 import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
 
@@ -87,7 +84,7 @@ export const historyColDefs: ColDef<Record<string, any>>[] = [
 		valueFormatter: (param) => (param.value ? dayjs(param.value).format('YYYY-MM-DD') : '-'),
 	},
 	{
-		field: 'vacationDesc',
+		field: 'violationReason',
 		headerName: '상세',
 		flex: 3,
 	},

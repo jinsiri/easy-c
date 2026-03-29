@@ -8,13 +8,13 @@ import CommonTabs from '@/app/_component/CommonTabs';
 import CommonTreeview from '@/app/_component/Tree';
 import { useRouter } from 'next/navigation';
 import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axiosConfig from '@/app/_lib/axiosConfig';
 import { useDialogStore } from '@/store/useDialogStore';
 import { useDeptForm } from '@/app/admin/dept/_hooks/useDeptForm';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
-import { mapDeptToTree, mapOrgToTree } from '@/app/admin/dept/_utils/deptUtil';
+import { mapOrgToTree } from '@/app/admin/dept/_utils/deptUtil';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -97,7 +97,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 		{
 			label: '부서 정보',
 			content: (
-				<Box sx={{ p: '1rem 1.5rem' }}>
+				<Box sx={{ p: { md: '1rem 1.5rem' } }}>
 					<DeptManageComp
 						deptId={selectedId || 1}
 						items={[
