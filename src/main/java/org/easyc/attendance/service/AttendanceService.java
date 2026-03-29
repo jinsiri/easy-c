@@ -39,7 +39,7 @@ public class AttendanceService {
 
     public AttendanceDayResponseDto getAttendanceUserData(AttendanceRequestDto req) {
         LocalDate workDate =  req.getWorkDate().toLocalDate();
-        Attendance attendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(),workDate).orElse(new Attendance());
+        Attendance attendance = attendanceRepository.findByMemberIdAndWorkDateAndDeletedFalse(req.getMemberId(),workDate).orElse(new Attendance());
         return new AttendanceDayResponseDto(attendance);
     }
 
@@ -51,14 +51,14 @@ public class AttendanceService {
         //데이터 조회 - 오전 7시 이전이면 이전 데이터 이후면 당일 데이터
         Attendance targetAttendance = null;
         if(workTime.isBefore(LocalTime.of(7, 0))){
-            Attendance beforeAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate.minus(1, ChronoUnit.DAYS)).orElse(null);
+            Attendance beforeAttendance = attendanceRepository.findByMemberIdAndWorkDateAndDeletedFalse(req.getMemberId(), workDate.minus(1, ChronoUnit.DAYS)).orElse(null);
             if(beforeAttendance != null && beforeAttendance.getStartTime() != null && beforeAttendance.getEndTime() == null){
                 targetAttendance = beforeAttendance;
             }
         }
 
         if(targetAttendance == null){
-            targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate).orElse(
+            targetAttendance = attendanceRepository.findByMemberIdAndWorkDateAndDeletedFalse(req.getMemberId(), workDate).orElse(
                     Attendance.builder()
                             .memberId(req.getMemberId())
                             .workDate(workDate)
@@ -83,7 +83,7 @@ public class AttendanceService {
         LocalDate firstDay = yearMonth.atDay(1);
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
-        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetween(memberId, firstDay, lastDay);
+        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalse(memberId, firstDay, lastDay);
         Map<Integer, Attendance> attendanceMap = targetMonthAttendanceList.stream()
                 .collect(Collectors.toMap(a -> a.getWorkDate().getDayOfMonth(), a -> a));
 
@@ -158,7 +158,7 @@ public class AttendanceService {
 
         // 유관 데이터 조회
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getMemberId());
-        Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), workDate).orElse(null);
+        Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDateAndDeletedFalse(req.getMemberId(), workDate).orElse(null);
 
         if(targetAttendance == null){
             targetAttendance = makeNewAttendance(req.getMemberId(), workDate, targetPolicy);
@@ -356,7 +356,7 @@ public class AttendanceService {
         Integer defaultDayWorkTime = targetPolicy.getWorkingTimeDay(); // 일일 기준 근로시간(분)
         Long defaultTotalWorkTime = defaultTotalWorkDay * defaultDayWorkTime; // 단위 근로시간(분)
 
-        List<Attendance> weekAttendanceData = attendanceRepository.findAllByMemberIdAndWorkDateBetween(memberId, start, end);
+        List<Attendance> weekAttendanceData = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalse(memberId, start, end);
 
         Long effectiveWorkDay = defaultTotalWorkDay;
         Long effectiveWorkTime = defaultTotalWorkTime;

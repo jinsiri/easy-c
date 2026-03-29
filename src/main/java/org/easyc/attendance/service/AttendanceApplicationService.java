@@ -47,7 +47,7 @@ public class AttendanceApplicationService {
 
     public void saveAttendanceApplication (AttendanceApplicationDto req){
         AttendanceApplication attendanceApplication = req.returnAttendanceApplicationEntity();
-        Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDate(req.getMemberId(), req.getWorkDate()).orElse(null);
+        Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDateAndDeletedFalse(req.getMemberId(), req.getWorkDate()).orElse(null);
 
         DeptMemberMap deptMemberMap = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(req.getMemberId());
         attendanceApplication.setMemberNm(deptMemberMap.getMember().getMemberNm());
@@ -104,7 +104,7 @@ public class AttendanceApplicationService {
         // 대상 근태 가져오기
         AttendancePolicy targetPolicy = attendanceService.findAttendancePolicy(request.getMemberId());
         Attendance targetAttendance = attendanceRepository
-                .findByMemberIdAndWorkDate(request.getMemberId(), request.getWorkDate())
+                .findByMemberIdAndWorkDateAndDeletedFalse(request.getMemberId(), request.getWorkDate())
                 .orElseGet(() -> attendanceService.makeNewAttendance(
                         request.getMemberId(),
                         request.getWorkDate(),
