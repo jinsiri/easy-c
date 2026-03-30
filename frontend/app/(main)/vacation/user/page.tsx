@@ -24,11 +24,6 @@ import { vacationService, VacationDataDto, VacationHistoryDto } from '@/app/serv
 import { vacationApplicationDataDto, vacationApplicationService } from '@/app/services/vacationApplicationService';
 import { colDefs, historyColDefs } from '@/constant/vacationColDef';
 
-const vacationTypeList = [
-	{ key: 'planVacation', label: '예정 휴가' },
-	{ key: 'endVacation', label: '종료 휴가' },
-];
-
 export default function VacationUserPage() {
 	const theme = useTheme();
 	const router = useRouter();
@@ -37,8 +32,7 @@ export default function VacationUserPage() {
 
 	const [vacationData, setVacationData] = useState<VacationDataDto>(null);
 	const [vacationHistory, setVacationHistory] = useState<VacationHistoryDto[]>([]);
-	const [planVacationList, setPlanVacationList] = useState<vacationApplicationDataDto[]>([]);
-	const [endVacationList, setEndVacationList] = useState<vacationApplicationDataDto[]>([]);
+	const [vacationList, setVacationList] = useState<vacationApplicationDataDto[]>([]);
 
 	const [chartOption, setChartOption] = useState<Record<string, any>>({});
 
@@ -141,10 +135,7 @@ export default function VacationUserPage() {
 			const encodedMemberId = btoa(String(secureLocalStorage.getItem('memberId')));
 			const res = await vacationApplicationService.getUserVacationApplicationData(encodedMemberId);
 
-			if (res) {
-				setPlanVacationList(res.planVacation);
-				setEndVacationList(res.endVacation);
-			}
+			if (res) setVacationList(res);
 		} finally {
 			setLoader(false);
 		}
@@ -215,33 +206,25 @@ export default function VacationUserPage() {
 					</Box>
 				</Grid>
 				<Grid sx={{ display: 'flex', flexDirection: { lg: 'row', md: 'column', sm: 'column', xs: 'column' }, flexGrow: 1, gap: '1rem' }}>
-					{vacationTypeList.map((item) => (
-						<Box
-							key={item.key}
-							sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								width: { lg: `calc(100% / ${vacationTypeList.length})`, md: '100%', sm: '100%', xs: '100%' },
-								backgroundColor: 'grey.50',
-								border: '1px solid',
-								borderColor: 'grey.200',
-								borderRadius: '1rem',
-							}}
-						>
-							<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 1rem' }}>
-								<Typography variant='subtitle1'>{item.label}</Typography>
-								<Button onClick={(e) => router.push(`/vacation/user/list?type=${item.key}`)}>상세보기</Button>
-							</Box>
-							<Box sx={{ flexGrow: 1, minHeight: '15rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
-								<CustomAgGridComp
-									rowData={item.key === 'planVacation' ? planVacationList : endVacationList}
-									colDefs={colDefs}
-									rowSelectionMode='none'
-									pagination={false}
-								/>
-							</Box>
+					<Box
+						sx={{
+							display: 'flex',
+							flexDirection: 'column',
+							width: '100%',
+							backgroundColor: 'grey.50',
+							border: '1px solid',
+							borderColor: 'grey.200',
+							borderRadius: '1rem',
+						}}
+					>
+						<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 1rem' }}>
+							<Typography variant='subtitle1'>휴가 신청 내역</Typography>
+							<Button onClick={(e) => router.push(`/vacation/user/list?vacationApp`)}>상세보기</Button>
 						</Box>
-					))}
+						<Box sx={{ flexGrow: 1, minHeight: '15rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
+							<CustomAgGridComp rowData={vacationList} colDefs={colDefs} rowSelectionMode='none' pagination={false} />
+						</Box>
+					</Box>
 				</Grid>
 			</Grid>
 		</Box>

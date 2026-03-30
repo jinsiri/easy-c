@@ -55,7 +55,13 @@ export default function VacationComp({ type, vacationData }: { type?: string; va
 					</ColTitleAndText>
 				))}
 			</Box>
-			<Button variant='contained' size='large' sx={{ width: '100%' }} onClick={onClickvacationApplication}>
+			<Button
+				variant='contained'
+				size='large'
+				sx={{ width: '100%' }}
+				onClick={onClickvacationApplication}
+				disabled={!vacationData || vacationData.remainDay === 0}
+			>
 				휴가 신청
 			</Button>
 		</Box>

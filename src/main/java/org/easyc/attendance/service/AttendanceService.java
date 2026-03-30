@@ -83,7 +83,7 @@ public class AttendanceService {
         LocalDate firstDay = yearMonth.atDay(1);
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
-        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalse(memberId, firstDay, lastDay);
+        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateAsc(memberId, firstDay, lastDay);
         Map<Integer, Attendance> attendanceMap = targetMonthAttendanceList.stream()
                 .collect(Collectors.toMap(a -> a.getWorkDate().getDayOfMonth(), a -> a));
 
@@ -177,7 +177,7 @@ public class AttendanceService {
         AttendancePolicy targetPolicy = findAttendancePolicy(req.getMemberId());
 
         // 데이터 조회
-        Attendance targetAttendance = attendanceRepository.findByMemberIdAndAttendanceId(req.getMemberId(), req.getAttendanceId()).orElseThrow();
+        Attendance targetAttendance = attendanceRepository.findByMemberIdAndAttendanceIdAndDeletedFalse(req.getMemberId(), req.getAttendanceId()).orElseThrow();
 
         // 상태업데이트 해서 save
         attendanceRepository.saveAndFlush(updateAttendanceByEndTime(targetAttendance, targetPolicy, req.getEndTime()));
@@ -188,14 +188,25 @@ public class AttendanceService {
         LocalDate endDate = application.getEndDate();
         long duration = endDate != null ? ChronoUnit.DAYS.between(startDate, endDate) : 0;
 
+        List<Attendance> prevAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalse(application.getMemberId(), startDate, endDate);
+        Map<LocalDate, Attendance> prevAttendanceMap = prevAttendanceList.stream().collect(Collectors.toMap(a -> a.getWorkDate(), a-> a));
+
         List<Attendance> attendanceList = new ArrayList<>();
         for(long i = 0; i <= duration; i++){
+            LocalDate currentDate = startDate.plusDays(i);
+
+            Attendance prevAttendance = prevAttendanceMap.get(currentDate);
+            if(prevAttendance != null){
+                prevAttendance.delete();
+                attendanceList.add(prevAttendance);
+            }
+
             Attendance result = new Attendance();
             result.setMemberId(application.getMemberId());
             result.setMemberNm(application.getMemberNm());
             result.setDeptNm(application.getDeptNm());
             result.setJobGrade(application.getJobGrade());
-            result.setWorkDate(startDate.plusDays(i));
+            result.setWorkDate(currentDate);
             result.setWorkType(WorkType.NORMAL);
             result.setWorkStatus(WorkStatus.VACATION);
             result.setViolationReason(application.getViolationReason());

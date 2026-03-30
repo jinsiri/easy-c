@@ -69,7 +69,7 @@ public class VacationApplicationRepositoryCustom {
     }
 
 
-    public Page<VacationApplication> searchUserApp(VacationAppSearchRequestDto req, Pageable pageable, String type) {
+    public Page<VacationApplication> searchUserApp(VacationAppSearchRequestDto req, Pageable pageable) {
         //휴가일 기준으로 기간 검색
         List<VacationApplication> content = queryFactory
                 .selectFrom(vacationApplication)
@@ -81,7 +81,7 @@ public class VacationApplicationRepositoryCustom {
                         vacationTypeEq(req.getVacationType()),
                         durationGoe(req.getVacationStart()),
                         durationLoe(req.getVacationEnd()))
-                .orderBy(type.equals("plan") ? vacationApplication.startDate.asc() : vacationApplication.startDate.desc())
+                .orderBy(vacationApplication.registerDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

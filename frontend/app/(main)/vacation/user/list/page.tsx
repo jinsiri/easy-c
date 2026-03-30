@@ -180,12 +180,10 @@ export default function VacationUserListPage() {
 		if (detailSearchFilterRef.current) {
 			getListData(detailSearchFilterRef.current.getFilterValues());
 		} else {
-			if (type === 'planVacation') {
-				getListData({ ...applicationFieldDefault, startDate: dayjs() });
-			} else if (type === 'endVacation') {
-				getListData({ ...applicationFieldDefault, endDate: dayjs() });
-			} else {
+			if (type === 'vacationHistory') {
 				getListData(historyFieldDefault);
+			} else {
+				getListData(applicationFieldDefault);
 			}
 		}
 	}, [type]);
@@ -223,13 +221,10 @@ export default function VacationUserListPage() {
 					vacationEnd: data.vacationEnd,
 				};
 
-				const res: PageResponse<vacationApplicationDataDto> = await vacationApplicationService.searchUserVacationApplicationData(
-					{
-						...req,
-						request: _request,
-					},
-					type === 'planVacation' ? 'plan' : 'end',
-				);
+				const res: PageResponse<vacationApplicationDataDto> = await vacationApplicationService.searchUserVacationApplicationData({
+					...req,
+					request: _request,
+				});
 
 				setGridData(res.content);
 				setTotalElements(res.totalElements);
@@ -251,17 +246,7 @@ export default function VacationUserListPage() {
 					ref={detailSearchFilterRef}
 					title={'연차 내역'}
 					fields={type === 'vacationHistory' ? detailHistorySearchFields : detailAppSearchFields}
-					fieldDefault={
-						type === 'planVacation'
-							? { ...applicationFieldDefault, startDate: dayjs() }
-							: type === 'endVacation'
-								? { ...applicationFieldDefault, endDate: dayjs() }
-								: historyFieldDefault
-					}
-					startDateMin={type === 'planVacation' ? dayjs() : null}
-					startDateMax={type === 'endVacation' ? dayjs() : null}
-					endDateMin={type === 'planVacation' ? dayjs() : null}
-					endDateMax={type === 'endVacation' ? dayjs() : null}
+					fieldDefault={type === 'vacationHistory' ? historyFieldDefault : applicationFieldDefault}
 					onSearch={getListData}
 					onReset={() => {}}
 				/>

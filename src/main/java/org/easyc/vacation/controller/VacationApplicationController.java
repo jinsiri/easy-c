@@ -5,12 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.easyc.audit.activity.annotation.AuditAction;
 import org.easyc.common.dto.PageRequestDto;
 import org.easyc.common.dto.PageResponseDto;
-import org.easyc.common.dto.SearchRequestDto;
 import org.easyc.excel.dto.ExcelRequestDto;
 import org.easyc.util.ExcelUtil;
 import org.easyc.vacation.dto.*;
 import org.easyc.vacation.entity.VacationApplication;
-import org.easyc.vacation.entity.VacationHistory;
 import org.easyc.vacation.service.VacationApplicationService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import static org.easyc.attendance.entity.QAttendanceApplication.attendanceApplication;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/vacation/application")
@@ -30,7 +26,7 @@ public class VacationApplicationController {
     private final VacationApplicationService vacationApplicationService;
 
     @GetMapping("/user")
-    public VacationApplicationResponseDto findUserVacationApplicationData(@RequestParam("target") String encodeId) {
+    public List<VacationApplication> findUserVacationApplicationData(@RequestParam("target") String encodeId) {
         // Base64 디코딩
         byte[] decodedBytes = Base64.getDecoder().decode(encodeId);
         String idStr = new String(decodedBytes);
@@ -86,9 +82,9 @@ public class VacationApplicationController {
     }
 
     @PostMapping("/user/search")
-    public PageResponseDto<VacationApplication> searchUserVacationApplicationData(@RequestParam("type") String type, @RequestBody PageRequestDto<VacationAppSearchRequestDto> request) {
+    public PageResponseDto<VacationApplication> searchUserVacationApplicationData( @RequestBody PageRequestDto<VacationAppSearchRequestDto> request) {
         Pageable pageable = PageRequest.of(request.getNumber(), request.getSize());
-        return vacationApplicationService.searchUserVacationApplicationData(request.getRequest(), pageable, type);
+        return vacationApplicationService.searchUserVacationApplicationData(request.getRequest(), pageable);
     }
 
 }

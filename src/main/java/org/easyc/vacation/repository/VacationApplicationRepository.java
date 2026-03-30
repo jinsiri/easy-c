@@ -10,6 +10,5 @@ import java.util.List;
 
 @Repository
 public interface VacationApplicationRepository extends JpaRepository<VacationApplication, Long> {
-    List<VacationApplication> findTop10ByMemberIdAndStartDateGreaterThanEqualOrderByStartDateAsc(Long memberId, LocalDate todayDate);
-    List<VacationApplication> findTop10ByMemberIdAndStartDateBeforeOrderByStartDateDesc(Long memberId, LocalDate todayDate);
+    List<VacationApplication> findTop10ByMemberIdAndDeletedFalseOrderByRegisterDateDesc(Long memberId);
 }

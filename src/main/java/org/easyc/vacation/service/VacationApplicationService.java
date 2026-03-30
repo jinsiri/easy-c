@@ -9,7 +9,6 @@ import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
 import org.easyc.vacation.constant.VacationCategory;
 import org.easyc.vacation.dto.VacationAppSearchRequestDto;
 import org.easyc.vacation.dto.VacationApplicationDto;
-import org.easyc.vacation.dto.VacationApplicationResponseDto;
 import org.easyc.vacation.entity.Vacation;
 import org.easyc.vacation.entity.VacationApplication;
 import org.easyc.vacation.entity.VacationHistory;
@@ -25,6 +24,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,22 +48,11 @@ public class VacationApplicationService {
         vacationApplicationRepository.save(application);
     }
 
-    public VacationApplicationResponseDto findUserVacationApplicationData(Long memberId){
-        VacationApplicationResponseDto result = new VacationApplicationResponseDto();
-        LocalDate todayDate = LocalDate.now();
+    public List<VacationApplication> findUserVacationApplicationData(Long memberId){
+        List<VacationApplication> vacationList = vacationApplicationRepository
+                .findTop10ByMemberIdAndDeletedFalseOrderByRegisterDateDesc(memberId);
 
-        // 1. 예정된 휴가 조회 (최대 10개, 날짜 가까운 순)
-        List<VacationApplication> planVacation = vacationApplicationRepository
-                .findTop10ByMemberIdAndStartDateGreaterThanEqualOrderByStartDateAsc(memberId, todayDate);
-
-        // 2. 지난 휴가 조회 (최대 10개, 최신순)
-        List<VacationApplication> endVacation = vacationApplicationRepository
-                .findTop10ByMemberIdAndStartDateBeforeOrderByStartDateDesc(memberId, todayDate);
-
-        result.setPlanVacation(planVacation);
-        result.setEndVacation(endVacation);
-
-        return result;
+        return vacationList;
     }
 
     public void approveVacationApplicationData( List<VacationApplication> request) {
@@ -71,9 +60,14 @@ public class VacationApplicationService {
         List<Vacation> vacationList = new ArrayList<>();
         List<VacationHistory> vacationHistoryList = new ArrayList<>();
 
+        List<Long> memberIdList = request.stream().map(VacationApplication::getMemberId).collect(Collectors.toList());
+        List<Vacation> prevVacation = vacationRepository.findAllByMemberIdIsInAndYear(memberIdList, LocalDate.now().getYear());
+        Map<Long, Vacation> prevVacationMap = prevVacation.stream().collect(Collectors.toMap(a -> a.getMemberId(), a -> a));
+
         for(VacationApplication vacationApplication : request){
             if(vacationApplication.getStatus().equals(BasicStatus.PENDING)){
-                Map<String, Object> vacationData = approveVacationData(vacationApplication);
+                Vacation targetVacation = prevVacationMap.get(vacationApplication.getMemberId()) ;
+                Map<String, Object> vacationData = approveVacationData(vacationApplication, targetVacation);
 
                 vacationApplication.setStatus(BasicStatus.APPROVED);
                 vacationApplicationList.add(vacationApplication);
@@ -100,8 +94,7 @@ public class VacationApplicationService {
         vacationApplicationRepository.saveAll(vacationApplicationList);
     }
 
-    public Map<String, Object> approveVacationData(VacationApplication request) {
-        Vacation targetVacation = vacationRepository.findAllByMemberIdAndExpireDateAfter(request.getMemberId(), LocalDate.now()).orElse(null);
+    public Map<String, Object> approveVacationData(VacationApplication request, Vacation targetVacation) {
         VacationHistory newHistory = null;
 
         if(targetVacation != null){
@@ -133,8 +126,8 @@ public class VacationApplicationService {
         return new PageResponseDto<VacationApplication>(vacationApplicationRepositoryCustom.searchApp(request, pageable));
     }
 
-    public PageResponseDto<VacationApplication> searchUserVacationApplicationData(VacationAppSearchRequestDto request,Pageable pageable, String type) {
-        return new PageResponseDto<VacationApplication>(vacationApplicationRepositoryCustom.searchUserApp(request, pageable, type));
+    public PageResponseDto<VacationApplication> searchUserVacationApplicationData(VacationAppSearchRequestDto request,Pageable pageable) {
+        return new PageResponseDto<VacationApplication>(vacationApplicationRepositoryCustom.searchUserApp(request, pageable));
     }
 
     public List<VacationApplication> excelVacationApplication(VacationAppSearchRequestDto request, Pageable pageable) {

@@ -11,13 +11,10 @@ import java.util.Optional;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
-    Optional<Attendance> findByMemberIdAndWorkDate(Long memberId, LocalDate workDate);
     Optional<Attendance> findByMemberIdAndWorkDateAndDeletedFalse(Long memberId, LocalDate workDate);
-
-    List<Attendance> findAllByWorkDate(LocalDate workDate);
-
-    Optional<Attendance> findByMemberIdAndAttendanceId(Long memberId, Long attendanceId);
-
-    List<Attendance> findAllByMemberIdAndWorkDateBetween(Long memberId, LocalDate workDateBefore, LocalDate workDateAfter);
+    Optional<Attendance> findByMemberIdAndAttendanceIdAndDeletedFalse(Long memberId, Long attendanceId);
     List<Attendance> findAllByMemberIdAndWorkDateBetweenAndDeletedFalse(Long memberId, LocalDate workDateBefore, LocalDate workDateAfter);
+
+    List<Attendance> findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateAsc(Long memberId, LocalDate workDateAfter, LocalDate workDateBefore);
+
 }
