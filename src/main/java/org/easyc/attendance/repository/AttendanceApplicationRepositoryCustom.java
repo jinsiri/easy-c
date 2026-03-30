@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.easyc.attendance.entity.QAttendance.attendance;
 import static org.easyc.attendance.entity.QAttendanceApplication.attendanceApplication;
 
 @Repository
@@ -81,12 +82,33 @@ public class AttendanceApplicationRepositoryCustom {
         return end != null ? attendanceApplication.registerDate.lt(end.atStartOfDay()) : null;
     }
 
-    private BooleanExpression deptNmContains(String depthNm) {
-        return StringUtils.hasText(depthNm) ? attendanceApplication.deptNm.containsIgnoreCase(depthNm) : null;
+
+    private BooleanExpression deptNmContains(String deptNm) {
+        if (!StringUtils.hasText(deptNm)) return null;
+
+        List<String> keywords = Arrays.stream(deptNm.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        return keywords.stream()
+                .map(attendanceApplication.deptNm::containsIgnoreCase)
+                .reduce(BooleanExpression::or)
+                .orElse(null);
     }
 
     private BooleanExpression memberNmContains(String memberNm) {
-        return StringUtils.hasText(memberNm) ? attendanceApplication.memberNm.containsIgnoreCase(memberNm) : null;
+        if (!StringUtils.hasText(memberNm)) return null;
+
+        List<String> keywords = Arrays.stream(memberNm.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        return keywords.stream()
+                .map(attendanceApplication.memberNm::containsIgnoreCase)
+                .reduce(BooleanExpression::or)
+                .orElse(null);
     }
 
     private BooleanExpression summaryContains(String summary) {
