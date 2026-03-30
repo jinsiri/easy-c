@@ -247,6 +247,8 @@ export default function VacationUserListPage() {
 					title={'연차 내역'}
 					fields={type === 'vacationHistory' ? detailHistorySearchFields : detailAppSearchFields}
 					fieldDefault={type === 'vacationHistory' ? historyFieldDefault : applicationFieldDefault}
+					startDateLabel={type === 'vacationHistory' ? '지급일 기준 조회 시작일' : '신청일 기준 조회 시작일'}
+					endDateLabel={type === 'vacationHistory' ? '지급일 기준 조회 종료일' : '신청일 기준 조회 종료일'}
 					onSearch={getListData}
 					onReset={() => {}}
 				/>

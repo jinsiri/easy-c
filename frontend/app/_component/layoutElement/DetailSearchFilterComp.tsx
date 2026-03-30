@@ -21,6 +21,8 @@ interface Props {
 	sx?: SxProps;
 	isDate?: boolean;
 	isExcel?: boolean;
+	startDateLabel?: string | null;
+	endDateLabel?: string | null;
 	startDateMin?: Dayjs | null;
 	startDateMax?: Dayjs | null;
 	endDateMin?: Dayjs | null;
@@ -229,9 +231,9 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 										control={control}
 										rules={{
 											validate: (value) => {
-												if (!value) return '시작일은 필수입니다.';
+												if (!value) return `${props.startDateLabel ?? '시작일'}은 필수입니다.`;
 												if (watchAllFields['endDate'] && value.isAfter(watchAllFields['endDate'])) {
-													return '시작일은 종료일보다 빨라야 합니다.';
+													return `${props.startDateLabel ?? '시작일'}은 ${props.endDateLabel ?? '종료일'}보다 빨라야 합니다.`;
 												}
 												return true;
 											},
@@ -239,7 +241,7 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 										render={({ field }) => (
 											<DatePicker
 												{...field}
-												label='시작일'
+												label={props.startDateLabel ?? '시작일'}
 												value={field.value?.isValid ? field.value : null}
 												minDate={props.startDateMin ?? undefined}
 												maxDate={props.startDateMax ?? undefined}
@@ -257,9 +259,9 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 										control={control}
 										rules={{
 											validate: (value) => {
-												if (!value) return '종료일은 필수입니다.';
+												if (!value) return `${props.endDateLabel ?? '종료일'}은 필수입니다.`;
 												if (watchAllFields['startDate'] && value.isBefore(watchAllFields['startDate'])) {
-													return '종료일은 시작일보다 늦어야 합니다.';
+													return `${props.endDateLabel ?? '종료일'}은 ${props.startDateLabel ?? '시작일'}보다 늦어야 합니다.`;
 												}
 												return true;
 											},
@@ -267,7 +269,7 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 										render={({ field }) => (
 											<DatePicker
 												{...field}
-												label='종료일'
+												label={props.endDateLabel ?? '종료일'}
 												value={field.value?.isValid ? field.value : null}
 												minDate={props.endDateMin ?? undefined}
 												maxDate={props.endDateMax ?? undefined}

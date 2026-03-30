@@ -31,10 +31,10 @@ public class VacationHistoryRepositoryCustom {
                 .where(
                         memberIdEq(req.getMemberId()),
                         dateGoe(req.getStartDate()),
-                        dateLt(req.getEndDate()),
+                        dateLeo(req.getEndDate()),
                         transactionTypeEq(req.getTransactionType()),
                         vacationCategoryEq(req.getVacationCategory()),
-                        descContains(req.getVacationCategory()))
+                        descContains(req.getViolationReason()))
                 .orderBy(vacationHistory.accrualDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -46,7 +46,7 @@ public class VacationHistoryRepositoryCustom {
                 .where(
                         memberIdEq(req.getMemberId()),
                         dateGoe(req.getStartDate()),
-                        dateLt(req.getEndDate()),
+                        dateLeo(req.getEndDate()),
                         transactionTypeEq(req.getTransactionType()),
                         vacationCategoryEq(req.getVacationCategory()),
                         descContains(req.getViolationReason()))
@@ -90,8 +90,8 @@ public class VacationHistoryRepositoryCustom {
         return start != null ? vacationHistory.accrualDate.goe(start) : null;
     }
 
-    private BooleanExpression dateLt(LocalDate end) {
-        return end != null ? vacationHistory.accrualDate.lt(end) : null;
+    private BooleanExpression dateLeo(LocalDate end) {
+        return end != null ? vacationHistory.accrualDate.loe(end) : null;
     }
 }
 

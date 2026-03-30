@@ -70,6 +70,8 @@ export const historyColDefs: ColDef<Record<string, any>>[] = [
 		field: 'day',
 		headerName: '휴가일',
 		flex: 1,
+		cellStyle: { textAlign: 'center' },
+		valueFormatter: (param) => (param.value ? param.value + '일' : '-'),
 	},
 	{
 		field: 'accrualDate',
