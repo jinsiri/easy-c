@@ -19,6 +19,9 @@ public class AttendanceAppSearchRequestDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate workDate;
+
     private String status;
 
     private String deptNm;

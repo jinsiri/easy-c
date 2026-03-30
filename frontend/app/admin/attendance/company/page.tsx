@@ -1,10 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+
+import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
 import { Box, Grid, IconButton, Typography } from '@mui/material';
@@ -13,7 +16,6 @@ import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
-import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -21,7 +23,7 @@ import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
 import DetailSearchFilterComp from '@/app/_component/layoutElement/DetailSearchFilterComp';
 import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
 
-import { formatMinutes } from '@/utils/commonFunc';
+import { formatMinutes, encoded } from '@/utils/commonFunc';
 import { downloadExcel } from '@/utils/excelDownloadFunc';
 
 /** Type / Interface */
@@ -85,7 +87,8 @@ const detailAppSearchFields: FilterField[] = [
 ];
 
 export default function AttendanceCompanyPage() {
-	const { setLoader } = useLoaderStore();
+	const router = useRouter();
+	const setLoader = useLoaderStore((state) => state.setLoader);
 
 	const detailSearchFilterRef = useRef<FilterRef>(null);
 
@@ -110,55 +113,60 @@ export default function AttendanceCompanyPage() {
 		}
 	}, [calendarDate]);
 
-	const onClickSearch = useCallback(async (data: FilterValues) => {
-		setLoader(true);
+	const onClickSearch = useCallback(
+		async (data: FilterValues) => {
+			setLoader(true);
 
-		try {
-			const req: PageRequest<AttendanceCompanySearchRequestDto> = {
-				number: page,
-				size: pageSize,
-				request: {
-					...data,
-					startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
-					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
-				},
-			};
+			try {
+				const req: PageRequest<AttendanceCompanySearchRequestDto> = {
+					number: page,
+					size: pageSize,
+					request: {
+						...data,
+						startDate: calendarDate.format('YYYY-MM-DD'),
+						endDate: calendarDate.format('YYYY-MM-DD'),
+					},
+				};
 
-			const res: AttendanceCompanySearchResponseDto = await attendanceCompanyService.searchVacationApplication(req);
-			setCountData({
-				allCount: res.allCount,
-				lateCount: res.lateCount,
-				earlyLeaveCount: res.earlyLeaveCount,
-				absentCount: res.absentCount,
-				changeRequestCount: res.changeRequestCount,
-			});
+				const res: AttendanceCompanySearchResponseDto = await attendanceCompanyService.searchVacationApplication(req);
+				setCountData({
+					allCount: res.allCount,
+					lateCount: res.lateCount,
+					earlyLeaveCount: res.earlyLeaveCount,
+					absentCount: res.absentCount,
+					changeRequestCount: res.changeRequestCount,
+				});
 
-			console.log(res);
-			setRowData(res.dayData.content);
-			setTotalElements(res.dayData.totalElements);
-		} finally {
-			setLoader(false);
-		}
-	}, []);
+				setRowData(res.dayData.content);
+				setTotalElements(res.dayData.totalElements);
+			} finally {
+				setLoader(false);
+			}
+		},
+		[calendarDate, page, pageSize],
+	);
 
-	const onClickExcel = useCallback(async (data: FilterValues) => {
-		setLoader(true);
+	const onClickExcel = useCallback(
+		async (data: FilterValues) => {
+			setLoader(true);
 
-		try {
-			const req: ExcelRequestDto<AttendanceCompanySearchRequestDto> = {
-				fileName: '전사근태내역',
-				request: {
-					...data,
-					startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
-					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
-				},
-			};
+			try {
+				const req: ExcelRequestDto<AttendanceCompanySearchRequestDto> = {
+					fileName: '전사근태내역',
+					request: {
+						...data,
+						startDate: calendarDate.format('YYYY-MM-DD'),
+						endDate: calendarDate.format('YYYY-MM-DD'),
+					},
+				};
 
-			downloadExcel('/api/attendance/company/excel', req);
-		} finally {
-			setLoader(false);
-		}
-	}, []);
+				downloadExcel('/api/attendance/company/excel', req);
+			} finally {
+				setLoader(false);
+			}
+		},
+		[calendarDate],
+	);
 
 	const onChangeDatePicker = useCallback(
 		(value) => {
@@ -169,13 +177,23 @@ export default function AttendanceCompanyPage() {
 		[calendarDate],
 	);
 
+	const onClickChangeRequest = useCallback(() => {
+		if (rowData.length > 0) {
+			const memberNmList = rowData.map((item) => item.memberNm);
+			const convertCalendarDate = encoded(dayjs(calendarDate).format('YYYY-MM-DD'));
+			const convertMemberNmList = encoded(memberNmList.join(','));
+
+			router.push(`/admin/attendance/application?date=${convertCalendarDate}&list=${convertMemberNmList}`);
+		}
+	}, [calendarDate, rowData]);
+
 	const colDefs: ColDef<Record<string, any>>[] = useMemo(
 		() => [
 			{ field: 'workDate', headerName: '근무일', flex: 1 },
 			{
 				field: 'member',
 				headerName: '근무자',
-				cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
+				cellStyle: { padding: '0.25rem 0' },
 				cellRenderer: (params: any) => {
 					const { deptNm, jobGrade, memberNm, vacationPolicyName } = params.data || {};
 					return <GridMemberComp memberNm={memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={vacationPolicyName} />;
@@ -283,7 +301,15 @@ export default function AttendanceCompanyPage() {
 						>
 							<Box sx={{ width: '100%' }}>{item.label}</Box>
 							<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', width: '100%' }}>
-								<Typography variant='h4'>{countData[item.key]}</Typography>
+								{item.key === 'changeRequestCount' && countData[item.key] > 0 ? (
+									<Box component={'a'} sx={{ cursor: 'pointer' }} onClick={onClickChangeRequest}>
+										<Typography variant='h4' color='primary'>
+											{countData[item.key]}
+										</Typography>
+									</Box>
+								) : (
+									<Typography variant='h4'>{countData[item.key]}</Typography>
+								)}
 							</Box>
 						</Box>
 					))}

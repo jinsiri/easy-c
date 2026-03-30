@@ -29,7 +29,7 @@ export interface ExcelRequestDto<T> {
 export interface FilterField {
 	key: string;
 	label: string;
-	type: 'text' | 'select';
+	type: 'text' | 'select' | 'date';
 	options?: { value: string; label: string }[];
 	validate?: (data: any, watchAllFields: FilterValues) => string | boolean;
 }
@@ -38,4 +38,5 @@ export interface FilterValues {
 	[key: string]: any;
 	startDate: Dayjs | null;
 	endDate: Dayjs | null;
+	workDate?: Dayjs | null;
 }

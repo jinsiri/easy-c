@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.easyc.attendance.entity.QAttendance.attendance;
 import static org.easyc.vacation.entity.QVacation.vacation;
 import static org.easyc.vacation.entity.QVacationHistory.vacationHistory;
 
@@ -56,14 +57,32 @@ public class VacationRepositoryCustom {
     }
 
     private BooleanExpression deptNmContains(String deptNm) {
-        return StringUtils.hasText(deptNm) ? vacation.deptNm.containsIgnoreCase(deptNm) : null;
+        if (!StringUtils.hasText(deptNm)) return null;
+
+        List<String> keywords = Arrays.stream(deptNm.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        return keywords.stream()
+                .map(vacation.deptNm::containsIgnoreCase)
+                .reduce(BooleanExpression::or)
+                .orElse(null);
     }
 
     private BooleanExpression memberNmContains(String memberNm) {
-        return StringUtils.hasText(memberNm) ? vacation.memberNm.containsIgnoreCase(memberNm) : null;
+        if (!StringUtils.hasText(memberNm)) return null;
+
+        List<String> keywords = Arrays.stream(memberNm.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        return keywords.stream()
+                .map(vacation.memberNm::containsIgnoreCase)
+                .reduce(BooleanExpression::or)
+                .orElse(null);
     }
-
-
 
 }
 

@@ -55,7 +55,7 @@ public class VacationApplicationController {
     @AuditAction(code = "VACATION_APP_EXCELDOWN", name = "휴가 신청 엑셀 다운로드", targetType = "VACATION_APP")
     @PostMapping("/excel")
     public void excelVacationApplication(HttpServletResponse response, @RequestBody ExcelRequestDto<VacationAppSearchRequestDto> request) throws Exception {
-        Pageable pageable = PageRequest.of(1, 1000);
+        Pageable pageable = PageRequest.of(0, 1000);
         List<VacationApplication> searchList = vacationApplicationService.excelVacationApplication(request.getRequest(), pageable);
 
         List<ExcelVacationApplicationDto> list = new ArrayList<>();

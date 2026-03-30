@@ -15,3 +15,22 @@ export const getTimelineInnerData = (target: any): ReactNode => {
 		return target;
 	}
 };
+
+// 1. 인코딩: 한글(UTF-8) -> Base64
+export const encoded = (data: string): string => {
+	const bytes = new TextEncoder().encode(data);
+	const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join('');
+	return btoa(binString);
+};
+
+// 2. 디코딩: Base64 -> 한글(UTF-8)
+export const decoded = (encoded: string): string => {
+	try {
+		const binString = atob(encoded);
+		const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0)!);
+		return new TextDecoder().decode(bytes);
+	} catch (e) {
+		console.error('Decoding error:', e);
+		return '';
+	}
+};

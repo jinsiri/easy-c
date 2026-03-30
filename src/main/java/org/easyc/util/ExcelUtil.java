@@ -48,7 +48,7 @@ public class ExcelUtil {
         headStyle.setWriteFont(headFont);
 
         WriteCellStyle contentStyle = new WriteCellStyle();
-        contentStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        //contentStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
         contentStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
         WriteFont contentFont = new WriteFont();

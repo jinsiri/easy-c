@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static org.easyc.attendance.entity.QAttendance.attendance;
 import static org.easyc.attendance.entity.QAttendanceApplication.attendanceApplication;
@@ -106,11 +107,26 @@ public class AttendanceRepositoryCustom {
                 .where(whereClause)
                 .fetchOne();
 
+        List<Long> memberIdList = content.stream()
+                .map(a -> a.getMemberId())
+                .filter(Objects::nonNull)
+                .toList();
+
+        Long changeRequestApp = queryFactory
+                .select( attendanceApplication.count())
+                .from(attendanceApplication)
+                .where(
+                        attendanceApplication.memberId.in(memberIdList)
+                                .and(appDateGoe(req.getStartDate()))
+                                .and(appDateLoe(req.getEndDate()))
+                ).fetchOne();
+
         AttendanceCompanySearchResponseDto response = new AttendanceCompanySearchResponseDto();
         response.setAllCount(stats.getAllCount().intValue());
         response.setLateCount(stats.getLateCount().intValue());
         response.setEarlyLeaveCount(stats.getEarlyLeaveCount().intValue());
         response.setAbsentCount(stats.getAbsentCount().intValue());
+        response.setChangeRequestCount(changeRequestApp != null ? changeRequestApp : 0L);
 
         List<AttendanceDayResponseDto> dtoList = content.stream().map(a ->new AttendanceDayResponseDto(a)).toList();
         Long total = stats.getAllCount() != null ? stats.getAllCount().longValue() : 0L;
@@ -120,6 +136,8 @@ public class AttendanceRepositoryCustom {
         return response;
     }
 
+
+
     private BooleanExpression dateGoe(LocalDate start) {
         return start != null ? attendance.workDate.goe(start) : null;
     }
@@ -128,12 +146,32 @@ public class AttendanceRepositoryCustom {
         return end != null ? attendance.workDate.loe(end) : null;
     }
 
-    private BooleanExpression deptNmContains(String depthNm) {
-        return StringUtils.hasText(depthNm) ? attendance.deptNm.containsIgnoreCase(depthNm) : null;
+    private BooleanExpression deptNmContains(String deptNm) {
+        if (!StringUtils.hasText(deptNm)) return null;
+
+        List<String> keywords = Arrays.stream(deptNm.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        return keywords.stream()
+                .map(attendance.deptNm::containsIgnoreCase)
+                .reduce(BooleanExpression::or)
+                .orElse(null);
     }
 
     private BooleanExpression memberNmContains(String memberNm) {
-        return StringUtils.hasText(memberNm) ? attendance.memberNm.containsIgnoreCase(memberNm) : null;
+        if (!StringUtils.hasText(memberNm)) return null;
+
+        List<String> keywords = Arrays.stream(memberNm.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        return keywords.stream()
+                .map(attendance.memberNm::containsIgnoreCase)
+                .reduce(BooleanExpression::or)
+                .orElse(null);
     }
 
     private BooleanExpression workTypeEq(String workType) {
@@ -157,6 +195,15 @@ public class AttendanceRepositoryCustom {
 
         return type != null ? attendance.workStatus.eq(type) : null;
     }
+
+    private BooleanExpression appDateGoe(LocalDate start) {
+        return start != null ? attendanceApplication.workDate.goe(start) : null;
+    }
+
+    private BooleanExpression appDateLoe(LocalDate end) {
+        return end != null ? attendanceApplication.workDate.loe(end) : null;
+    }
+
 
 }
 

@@ -3,9 +3,9 @@
 import { useState, useMemo, forwardRef, useImperativeHandle } from 'react';
 
 /** MUI */
-import { FormHelperText, Box, Button, TextField, Select, MenuItem, FormControl, InputLabel, SxProps, Typography, IconButton } from '@mui/material';
+import { FormHelperText, Box, Button, TextField, Select, MenuItem, FormControl, InputLabel, SxProps, Typography, IconButton, Tooltip } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-import { KeyboardArrowDownRounded, KeyboardArrowUpRounded, DownloadRounded } from '@mui/icons-material';
+import { KeyboardArrowDownRounded, KeyboardArrowUpRounded, DownloadRounded, InfoOutlineRounded } from '@mui/icons-material';
 
 /** Lib */
 import dayjs, { Dayjs } from 'dayjs';
@@ -86,6 +86,108 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 			onClickExcelDown?.(data);
 		});
 
+		const controllerContents = (fieldItem) => {
+			switch (fieldItem.type) {
+				case 'select':
+					return (
+						<Controller
+							key={`${fieldItem.key}`}
+							name={fieldItem.key}
+							control={control}
+							rules={{
+								validate: (value) => {
+									if (fieldItem.validate) {
+										return fieldItem.validate(value, watchAllFields);
+									} else {
+										return true;
+									}
+								},
+							}}
+							render={({ field: { onChange, value }, fieldState: { error } }) => (
+								<FormControl size='small' error={!!error}>
+									<InputLabel id='demo-simple-select-label'>{fieldItem.label}</InputLabel>
+									<Select
+										labelId='demo-simple-select-label'
+										label={fieldItem.label}
+										value={value}
+										sx={{ minWidth: '8rem' }}
+										onChange={onChange}
+										size='small'
+									>
+										<MenuItem value='all'>
+											<em>전체</em>
+										</MenuItem>
+										{fieldItem.options?.map((opt) => (
+											<MenuItem key={opt.value} value={opt.value} sx={{ fontSize: '0.875rem' }}>
+												{opt.label}
+											</MenuItem>
+										))}
+									</Select>
+									{error && <FormHelperText>{error.message}</FormHelperText>}
+								</FormControl>
+							)}
+						/>
+					);
+
+				case 'date':
+					return (
+						<Controller
+							name={fieldItem.key}
+							control={control}
+							rules={{
+								validate: (value) => {
+									if (fieldItem.validate) {
+										return fieldItem.validate(value, watchAllFields);
+									} else {
+										return true;
+									}
+								},
+							}}
+							render={({ field, fieldState: { error } }) => (
+								<DatePicker
+									{...field}
+									label={fieldItem.label}
+									value={field.value?.isValid ? field.value : null}
+									slotProps={{
+										textField: {
+											error: !!error,
+											helperText: error?.message ?? '',
+										},
+									}}
+								/>
+							)}
+						/>
+					);
+
+				default:
+					return (
+						<Controller
+							key={fieldItem.key}
+							name={fieldItem.key}
+							control={control}
+							rules={{
+								validate: (value) => {
+									if (fieldItem.validate) {
+										fieldItem.validate(value, watchAllFields);
+									}
+									return true;
+								},
+							}}
+							render={({ field, fieldState: { error } }) => (
+								<TextField
+									{...field}
+									label={fieldItem.label}
+									size='small'
+									sx={{ minWidth: '8rem' }}
+									error={!!error}
+									helperText={error?.message ?? ''}
+								/>
+							)}
+						/>
+					);
+			}
+		};
+
 		return (
 			<Box>
 				<Box
@@ -138,6 +240,7 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 											<DatePicker
 												{...field}
 												label='시작일'
+												value={field.value?.isValid ? field.value : null}
 												minDate={props.startDateMin ?? undefined}
 												maxDate={props.startDateMax ?? undefined}
 												slotProps={{
@@ -165,6 +268,7 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 											<DatePicker
 												{...field}
 												label='종료일'
+												value={field.value?.isValid ? field.value : null}
 												minDate={props.endDateMin ?? undefined}
 												maxDate={props.endDateMax ?? undefined}
 												slotProps={{
@@ -180,71 +284,7 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 							)}
 
 							{/* 동적 필드 */}
-							{fields?.map((fieldItem) =>
-								fieldItem.type === 'select' ? (
-									<Controller
-										key={fieldItem.key}
-										name={fieldItem.key}
-										control={control}
-										rules={{
-											validate: (value) => {
-												if (fieldItem.validate) {
-													return fieldItem.validate(value, watchAllFields);
-												} else {
-													return true;
-												}
-											},
-										}}
-										render={({ field: { onChange, value }, fieldState: { error } }) => (
-											<FormControl size='small' error={!!error}>
-												<InputLabel id='demo-simple-select-label'>{fieldItem.label}</InputLabel>
-												<Select
-													labelId='demo-simple-select-label'
-													label={fieldItem.label}
-													value={value}
-													sx={{ minWidth: '8rem' }}
-													onChange={onChange}
-													size='small'
-												>
-													<MenuItem value='all'>
-														<em>전체</em>
-													</MenuItem>
-													{fieldItem.options?.map((opt) => (
-														<MenuItem key={opt.value} value={opt.value} sx={{ fontSize: '0.875rem' }}>
-															{opt.label}
-														</MenuItem>
-													))}
-												</Select>
-												{error && <FormHelperText>{error.message}</FormHelperText>}
-											</FormControl>
-										)}
-									/>
-								) : (
-									<Controller
-										key={fieldItem.key}
-										name={fieldItem.key}
-										control={control}
-										rules={{
-											validate: (value) => {
-												if (fieldItem.validate) {
-													fieldItem.validate(value, watchAllFields);
-												}
-												return true;
-											},
-										}}
-										render={({ field, fieldState: { error } }) => (
-											<TextField
-												{...field}
-												label={fieldItem.label}
-												size='small'
-												sx={{ minWidth: '8rem' }}
-												error={!!error}
-												helperText={error?.message ?? ''}
-											/>
-										)}
-									/>
-								),
-							)}
+							{fields?.map((fieldItem) => <Box key={fieldItem.key}> {controllerContents(fieldItem)} </Box>)}
 						</Box>
 						<Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'nowrap', flexGrow: 1, gap: 1, mt: '0.5rem' }}>
 							<Button variant='contained' type='submit' onClick={handleSave}>
@@ -254,9 +294,20 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 								초기화
 							</Button>
 							{isExcel && (
-								<Button variant='contained' color='secondary' startIcon={<DownloadRounded />} onClick={handleExcelDown} sx={{ ml: '0.5rem' }}>
-									엑셀 다운
-								</Button>
+								<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
+									<Button
+										variant='contained'
+										color='secondary'
+										startIcon={<DownloadRounded />}
+										onClick={handleExcelDown}
+										sx={{ ml: '0.5rem' }}
+									>
+										엑셀 다운
+									</Button>
+									<Tooltip title='엑셀 데이터는 현재 검색조건을 기준으로 1000개까지 저장됩니다.' arrow>
+										<InfoOutlineRounded color='secondary' />
+									</Tooltip>
+								</Box>
 							)}
 						</Box>
 					</Box>

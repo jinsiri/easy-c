@@ -17,10 +17,11 @@ export const adminBasicColDef: ColDef<Record<string, any>>[] = [
 		cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
 		cellRenderer: (params: any) => (params.value ? <GridStatusComp status={params.value} /> : '-'),
 	},
+
 	{
 		field: 'member',
 		headerName: '근무자',
-		cellStyle: { display: 'flex', alignItems: 'center' },
+		cellStyle: { padding: '0.25rem 0' },
 		cellRenderer: (params: any) => {
 			const { deptNm, jobGrade, memberNm, vacationPolicyName } = params.data || {};
 			return <GridMemberComp memberNm={memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={vacationPolicyName} />;

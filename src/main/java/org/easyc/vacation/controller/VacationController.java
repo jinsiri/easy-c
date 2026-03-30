@@ -45,7 +45,7 @@ public class VacationController {
 
     @PostMapping("/excel")
     public void excelVacationCompany(HttpServletResponse response, @RequestBody ExcelRequestDto<VacationCompanySearchRequestDto> request) throws Exception {
-        Pageable pageable = PageRequest.of(1, 1000);
+        Pageable pageable = PageRequest.of(0, 1000);
         List<Vacation> searchList = vacationService.excelVacationCompany(request.getRequest(), pageable);
 
         List<ExcelVacationDto> list = new ArrayList<>();

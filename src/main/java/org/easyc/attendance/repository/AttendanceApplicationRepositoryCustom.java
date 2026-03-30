@@ -1,5 +1,6 @@
 package org.easyc.attendance.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.easyc.attendance.entity.QAttendance.attendance;
 import static org.easyc.attendance.entity.QAttendanceApplication.attendanceApplication;
 
 @Repository
@@ -26,16 +28,19 @@ public class AttendanceApplicationRepositoryCustom {
 
     public Page<AttendanceApplication> searchApp(AttendanceAppSearchRequestDto req, Pageable pageable) {
         //등록일 기준으로 기간 검색
+        BooleanBuilder whereClause = new BooleanBuilder();
+        whereClause.and(registerDateGoe(req.getStartDate()))
+                .and(registerDateLt(req.getEndDate()))
+                .and(workDateEq(req.getWorkDate()))
+                .and(statusEq(req.getStatus()))
+                .and(deptNmContains(req.getDeptNm()))
+                .and(memberNmContains(req.getMemberNm()))
+                .and(summaryContains(req.getSummary()))
+        ;
+
         List<AttendanceApplication> content = queryFactory
                 .selectFrom(attendanceApplication)
-                .where(
-                        registerDateGoe(req.getStartDate()),
-                        registerDateLt(req.getEndDate()),
-                        statusEq(req.getStatus()),
-                        deptNmContains(req.getDeptNm()),
-                        memberNmContains(req.getMemberNm()),
-                        summaryContains(req.getSummary())
-                )
+                .where(whereClause)
                 .orderBy(attendanceApplication.registerDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -44,13 +49,7 @@ public class AttendanceApplicationRepositoryCustom {
         Long total = queryFactory
                 .select(attendanceApplication.count())
                 .from(attendanceApplication)
-                .where(
-                        registerDateGoe(req.getStartDate()),
-                        registerDateLt(req.getEndDate()),
-                        statusEq(req.getStatus()),
-                        deptNmContains(req.getDeptNm()),
-                        memberNmContains(req.getMemberNm()),
-                        summaryContains(req.getSummary()))
+                .where(whereClause)
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
@@ -81,12 +80,38 @@ public class AttendanceApplicationRepositoryCustom {
         return end != null ? attendanceApplication.registerDate.lt(end.atStartOfDay()) : null;
     }
 
-    private BooleanExpression deptNmContains(String depthNm) {
-        return StringUtils.hasText(depthNm) ? attendanceApplication.deptNm.containsIgnoreCase(depthNm) : null;
+    private BooleanExpression workDateEq(LocalDate workDate) {
+        return workDate != null ? attendanceApplication.workDate.eq(workDate) : null;
+    }
+
+
+
+    private BooleanExpression deptNmContains(String deptNm) {
+        if (!StringUtils.hasText(deptNm)) return null;
+
+        List<String> keywords = Arrays.stream(deptNm.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        return keywords.stream()
+                .map(attendanceApplication.deptNm::containsIgnoreCase)
+                .reduce(BooleanExpression::or)
+                .orElse(null);
     }
 
     private BooleanExpression memberNmContains(String memberNm) {
-        return StringUtils.hasText(memberNm) ? attendanceApplication.memberNm.containsIgnoreCase(memberNm) : null;
+        if (!StringUtils.hasText(memberNm)) return null;
+
+        List<String> keywords = Arrays.stream(memberNm.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        return keywords.stream()
+                .map(attendanceApplication.memberNm::containsIgnoreCase)
+                .reduce(BooleanExpression::or)
+                .orElse(null);
     }
 
     private BooleanExpression summaryContains(String summary) {
