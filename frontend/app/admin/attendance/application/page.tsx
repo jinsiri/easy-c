@@ -165,8 +165,8 @@ export default function AttendanceApplicationPage() {
 
 	const colDefs = useMemo(() => {
 		const onClickDetail = (param: any) => {
-			setModalData(param.data);
-			router.push('/vacation/user/modal?type=read');
+			setModalData(param);
+			router.push('/attendance/user/modal?mode=detail');
 		};
 
 		const clickEvent = async (type: 'reject' | 'approve', data: AttendanceApplicationResponseDto) => {
