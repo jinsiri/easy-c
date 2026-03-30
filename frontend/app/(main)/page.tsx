@@ -98,17 +98,16 @@ export default function Home() {
 			<Grid size={3}>
 				<UserResorceComp userData={memberInfo} deptData={deptMemberMapInfo} />
 			</Grid>
-			<Grid size={4} sx={{ border: '1px solid', borderColor: 'grey.100', borderRadius: '1rem' }}>
+			<Grid size={4} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
 				<AttendanceComp type={'home'} attendanceData={attendanceData} />
 			</Grid>
-			<Grid size={5} sx={{ border: '1px solid', borderColor: 'grey.100', borderRadius: '1rem' }}>
+			<Grid size={5} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
 				<VacationComp type={'home'} vacationData={vacationData} />
 			</Grid>
-			<Grid size={5}>
+			<Grid size={4}>
 				<UserLoginLogComp myLogins={myLogins} />
 			</Grid>
-			{/* 게시판 위젯 행 */}
-			<Grid sx={{ display: 'flex', gap: '1rem', width: '100%', mt: '1rem' }}>
+			<Grid size={4}>
 				{/* 공지사항 위젯 */}
 				<Box
 					sx={{
@@ -116,14 +115,15 @@ export default function Home() {
 						display: 'flex',
 						flexDirection: 'column',
 						padding: '1rem',
+						height: '15rem',
 						borderRadius: '1rem',
 						backgroundColor: 'grey.50',
 					}}
 				>
-					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-						<Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: 'grey.700' }}>공지사항</Typography>
+					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+						<Typography variant='subtitle1'>최근 로그인 이력</Typography>
 						<Typography
-							sx={{ fontSize: '0.75rem', color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+							sx={{ color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
 							onClick={() => router.push('/board/notice')}
 						>
 							더보기
@@ -152,7 +152,8 @@ export default function Home() {
 						))
 					)}
 				</Box>
-
+			</Grid>
+			<Grid size={4}>
 				{/* 자유게시판 위젯 */}
 				<Box
 					sx={{
@@ -160,14 +161,15 @@ export default function Home() {
 						display: 'flex',
 						flexDirection: 'column',
 						padding: '1rem',
+						height: '15rem',
 						borderRadius: '1rem',
 						backgroundColor: 'grey.50',
 					}}
 				>
-					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-						<Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: 'grey.700' }}>자유게시판</Typography>
+					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+						<Typography variant='subtitle1'>최근 로그인 이력</Typography>
 						<Typography
-							sx={{ fontSize: '0.75rem', color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+							sx={{ color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
 							onClick={() => router.push('/board/general')}
 						>
 							더보기

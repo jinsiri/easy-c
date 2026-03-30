@@ -19,6 +19,7 @@ export default function UserLoginLogComp({ type, myLogins }: { type?: string; my
 				display: 'flex',
 				flexDirection: 'column',
 				padding: '1.5rem',
+				height: '15rem',
 				borderRadius: '1rem',
 				backgroundColor: 'grey.50',
 			}}
