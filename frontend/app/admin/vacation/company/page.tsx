@@ -112,16 +112,10 @@ export default function VacationCompanyPage() {
 			{
 				field: 'member',
 				headerName: '근무자',
-				flex: 2,
-				cellRenderer: (param) => {
-					const deptNm = param.data?.deptNm;
-					const jobGrade = param.data?.jobGrade;
-
-					return (
-						<Box sx={{ py: '6px' }}>
-							<GridMemberComp memberNm={param.data.memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={param.data.vacationPolicyName} />
-						</Box>
-					);
+				cellStyle: { padding: '0.25rem 0' },
+				cellRenderer: (params: any) => {
+					const { deptNm, jobGrade, memberNm, vacationPolicyName } = params.data || {};
+					return <GridMemberComp memberNm={memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={vacationPolicyName} />;
 				},
 			},
 			{

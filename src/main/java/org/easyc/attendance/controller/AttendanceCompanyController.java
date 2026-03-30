@@ -38,7 +38,7 @@ public class AttendanceCompanyController {
     @AuditAction(code = "ATTENDANCE_COMPANY_EXCELDOWN", name = "전사 근태 엑셀 다운로드", targetType = "ATTENDANCE_COMPANY")
     @PostMapping("/excel")
     public void excelAttendanceCompany(HttpServletResponse response, @RequestBody ExcelRequestDto<AttendanceCompanySearchRequestDto> request) throws Exception {
-        Pageable pageable = PageRequest.of(1, 1000);
+        Pageable pageable = PageRequest.of(0, 1000);
 
         List<AttendanceDayResponseDto> searchList =  attendanceCompanyService.getAttendanceCompanySearch(request.getRequest(), pageable);
         List<ExcelAttendanceDto> list = new ArrayList<>();

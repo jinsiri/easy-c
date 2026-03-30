@@ -110,55 +110,60 @@ export default function AttendanceCompanyPage() {
 		}
 	}, [calendarDate]);
 
-	const onClickSearch = useCallback(async (data: FilterValues) => {
-		setLoader(true);
+	const onClickSearch = useCallback(
+		async (data: FilterValues) => {
+			setLoader(true);
 
-		try {
-			const req: PageRequest<AttendanceCompanySearchRequestDto> = {
-				number: page,
-				size: pageSize,
-				request: {
-					...data,
-					startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
-					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
-				},
-			};
+			try {
+				const req: PageRequest<AttendanceCompanySearchRequestDto> = {
+					number: page,
+					size: pageSize,
+					request: {
+						...data,
+						startDate: calendarDate.format('YYYY-MM-DD'),
+						endDate: calendarDate.format('YYYY-MM-DD'),
+					},
+				};
 
-			const res: AttendanceCompanySearchResponseDto = await attendanceCompanyService.searchVacationApplication(req);
-			setCountData({
-				allCount: res.allCount,
-				lateCount: res.lateCount,
-				earlyLeaveCount: res.earlyLeaveCount,
-				absentCount: res.absentCount,
-				changeRequestCount: res.changeRequestCount,
-			});
+				const res: AttendanceCompanySearchResponseDto = await attendanceCompanyService.searchVacationApplication(req);
+				setCountData({
+					allCount: res.allCount,
+					lateCount: res.lateCount,
+					earlyLeaveCount: res.earlyLeaveCount,
+					absentCount: res.absentCount,
+					changeRequestCount: res.changeRequestCount,
+				});
 
-			console.log(res);
-			setRowData(res.dayData.content);
-			setTotalElements(res.dayData.totalElements);
-		} finally {
-			setLoader(false);
-		}
-	}, []);
+				setRowData(res.dayData.content);
+				setTotalElements(res.dayData.totalElements);
+			} finally {
+				setLoader(false);
+			}
+		},
+		[calendarDate, page, pageSize],
+	);
 
-	const onClickExcel = useCallback(async (data: FilterValues) => {
-		setLoader(true);
+	const onClickExcel = useCallback(
+		async (data: FilterValues) => {
+			setLoader(true);
 
-		try {
-			const req: ExcelRequestDto<AttendanceCompanySearchRequestDto> = {
-				fileName: '전사근태내역',
-				request: {
-					...data,
-					startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
-					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
-				},
-			};
+			try {
+				const req: ExcelRequestDto<AttendanceCompanySearchRequestDto> = {
+					fileName: '전사근태내역',
+					request: {
+						...data,
+						startDate: calendarDate.format('YYYY-MM-DD'),
+						endDate: calendarDate.format('YYYY-MM-DD'),
+					},
+				};
 
-			downloadExcel('/api/attendance/company/excel', req);
-		} finally {
-			setLoader(false);
-		}
-	}, []);
+				downloadExcel('/api/attendance/company/excel', req);
+			} finally {
+				setLoader(false);
+			}
+		},
+		[calendarDate],
+	);
 
 	const onChangeDatePicker = useCallback(
 		(value) => {
@@ -175,7 +180,7 @@ export default function AttendanceCompanyPage() {
 			{
 				field: 'member',
 				headerName: '근무자',
-				cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
+				cellStyle: { padding: '0.25rem 0' },
 				cellRenderer: (params: any) => {
 					const { deptNm, jobGrade, memberNm, vacationPolicyName } = params.data || {};
 					return <GridMemberComp memberNm={memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={vacationPolicyName} />;

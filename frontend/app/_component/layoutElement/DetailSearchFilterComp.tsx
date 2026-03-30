@@ -3,9 +3,9 @@
 import { useState, useMemo, forwardRef, useImperativeHandle } from 'react';
 
 /** MUI */
-import { FormHelperText, Box, Button, TextField, Select, MenuItem, FormControl, InputLabel, SxProps, Typography, IconButton } from '@mui/material';
+import { FormHelperText, Box, Button, TextField, Select, MenuItem, FormControl, InputLabel, SxProps, Typography, IconButton, Tooltip } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-import { KeyboardArrowDownRounded, KeyboardArrowUpRounded, DownloadRounded } from '@mui/icons-material';
+import { KeyboardArrowDownRounded, KeyboardArrowUpRounded, DownloadRounded, InfoOutlineRounded } from '@mui/icons-material';
 
 /** Lib */
 import dayjs, { Dayjs } from 'dayjs';
@@ -254,9 +254,20 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 								초기화
 							</Button>
 							{isExcel && (
-								<Button variant='contained' color='secondary' startIcon={<DownloadRounded />} onClick={handleExcelDown} sx={{ ml: '0.5rem' }}>
-									엑셀 다운
-								</Button>
+								<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
+									<Button
+										variant='contained'
+										color='secondary'
+										startIcon={<DownloadRounded />}
+										onClick={handleExcelDown}
+										sx={{ ml: '0.5rem' }}
+									>
+										엑셀 다운
+									</Button>
+									<Tooltip title='엑셀 데이터는 현재 검색조건을 기준으로 1000개까지 저장됩니다.' arrow>
+										<InfoOutlineRounded color='secondary' />
+									</Tooltip>
+								</Box>
 							)}
 						</Box>
 					</Box>

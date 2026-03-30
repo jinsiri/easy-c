@@ -2,7 +2,6 @@ package org.easyc.excel.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.easyc.common.dto.SearchRequestDto;
 
 @Getter
 @NoArgsConstructor

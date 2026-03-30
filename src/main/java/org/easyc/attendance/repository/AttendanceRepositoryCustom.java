@@ -120,6 +120,8 @@ public class AttendanceRepositoryCustom {
         return response;
     }
 
+
+
     private BooleanExpression dateGoe(LocalDate start) {
         return start != null ? attendance.workDate.goe(start) : null;
     }
