@@ -47,6 +47,7 @@ export interface AttendanceAppSearchRequestDto {
 	memberId: number | null;
 	startDate?: string | null;
 	endDate?: string | null;
+	workDate?: string | null;
 	status?: string;
 	deptNm?: string;
 	memberNm?: string;

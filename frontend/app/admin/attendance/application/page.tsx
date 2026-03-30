@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -17,9 +17,11 @@ import { Box, Button, Grid, Typography } from '@mui/material';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
-import { downloadExcel } from '@/utils/excelDownloadFunc';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import DetailSearchFilterComp from '@/app/_component/layoutElement/DetailSearchFilterComp';
+
+import { decoded } from '@/utils/commonFunc';
+import { downloadExcel } from '@/utils/excelDownloadFunc';
 
 /** Type / Interface */
 import { ExcelRequestDto, FilterField, FilterValues, PageRequest, PageResponse } from '@/type/interface';
@@ -33,6 +35,7 @@ dayjs.extend(duration);
 const applicationFieldDefault: FilterValues = {
 	startDate: dayjs().startOf('year'),
 	endDate: dayjs().endOf('year'),
+	workDate: null,
 	status: 'all',
 	deptNm: '',
 	memberNm: '',
@@ -40,6 +43,11 @@ const applicationFieldDefault: FilterValues = {
 };
 
 const detailAppSearchFields: FilterField[] = [
+	{
+		key: 'workDate',
+		label: '수정 근무일',
+		type: 'date',
+	},
 	{
 		key: 'status',
 		label: '상태',
@@ -68,6 +76,18 @@ const detailAppSearchFields: FilterField[] = [
 
 export default function AttendanceApplicationPage() {
 	const router = useRouter();
+	const searchParam = useSearchParams();
+	const paramDate = searchParam.get('date');
+	const paramMemberList = searchParam.get('list');
+
+	if (paramDate) {
+		applicationFieldDefault.workDate = dayjs(decoded(paramDate), 'YYYY-MM-DD');
+	}
+
+	if (paramMemberList) {
+		applicationFieldDefault.memberNm = decoded(paramMemberList);
+	}
+
 	const { setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 
@@ -99,6 +119,7 @@ export default function AttendanceApplicationPage() {
 					memberId: null,
 					startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
 					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
+					workDate: data.workDate ? data.workDate.format('YYYY-MM-DD') : null,
 				},
 			};
 

@@ -1,10 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+
+import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
 import { Box, Grid, IconButton, Typography } from '@mui/material';
@@ -13,7 +16,6 @@ import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 /** Ag Grid */
 import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
-import useLoaderStore from '@/store/useLoaderStore';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -21,7 +23,7 @@ import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
 import DetailSearchFilterComp from '@/app/_component/layoutElement/DetailSearchFilterComp';
 import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
 
-import { formatMinutes } from '@/utils/commonFunc';
+import { formatMinutes, encoded } from '@/utils/commonFunc';
 import { downloadExcel } from '@/utils/excelDownloadFunc';
 
 /** Type / Interface */
@@ -85,7 +87,8 @@ const detailAppSearchFields: FilterField[] = [
 ];
 
 export default function AttendanceCompanyPage() {
-	const { setLoader } = useLoaderStore();
+	const router = useRouter();
+	const setLoader = useLoaderStore((state) => state.setLoader);
 
 	const detailSearchFilterRef = useRef<FilterRef>(null);
 
@@ -173,6 +176,16 @@ export default function AttendanceCompanyPage() {
 		},
 		[calendarDate],
 	);
+
+	const onClickChangeRequest = useCallback(() => {
+		if (rowData.length > 0) {
+			const memberNmList = rowData.map((item) => item.memberNm);
+			const convertCalendarDate = encoded(dayjs(calendarDate).format('YYYY-MM-DD'));
+			const convertMemberNmList = encoded(memberNmList.join(','));
+
+			router.push(`/admin/attendance/application?date=${convertCalendarDate}&list=${convertMemberNmList}`);
+		}
+	}, [calendarDate, rowData]);
 
 	const colDefs: ColDef<Record<string, any>>[] = useMemo(
 		() => [
@@ -288,7 +301,15 @@ export default function AttendanceCompanyPage() {
 						>
 							<Box sx={{ width: '100%' }}>{item.label}</Box>
 							<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'end', width: '100%' }}>
-								<Typography variant='h4'>{countData[item.key]}</Typography>
+								{item.key === 'changeRequestCount' && countData[item.key] > 0 ? (
+									<Box component={'a'} sx={{ cursor: 'pointer' }} onClick={onClickChangeRequest}>
+										<Typography variant='h4' color='primary'>
+											{countData[item.key]}
+										</Typography>
+									</Box>
+								) : (
+									<Typography variant='h4'>{countData[item.key]}</Typography>
+								)}
 							</Box>
 						</Box>
 					))}
