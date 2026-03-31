@@ -23,7 +23,7 @@ export const mapOrgToTree = (item: any): TreeData<any> => {
 
 	return {
 		...item,
-		id: `mem-${item.memberId}`,
+		id: `dept-${item.deptId}-mem-${item.memberId}`,
 		label: `${item.memberNm} ${item.jobPositionNm || ''}`,
 		treeParentId: `dept-${item.deptId}`,
 		treeSiblingOrder: item.jobPositionLevel,
