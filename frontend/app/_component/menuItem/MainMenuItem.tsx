@@ -1,5 +1,5 @@
 /** MUI */
-import { AssignmentIndRounded, WorkHistoryRounded, BeachAccessRounded, AssignmentRounded } from '@mui/icons-material';
+import { DashboardRounded, AssignmentIndRounded, WorkHistoryRounded, BeachAccessRounded, AssignmentRounded } from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '@/type/types';
@@ -11,6 +11,13 @@ const MainMenuItem: menuType[] = [
 		type: '',
 		url: '/',
 		children: [
+			{
+				id: 'main-dashboard',
+				title: '대시보드',
+				type: '1depth',
+				url: '/dashboard',
+				icon: DashboardRounded,
+			},
 			{
 				id: 'main-humanResources',
 				title: '인사',

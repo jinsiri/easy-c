@@ -44,7 +44,7 @@ const LoginPage = () => {
 		secureLocalStorage.setItem('memberId', res.memberId);
 		secureLocalStorage.setItem('memberRole', res.memberRole);
 
-		router.push('/'); // 메인 페이지 이동
+		router.push('/dashboard'); // 메인 페이지 이동
 	};
 
 	return (
