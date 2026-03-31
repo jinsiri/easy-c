@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 @Service
@@ -42,7 +43,15 @@ public class AttendanceApplicationService {
 
     public List<AttendanceApplication> getUserAttendanceApplication(AttendanceRequestDto request){
         LocalDate workDate = request.getWorkDate().toLocalDate();
-        return attendanceApplicationRepository.findAllByWorkDateAndMemberId(workDate, request.getMemberId());
+        return attendanceApplicationRepository.findAllByWorkDateAndMemberIdAndDeletedFalse(workDate, request.getMemberId());
+    }
+
+    public List<AttendanceApplication> getUserMonthAttendanceApplication(AttendanceRequestDto request) {
+        LocalDate workDate = request.getWorkDate().toLocalDate();
+        LocalDate startOfMonth = workDate.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endOfMonth = workDate.with(TemporalAdjusters.lastDayOfMonth());
+
+        return attendanceApplicationRepository.findTop10ByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateDesc(request.getMemberId(), startOfMonth, endOfMonth);
     }
 
     public void saveAttendanceApplication (AttendanceApplicationDto req){
@@ -185,4 +194,13 @@ public class AttendanceApplicationService {
         return String.join(", ", changes);
     }
 
+
+    public void deleteUserAttendanceApplication(Long attendanceApplication) {
+        AttendanceApplication target = attendanceApplicationRepository.findByAttendanceApplicationIdAndDeletedFalse(attendanceApplication).orElse(null);
+
+        if(target != null){
+            target.delete();
+            attendanceApplicationRepository.save(target);
+        }
+    }
 }

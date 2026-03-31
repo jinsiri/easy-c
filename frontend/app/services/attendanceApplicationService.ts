@@ -57,10 +57,13 @@ export interface AttendanceAppSearchRequestDto {
 // API 정의
 export const attendanceApplicationService = {
 	getUserAttendanceApplication: (req: AttendanceReqDto) => axiosConfig.post<AttendanceApplicationResponseDto>('/api/attendance/application/user', req),
+	getUserMonthAttendanceApplication: (req: AttendanceReqDto) =>
+		axiosConfig.post<AttendanceApplicationResponseDto[]>('/api/attendance/application/user/month', req),
 	submitAttendanceApplication: (req: AttendanceApplicationRequestDto) => axiosConfig.post('/api/attendance/application/save', req),
 	approveAttendanceApplication: (req: AttendanceApplicationResponseDto[]) => axiosConfig.post<void>('/api/attendance/application/approve', req),
 	rejectAttendanceApplication: (req: AttendanceApplicationResponseDto[]) => axiosConfig.post<void>('/api/attendance/application/reject', req),
-
 	searchAttendanceApplication: (req: PageRequest<AttendanceAppSearchRequestDto>) =>
 		axiosConfig.post<PageResponse<AttendanceApplicationResponseDto>>('/api/attendance/application/search', req),
+
+	deleteUserAttendanceApplication: (applicationId: number) => axiosConfig.delete<void>(`/api/attendance/application/delete?id=${applicationId}`),
 };

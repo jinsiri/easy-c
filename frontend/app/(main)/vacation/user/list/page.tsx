@@ -8,6 +8,7 @@ import secureLocalStorage from 'react-secure-storage';
 import dayjs from 'dayjs';
 
 import useLoaderStore from '@/store/useLoaderStore';
+import useModalStore from '@/store/useModalStore';
 
 /** MUI */
 import { Box, Grid, Button } from '@mui/material';
@@ -18,6 +19,7 @@ import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
 import DetailSearchFilterComp from '@/app/_component/layoutElement/DetailSearchFilterComp';
+import { colDefs, historyColDefs } from '@/constant/vacationColDef';
 
 /** Type / Interface */
 import { FilterField, FilterValues, PageRequest, PageResponse } from '@/type/interface';
@@ -25,7 +27,6 @@ import { BASICSTATUS, PAGE_SIZE_OPTIONS } from '@/constant/commonConst';
 import { VACATIONTYPE } from '@/constant/attendanceConst';
 import { TRANSACTIONTYPE, VACATIONCATEGORY } from '@/constant/vacationConst';
 
-import { colDefs, historyColDefs } from '@/constant/vacationColDef';
 import { vacationService, VacationHistorySearchRequestDto, VacationHistoryDto } from '@/app/services/vacationService';
 import { vacationApplicationService, VacationAppSearchRequestDto, vacationApplicationDataDto } from '@/app/services/vacationApplicationService';
 import { FilterRef } from '@/app/_component/layoutElement/DetailSearchFilterComp';
@@ -165,17 +166,27 @@ export default function VacationUserListPage() {
 	const searchParam = useSearchParams();
 	const type = searchParam.get('type');
 	const { loader, setLoader } = useLoaderStore();
+	const { setModalData } = useModalStore();
 
 	const detailSearchFilterRef = useRef<FilterRef>(null);
 
-	const [gridColDef, setGridColDef] = useState(historyColDefs);
+	const [gridColDef, setGridColDef] = useState([...historyColDefs()]);
 	const [gridData, setGridData] = useState<Record<string, any>[]>([]);
 	const [page, setPage] = useState(0);
 	const [pageSize, setPageSize] = useState(50);
 	const [totalElements, setTotalElements] = useState(0);
 
 	useEffect(() => {
-		setGridColDef(type === 'vacationHistory' ? historyColDefs : colDefs);
+		setGridColDef(
+			type === 'vacationHistory'
+				? [...historyColDefs()]
+				: [
+						...colDefs((data: any) => {
+							setModalData(data);
+							router.push('/vacation/user/modal?type=read');
+						}),
+					],
+		);
 
 		if (detailSearchFilterRef.current) {
 			getListData(detailSearchFilterRef.current.getFilterValues());
@@ -258,6 +269,7 @@ export default function VacationUserListPage() {
 						rowData={gridData}
 						colDefs={gridColDef}
 						rowSelectionMode='none'
+						rowHeight={type === 'vacationHistory' ? 36 : 56}
 						serverPagination={{
 							page,
 							pageSize,

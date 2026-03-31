@@ -135,4 +135,12 @@ public class VacationApplicationService {
         return searchList.getContent();
     }
 
+    public void deleteVacationApplicationData(Long vacationApplicationId) {
+        VacationApplication target = vacationApplicationRepository.findByVacationApplicationIdAndDeletedFalse(vacationApplicationId).orElse(null);
+
+        if(target != null){
+            target.delete();
+            vacationApplicationRepository.save(target);
+        }
+    }
 }

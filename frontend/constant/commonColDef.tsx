@@ -10,29 +10,22 @@ import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
 import GridDetailButtonComp from '@/app/_component/baseElement/GridDetailButtonComp';
 import GridActionButtonComp from '@/app/_component/baseElement/GridActionButtonComp';
 
-export const adminBasicColDef: ColDef<Record<string, any>>[] = [
-	{
-		field: 'status',
-		headerName: '상태',
-		cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
-		cellRenderer: (params: any) => (params.value ? <GridStatusComp status={params.value} /> : '-'),
-	},
+export const getAppStatusColumn = (): ColDef => ({
+	field: 'status',
+	headerName: '상태',
+	cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
+	cellRenderer: (params: any) => (params.value ? <GridStatusComp status={params.value} /> : '-'),
+});
 
-	{
-		field: 'member',
-		headerName: '근무자',
-		cellStyle: { padding: '0.25rem 0' },
-		cellRenderer: (params: any) => {
-			const { deptNm, jobGrade, memberNm, vacationPolicyName } = params.data || {};
-			return <GridMemberComp memberNm={memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={vacationPolicyName} />;
-		},
+export const getMemberColumn = (type?: null | 'update'): ColDef => ({
+	field: 'member',
+	headerName: `${type && type === 'update' ? '수정 근무자' : '근무자'}`,
+	cellStyle: { padding: '0.25rem 0' },
+	cellRenderer: (params: any) => {
+		const { deptNm, jobGrade, memberNm, vacationPolicyName } = params.data || {};
+		return <GridMemberComp memberNm={memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={vacationPolicyName} />;
 	},
-	{
-		field: 'registerDate',
-		headerName: '신청일',
-		valueFormatter: (param) => (param.value ? dayjs(param.value).format('YYYY-MM-DD') : '-'),
-	},
-];
+});
 
 export const getAdminBasicDetailColumn = (onClickDetail: (data: any) => void): ColDef => ({
 	field: 'detail',
@@ -50,3 +43,13 @@ export const getAdminBasicActionColumn = (onClickAction: (data: any) => void): C
 	},
 	cellRendererParams: { onClickAction },
 });
+
+export const adminBasicColDef: ColDef<Record<string, any>>[] = [
+	getAppStatusColumn(),
+	getMemberColumn(),
+	{
+		field: 'registerDate',
+		headerName: '신청일',
+		valueFormatter: (param) => (param.value ? dayjs(param.value).format('YYYY-MM-DD') : '-'),
+	},
+];

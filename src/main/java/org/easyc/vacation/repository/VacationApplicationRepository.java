@@ -7,8 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VacationApplicationRepository extends JpaRepository<VacationApplication, Long> {
     List<VacationApplication> findTop10ByMemberIdAndDeletedFalseOrderByRegisterDateDesc(Long memberId);
+    Optional<VacationApplication> findByVacationApplicationIdAndDeletedFalse(Long vacationApplicationId);
 }
