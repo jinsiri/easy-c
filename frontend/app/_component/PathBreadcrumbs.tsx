@@ -25,8 +25,6 @@ const findMenuById = (menuList: menuType[], targetId: string): any | null => {
 			const found = findMenuById(menu.children, targetId);
 
 			if (found) return found;
-		} else {
-			console.log('자식 없ㅇ음');
 		}
 	}
 	return null;
