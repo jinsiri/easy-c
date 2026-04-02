@@ -61,6 +61,9 @@ export default function VacationUserModal() {
 					violationReason: modalData.violationReason,
 				});
 			} else {
+				reset({
+					vacationType: modalData.remainDay === 0.5 ? 'HALF_AM' : 'FULL',
+				});
 				setRemainDay(modalData.remainDay);
 			}
 		}
@@ -96,11 +99,20 @@ export default function VacationUserModal() {
 						control={control}
 						render={({ field: { onChange, value } }) => (
 							<Select value={value} onChange={onChange} size='small' fullWidth inputProps={{ readOnly: type && type === 'read' }}>
-								{Object.entries(VACATIONTYPE).map(([key, value]) => (
-									<MenuItem key={key} value={key}>
-										{value}
-									</MenuItem>
-								))}
+								{remainDay == 0.5
+									? [
+											<MenuItem key='HALF_AM' value='HALF_AM'>
+												오전 반차
+											</MenuItem>,
+											<MenuItem key='HALF_PM' value='HALF_PM'>
+												오후 반차
+											</MenuItem>,
+										]
+									: Object.entries(VACATIONTYPE).map(([key, value]) => (
+											<MenuItem key={key} value={key}>
+												{value}
+											</MenuItem>
+										))}
 							</Select>
 						)}
 					/>
