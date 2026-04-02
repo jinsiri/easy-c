@@ -213,7 +213,7 @@ export default function VacationUserPage() {
 						}}
 					>
 						<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 1rem' }}>
-							<Typography variant='subtitle1'>연차 내역</Typography>
+							<Typography variant='subtitle1'>연차 지급 내역</Typography>
 							<Button onClick={(e) => router.push(`/vacation/user/list?type=vacationHistory`)}>더보기</Button>
 						</Box>
 						<Box sx={{ flexGrow: 1, minHeight: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>

@@ -67,6 +67,11 @@ export const colDefs = (onClickDetail: (data: any) => void, onClickRemove: (data
 export const historyColDefs = (): ColDef<Record<string, any>>[] => {
 	return [
 		{
+			field: 'registerDate',
+			headerName: '휴가신청일',
+			valueFormatter: (param) => (param.value ? dayjs(param.value).format('YYYY-MM-DD') : '-'),
+		},
+		{
 			field: 'transactionType',
 			headerName: '휴가 관리 상태',
 			flex: 1,

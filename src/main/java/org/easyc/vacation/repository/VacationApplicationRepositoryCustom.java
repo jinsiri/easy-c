@@ -1,5 +1,6 @@
 package org.easyc.vacation.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.easyc.attendance.entity.QAttendance.attendance;
 import static org.easyc.vacation.entity.QVacation.vacation;
 import static org.easyc.vacation.entity.QVacationApplication.vacationApplication;
 
@@ -33,18 +35,22 @@ public class VacationApplicationRepositoryCustom {
 
     public Page<VacationApplication> searchApp(VacationAppSearchRequestDto req, Pageable pageable) {
         //등록일 기준으로 기간 검색
+        BooleanBuilder whereClause = new BooleanBuilder();
+        whereClause.and(registerDateGoe(req.getStartDate()))
+                .and(registerDateLt(req.getEndDate()))
+                .and(statusEq(req.getStatus()))
+                .and(vacationTypeEq(req.getVacationType()))
+                .and(durationGoe(req.getVacationStart()))
+                .and(durationLoe(req.getVacationEnd()))
+                .and(deptNmContains(req.getDeptNm()))
+                .and(memberNmContains(req.getMemberNm()))
+                .and(vacationApplication.deleted.isFalse())
+        ;
+
+
         List<VacationApplication> content = queryFactory
                 .selectFrom(vacationApplication)
-                .where(
-                        registerDateGoe(req.getStartDate()),
-                        registerDateLt(req.getEndDate()),
-                        statusEq(req.getStatus()),
-                        vacationTypeEq(req.getVacationType()),
-                        durationGoe(req.getVacationStart()),
-                        durationLoe(req.getVacationEnd()),
-                        deptNmContains(req.getDeptNm()),
-                        memberNmContains(req.getMemberNm())
-                )
+                .where(whereClause)
                 .orderBy(vacationApplication.registerDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -53,16 +59,7 @@ public class VacationApplicationRepositoryCustom {
         Long total = queryFactory
                 .select(vacationApplication.count())
                 .from(vacationApplication)
-                .where(
-                        registerDateGoe(req.getStartDate()),
-                        registerDateLt(req.getEndDate()),
-                        statusEq(req.getStatus()),
-                        vacationTypeEq(req.getVacationType()),
-                        durationGoe(req.getVacationStart()),
-                        durationLoe(req.getVacationEnd()),
-                        deptNmContains(req.getDeptNm()),
-                        memberNmContains(req.getMemberNm())
-                )
+                .where(whereClause)
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
@@ -71,16 +68,20 @@ public class VacationApplicationRepositoryCustom {
 
     public Page<VacationApplication> searchUserApp(VacationAppSearchRequestDto req, Pageable pageable) {
         //휴가일 기준으로 기간 검색
+        BooleanBuilder whereClause = new BooleanBuilder();
+        whereClause.and( memberIdEq(req.getMemberId()))
+                .and(dateGoe(req.getStartDate()))
+                .and(dateLt(req.getEndDate()))
+                .and(statusEq(req.getStatus()))
+                .and(vacationTypeEq(req.getVacationType()))
+                .and(durationGoe(req.getVacationStart()))
+                .and(durationLoe(req.getVacationEnd()))
+                .and(vacationApplication.deleted.isFalse())
+        ;
+
         List<VacationApplication> content = queryFactory
                 .selectFrom(vacationApplication)
-                .where(
-                        memberIdEq(req.getMemberId()),
-                        dateGoe(req.getStartDate()),
-                        dateLt(req.getEndDate()),
-                        statusEq(req.getStatus()),
-                        vacationTypeEq(req.getVacationType()),
-                        durationGoe(req.getVacationStart()),
-                        durationLoe(req.getVacationEnd()))
+                .where(whereClause)
                 .orderBy(vacationApplication.registerDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -89,14 +90,7 @@ public class VacationApplicationRepositoryCustom {
         Long total = queryFactory
                 .select(vacationApplication.count())
                 .from(vacationApplication)
-                .where(
-                        memberIdEq(req.getMemberId()),
-                        dateGoe(req.getStartDate()),
-                        dateLt(req.getEndDate()),
-                        statusEq(req.getStatus()),
-                        vacationTypeEq(req.getVacationType()),
-                        durationGoe(req.getVacationStart()),
-                        durationLoe(req.getVacationEnd()))
+                .where(whereClause)
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);

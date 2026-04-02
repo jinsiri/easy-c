@@ -63,6 +63,7 @@ export default function AttendanceUserListPage() {
 	const { loader, setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 
+	const gridRef = useRef();
 	const detailSearchFilterRef = useRef<FilterRef>(null);
 
 	const [gridData, setGridData] = useState<Record<string, any>[]>([]);
@@ -108,10 +109,18 @@ export default function AttendanceUserListPage() {
 		router.push('/attendance/user/modal?mode=detail');
 	};
 
-	const onClickRemove = (data: any) => {
+	const onClickRemove = async (data: any) => {
 		if (data.attendanceApplicationId) {
 			if (confirm('근태수정요청을 취소하시겠습니까>')) {
-				attendanceApplicationService.deleteUserAttendanceApplication(data.attendanceApplicationId);
+				if (gridRef.current) {
+					gridRef.current.api.applyTransaction({
+						remove: [data],
+					});
+				} else {
+					setGridData((prev) => prev.filter((item) => item.attendanceApplicationId !== data.attendanceApplicationId));
+				}
+
+				await attendanceApplicationService.deleteUserAttendanceApplication(data.attendanceApplicationId);
 				alert('근태수정요청이 성공적으로 취소되었습니다.');
 			}
 		}
@@ -138,6 +147,7 @@ export default function AttendanceUserListPage() {
 
 				<Grid sx={{ width: '100%', flexGrow: 1 }}>
 					<CustomAgGridComp
+						ref={gridRef}
 						rowData={gridData}
 						colDefs={colDefs(onClickDetail, onClickRemove)}
 						rowSelectionMode='none'

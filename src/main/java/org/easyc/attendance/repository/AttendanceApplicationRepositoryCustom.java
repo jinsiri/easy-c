@@ -36,6 +36,7 @@ public class AttendanceApplicationRepositoryCustom {
                 .and(deptNmContains(req.getDeptNm()))
                 .and(memberNmContains(req.getMemberNm()))
                 .and(summaryContains(req.getSummary()))
+                .and(attendanceApplication.deleted.isFalse())
         ;
 
         List<AttendanceApplication> content = queryFactory

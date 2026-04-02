@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import secureLocalStorage from 'react-secure-storage';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -38,8 +38,11 @@ dayjs.extend(duration);
 export default function AttendanceUserPage() {
 	const theme = useTheme();
 	const router = useRouter();
+	const pathName = usePathname();
 	const { loader, setLoader } = useLoaderStore();
-	const { setModalData } = useModalStore();
+	const { isRefresh, setIsRefresh, setModalData } = useModalStore();
+
+	const gridRef = useRef();
 
 	const [attendanceData, setAttenceData] = useState<AttendanceResDto>({});
 	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
@@ -55,9 +58,16 @@ export default function AttendanceUserPage() {
 	useEffect(() => {
 		//해당하는 달의 날짜 정보 및 달력에 표시할 데이터 불러오기
 		getAttendanceCalendarData();
-		//근태수정요청 데이터
 		getAttendancAppData();
 	}, [calendarDate]);
+
+	useEffect(() => {
+		if (pathName === '/attendance/user' && isRefresh) {
+			//근태수정요청 데이터
+			getAttendancAppData();
+			setIsRefresh(false);
+		}
+	}, [pathName]);
 
 	const getAttendanceTodayData = async () => {
 		if (!loader) setLoader(true);
@@ -102,6 +112,7 @@ export default function AttendanceUserPage() {
 				workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
 			});
 
+			console.log(res);
 			setAttendanceData(res);
 		} finally {
 			setLoader(false);
@@ -197,7 +208,7 @@ export default function AttendanceUserPage() {
 		setLoader(true);
 
 		try {
-			await Promise.all([getAttendanceTodayData(), getAttendanceCalendarData()]);
+			await Promise.all([getAttendanceTodayData(), getAttendanceCalendarData(), getAttendancAppData()]);
 		} finally {
 			setLoader(false);
 		}
@@ -214,10 +225,18 @@ export default function AttendanceUserPage() {
 		router.push('/attendance/user/modal?mode=detail');
 	};
 
-	const onClickRemove = (data: any) => {
+	const onClickRemove = async (data: any) => {
 		if (data.attendanceApplicationId) {
 			if (confirm('근태수정요청을 취소하시겠습니까>')) {
-				attendanceApplicationService.deleteUserAttendanceApplication(data.attendanceApplicationId);
+				if (gridRef.current) {
+					gridRef.current.api.applyTransaction({
+						remove: [data],
+					});
+				} else {
+					setAttendanceData((prev) => prev.filter((item) => item.attendanceApplicationId !== data.attendanceApplicationId));
+				}
+
+				await attendanceApplicationService.deleteUserAttendanceApplication(data.attendanceApplicationId);
 				alert('근태수정요청이 성공적으로 취소되었습니다.');
 			}
 		}
@@ -376,6 +395,7 @@ export default function AttendanceUserPage() {
 						</Box>
 						<Box sx={{ flexGrow: 1, minHeight: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
 							<CustomAgGridComp
+								ref={gridRef}
 								rowData={attendanceAppData}
 								colDefs={colDefs(onClickDetail, onClickRemove)}
 								rowSelectionMode='none'

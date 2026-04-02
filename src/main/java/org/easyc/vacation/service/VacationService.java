@@ -57,7 +57,7 @@ public class VacationService {
         //3. 해당 연차 데이터 없는 경우 - 신규 데이터 로직 생성
         if(vacation == null){
             vacationHistoryList = makeVacationHistory(memberProfile, vacationPolicy.getVacationPolicyType());
-            vacation = makeVacation(memberProfile, vacationPolicy, vacationHistoryList);
+            vacation = makeVacation(memberProfile, vacationPolicy, vacationHistoryList, null);
 
             vacationHistoryRepository.saveAll(vacationHistoryList);
             vacationRepository.save(vacation);
@@ -65,7 +65,7 @@ public class VacationService {
 
         //4. 데이터 있는데 추가 필요한 경우 - 1년 미만에 입사일 기준이거나 회계일기준인데 해가 바뀌지 않아서 달마다 연차 하나씩 부여
         else{
-            vacationHistoryList = vacationHistoryRepository.findTop10ByMemberIdAndAccrualDateBetweenAndActiveTrueOrderByAccrualDateDesc(memberId, LocalDate.of(today.getYear(), 1, 1), LocalDate.of(today.getYear(), 12, 31));
+            vacationHistoryList = vacationHistoryRepository.findTop10ByMemberIdAndAccrualDateBetweenAndActiveTrueOrderByRegisterDateDesc(memberId, LocalDate.of(today.getYear(), 1, 1), LocalDate.of(today.getYear(), 12, 31));
 
             LocalDate resignationDate = memberProfile.getResignationDate();
             long workingYears = ChronoUnit.YEARS.between(resignationDate, today);
@@ -88,13 +88,12 @@ public class VacationService {
                                 resignationDate.plusYears(1).minusDays(1),
                                 "1년 미만 월차"
                         );
+                        VacationHistory saved = vacationHistoryRepository.save(newHistory);
 
+                        vacationHistoryList.add(saved);
 
-                        vacationHistoryList.add(0, vacationHistoryRepository.save(newHistory));
-
-                        Vacation newVacation = makeVacation(memberProfile, vacationPolicy, vacationHistoryList);
-                        newVacation.setVacationId(vacation.getVacationId());
-                        vacation = vacationRepository.save(newVacation);;
+                        Vacation newVacation = makeVacation(memberProfile, vacationPolicy, vacationHistoryList, vacation);
+                        vacation = vacationRepository.save(newVacation);
                     }
                 }
             }
@@ -126,7 +125,7 @@ public class VacationService {
 
 
 
-    public Vacation makeVacation (MemberProfile targetMemberProfile, VacationPolicy targetVacationPolicy, List<VacationHistory> vh){
+    public Vacation makeVacation (MemberProfile targetMemberProfile, VacationPolicy targetVacationPolicy, List<VacationHistory> vh, Vacation targetVacation ){
         LocalDate resignationDate = targetMemberProfile.getResignationDate();
         LocalDate today = LocalDate.now();
         Long minusYear = ChronoUnit.YEARS.between(resignationDate, today);
@@ -142,7 +141,7 @@ public class VacationService {
         Double usedDay = 0.0;
 
         for(VacationHistory vhItem : vh){
-            double amount = vhItem.getDay();
+            double amount = Math.abs(vhItem.getDay());
 
             switch (vhItem.getTransactionType()){
                 case GRANT:
@@ -169,7 +168,7 @@ public class VacationService {
 
         }
 
-        Vacation newVacation = new Vacation();
+        Vacation newVacation = targetVacation != null ? targetVacation : new Vacation();
         newVacation.setMemberId(targetMemberProfile.getMemberId());
         newVacation.setMemberNm(targetMemberProfile.getMember().getMemberNm());
 
@@ -258,15 +257,16 @@ public class VacationService {
     }
 
     private VacationHistory createHistory(MemberProfile profile, Double days, LocalDate accrualDate, LocalDate expireDate, String desc) {
-        return VacationHistory.builder()
-                .memberId(profile.getMemberId())
-                .vacationCategory(VacationCategory.ANNUAL)
-                .transactionType(TransactionType.GRANT)
-                .day(days)
-                .accrualDate(accrualDate)
-                .expireDate(expireDate)
-                .violationReason(desc)
-                .build();
+        VacationHistory newHistory = new VacationHistory();
+        newHistory.setMemberId(profile.getMemberId());
+        newHistory.setVacationCategory(VacationCategory.ANNUAL);
+        newHistory.setTransactionType(TransactionType.GRANT);
+        newHistory.setDay(days);
+        newHistory.setAccrualDate(accrualDate);
+        newHistory.setExpireDate(expireDate);
+        newHistory.setViolationReason(desc);
+
+        return newHistory;
     }
 
     private Double vacationDay (Long minusYear) {
