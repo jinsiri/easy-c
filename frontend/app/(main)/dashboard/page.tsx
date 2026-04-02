@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Divider, Grid, Typography, useTheme } from '@mui/material';
+import { Box, Divider, Grid, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { SecurityLogResponseDto, securityLogService } from '@/app/services/securityLogService';
@@ -14,15 +14,12 @@ import UserResorceComp from '@/app/_component/layoutElement/UserResourceComp';
 import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
 import VacationComp from '@/app/_component/layoutElement/VacationComp';
 import UserLoginLogComp from '@/app/_component/layoutElement/UserLoginLogComp';
-
-const EVENT_LABEL: Record<string, { label: string; color: 'success' | 'error' }> = {
-	LOGIN_SUCCESS: { label: '성공', color: 'success' },
-	LOGIN_FAILURE: { label: '실패', color: 'error' },
-};
+import useLoaderStore from '@/store/useLoaderStore';
 
 export default function DashboardPage() {
-	const theme = useTheme();
 	const router = useRouter();
+	const { loader, setLoader } = useLoaderStore();
+
 	const [myLogins, setMyLogins] = useState<SecurityLogResponseDto[]>([]);
 	const [notices, setNotices] = useState<BoardPostResponseDto[]>([]);
 	const [generals, setGenerals] = useState<BoardPostResponseDto[]>([]);
@@ -52,16 +49,10 @@ export default function DashboardPage() {
 		});
 
 		//근태 조회
-		attendanceService
-			.getAttendanceTodayData({
-				memberId: secureLocalStorage.getItem('memberId') as number,
-				workDate: dayjs().format('YYYY-MM-DD HH:mm'),
-			})
-			.then((res: AttendanceResDto) => setAttendanceData(res));
+		getAttendanceTodayData();
 
 		//휴가 조회
-		const encodedMemberId = btoa(String(secureLocalStorage.getItem('memberId')));
-		vacationService.getVacationData(encodedMemberId).then((res: VacationResponseDto) => setVacationData(res.vacation));
+		getVacationData();
 	};
 
 	const getMember = useCallback(async (memberId: number) => {
@@ -80,6 +71,32 @@ export default function DashboardPage() {
 		await Promise.all(requests);
 	}, []);
 
+	const getAttendanceTodayData = async () => {
+		if (!loader) setLoader(true);
+
+		try {
+			await attendanceService
+				.getAttendanceTodayData({
+					memberId: secureLocalStorage.getItem('memberId') as number,
+					workDate: dayjs().format('YYYY-MM-DD HH:mm'),
+				})
+				.then((res: AttendanceResDto) => setAttendanceData(res));
+		} finally {
+			setLoader(false);
+		}
+	};
+
+	const getVacationData = async () => {
+		if (!loader) setLoader(true);
+
+		try {
+			const encodedMemberId = btoa(String(secureLocalStorage.getItem('memberId')));
+			vacationService.getVacationData(encodedMemberId).then((res: VacationResponseDto) => setVacationData(res.vacation));
+		} finally {
+			setLoader(false);
+		}
+	};
+
 	return (
 		<Grid
 			container
@@ -90,10 +107,10 @@ export default function DashboardPage() {
 				<UserResorceComp userData={memberInfo} deptData={deptMemberMapInfo} />
 			</Grid>
 			<Grid size={4} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
-				<AttendanceComp type={'home'} attendanceData={attendanceData} />
+				<AttendanceComp type={'home'} attendanceData={attendanceData} onSuccess={getAttendanceTodayData} />
 			</Grid>
 			<Grid size={5} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
-				<VacationComp type={'home'} vacationData={vacationData} />
+				<VacationComp type={'home'} vacationData={vacationData} onSuccess={getVacationData} />
 			</Grid>
 			<Grid size={4}>
 				<UserLoginLogComp myLogins={myLogins} />

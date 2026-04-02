@@ -1,18 +1,18 @@
 // 공통 필드 (BaseDto)
 export interface BaseDto {
-	deleted: boolean;
-	active: boolean;
-	registerDate: string;
-	registerIp: string;
-	registerUser: {
+	deleted?: boolean;
+	active?: boolean;
+	registerDate?: string;
+	registerIp?: string;
+	registerUser?: {
 		loginId: string;
 		memberNm: string;
 		memberRole: string;
 	};
 
-	lastUpdateDate: string;
-	lastUpdateIp: string;
-	lastUpdateUser: {
+	lastUpdateDate?: string;
+	lastUpdateIp?: string;
+	lastUpdateUser?: {
 		loginId: string;
 		memberNm: string;
 		memberRole: string;
