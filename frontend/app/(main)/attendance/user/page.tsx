@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import secureLocalStorage from 'react-secure-storage';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -16,7 +16,6 @@ import { Box, Button, Grid, IconButton, Typography, useTheme } from '@mui/materi
 import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 
 /** Ag Grid */
-import { ColDef } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
@@ -26,105 +25,30 @@ import Calendar from '@/app/(main)/attendance/Calendar';
 import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
 import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
 import CustomEchartComp from '@/app/_lib/CustomEchartComp';
-
-import GridStatusComp from '@/app/_component/baseElement/GridStatusComp';
-import GridMemberComp from '@/app/_component/baseElement/GridMemberComp';
-
+import { colDefs } from '@/constant/attendanceColDef';
 import { formatMinutes } from '@/utils/commonFunc';
 
 /** Type / Interface */
 import { dayName } from '@/type/types';
 import { attendanceService, AttendanceResDto, CalendarData } from '@/app/services/attendanceService';
+import { attendanceApplicationService, AttendanceApplicationResponseDto } from '@/app/services/attendanceApplicationService';
 
 dayjs.extend(duration);
 
 export default function AttendanceUserPage() {
 	const theme = useTheme();
 	const router = useRouter();
+	const pathName = usePathname();
 	const { loader, setLoader } = useLoaderStore();
-	const { setModalData } = useModalStore();
+	const { isRefresh, setIsRefresh, setModalData } = useModalStore();
+
+	const gridRef = useRef();
 
 	const [attendanceData, setAttenceData] = useState<AttendanceResDto>({});
 	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
 	const [calendarData, setCalendarData] = useState<Record<dayName, CalendarData>[]>([]);
+	const [attendanceAppData, setAttendanceData] = useState<AttendanceApplicationResponseDto[]>([]);
 	const [chartOption, setChartOption] = useState<Record<string, any>>({});
-
-	const colDefs: ColDef<Record<string, any>>[] = [
-		{
-			field: 'status',
-			headerName: '상태',
-			cellRenderer: (data) => (
-				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-					{data.value ? <GridStatusComp status={data.value} /> : '-'}
-				</Box>
-			),
-		},
-		{
-			field: 'workDate',
-			headerName: '수정 근무일',
-			flex: 2,
-			cellStyle: {
-				textAlign: 'center',
-			},
-		},
-		{
-			field: 'member',
-			headerName: '수정 근무자',
-			flex: 2,
-			cellRenderer: (param) => {
-				const deptNm = param.data?.deptNm;
-				const jobGrade = param.data?.jobGrade;
-
-				return (
-					<Box sx={{ py: '6px' }}>
-						<GridMemberComp memberNm={param.data.memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={param.data.attendancePolicyName} />
-					</Box>
-				);
-			},
-		},
-		{
-			field: 'summary',
-			headerName: '수정 내용',
-			flex: 2,
-			cellRenderer: (param) => {
-				const valueList: string[] = param?.value ? param.value.split(',') : [];
-				return (
-					<Box sx={{ py: '6px' }}>
-						{valueList.map((item, idx) => (
-							<Typography key={idx}>{item}</Typography>
-						))}
-					</Box>
-				);
-			},
-		},
-		{
-			field: 'detail',
-			headerName: '상세',
-			cellRenderer: (param) => (
-				<Box
-					sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', py: '6px' }}
-					onClick={(e) => {
-						setModalData(param.data);
-						router.push('/vacation/user/modal?type=detail');
-					}}
-				>
-					<Button variant='outlined'>상세 보기</Button>
-				</Box>
-			),
-		},
-		{
-			field: 'action',
-			headerName: '처리',
-			cellRenderer: (param) => (
-				<Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, py: '6px' }}>
-					<Button variant='contained'>승인</Button>
-					<Button variant='contained' color='error'>
-						반려
-					</Button>
-				</Box>
-			),
-		},
-	];
 
 	useEffect(() => {
 		//금일 및 금주 데이터
@@ -134,7 +58,16 @@ export default function AttendanceUserPage() {
 	useEffect(() => {
 		//해당하는 달의 날짜 정보 및 달력에 표시할 데이터 불러오기
 		getAttendanceCalendarData();
+		getAttendancAppData();
 	}, [calendarDate]);
+
+	useEffect(() => {
+		if (pathName === '/attendance/user' && isRefresh) {
+			//근태수정요청 데이터
+			getAttendancAppData();
+			setIsRefresh(false);
+		}
+	}, [pathName]);
 
 	const getAttendanceTodayData = async () => {
 		if (!loader) setLoader(true);
@@ -164,9 +97,23 @@ export default function AttendanceUserPage() {
 				workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
 			});
 
-			if (Object.keys(res).length > 0) {
-				setCalendarData(res);
-			}
+			setCalendarData(res);
+		} finally {
+			setLoader(false);
+		}
+	};
+
+	const getAttendancAppData = async () => {
+		if (!loader) setLoader(true);
+
+		try {
+			const res = await attendanceApplicationService.getUserMonthAttendanceApplication({
+				memberId: secureLocalStorage.getItem('memberId') as number,
+				workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
+			});
+
+			console.log(res);
+			setAttendanceData(res);
 		} finally {
 			setLoader(false);
 		}
@@ -261,7 +208,7 @@ export default function AttendanceUserPage() {
 		setLoader(true);
 
 		try {
-			await Promise.all([getAttendanceTodayData(), getAttendanceCalendarData()]);
+			await Promise.all([getAttendanceTodayData(), getAttendanceCalendarData(), getAttendancAppData()]);
 		} finally {
 			setLoader(false);
 		}
@@ -270,6 +217,28 @@ export default function AttendanceUserPage() {
 	const onChangeDatePicker = (value) => {
 		if (value != null) {
 			setCalendarDate(value);
+		}
+	};
+
+	const onClickDetail = (data: any) => {
+		setModalData(data);
+		router.push('/attendance/user/modal?mode=detail');
+	};
+
+	const onClickRemove = async (data: any) => {
+		if (data.attendanceApplicationId) {
+			if (confirm('근태수정요청을 취소하시겠습니까>')) {
+				if (gridRef.current) {
+					gridRef.current.api.applyTransaction({
+						remove: [data],
+					});
+				} else {
+					setAttendanceData((prev) => prev.filter((item) => item.attendanceApplicationId !== data.attendanceApplicationId));
+				}
+
+				await attendanceApplicationService.deleteUserAttendanceApplication(data.attendanceApplicationId);
+				alert('근태수정요청이 성공적으로 취소되었습니다.');
+			}
 		}
 	};
 
@@ -422,9 +391,17 @@ export default function AttendanceUserPage() {
 					>
 						<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0.5rem 0.5rem 1rem' }}>
 							<Typography variant='subtitle1'>근태 수정 요청 내역</Typography>
+							<Button onClick={(e) => router.push(`/attendance/user/list`)}>더보기</Button>
 						</Box>
 						<Box sx={{ flexGrow: 1, minHeight: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
-							<CustomAgGridComp rowData={[]} colDefs={colDefs} rowSelectionMode='multiple' />
+							<CustomAgGridComp
+								ref={gridRef}
+								rowData={attendanceAppData}
+								colDefs={colDefs(onClickDetail, onClickRemove)}
+								rowSelectionMode='none'
+								rowHeight={56}
+								pagination={false}
+							/>
 						</Box>
 					</Box>
 				</Grid>

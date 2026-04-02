@@ -244,7 +244,6 @@ export default function VacationApplicationPage() {
 
 	const colDefs = useMemo(() => {
 		const onClickDetail = (data: any) => {
-			console.log(data);
 			setModalData(data);
 			router.push('/vacation/user/modal?type=read');
 		};

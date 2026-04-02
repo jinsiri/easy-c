@@ -64,4 +64,6 @@ export const vacationApplicationService = {
 		axiosConfig.post<PageResponse<vacationApplicationDataDto>>('/api/vacation/application/search', request),
 	searchUserVacationApplicationData: (request: PageRequest<VacationAppSearchRequestDto>) =>
 		axiosConfig.post<PageResponse<vacationApplicationDataDto>>(`/api/vacation/application/user/search`, request),
+
+	deleteVacationApplication: (applicationId: number) => axiosConfig.delete<void>(`/api/vacation/application/delete?id=${applicationId}`),
 };

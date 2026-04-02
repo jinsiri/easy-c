@@ -90,7 +90,7 @@ public class AttendanceService {
         List<HolidayCalendar> holidayCalendarList = holidayCalendarRepository.findByYearEquals(targetYear.toString());
         Map<LocalDate,String> holidayMap = holidayCalendarList.stream().collect(Collectors.toMap(a -> a.getStartDate() , a -> a.getSubject()));
 
-        List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdAndActiveTrueAndWorkDateBetween(memberId, firstDay, lastDay);
+        List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDate(memberId, firstDay, lastDay);
         Map<Integer, List<AttendanceApplication>> changeRequestMap =
                 targetAttendanceChangeRequestList.stream()
                         .collect(Collectors.groupingBy(

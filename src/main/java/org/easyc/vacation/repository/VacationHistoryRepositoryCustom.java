@@ -35,7 +35,7 @@ public class VacationHistoryRepositoryCustom {
                         transactionTypeEq(req.getTransactionType()),
                         vacationCategoryEq(req.getVacationCategory()),
                         descContains(req.getViolationReason()))
-                .orderBy(vacationHistory.accrualDate.desc())
+                .orderBy(vacationHistory.registerDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

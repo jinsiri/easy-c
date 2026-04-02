@@ -58,7 +58,9 @@ public class AttendanceRepositoryCustom {
                 .and(deptNmContains(req.getDeptNm()))
                 .and(memberNmContains(req.getMemberNm()))
                 .and(workTypeEq(req.getWorkType()))
-                .and(workStatusEq(req.getWorkStatus()));
+                .and(workStatusEq(req.getWorkStatus()))
+                .and(attendance.deleted.isFalse())
+        ;
 
         List<Attendance> content = queryFactory
                 .selectFrom(attendance)
@@ -86,7 +88,9 @@ public class AttendanceRepositoryCustom {
                 .and(deptNmContains(req.getDeptNm()))
                 .and(memberNmContains(req.getMemberNm()))
                 .and(workTypeEq(req.getWorkType()))
-                .and(workStatusEq(req.getWorkStatus()));
+                .and(workStatusEq(req.getWorkStatus()))
+                .and(attendance.deleted.isFalse())
+        ;
 
         List<Attendance> content = queryFactory
                 .selectFrom(attendance)
@@ -119,6 +123,7 @@ public class AttendanceRepositoryCustom {
                         attendanceApplication.memberId.in(memberIdList)
                                 .and(appDateGoe(req.getStartDate()))
                                 .and(appDateLoe(req.getEndDate()))
+                                .and(attendanceApplication.deleted.isFalse())
                 ).fetchOne();
 
         AttendanceCompanySearchResponseDto response = new AttendanceCompanySearchResponseDto();

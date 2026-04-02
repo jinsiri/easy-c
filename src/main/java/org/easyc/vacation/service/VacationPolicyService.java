@@ -153,7 +153,7 @@ public class VacationPolicyService {
                                 .vacationCategory(vh.getVacationCategory())
                                 .transactionType(TransactionType.EXPIRE)
                                 .day(vh.getDay() * -1)
-                                .accrualDate(today)
+                                .accrualDate(null)
                                 .expireDate(today)
                                 .violationReason("기존 연차 만료 - 정책 변경 (" + vh.getViolationReason() + ")")
                                 .build();
@@ -197,8 +197,7 @@ public class VacationPolicyService {
 
                 // 통계 갱신
                 Vacation targetVacation = changeVacationMap.get(profile.getMemberId());
-                Vacation newVacation = vacationService.makeVacation(profile, targetPolicy, combinedForSummary);
-                newVacation.setVacationId(targetVacation != null ? targetVacation.getVacationId() : null);
+                Vacation newVacation = vacationService.makeVacation(profile, targetPolicy, combinedForSummary, targetVacation);
 
                 // DB에 새로 저장할 내역들만 리스트에 추가
                 finalUpdateHistoryList.addAll(newExpireMap.getOrDefault(mId, Collections.emptyList()));

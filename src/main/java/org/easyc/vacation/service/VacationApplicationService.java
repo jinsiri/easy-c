@@ -7,6 +7,7 @@ import org.easyc.common.dto.PageResponseDto;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
 import org.easyc.vacation.constant.VacationCategory;
+import org.easyc.vacation.constant.VacationType;
 import org.easyc.vacation.dto.VacationAppSearchRequestDto;
 import org.easyc.vacation.dto.VacationApplicationDto;
 import org.easyc.vacation.entity.Vacation;
@@ -111,6 +112,8 @@ public class VacationApplicationService {
                     .vacationCategory(vacationCategory)
                     .day(request.getVacationDuration() * 1.0)
                     .violationReason(request.getViolationReason())
+                    .accrualDate(null)
+                    .expireDate(null)
                     .build();
 
             targetVacation.setUsedDay(targetVacation.getUsedDay() + request.getVacationDuration());
@@ -135,4 +138,12 @@ public class VacationApplicationService {
         return searchList.getContent();
     }
 
+    public void deleteVacationApplicationData(Long vacationApplicationId) {
+        VacationApplication target = vacationApplicationRepository.findByVacationApplicationIdAndDeletedFalse(vacationApplicationId).orElse(null);
+
+        if(target != null){
+            target.delete();
+            vacationApplicationRepository.save(target);
+        }
+    }
 }

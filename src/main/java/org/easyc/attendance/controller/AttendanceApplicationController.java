@@ -40,11 +40,23 @@ public class AttendanceApplicationController {
         return attendanceApplicationService.getUserAttendanceApplication(request);
     }
 
+    @PostMapping("/user/month")
+    public List<AttendanceApplication> getAttendanceApplicationUserMonth(@RequestBody AttendanceRequestDto request) {
+        return attendanceApplicationService.getUserMonthAttendanceApplication(request);
+    }
+
     @AuditAction(code = "ATTENDANCE_APP_SAVE", name = "근태 수정 요청 저장", targetType = "ATTENDANCE_APP")
     @PostMapping("/save")
     public void saveAttendanceApplication(@RequestBody AttendanceApplicationDto request) {
         attendanceApplicationService.saveAttendanceApplication(request);
     }
+
+    @AuditAction(code = "ATTENDANCE_APP_DELETE", name = "근태 수정 요청 취소", targetType = "ATTENDANCE_APP")
+    @DeleteMapping("/delete")
+    public void deleteUserAttendanceApplication(@RequestParam Long id) {
+        attendanceApplicationService.deleteUserAttendanceApplication(id);
+    }
+
 
     @AuditAction(code = "ATTENDANCE_APP_SEARCH", name = "근태 수정 요청 검색", targetType = "ATTENDANCE_APP")
     @PostMapping("/search")
@@ -84,6 +96,4 @@ public class AttendanceApplicationController {
     public void rejectVacationApplicationData(@RequestBody List<AttendanceApplication> request) {
         attendanceApplicationService.rejectAttendanceApplicationData(request);
     }
-
-
 }

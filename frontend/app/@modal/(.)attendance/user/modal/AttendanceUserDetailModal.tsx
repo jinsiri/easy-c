@@ -30,7 +30,7 @@ export default function AttendanceUserDetailModal({
 }) {
 	const router = useRouter();
 	const { setLoader } = useLoaderStore();
-	const { resetModalData } = useModalStore();
+	const { resetModalData, setIsRefresh } = useModalStore();
 	const [attendanceData, setAttendanceData] = useState<AttendanceDayResDto>();
 
 	const {
@@ -101,6 +101,7 @@ export default function AttendanceUserDetailModal({
 
 			if (confirm('요청이 성공적으로 등록되었습니다.')) {
 				resetModalData();
+				setIsRefresh(true);
 
 				router.refresh();
 				router.back();

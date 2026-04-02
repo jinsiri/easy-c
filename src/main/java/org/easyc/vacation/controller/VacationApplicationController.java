@@ -48,6 +48,13 @@ public class VacationApplicationController {
         return vacationApplicationService.searchVacationApplicationData(request.getRequest(), pageable);
     }
 
+    @AuditAction(code = "VACATION_APP_DELETE", name = "휴가 신청 취소", targetType = "VACATION_APP")
+    @DeleteMapping("/delete")
+    public void deleteVacationApplicationData(@RequestParam Long id) {
+        vacationApplicationService.deleteVacationApplicationData(id);
+    }
+
+
     @AuditAction(code = "VACATION_APP_EXCELDOWN", name = "휴가 신청 엑셀 다운로드", targetType = "VACATION_APP")
     @PostMapping("/excel")
     public void excelVacationApplication(HttpServletResponse response, @RequestBody ExcelRequestDto<VacationAppSearchRequestDto> request) throws Exception {

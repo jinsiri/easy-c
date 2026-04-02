@@ -12,13 +12,10 @@ import java.util.Optional;
 
 @Repository
 public interface AttendanceApplicationRepository extends JpaRepository<AttendanceApplication, Long> {
-    List<AttendanceApplication> findAllByWorkDateAndMemberId(LocalDate workDate, Long memberId);
-    List<AttendanceApplication> findAllByWorkDateAndActiveTrueOrderByAttendanceApplicationIdAsc(LocalDate workDate);
-    List<AttendanceApplication> findAllByMemberIdAndActiveTrueAndWorkDateBetween(Long memberId, LocalDate startDate, LocalDate endDate);
+    List<AttendanceApplication> findAllByWorkDateAndMemberIdAndDeletedFalse(LocalDate workDate, Long memberId);
+    List<AttendanceApplication> findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDate(Long memberId, LocalDate start, LocalDate end);
 
+    List<AttendanceApplication> findTop10ByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateDesc(Long memberId, LocalDate start, LocalDate end);
 
-    List<AttendanceApplication> findAllByActiveTrueOrderByAttendanceApplicationIdAsc();
-    List<AttendanceApplication> findAllByDeptNmContainsAndActiveTrueOrderByAttendanceApplicationIdAsc(String deptNm);
-    List<AttendanceApplication> findAllByMemberNmContainsAndActiveTrueOrderByAttendanceApplicationIdAsc(String searchValue);
-    List<AttendanceApplication> findAllByStatusAndActiveTrueOrderByAttendanceApplicationIdAsc(BasicStatus basicStatus);
+    Optional<AttendanceApplication> findByAttendanceApplicationIdAndDeletedFalse(Long attendanceApplication);
 }

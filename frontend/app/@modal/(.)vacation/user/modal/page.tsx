@@ -25,7 +25,6 @@ export default function VacationUserModal() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const type = searchParams.get('type');
-	console.log(type);
 
 	const { modalData, resetModalData } = useModalStore();
 

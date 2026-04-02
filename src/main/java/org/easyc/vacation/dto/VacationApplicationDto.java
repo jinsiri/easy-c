@@ -35,7 +35,7 @@ public class VacationApplicationDto {
         entity.setVacationApplicationId(this.vacationApplicationId);
         entity.setMemberId(this.memberId);
         entity.setVacationType(this.vacationType);
-        entity.setVacationDuration(this.vacationDuration);
+        entity.setVacationDuration(this.vacationType.equals(VacationType.HALF_AM) || this.vacationType.equals(VacationType.HALF_PM) ? 0.5 : this.vacationDuration);
         entity.setStartDate(this.startDate);
         entity.setEndDate(this.endDate);
         entity.setViolationReason(this.violationReason);
