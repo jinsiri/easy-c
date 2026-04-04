@@ -32,8 +32,6 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 		isPrimary: false,
 	});
 
-	console.log(updatedList);
-
 	const addedDeptIds = useMemo(() => updatedList.map((item) => String(item.deptId)), [updatedList]);
 
 	const handleSave = () => {
@@ -130,37 +128,56 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 							/>
 						</Box>
 
-						<Box>
-							<Typography variant='h6' sx={{ mb: 1.5 }}>
-								직책 선택
-							</Typography>
-							<Select displayEmpty fullWidth value={selection.jobTitleId} onChange={handleJobTitleChange}>
-								<MenuItem value=''>
-									<em style={{ color: '#aaa' }}>미선택</em>
-								</MenuItem>
-								{jobTitleList?.map((opt) => (
-									<MenuItem key={'jobTitle_' + opt.jobTitleId} value={opt.jobTitleId}>
-										{opt.jobTitleNm}
-									</MenuItem>
-								))}
-							</Select>
-						</Box>
+						<Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 3 }}>
+							{!selection.deptId && (
+								<Box
+									sx={{
+										zIndex: 2,
+										position: 'absolute',
+										top: 0,
+										right: 0,
+										bottom: 0,
+										left: 0,
+										background: theme.palette.background.paper,
+										opacity: 0.9,
+									}}
+								>
+									<Typography variant={'h6'}>먼저 부서를 선택하세요.</Typography>
+								</Box>
+							)}
 
-						<Box>
-							<Typography variant='h6' sx={{ mb: 0.5 }}>
-								대표부서 여부
-							</Typography>
-							<FormControlLabel
-								control={
-									<Checkbox
-										size='small'
-										checked={selection.isPrimary}
-										onChange={(e) => setSelection((prev: any) => ({ ...prev, isPrimary: e.target.checked }))}
-									/>
-								}
-								color='primary'
-								label='대표부서입니다.'
-							/>
+							<Box>
+								<Typography variant='h6' sx={{ mb: 1.5 }}>
+									직책 선택
+								</Typography>
+								<Select displayEmpty fullWidth value={selection.jobTitleId} onChange={handleJobTitleChange}>
+									<MenuItem value=''>
+										<em style={{ color: '#aaa' }}>미선택</em>
+									</MenuItem>
+									{jobTitleList?.map((opt) => (
+										<MenuItem key={'jobTitle_' + opt.jobTitleId} value={opt.jobTitleId}>
+											{opt.jobTitleNm}
+										</MenuItem>
+									))}
+								</Select>
+							</Box>
+
+							<Box>
+								<Typography variant='h6' sx={{ mb: 0.5 }}>
+									대표부서 여부 선택
+								</Typography>
+								<FormControlLabel
+									control={
+										<Checkbox
+											size='small'
+											checked={selection.isPrimary}
+											onChange={(e) => setSelection((prev: any) => ({ ...prev, isPrimary: e.target.checked }))}
+										/>
+									}
+									color='primary'
+									label='대표부서입니다.'
+								/>
+							</Box>
 						</Box>
 					</Box>
 				</Grid>
