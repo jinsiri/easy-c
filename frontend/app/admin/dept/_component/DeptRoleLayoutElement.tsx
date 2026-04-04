@@ -304,7 +304,7 @@ export default function DeptRoleLayoutElement({ category }: DeptRoleLayoutElemen
 						}}
 						sx={{ display: 'flex', flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
 					>
-						<IconButton className={'contained-primary light'} sx={{ ml: 1 }} onClick={() => saveTemplates(category)}>
+						<IconButton className={'rounded-square bg-light'} sx={{ ml: 1 }} onClick={() => saveTemplates(category)}>
 							<ArrowBack fontSize={'small'} />
 						</IconButton>
 					</Grid>

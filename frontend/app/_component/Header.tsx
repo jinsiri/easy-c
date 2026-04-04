@@ -71,7 +71,7 @@ export default function Header(props: propsType) {
 			}}
 		>
 			<Box sx={{ display: 'flex', alignItems: 'center' }}>
-				<IconButton className='contained-primary ' onClick={onClickDrawerButton}>
+				<IconButton className='rounded-square bg-primary' onClick={onClickDrawerButton}>
 					<FormatIndentIncrease className='svg-small' />
 				</IconButton>
 			</Box>

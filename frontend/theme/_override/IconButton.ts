@@ -5,19 +5,13 @@ const IconButton = (theme: Theme) => ({
 		styleOverrides: {
 			root: {},
 			sizeMedium: {
-				'&.contained-primary': {
+				'&.rounded-square': {
 					width: '2.25rem',
 					height: '2.25rem',
 					borderRadius: '0.3em',
-					backgroundColor: theme.palette.primary.main,
-
-					'&:hover': {
-						backgroundColor: theme.palette.primary.dark,
-					},
 
 					'& .MuiSvgIcon-root': {
 						fontSize: '1.5rem',
-						fill: theme.palette.primary.contrastText,
 
 						'&.svg': {
 							'&-small': {
@@ -29,12 +23,45 @@ const IconButton = (theme: Theme) => ({
 						},
 					},
 
-					'&.light': {
-						backgroundColor: theme.palette.primary.light,
-					},
+					'&.bg-primary': {
+						backgroundColor: theme.palette.primary.main,
 
-					'&.disabled': {
+						'&:hover': {
+							backgroundColor: theme.palette.primary.dark,
+						},
+
+						'& .MuiSvgIcon-root': {
+							fill: theme.palette.primary.contrastText,
+						},
+					},
+					'&.bg-light': {
+						backgroundColor: theme.palette.primary.light,
+
+						'&:hover': {
+							backgroundColor: theme.palette.primary.dark,
+						},
+
+						'& .MuiSvgIcon-root': {
+							fill: theme.palette.primary.contrastText,
+						},
+					},
+					'&.bg-success': {
+						backgroundColor: theme.palette.success.main,
+
+						'&:hover': {
+							backgroundColor: theme.palette.success.dark,
+						},
+
+						'& .MuiSvgIcon-root': {
+							fill: theme.palette.success.contrastText,
+						},
+					},
+					'&.bg-disabled': {
 						backgroundColor: theme.palette.grey['700'],
+
+						'& .MuiSvgIcon-root': {
+							fill: theme.palette.grey['200'],
+						},
 					},
 				},
 

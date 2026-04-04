@@ -185,11 +185,11 @@ export default function AdminDeptListView({ dbData }: Props) {
 
 					<Box sx={{ mb: 1 }}>
 						<Stack direction={'row'} spacing={1} sx={{ alignItems: 'center' }}>
-							<IconButton className='contained-primary light' onClick={() => router.push(`/admin/dept/list/new?parentId=${selectedId}`)}>
+							<IconButton className='rounded-square bg-light' onClick={() => router.push(`/admin/dept/list/new?parentId=${selectedId}`)}>
 								<AddCircleOutline className='svg-small' />
 							</IconButton>
 							{selectedId && selectedId !== 1 && (
-								<IconButton className='contained-primary light' onClick={() => handleDelete(selectedId)}>
+								<IconButton className='rounded-square bg-light' onClick={() => handleDelete(selectedId)}>
 									<RemoveCircleOutline className='svg-small' />
 								</IconButton>
 							)}
