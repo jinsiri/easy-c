@@ -205,17 +205,23 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 						)}
 						{updatedList
 							.filter((m) => !m.deleted)
-							.map((m) => (
-								<Chip
-									key={'memberMap_' + m.deptMemberMapId}
-									label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''}`}
-									color='primary'
-									variant='outlined'
-									onClick={() => selectAddedDeptMemberMap(m.deptMemberMapId)}
-									onDelete={() => removeMap(m.deptMemberMapId)}
-									sx={{ m: 0.5 }}
-								/>
-							))}
+							.map((m) => {
+								const isThisEditing = editingId === m.deptMemberMapId;
+								return (
+									<Chip
+										key={'memberMap_' + m.deptMemberMapId}
+										label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''} ${isThisEditing ? '(수정중)' : ''}`}
+										color={'primary'}
+										variant={isThisEditing ? 'filled' : 'outlined'}
+										onClick={() => selectAddedDeptMemberMap(m.deptMemberMapId)}
+										onDelete={() => removeMap(m.deptMemberMapId)}
+										sx={{
+											m: 0.5,
+											transition: 'all 0.2s ease-in-out',
+										}}
+									/>
+								);
+							})}
 					</Box>
 				</Grid>
 			</Grid>
