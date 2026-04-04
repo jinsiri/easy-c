@@ -101,7 +101,10 @@ export default function Header(props: propsType) {
 																component={item.component as any}
 																{...(item.component === Link && item.url ? { href: item.url } : {})}
 																sx={{ width: '100%' }}
-																onClick={item.onClick}
+																onClick={() => {
+																	if (item.onClick) item.onClick();
+																	popupState.close();
+																}}
 															>
 																<ListItemIcon>{item.icon}</ListItemIcon>
 																<ListItemText primary={item.title} sx={{ marginRight: '1rem' }} />
