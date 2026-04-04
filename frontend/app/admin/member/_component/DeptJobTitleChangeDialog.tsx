@@ -1,13 +1,14 @@
 import { useRef, useState, useMemo } from 'react';
 import { Box, Checkbox, Chip, FormControlLabel, Grid, IconButton, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { ArrowDownward, ArrowForward } from '@mui/icons-material';
+import { ArrowDownward, ArrowForward, Close, Done } from '@mui/icons-material';
 
 import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import CommonTreeview from '@/app/_component/Tree';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
 import { mapDeptToTree } from '@/app/admin/dept/_utils/deptUtil';
 import { useDialogStore } from '@/store/useDialogStore';
+import clsx from 'clsx';
 
 interface Props {
 	onClose: () => void;
@@ -189,15 +190,26 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 					</Box>
 				</Grid>
 
-				<Grid size={{ xs: 12, md: 2 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-					<IconButton
-						className={selection.deptId ? 'contained-primary' : 'contained-primary disabled'}
-						sx={{ ml: 1 }}
-						disabled={!selection.deptId}
-						onClick={handleAddOrUpdate}
-					>
-						{isDownMd ? <ArrowDownward /> : <ArrowForward />}
-					</IconButton>
+				<Grid size={{ xs: 12, md: 2 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 1 }}>
+					{editingId && +editingId > 0 ? (
+						<>
+							<IconButton className={'rounded-square bg-success'} sx={{ ml: 1 }} onClick={handleAddOrUpdate}>
+								<Done />
+							</IconButton>
+							<IconButton className={'rounded-square bg-disabled'} sx={{ ml: 1 }} onClick={resetSelection}>
+								<Close />
+							</IconButton>
+						</>
+					) : (
+						<IconButton
+							className={clsx('rounded-square', selection.deptId ? 'bg-primary' : 'bg-disabled')}
+							sx={{ ml: 1 }}
+							disabled={!selection.deptId}
+							onClick={handleAddOrUpdate}
+						>
+							{isDownMd ? <ArrowDownward /> : <ArrowForward />}
+						</IconButton>
+					)}
 				</Grid>
 
 				<Grid size={{ xs: 12, md: 5 }}>
