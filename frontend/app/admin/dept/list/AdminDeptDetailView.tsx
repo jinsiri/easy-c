@@ -213,24 +213,30 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 				</Button>
 			</Stack>
 			<Grid container spacing={2} sx={{ flexGrow: 1 }}>
-				<Grid size={{ xs: 12, md: deptMembers?.length !== 0 ? 4 : 12 }} sx={{ minHeight: '50vh' }}>
-					<CustomAgGridComp
-						ref={gridRef}
-						rowData={deptMembers}
-						colDefs={deptMemberColDefs}
-						headerHeight={0}
-						rowHeight={80}
-						pagination={false}
-						rowSelectionMode={'multiple'}
-						onFirstDataRendered={handleFirstDataRendered}
-						onCellClicked={handleCellClicked}
-						onSelectionChanged={onSelectionChanged}
-					/>
-				</Grid>
-				{selectedId && (
-					<Grid size={{ xs: 12, md: 8 }}>
-						<MemberDetail selectedId={selectedId} />
+				{!deptMembers || deptMembers.length === 0 ? (
+					<Grid justifyContent={'center'} alignItems={'center'} size={{ xs: 12 }} sx={{ display: 'flex', height: '150px' }}>
+						<Typography>추가된 하위 부서원이 없습니다.</Typography>
 					</Grid>
+				) : (
+					<>
+						<Grid size={{ xs: 12, md: 4 }} sx={{ height: '500px' }}>
+							<CustomAgGridComp
+								ref={gridRef}
+								rowData={deptMembers}
+								colDefs={deptMemberColDefs}
+								headerHeight={0}
+								rowHeight={80}
+								pagination={false}
+								rowSelectionMode={'multiple'}
+								onFirstDataRendered={handleFirstDataRendered}
+								onCellClicked={handleCellClicked}
+								onSelectionChanged={onSelectionChanged}
+							/>
+						</Grid>
+						<Grid size={{ xs: 12, md: 8 }}>
+							<MemberDetail selectedId={selectedId} />
+						</Grid>
+					</>
 				)}
 			</Grid>
 		</>
