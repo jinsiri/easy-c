@@ -1,13 +1,14 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Box, Checkbox, Chip, Grid, List, ListItem, OutlinedInput, Typography, useTheme } from '@mui/material';
+import { Box, Checkbox, Chip, Grid, IconButton, List, ListItem, OutlinedInput, Typography, useTheme } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { memberService } from '@/app/services/memberService';
 import { useContainerSize } from '@/app/_hooks/useContainerSize';
 import { CAREER_COL_DEFS, CERTIFICATION_COL_DEFS, LANGUAGE_COL_DEFS, REWARD_COL_DEFS } from '@/app/admin/member/_constant/formConst';
 import CommonTabs from '@/app/_component/CommonTabs';
 import { getDisplayValue, transformGridData } from '@/app/admin/member/_utils/formUtil';
+import { CheckCircle, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 
 // ========== 필드 매핑 정의 ==========
 // 상단 기본 인사정보 (카드 영역)
@@ -94,6 +95,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 	const [qualificationInfo, setQualificationInfo] = useState<any[]>([]);
 	const [languageInfo, setLanguageInfo] = useState<any[]>([]);
 	const [loading, setLoading] = useState(false);
+	const [isExpanded, setIsExpanded] = useState(false);
 
 	useEffect(() => {
 		const fetchMemberData = async () => {
@@ -249,6 +251,10 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 		{ label: '어학', type: 'grid', colDefs: LANGUAGE_COL_DEFS, rowData: transformGridData(languageInfo) },
 	];
 
+	const toggleExpand = () => {
+		setIsExpanded(!isExpanded);
+	};
+
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
 			<Box sx={{ flexShrink: 0, width: '100%', mb: '1rem', padding: '0 1.5rem' }}>
@@ -296,17 +302,40 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 										<Box sx={{ width: 'calc(100% - 6rem)', textWrap: 'nowrap' }}>
 											{key === 'deptMemberMapList' ? (
 												<>
-													{deptMemberMapInfo.length !== 0
-														? deptMemberMapInfo.map((m) => (
-																<Chip
-																	key={m.deptMemberMapId}
-																	label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''}`}
-																	variant='outlined'
-																	color={'primary'}
-																	size={'small'}
-																/>
-															))
-														: '-'}
+													{deptMemberMapInfo.length > 0 ? (
+														<>
+															{(isExpanded ? deptMemberMapInfo : [deptMemberMapInfo[0]]).map((m) => (
+																<Box key={m.deptMemberMapId} sx={{ display: 'flex' }}>
+																	<Chip
+																		label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''}`}
+																		variant='outlined'
+																		color='primary'
+																		size='small'
+																	/>
+																	{m.primary && <CheckCircle color='primary' sx={{ ml: '2px' }} />}
+																</Box>
+															))}
+
+															{deptMemberMapInfo.length > 1 && (
+																<Box component='span' onClick={toggleExpand}>
+																	{!isExpanded && (
+																		<Box component='span' sx={{ fontSize: '0.8rem', color: 'text.secondary', ml: 0.5 }}>
+																			외 {deptMemberMapInfo.length - 1}건
+																		</Box>
+																	)}
+																	<IconButton size='small' sx={{ p: 0, ml: 0.2 }}>
+																		{isExpanded ? (
+																			<KeyboardArrowUp fontSize='small' />
+																		) : (
+																			<KeyboardArrowDown fontSize='small' />
+																		)}
+																	</IconButton>
+																</Box>
+															)}
+														</>
+													) : (
+														'소속 부서 미지정'
+													)}
 												</>
 											) : (
 												<>{displayValue}</>
