@@ -129,7 +129,7 @@ export default function DashboardPage() {
 					}}
 				>
 					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-						<Typography variant='subtitle1'>최근 로그인 이력</Typography>
+						<Typography variant='subtitle1'>공지사항</Typography>
 						<Typography
 							sx={{ color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
 							onClick={() => router.push('/board/notice')}
@@ -175,7 +175,7 @@ export default function DashboardPage() {
 					}}
 				>
 					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-						<Typography variant='subtitle1'>최근 로그인 이력</Typography>
+						<Typography variant='subtitle1'>자유게시판</Typography>
 						<Typography
 							sx={{ color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
 							onClick={() => router.push('/board/general')}
