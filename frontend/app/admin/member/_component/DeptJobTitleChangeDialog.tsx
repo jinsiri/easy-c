@@ -7,6 +7,7 @@ import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 import CommonTreeview from '@/app/_component/Tree';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
 import { mapDeptToTree } from '@/app/admin/dept/_utils/deptUtil';
+import { useDialogStore } from '@/store/useDialogStore';
 
 interface Props {
 	onClose: () => void;
@@ -18,10 +19,11 @@ interface Props {
 
 export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleList, initialDeptMaps, setDeptMemberMap }: Props) {
 	const theme = useTheme();
+	const { alert } = useDialogStore();
+	const { expandedIds, setExpandedIds } = useDeptTreeStore();
 	const isDownMd = useMediaQuery(theme.breakpoints.down('md'));
 	const minId = Math.min(0, ...initialDeptMaps.map((m) => Number(m.deptMemberMapId)).filter((id) => id < 0));
 	const addedElIdxRef = useRef<number>(minId - 1);
-	const { expandedIds, setExpandedIds } = useDeptTreeStore();
 	const [updatedList, setUpdatedList] = useState<any[]>(initialDeptMaps);
 	const [editingId, setEditingId] = useState<string | number | null>(null);
 	const [selection, setSelection] = useState({
@@ -34,7 +36,12 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 
 	const addedDeptIds = useMemo(() => updatedList.map((item) => String(item.deptId)), [updatedList]);
 
-	const handleSave = () => {
+	const handleSave = async () => {
+		if (selection.deptId || editingId !== null) {
+			await alert('현재 편집 중인 항목이 있습니다. 화살표 버튼을 눌러 적용을 완료해주세요.');
+			return;
+		}
+
 		setDeptMemberMap('deptMemberMapList', updatedList);
 		onClose();
 	};
