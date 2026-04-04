@@ -47,7 +47,7 @@ export const SystemDialog = () => {
 				{config.type === 'danger' ? '경고' : '알림'}
 			</DialogTitle>
 
-			<DialogContent sx={{ color: 'text.secondary', pt: 1, textAlign: 'center' }}>{config.content}</DialogContent>
+			<DialogContent sx={{ color: 'text.secondary', pt: 1, textAlign: 'center', wordBreak: 'keep-all' }}>{config.content}</DialogContent>
 
 			<DialogActions sx={{ p: 2, pt: 1 }}>
 				{!isOneButton && (
