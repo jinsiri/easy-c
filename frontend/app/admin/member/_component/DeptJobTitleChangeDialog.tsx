@@ -1,5 +1,5 @@
 import { useRef, useState, useMemo } from 'react';
-import { Box, Chip, Grid, IconButton, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Checkbox, Chip, FormControlLabel, Grid, IconButton, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { ArrowDownward, ArrowForward } from '@mui/icons-material';
 
@@ -29,7 +29,10 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 		deptNm: '',
 		jobTitleId: '',
 		jobTitleNm: '',
+		isPrimary: false,
 	});
+
+	console.log(updatedList);
 
 	const addedDeptIds = useMemo(() => updatedList.map((item) => String(item.deptId)), [updatedList]);
 
@@ -50,7 +53,7 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 	};
 
 	const resetSelection = () => {
-		setSelection({ deptId: null, deptNm: '', jobTitleId: '', jobTitleNm: '' });
+		setSelection({ deptId: null, deptNm: '', jobTitleId: '', jobTitleNm: '', isPrimary: false });
 		setEditingId(null);
 	};
 
@@ -64,6 +67,7 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 			deptNm: targetMap.deptNm,
 			jobTitleId: targetMap.jobTitleId || '',
 			jobTitleNm: targetMap.jobTitleNm || '',
+			isPrimary: targetMap.isPrimary,
 		});
 	};
 
@@ -140,6 +144,23 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 									</MenuItem>
 								))}
 							</Select>
+						</Box>
+
+						<Box>
+							<Typography variant='h6' sx={{ mb: 0.5 }}>
+								대표부서 여부
+							</Typography>
+							<FormControlLabel
+								control={
+									<Checkbox
+										size='small'
+										checked={selection.isPrimary}
+										onChange={(e) => setSelection((prev: any) => ({ ...prev, isPrimary: e.target.checked }))}
+									/>
+								}
+								color='primary'
+								label='대표부서입니다.'
+							/>
 						</Box>
 					</Box>
 				</Grid>

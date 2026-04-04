@@ -1,5 +1,6 @@
 package org.easyc.deptMemberMap.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.dto.BaseDto;
@@ -18,6 +19,8 @@ public class DeptMemberMapRequestDto extends BaseDto {
     private Long memberId;
     private Long jobTitleId;
     private DeptRole deptRole;
+
+    @JsonProperty("isPrimary")
     private boolean isPrimary;
 
     private Set<Long> memberIds;

@@ -1,7 +1,9 @@
 package org.easyc.deptMemberMap.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.entity.BaseEntity;
 import org.easyc.dept.entity.Dept;
@@ -59,10 +61,11 @@ public class DeptMemberMap extends BaseEntity {
         super.delete();
     }
 
-    public void updateInfo(Long deptId, Long jobTitleId, DeptRole deptRole) {
+    public void updateInfo(Long deptId, Long jobTitleId, DeptRole deptRole, boolean isPrimary) {
         this.deptId = deptId;
         this.jobTitleId = jobTitleId;
         this.deptRole = deptRole;
+        this.isPrimary = isPrimary;
     }
 
     public void updateDeptRole(DeptRole deptRole) {

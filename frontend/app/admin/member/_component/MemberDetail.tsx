@@ -312,7 +312,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 																		color='primary'
 																		size='small'
 																	/>
-																	{m.primary && <CheckCircle color='primary' sx={{ ml: '2px' }} />}
+																	{m.isPrimary && <CheckCircle color='primary' sx={{ ml: '2px' }} />}
 																</Box>
 															))}
 

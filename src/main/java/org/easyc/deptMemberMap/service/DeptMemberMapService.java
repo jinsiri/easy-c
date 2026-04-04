@@ -54,6 +54,7 @@ public class DeptMemberMapService {
                         .memberId(memberId)
                         .deptId(dto.getDeptId())
                         .jobTitleId(dto.getJobTitleId())
+                        .isPrimary(dto.isPrimary())
                         .build();
                 deptMemberMapRepository.save(newMap);
             }
@@ -64,7 +65,7 @@ public class DeptMemberMapService {
                 if (dto.isDeleted()) {
                     map.delete();
                 } else {
-                    map.updateInfo(dto.getDeptId(), dto.getJobTitleId(), DeptRole.MEMBER);
+                    map.updateInfo(dto.getDeptId(), dto.getJobTitleId(), DeptRole.MEMBER, dto.isPrimary());
                 }
             }
         }
