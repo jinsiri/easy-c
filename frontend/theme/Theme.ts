@@ -1,12 +1,13 @@
 'use client';
 
 // import type {} from '@mui/material/themeCssVarsAugmentation';
-import { createTheme } from '@mui/material/styles';
+import { Components, createTheme } from '@mui/material/styles';
 import colorSchemes from '@/theme/colorSchemes';
 import typography from '@/theme/typography';
 
 import component from './component';
 import shapes from './shapes';
+import { BaseTheme } from '@/node_modules/@mui/material/styles/createThemeNoVars';
 
 const theme = createTheme({
 	cssVariables: true,
@@ -24,6 +25,6 @@ const theme = createTheme({
 	},
 });
 
-theme.components = component(theme);
+theme.components = component(theme) as Components<BaseTheme>;
 
 export default theme;

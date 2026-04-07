@@ -1,6 +1,6 @@
-import { Theme } from '@mui/material/styles';
+import { Components, Theme } from '@mui/material/styles';
 
-const Button = (theme: Theme) => ({
+const Button = (theme: Theme): Components => ({
 	MuiButton: {
 		styleOverrides: {
 			root: {
@@ -8,8 +8,9 @@ const Button = (theme: Theme) => ({
 			},
 
 			contained: ({ ownerState }) => {
-				const color = ownerState.color || 'primary';
-				const shadowColor = theme.palette[color].darker;
+				const color = ownerState?.color || 'primary';
+				const targetColor = (theme.palette as any)[color];
+				const shadowColor = targetColor?.darker || targetColor?.dark || targetColor?.main || '#000000';
 
 				return {
 					transition: 'all 0.2s ease-in-out',
@@ -48,7 +49,8 @@ const Button = (theme: Theme) => ({
 	},
 });
 
-function hexToRgb(hex) {
+function hexToRgb(hex?: string) {
+	if (!hex || !hex.startsWith('#')) return '0, 0, 0';
 	const r = parseInt(hex.slice(1, 3), 16);
 	const g = parseInt(hex.slice(3, 5), 16);
 	const b = parseInt(hex.slice(5, 7), 16);
