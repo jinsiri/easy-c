@@ -20,7 +20,7 @@ interface Props {
 
 export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleList, initialDeptMaps, setDeptMemberMap }: Props) {
 	const theme = useTheme();
-	const { alert } = useDialogStore();
+	const { alert, confirm } = useDialogStore();
 	const { expandedIds, setExpandedIds } = useDeptTreeStore();
 	const isDownMd = useMediaQuery(theme.breakpoints.down('md'));
 	const minId = Math.min(0, ...initialDeptMaps.map((m) => Number(m.deptMemberMapId)).filter((id) => id < 0));
@@ -80,17 +80,28 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 	const handleAddOrUpdate = () => {
 		if (!selection.deptId) return;
 
-		if (editingId) {
-			setUpdatedList((prev) => prev.map((item) => (item.deptMemberMapId === editingId ? { ...item, ...selection } : item)));
-		} else {
-			setUpdatedList((prev) => [
-				...prev,
-				{
-					deptMemberMapId: addedElIdxRef.current--,
-					...selection,
-				},
-			]);
-		}
+		setUpdatedList((prev) => {
+			let baseList = [...prev];
+			if (selection.isPrimary) {
+				baseList = baseList.map((item) => ({
+					...item,
+					isPrimary: item.deptMemberMapId === editingId ? item.isPrimary : false,
+				}));
+			}
+
+			if (editingId) {
+				return baseList.map((item) => (item.deptMemberMapId === editingId ? { ...item, ...selection } : item));
+			} else {
+				return [
+					...baseList,
+					{
+						deptMemberMapId: addedElIdxRef.current--,
+						...selection,
+					},
+				];
+			}
+		});
+
 		resetSelection();
 	};
 
@@ -109,6 +120,23 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 		if (editingId === id) {
 			resetSelection();
 		}
+	};
+
+	const handlePrimaryChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const isChecked = e.target.checked;
+
+		if (isChecked) {
+			const existingPrimary = updatedList.find((m) => !m.deleted && m.isPrimary && m.deptMemberMapId !== editingId);
+
+			if (existingPrimary) {
+				const isConfirmed = await confirm(
+					`이미 대표부서(${existingPrimary.deptNm})가 존재합니다. 적용 시 기존 대표부서는 해제됩니다. 진행하시겠습니까?`,
+				);
+				if (!isConfirmed) return;
+			}
+		}
+
+		setSelection((prev) => ({ ...prev, isPrimary: isChecked }));
 	};
 
 	return (
@@ -175,13 +203,7 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 									대표부서 여부 선택
 								</Typography>
 								<FormControlLabel
-									control={
-										<Checkbox
-											size='small'
-											checked={selection.isPrimary}
-											onChange={(e) => setSelection((prev: any) => ({ ...prev, isPrimary: e.target.checked }))}
-										/>
-									}
+									control={<Checkbox size='small' checked={selection.isPrimary} onChange={handlePrimaryChange} />}
 									color='primary'
 									label='대표부서입니다.'
 								/>
