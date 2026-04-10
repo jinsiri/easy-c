@@ -78,6 +78,7 @@ public class DeptMemberMapService {
                     .map(memberId -> DeptMemberMap.builder()
                             .deptId(dto.getDeptId())
                             .memberId(memberId)
+                            .deptRole(DeptRole.MEMBER)
                             .build())
                     .collect(Collectors.toList());
 

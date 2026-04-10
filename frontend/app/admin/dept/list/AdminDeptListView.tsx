@@ -6,7 +6,7 @@ import { DeptResponseDto } from '@/type/dept';
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import CommonTabs from '@/app/_component/CommonTabs';
 import CommonTreeview from '@/app/_component/Tree';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import AdminDeptDetailView from '@/app/admin/dept/list/AdminDeptDetailView';
 import { useEffect, useState } from 'react';
 import axiosConfig from '@/app/_lib/axiosConfig';
@@ -15,9 +15,11 @@ import { useDeptForm } from '@/app/admin/dept/_hooks/useDeptForm';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
 import { mapOrgToTree } from '@/app/admin/dept/_utils/deptUtil';
+import useRefreshStore from '@/store/useRefreshStore';
 
 interface Props {
 	dbData: DeptResponseDto[];
+	refreshDeptData: (path: string) => void;
 }
 
 type InfoItem = {
@@ -84,11 +86,13 @@ function DeptManageComp({ deptId, items }: { deptId: number; items: InfoItem[] }
 	return isEdit ? <EditDeptForm deptId={deptId} handleEdit={handleEdit} /> : <InfoList deptId={deptId} items={items} handleEdit={handleEdit} />;
 }
 
-export default function AdminDeptListView({ dbData }: Props) {
+export default function AdminDeptListView({ dbData, refreshDeptData }: Props) {
 	const router = useRouter();
 	const theme = useTheme();
+	const pathname = usePathname();
 	const { success, danger } = useDialogStore();
 	const { expandedIds, setExpandedIds, selectedId, setSelectedId, _hasHydrated } = useDeptTreeStore();
+	const refreshTicket = useRefreshStore((state) => state.refreshTicket);
 	const rootId = dbData?.[0]?.deptId ? dbData[0].deptId : null;
 	const selectedDept = dbData.find((d) => d.deptId === Number(selectedId)) ?? dbData[0];
 	const [activeTab, setActiveTab] = useState(0);
@@ -156,6 +160,13 @@ export default function AdminDeptListView({ dbData }: Props) {
 		}
 	}, [dbData]);
 
+	useEffect(() => {
+		if (refreshTicket > 0) {
+			refreshDeptData(pathname);
+			router.refresh();
+		}
+	}, [refreshTicket, pathname]);
+
 	return (
 		<Box
 			sx={{
@@ -198,6 +209,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 
 					<Box sx={{ flexGrow: 1, padding: '1.125rem', borderRadius: '1rem', bgcolor: '#fff' }}>
 						<CommonTreeview
+							key={refreshTicket}
 							rawData={dbData || []}
 							mapEntityToTree={mapOrgToTree}
 							expandedIds={expandedIds}

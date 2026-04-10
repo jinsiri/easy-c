@@ -7,6 +7,7 @@ import { deptService } from '@/app/services/deptService';
 import { useDialogStore } from '@/store/useDialogStore';
 import { mapDeptToTree } from '@/app/admin/dept/_utils/deptUtil';
 import { useRouter } from 'next/navigation';
+import useRefreshStore from '@/store/useRefreshStore';
 
 interface BatchReassignDialogProps {
 	prevDeptId: number;
@@ -18,6 +19,7 @@ export default function BatchReassignDeptDialog({ prevDeptId, checkedIds, onClos
 	const router = useRouter();
 	const { alert, success } = useDialogStore();
 	const { expandedIds, setExpandedIds } = useDeptTreeStore();
+	const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 	const [loading, setLoading] = useState(false);
 	const [deptList, setDeptList] = useState<DeptResponseDto[]>([]);
 	const [selectedId, setSelectedId] = useState<string>('');
@@ -51,6 +53,7 @@ export default function BatchReassignDeptDialog({ prevDeptId, checkedIds, onClos
 
 			await deptService.reassignDept(payload);
 			await success('이동되었습니다.');
+			triggerRefresh();
 			router.refresh();
 			onClose();
 		} catch (e: any) {
