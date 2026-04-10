@@ -8,10 +8,12 @@ import { deptService } from '@/app/services/deptService';
 import { IDeptMemberForm } from '@/app/@modal/(.)admin/dept/list/assign/page';
 import { Box, Button, Container, Paper, Typography } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
+import useRefreshStore from '@/store/useRefreshStore';
 
 export default function AssignDeptListPage() {
 	const router = useRouter();
 	const { alert } = useDialogStore();
+	const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 	const searchParams = useSearchParams();
 	const deptIdStr = searchParams.get('deptId');
 	const deptId = deptIdStr ? parseInt(deptIdStr) : null;
@@ -29,6 +31,7 @@ export default function AssignDeptListPage() {
 		}
 
 		await deptService.assignMembersToDept({ deptId: deptId, memberIds: data.selectedMemberIds });
+		triggerRefresh();
 		router.back();
 	};
 
