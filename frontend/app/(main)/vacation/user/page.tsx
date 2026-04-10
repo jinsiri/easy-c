@@ -24,11 +24,13 @@ import CustomEchartComp from '@/app/_lib/CustomEchartComp';
 import { vacationService, VacationDataDto, VacationHistoryDto } from '@/app/services/vacationService';
 import { vacationApplicationDataDto, vacationApplicationService } from '@/app/services/vacationApplicationService';
 import { colDefs, historyColDefs } from '@/constant/vacationColDef';
+import { useDialogStore } from '@/store/useDialogStore';
 
 export default function VacationUserPage() {
 	const theme = useTheme();
 	const router = useRouter();
 	const pathname = usePathname();
+	const { alert } = useDialogStore();
 	const { loader, setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 

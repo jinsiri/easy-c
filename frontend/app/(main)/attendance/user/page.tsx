@@ -32,6 +32,7 @@ import { formatMinutes } from '@/utils/commonFunc';
 import { dayName } from '@/type/types';
 import { attendanceService, AttendanceResDto, CalendarData } from '@/app/services/attendanceService';
 import { attendanceApplicationService, AttendanceApplicationResponseDto } from '@/app/services/attendanceApplicationService';
+import { useDialogStore } from '@/store/useDialogStore';
 
 dayjs.extend(duration);
 
@@ -39,6 +40,7 @@ export default function AttendanceUserPage() {
 	const theme = useTheme();
 	const router = useRouter();
 	const pathName = usePathname();
+	const { alert } = useDialogStore();
 	const { loader, setLoader } = useLoaderStore();
 	const { isRefresh, setIsRefresh, setModalData } = useModalStore();
 
@@ -237,7 +239,7 @@ export default function AttendanceUserPage() {
 				}
 
 				await attendanceApplicationService.deleteUserAttendanceApplication(data.attendanceApplicationId);
-				alert('근태수정요청이 성공적으로 취소되었습니다.');
+				await alert('근태수정요청이 성공적으로 취소되었습니다.');
 			}
 		}
 	};

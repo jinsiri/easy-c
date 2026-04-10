@@ -27,6 +27,7 @@ import { BASICSTATUS, PAGE_SIZE_OPTIONS } from '@/constant/commonConst';
 
 import { FilterRef } from '@/app/_component/layoutElement/DetailSearchFilterComp';
 import { attendanceApplicationService, AttendanceAppSearchRequestDto } from '@/app/services/attendanceApplicationService';
+import { useDialogStore } from '@/store/useDialogStore';
 
 const applicationFieldDefault: FilterValues = {
 	startDate: dayjs().startOf('year'),
@@ -61,6 +62,7 @@ const detailAppSearchFields: FilterField[] = [
 export default function AttendanceUserListPage() {
 	const router = useRouter();
 	const { loader, setLoader } = useLoaderStore();
+	const { alert } = useDialogStore();
 	const { setModalData } = useModalStore();
 
 	const gridRef = useRef();
@@ -121,7 +123,7 @@ export default function AttendanceUserListPage() {
 				}
 
 				await attendanceApplicationService.deleteUserAttendanceApplication(data.attendanceApplicationId);
-				alert('근태수정요청이 성공적으로 취소되었습니다.');
+				await alert('근태수정요청이 성공적으로 취소되었습니다.');
 			}
 		}
 	};

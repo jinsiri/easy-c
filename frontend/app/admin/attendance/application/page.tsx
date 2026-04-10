@@ -29,6 +29,7 @@ import { BASICSTATUS, PAGE_SIZE_OPTIONS } from '@/constant/commonConst';
 import { adminBasicColDef, getAdminBasicDetailColumn, getAdminBasicActionColumn } from '@/constant/commonColDef';
 import { AttendanceApplicationResponseDto, attendanceApplicationService, AttendanceAppSearchRequestDto } from '@/app/services/attendanceApplicationService';
 import { FilterRef } from '@/app/_component/layoutElement/DetailSearchFilterComp';
+import { useDialogStore } from '@/store/useDialogStore';
 
 dayjs.extend(duration);
 
@@ -88,6 +89,7 @@ export default function AttendanceApplicationPage() {
 		applicationFieldDefault.memberNm = decoded(paramMemberList);
 	}
 
+	const { alert } = useDialogStore();
 	const { setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 
@@ -156,10 +158,10 @@ export default function AttendanceApplicationPage() {
 			try {
 				if (type === 'reject') {
 					await attendanceApplicationService.rejectAttendanceApplication(data);
-					alert('반려처리가 성공적으로 완료되었습니다.');
+					await alert('반려처리가 성공적으로 완료되었습니다.');
 				} else {
 					await attendanceApplicationService.approveAttendanceApplication(data);
-					alert('승인처리가 성공적으로 완료되었습니다.');
+					await alert('승인처리가 성공적으로 완료되었습니다.');
 				}
 
 				if (detailSearchFilterRef.current) {
