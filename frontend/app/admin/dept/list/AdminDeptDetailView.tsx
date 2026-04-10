@@ -13,6 +13,7 @@ import { deptService } from '@/app/services/deptService';
 import BatchJobUpdateDialog from '@/app/admin/dept/_component/BatchJobUpdateDialog';
 import { RoleCategory } from '@/constant/deptConst';
 import BatchReassignDeptDialog from '@/app/admin/dept/_component/BatchReassignDeptDialog';
+import useRefreshStore from '@/store/useRefreshStore';
 
 interface Props {
 	deptId: number;
@@ -28,6 +29,7 @@ const deptRoleNm: Record<DeptRole, string> = {
 
 export default function AdminDeptDetailView({ deptId }: Props) {
 	const { alert, confirm } = useDialogStore();
+	const refreshTicket = useRefreshStore((state) => state.refreshTicket);
 	const theme = useTheme();
 	const gridRef = useRef<AgGridReact>(null);
 	const [checked, setChecked] = useState(false);
@@ -100,7 +102,7 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 
 	useEffect(() => {
 		fetchMembersMappedToDeptId(deptId);
-	}, [deptId]);
+	}, [deptId, refreshTicket]);
 
 	const handleCellClicked = (params: CellClickedEvent) => {
 		setSelectedId(params.data.memberId);

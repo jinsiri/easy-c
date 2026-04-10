@@ -22,14 +22,13 @@ export default function AssignDeptListPage() {
 		},
 	});
 
-	const onSubmit: SubmitHandler<IDeptMemberForm> = (data) => {
+	const onSubmit: SubmitHandler<IDeptMemberForm> = async (data) => {
 		if (data.selectedMemberIds.length === 0) {
-			alert('선택된 데이터가 없습니다.');
+			await alert('선택된 데이터가 없습니다.');
 			return;
 		}
 
-		// TODO: UX 개선
-		deptService.assignMembersToDept({ deptId: deptId, memberIds: data.selectedMemberIds });
+		await deptService.assignMembersToDept({ deptId: deptId, memberIds: data.selectedMemberIds });
 		router.back();
 	};
 

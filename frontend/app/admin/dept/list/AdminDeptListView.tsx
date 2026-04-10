@@ -15,6 +15,7 @@ import { useDeptForm } from '@/app/admin/dept/_hooks/useDeptForm';
 import DeptForm from '@/app/admin/dept/_component/DeptForm';
 import { useDeptTreeStore } from '@/store/useDeptTreeStore';
 import { mapOrgToTree } from '@/app/admin/dept/_utils/deptUtil';
+import useRefreshStore from '@/store/useRefreshStore';
 
 interface Props {
 	dbData: DeptResponseDto[];
@@ -89,6 +90,7 @@ export default function AdminDeptListView({ dbData }: Props) {
 	const theme = useTheme();
 	const { success, danger } = useDialogStore();
 	const { expandedIds, setExpandedIds, selectedId, setSelectedId, _hasHydrated } = useDeptTreeStore();
+	const refreshTicket = useRefreshStore((state) => state.refreshTicket);
 	const rootId = dbData?.[0]?.deptId ? dbData[0].deptId : null;
 	const selectedDept = dbData.find((d) => d.deptId === Number(selectedId)) ?? dbData[0];
 	const [activeTab, setActiveTab] = useState(0);
@@ -155,6 +157,12 @@ export default function AdminDeptListView({ dbData }: Props) {
 			}
 		}
 	}, [dbData]);
+
+	useEffect(() => {
+		if (refreshTicket > 0) {
+			router.refresh();
+		}
+	}, [refreshTicket]);
 
 	return (
 		<Box
