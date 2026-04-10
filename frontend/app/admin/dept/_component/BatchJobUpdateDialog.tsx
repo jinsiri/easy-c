@@ -11,6 +11,7 @@ import {
 import { RoleCategory } from '@/constant/deptConst';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { useDialogStore } from '@/store/useDialogStore';
+import useRefreshStore from '@/store/useRefreshStore';
 
 interface BatchJobUpdateDialogProps {
 	category: RoleCategory;
@@ -59,6 +60,7 @@ const CATEGORY_CONFIG = {
 
 export default function BatchJobUpdateDialog({ category, checkedIds, onClose, reloadList }: BatchJobUpdateDialogProps) {
 	const { alert, success } = useDialogStore();
+	const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
 	const idKey = CATEGORY_CONFIG[category].idKey;
 	const nameKey = CATEGORY_CONFIG[category].nameKey;
 	const korName = CATEGORY_CONFIG[category].korName;
@@ -92,6 +94,7 @@ export default function BatchJobUpdateDialog({ category, checkedIds, onClose, re
 		await CATEGORY_CONFIG[category].saveApi(payload);
 		await success('변경되었습니다.');
 
+		triggerRefresh();
 		reloadList();
 		onClose();
 	};

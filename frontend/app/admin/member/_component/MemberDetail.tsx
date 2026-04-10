@@ -9,6 +9,7 @@ import { CAREER_COL_DEFS, CERTIFICATION_COL_DEFS, LANGUAGE_COL_DEFS, REWARD_COL_
 import CommonTabs from '@/app/_component/CommonTabs';
 import { getDisplayValue, transformGridData } from '@/app/admin/member/_utils/formUtil';
 import { CheckCircle, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import useRefreshStore from '@/store/useRefreshStore';
 
 // ========== 필드 매핑 정의 ==========
 // 상단 기본 인사정보 (카드 영역)
@@ -81,6 +82,7 @@ interface MemberDetailProps {
 }
 
 export default function MemberDetail({ selectedId }: MemberDetailProps) {
+	const refreshTicket = useRefreshStore((state) => state.refreshTicket);
 	const searchParams = useSearchParams();
 	const memberId = selectedId || Number(searchParams.get('memberId'));
 	const theme = useTheme();
@@ -148,7 +150,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 		};
 
 		fetchMemberData();
-	}, [memberId]);
+	}, [memberId, refreshTicket]);
 
 	const tabInfoContents = useMemo(() => {
 		return (
