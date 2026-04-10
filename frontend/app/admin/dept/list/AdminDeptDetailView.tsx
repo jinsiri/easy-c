@@ -20,6 +20,12 @@ interface Props {
 
 type DeptRole = 'MANAGER' | 'SUB_MANAGER' | 'MEMBER';
 
+const deptRoleNm: Record<DeptRole, string> = {
+	MANAGER: '부서장',
+	SUB_MANAGER: '부부서장',
+	MEMBER: '부서원',
+};
+
 export default function AdminDeptDetailView({ deptId }: Props) {
 	const { alert, confirm } = useDialogStore();
 	const theme = useTheme();
@@ -36,11 +42,6 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 		const photo = params.value ? params.value : '/images/blank_profile.png';
 		const { memberNm, jobTitle, loginId } = params.data;
 		const { deptRole } = params.data as { deptRole: DeptRole };
-		const deptRoleNm: Record<DeptRole, string> = {
-			MANAGER: '부서장',
-			SUB_MANAGER: '부부서장',
-			MEMBER: '부서원',
-		};
 
 		return (
 			<Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -141,24 +142,26 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 		return true;
 	};
 
-	const assignDeptHead = async () => {
+	const assignDeptRole = async (deptRole: DeptRole) => {
 		if (!(await validateSelection(1, 1, '위임할 대상을 선택해 주세요.'))) return;
 
-		const currentManager = deptMembers.find((m) => m.deptRole === 'MANAGER');
+		if (deptRole === 'MANAGER' || deptRole === 'SUB_MANAGER') {
+			const currentManager = deptMembers.find((m) => m.deptRole === deptRole);
 
-		if (currentManager?.memberId === checkedMemberIds[0]) {
-			await alert('이미 부서장으로 지정되어 있습니다.');
-			return;
-		}
+			if (currentManager?.memberId === checkedMemberIds[0]) {
+				await alert(`이미 ${deptRoleNm[deptRole]}으로 지정되어 있습니다.`);
+				return;
+			}
 
-		if (currentManager && !(await confirm('부서장이 이미 존재합니다. 바꾸시겠습니까?'))) {
-			return;
+			if (currentManager && !(await confirm(`${deptRoleNm[deptRole]}이 이미 존재합니다. 바꾸시겠습니까?`))) {
+				return;
+			}
 		}
 
 		await deptService.assignDeptRole({
 			deptId,
 			memberId: checkedMemberIds[0],
-			deptRole: 'MANAGER',
+			deptRole: deptRole,
 		});
 
 		await fetchMembersMappedToDeptId(deptId);
@@ -183,6 +186,11 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 		{ label: '직무 변경', onClick: () => openChangeRankModal('ROLE') },
 	];
 
+	const assignOptions = [
+		{ label: '부서장 위임', onClick: () => assignDeptRole('MANAGER') },
+		{ label: '부부서장 위임', onClick: () => assignDeptRole('SUB_MANAGER') },
+	];
+
 	return (
 		<>
 			{openUpdateModal && (
@@ -205,9 +213,7 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 					}}
 				/>
 				<DropdownButton initialLabel='일괄 변경' variant={'contained'} color={'primary'} options={menuOptions} />
-				<Button variant='contained' size='small' onClick={assignDeptHead}>
-					부서장 위임
-				</Button>
+				<DropdownButton initialLabel='부서장 위임' variant={'contained'} color={'primary'} options={assignOptions} />
 				<Button variant='contained' size='small' onClick={openReassignDept}>
 					부서 이동
 				</Button>
