@@ -11,21 +11,13 @@ import DropdownButton from '@/app/_component/DropdownButton';
 import { useDialogStore } from '@/store/useDialogStore';
 import { deptService } from '@/app/services/deptService';
 import BatchJobUpdateDialog from '@/app/admin/dept/_component/BatchJobUpdateDialog';
-import { RoleCategory } from '@/constant/deptConst';
+import { DEPT_ROLE, DEPT_ROLE_NM, RoleCategory } from '@/constant/deptConst';
 import BatchReassignDeptDialog from '@/app/admin/dept/_component/BatchReassignDeptDialog';
 import useRefreshStore from '@/store/useRefreshStore';
 
 interface Props {
 	deptId: number;
 }
-
-type DeptRole = 'MANAGER' | 'SUB_MANAGER' | 'MEMBER';
-
-const deptRoleNm: Record<DeptRole, string> = {
-	MANAGER: '부서장',
-	SUB_MANAGER: '부부서장',
-	MEMBER: '부서원',
-};
 
 export default function AdminDeptDetailView({ deptId }: Props) {
 	const { alert, confirm } = useDialogStore();
@@ -43,7 +35,7 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 	const PhotoRenderer = (params: ICellRendererParams) => {
 		const photo = params.value ? params.value : '/images/blank_profile.png';
 		const { memberNm, jobTitle, loginId } = params.data;
-		const { deptRole } = params.data as { deptRole: DeptRole };
+		const { deptRole } = params.data as { deptRole: DEPT_ROLE };
 
 		return (
 			<Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -62,7 +54,7 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 									color: theme.palette.secondary.contrastText,
 								}}
 							>
-								{deptRoleNm[deptRole]}
+								{DEPT_ROLE_NM[deptRole]}
 							</Typography>
 						)}
 						<Typography component={'span'} sx={{ display: 'block' }}>
@@ -144,18 +136,18 @@ export default function AdminDeptDetailView({ deptId }: Props) {
 		return true;
 	};
 
-	const assignDeptRole = async (deptRole: DeptRole) => {
+	const assignDeptRole = async (deptRole: DEPT_ROLE) => {
 		if (!(await validateSelection(1, 1, '위임할 대상을 선택해 주세요.'))) return;
 
 		if (deptRole === 'MANAGER' || deptRole === 'SUB_MANAGER') {
 			const currentManager = deptMembers.find((m) => m.deptRole === deptRole);
 
 			if (currentManager?.memberId === checkedMemberIds[0]) {
-				await alert(`이미 ${deptRoleNm[deptRole]}으로 지정되어 있습니다.`);
+				await alert(`이미 ${DEPT_ROLE_NM[deptRole]}으로 지정되어 있습니다.`);
 				return;
 			}
 
-			if (currentManager && !(await confirm(`${deptRoleNm[deptRole]}이 이미 존재합니다. 바꾸시겠습니까?`))) {
+			if (currentManager && !(await confirm(`${DEPT_ROLE_NM[deptRole]}이 이미 존재합니다. 바꾸시겠습니까?`))) {
 				return;
 			}
 		}
