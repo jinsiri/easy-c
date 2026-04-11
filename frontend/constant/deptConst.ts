@@ -231,3 +231,11 @@ export const RANK_TEMPLATES: Record<
 		subTypes: {},
 	},
 } as const;
+
+//todo: 이름 겹쳐서 상단 deptRole 적확 명칭으로 수정 필요
+export type DEPT_ROLE = 'MANAGER' | 'SUB_MANAGER' | 'MEMBER';
+export const DEPT_ROLE_NM: Record<DEPT_ROLE, string> = {
+	MANAGER: '부서장',
+	SUB_MANAGER: '부부서장',
+	MEMBER: '부서원',
+};

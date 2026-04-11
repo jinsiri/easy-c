@@ -3,7 +3,6 @@ package org.easyc.member.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.dto.AuditUser;
@@ -89,11 +88,11 @@ public class MemberLightResponseDto extends BaseDto {
     public void addDeptInfo(String deptNm, String jobTitle, DeptRole deptRole) {
         if (deptNm != null) {
             StringBuilder sb = new StringBuilder(deptNm);
-            if ((jobTitle != null && !jobTitle.isEmpty()) || (deptRole != null)) {
+            if ((jobTitle != null && !jobTitle.isEmpty()) || (deptRole != null) && deptRole != DeptRole.MEMBER) {
                 sb.append("(");
                 if (jobTitle != null) sb.append(jobTitle);
-                if (jobTitle != null && deptRole != null) sb.append("/");
-                if (deptRole != null) sb.append(deptRole);
+                if (jobTitle != null && deptRole != null && deptRole != DeptRole.MEMBER) sb.append("/");
+                if (deptRole != null && deptRole != DeptRole.MEMBER) sb.append(deptRole.getDescription());
                 sb.append(")");
             }
             this.deptInfoSet.add(sb.toString());
