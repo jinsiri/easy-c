@@ -176,7 +176,7 @@ export default function VacationUserPage() {
 					<Box sx={{ width: { sm: '100%', md: '50%' }, borderRight: '1px solid', borderColor: 'grey.300' }}>
 						<VacationComp vacationData={vacationData} />
 					</Box>
-					<Box sx={{ width: { sm: '100%', md: '50%' }, borderRight: '1px solid', borderColor: 'grey.300' }}>
+					<Box sx={{ width: { sm: '100%', md: '50%' } }}>
 						<Box
 							sx={{
 								display: 'flex',
@@ -191,7 +191,7 @@ export default function VacationUserPage() {
 								<Typography sx={{ color: 'grey.700' }}>
 									연차를{' '}
 									{vacationData && vacationData.usedDay && vacationData.grantedDay
-										? (vacationData.usedDay / vacationData.grantedDay) * 100
+										? Math.floor((vacationData.usedDay / vacationData.grantedDay) * 100)
 										: 0}
 									% 소진했습니다.
 								</Typography>

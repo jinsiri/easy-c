@@ -114,7 +114,6 @@ export default function AttendanceUserPage() {
 				workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
 			});
 
-			console.log(res);
 			setAttendanceData(res);
 		} finally {
 			setLoader(false);
