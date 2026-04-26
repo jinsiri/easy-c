@@ -12,6 +12,8 @@ import org.easyc.board.repository.BoardPostRepositoryCustom;
 import org.easyc.common.dto.AuditUser;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -63,6 +65,9 @@ public class BoardPostService {
     @Transactional
     public BoardPostResponseDto create(BoardPostRequestDto dto) {
         BoardPost post = boardPostRepository.save(dto.toEntity());
+        String htmlContents = Jsoup.clean(dto.getContent(), Safelist.basic());
+        post.updateContent(htmlContents);
+
         return BoardPostResponseDto.fromEntity(post);
     }
 

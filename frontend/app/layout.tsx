@@ -8,10 +8,10 @@ import theme from '../theme/Theme';
 
 /** Custom */
 import ClientLocalizationProvider from './_component/baseElement/ClientLocalizationProvider';
+import Loader from './_component/baseElement/Loader';
 
 /** CSS */
 import '@/style/globals.css';
-import Loader from './_component/baseElement/Loader';
 import { SystemDialog } from '@/app/_component/baseElement/SystemDialog';
 
 export const metadata: Metadata = {

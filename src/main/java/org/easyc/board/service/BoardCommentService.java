@@ -10,7 +10,10 @@ import org.easyc.board.repository.BoardPostRepository;
 import org.easyc.common.dto.AuditUser;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
+import org.jsoup.safety.Safelist;
 import org.springframework.stereotype.Service;
+
+import org.jsoup.Jsoup;
 
 import java.util.List;
 

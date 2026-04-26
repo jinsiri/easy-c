@@ -1,6 +1,8 @@
 @charset "utf-8";
 
 @import 'react-calendar-timeline/style.css';
+@import 'keyframe-animations.css';
+@import 'variables.css';
 @import 'font.css';
 
 * {

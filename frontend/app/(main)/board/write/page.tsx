@@ -1,14 +1,19 @@
 'use client';
 
+import { useState, useRef } from 'react';
+import secureLocalStorage from 'react-secure-storage';
+import { useRouter, useSearchParams } from 'next/navigation';
+
 /** MUI */
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
-import secureLocalStorage from 'react-secure-storage';
 
 /** Custom */
 import PathBreadcrumbs from '../../../_component/PathBreadcrumbs';
 import { boardPostService } from '../../../services/boardPostService';
+import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
+
+/** Type & Interface **/
+import { EditorValues } from '@/type/interface';
 
 const ALL_CATEGORIES = [
 	{ value: 'NOTICE', label: '공지사항' },
@@ -21,12 +26,15 @@ export default function BoardWritePage() {
 	const isAdmin = secureLocalStorage.getItem('memberRole') === 'ROLE_ADMIN';
 	const categories = isAdmin ? ALL_CATEGORIES : ALL_CATEGORIES.filter((c) => c.value !== 'NOTICE');
 	const initialCategory = searchParams.get('category') ?? (isAdmin ? 'NOTICE' : 'GENERAL');
+
+	const editorRef = useRef<EditorValues | null>(null);
+
 	const [category, setCategory] = useState(initialCategory);
 	const [title, setTitle] = useState('');
-	const [content, setContent] = useState('');
 
 	const handleSubmit = () => {
-		boardPostService.create({ category, title, content }).then(() => router.back());
+		const _content = editorRef.current ? editorRef.current.getHTML() : '';
+		boardPostService.create({ category, title, content: _content }).then(() => router.back());
 	};
 
 	return (
@@ -34,33 +42,28 @@ export default function BoardWritePage() {
 			<PathBreadcrumbs />
 			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 900, width: '100%' }}>
 				<Box sx={{ display: 'flex', gap: 2 }}>
-					<FormControl size="small" sx={{ minWidth: 140 }}>
+					<FormControl size='small' sx={{ minWidth: 140 }}>
 						<InputLabel>카테고리</InputLabel>
-						<Select label="카테고리" value={category} onChange={(e) => setCategory(e.target.value)}>
+						<Select label='카테고리' value={category} onChange={(e) => setCategory(e.target.value)}>
 							{categories.map((c) => (
-								<MenuItem key={c.value} value={c.value}>{c.label}</MenuItem>
+								<MenuItem key={c.value} value={c.value}>
+									{c.label}
+								</MenuItem>
 							))}
 						</Select>
 					</FormControl>
-					<TextField
-						label="제목"
-						size="small"
-						fullWidth
-						value={title}
-						onChange={(e) => setTitle(e.target.value)}
-					/>
+					<TextField label='제목' size='small' fullWidth value={title} onChange={(e) => setTitle(e.target.value)} />
 				</Box>
-				<TextField
-					label="내용"
-					multiline
-					rows={20}
-					fullWidth
-					value={content}
-					onChange={(e) => setContent(e.target.value)}
-				/>
+				<Box sx={{ flex: 1 }}>
+					<SimpleEditor ref={editorRef} />
+				</Box>
 				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-					<Button variant="outlined" onClick={() => router.back()}>취소</Button>
-					<Button variant="contained" onClick={handleSubmit}>등록</Button>
+					<Button variant='outlined' onClick={() => router.back()}>
+						취소
+					</Button>
+					<Button variant='contained' onClick={handleSubmit}>
+						등록
+					</Button>
 				</Box>
 			</Box>
 		</Box>

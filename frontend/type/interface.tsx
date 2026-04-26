@@ -40,3 +40,9 @@ export interface FilterValues {
 	endDate: Dayjs | null;
 	workDate?: Dayjs | null;
 }
+
+export interface EditorValues {
+	getHTML: () => string;
+	getJSON: () => any;
+	setContent: (content: string) => void;
+}
