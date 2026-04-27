@@ -7,7 +7,7 @@ export default function GridActionButtonComp(params: any) {
 	const { onClickAction } = params;
 
 	return (
-		<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', gap: 1, py: '6px' }}>
+		<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', gap: 1, px: '6px' }}>
 			<Button variant='contained' size='small' sx={{ px: '0.25rem' }} onClick={() => onClickAction('approve', params.data)}>
 				승인
 			</Button>

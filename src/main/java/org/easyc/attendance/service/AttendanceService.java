@@ -18,6 +18,7 @@ import org.easyc.memberJobGradeMap.entity.MemberJobGradeMap;
 import org.easyc.memberJobGradeMap.repository.MemberJobGradeMapRepository;
 import org.easyc.vacation.constant.VacationType;
 import org.easyc.vacation.entity.VacationApplication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -237,14 +238,28 @@ public class AttendanceService {
             targetPolicy = findAttendancePolicy(memberId);
         }
 
-        Attendance result = Attendance.builder()
-                            .memberId(memberId)
-                            .memberNm(deptMemberMaps.getMember().getMemberNm())
-                            .deptNm(deptMemberMaps.getDept().getDeptNm())
-                            .jobGrade(deptMemberMaps.getJobTitle().getJobTitleNm())
-                            .attendancePolicyName(targetPolicy.getAttendancePolicyName())
-                            .workDate(workDate)
-                            .build();
+        Attendance result = new Attendance();
+        if(deptMemberMaps == null){
+            Member member = memberRepository.findByMemberId(memberId)
+                    .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
+
+            result = Attendance.builder()
+                    .memberId(memberId)
+                    .memberNm(member.getMemberNm())
+                    .attendancePolicyName(targetPolicy.getAttendancePolicyName())
+                    .workDate(workDate)
+                    .build();
+
+        }else{
+            result = Attendance.builder()
+                    .memberId(memberId)
+                    .memberNm(deptMemberMaps.getMember().getMemberNm())
+                    .deptNm(deptMemberMaps.getDept().getDeptNm())
+                    .jobGrade(deptMemberMaps.getJobTitle().getJobTitleNm())
+                    .attendancePolicyName(targetPolicy.getAttendancePolicyName())
+                    .workDate(workDate)
+                    .build();
+        }
 
         return result;
     }

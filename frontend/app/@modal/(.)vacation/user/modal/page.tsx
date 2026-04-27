@@ -150,6 +150,7 @@ export default function VacationUserModal() {
 							render={({ field }) => (
 								<DatePicker
 									{...field}
+									value={field.value ?? null}
 									readOnly={type === 'read'}
 									slotProps={{
 										textField: {
@@ -178,6 +179,7 @@ export default function VacationUserModal() {
 									render={({ field }) => (
 										<DatePicker
 											{...field}
+											value={field.value ?? null}
 											readOnly={type === 'read'}
 											slotProps={{
 												textField: {

@@ -12,12 +12,16 @@ import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.dto.PageResponseDto;
 import org.easyc.common.dto.SearchRequestDto;
 
+import org.easyc.common.exception.CustomException;
+import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
+import org.easyc.member.entity.Member;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.vacation.entity.VacationApplication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,6 +40,7 @@ public class AttendanceApplicationService {
     private final DeptMemberMapRepository deptMemberMapRepository;
 
     private final AttendanceApplicationRepositoryCustom attendanceApplicationRepositoryCustom;
+    private final MemberRepository memberRepository;
 
     public List<AttendanceApplication> getAllAttendanceApplication (){
         return attendanceApplicationRepository.findAll();
@@ -59,9 +64,18 @@ public class AttendanceApplicationService {
         Attendance targetAttendance = attendanceRepository.findByMemberIdAndWorkDateAndDeletedFalse(req.getMemberId(), req.getWorkDate()).orElse(null);
 
         DeptMemberMap deptMemberMap = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(req.getMemberId());
-        attendanceApplication.setMemberNm(deptMemberMap.getMember().getMemberNm());
-        attendanceApplication.setDeptNm(deptMemberMap.getDept().getDeptNm());
-        attendanceApplication.setJobGrade(deptMemberMap.getJobTitle().getJobTitleNm());
+
+        if(deptMemberMap == null){
+            Member member = memberRepository.findByMemberId(req.getMemberId())
+                    .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
+
+            attendanceApplication.setMemberNm(member.getMemberNm());
+
+        }else{
+            attendanceApplication.setMemberNm(deptMemberMap.getMember().getMemberNm());
+            attendanceApplication.setDeptNm(deptMemberMap.getDept().getDeptNm());
+            attendanceApplication.setJobGrade(deptMemberMap.getJobTitle().getJobTitleNm());
+        }
 
         //summary 자동 계산
         String summary = makeSummary(targetAttendance, attendanceApplication);

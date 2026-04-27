@@ -4,8 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.easyc.attendance.service.AttendanceService;
 import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.dto.PageResponseDto;
+import org.easyc.common.exception.CustomException;
+import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
+import org.easyc.member.entity.Member;
+import org.easyc.member.repository.MemberRepository;
 import org.easyc.vacation.constant.VacationCategory;
 import org.easyc.vacation.constant.VacationType;
 import org.easyc.vacation.dto.VacationAppSearchRequestDto;
@@ -19,6 +23,7 @@ import org.easyc.vacation.repository.VacationRepository;
 import org.easyc.vacation.repository.VacationApplicationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -37,15 +42,23 @@ public class VacationApplicationService {
     private final AttendanceService attendanceService;
     private final DeptMemberMapRepository deptMemberMapRepository;
     private final VacationApplicationRepositoryCustom vacationApplicationRepositoryCustom;
+    private final MemberRepository memberRepository;
 
     public void saveVacationApplication(VacationApplicationDto request) {
-        DeptMemberMap deptMemberMap = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(request.getMemberId());
-
         VacationApplication application = request.returnEntity();
-        application.setMemberNm(deptMemberMap.getMember().getMemberNm());
-        application.setDeptNm(deptMemberMap.getDept().getDeptNm());
-        application.setJobGrade(deptMemberMap.getJobTitle().getJobTitleNm());
 
+        DeptMemberMap deptMemberMap = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(request.getMemberId());
+        if(deptMemberMap == null){
+            Member member = memberRepository.findByMemberId(request.getMemberId())
+                    .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
+
+            application.setMemberNm(member.getMemberNm());
+
+        }else{
+            application.setMemberNm(deptMemberMap.getMember().getMemberNm());
+            application.setDeptNm(deptMemberMap.getDept().getDeptNm());
+            application.setJobGrade(deptMemberMap.getJobTitle().getJobTitleNm());
+        }
         vacationApplicationRepository.save(application);
     }
 

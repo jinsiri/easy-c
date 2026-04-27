@@ -112,7 +112,7 @@ export default function VacationCompanyPage() {
 			{
 				field: 'member',
 				headerName: '근무자',
-				cellStyle: { padding: '0.25rem 0' },
+				cellStyle: { padding: '0.5rem' },
 				cellRenderer: (params: any) => {
 					const { deptNm, jobGrade, memberNm, vacationPolicyName } = params.data || {};
 					return <GridMemberComp memberNm={memberNm} deptNm={deptNm} jobGrade={jobGrade} policyNm={vacationPolicyName} />;
