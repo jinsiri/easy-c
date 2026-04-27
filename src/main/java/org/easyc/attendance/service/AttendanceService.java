@@ -84,11 +84,21 @@ public class AttendanceService {
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
         List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateAsc(memberId, firstDay, lastDay);
-        Map<Integer, Attendance> attendanceMap = targetMonthAttendanceList.stream()
-                .collect(Collectors.toMap(a -> a.getWorkDate().getDayOfMonth(), a -> a));
-
+        Map<Integer, Attendance> attendanceMap =
+                targetMonthAttendanceList.stream()
+                        .collect(Collectors.toMap(
+                                a -> a.getWorkDate().getDayOfMonth(),
+                                a -> a,
+                                (existing, replacement) -> existing,
+                                LinkedHashMap::new
+                        ));
         List<HolidayCalendar> holidayCalendarList = holidayCalendarRepository.findByYearEquals(targetYear.toString());
-        Map<LocalDate,String> holidayMap = holidayCalendarList.stream().collect(Collectors.toMap(a -> a.getStartDate() , a -> a.getSubject()));
+        Map<LocalDate,String> holidayMap = holidayCalendarList.stream()
+                .collect(Collectors.toMap(
+                        a -> a.getStartDate() ,
+                        a -> a.getSubject(),
+                        (existing, replacement) -> existing
+                ));
 
         List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDate(memberId, firstDay, lastDay);
         Map<Integer, List<AttendanceApplication>> changeRequestMap =

@@ -9,8 +9,6 @@ import { MemberResponseDto, DeptMemberMapResponseDto } from '@/app/services/memb
 export default function UserResorceComp({ userData, deptData }: { userData?: MemberResponseDto; deptData?: DeptMemberMapResponseDto }) {
 	const theme = useTheme();
 
-	console.log(deptData);
-
 	return (
 		<Box
 			sx={{
@@ -19,6 +17,7 @@ export default function UserResorceComp({ userData, deptData }: { userData?: Mem
 				borderRadius: '1rem',
 				padding: '1.5rem',
 				backgroundColor: 'primary.50',
+				minHeight: '14rem',
 			}}
 		>
 			<Box

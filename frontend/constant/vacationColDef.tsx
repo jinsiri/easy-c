@@ -67,11 +67,6 @@ export const colDefs = (onClickDetail: (data: any) => void, onClickRemove: (data
 export const historyColDefs = (): ColDef<Record<string, any>>[] => {
 	return [
 		{
-			field: 'registerDate',
-			headerName: '휴가신청일',
-			valueFormatter: (param) => (param.value ? dayjs(param.value).format('YYYY-MM-DD') : '-'),
-		},
-		{
 			field: 'transactionType',
 			headerName: '휴가 관리 상태',
 			flex: 1,
@@ -96,13 +91,24 @@ export const historyColDefs = (): ColDef<Record<string, any>>[] => {
 			field: 'accrualDate',
 			headerName: '휴가 지급일',
 			flex: 1,
+			cellStyle: { textAlign: 'center' },
 			valueFormatter: (param) => (param.value ? dayjs(param.value).format('YYYY-MM-DD') : '-'),
 		},
 		{
 			field: 'expireDate',
 			headerName: '휴가 만료일',
 			flex: 1,
+			cellStyle: { textAlign: 'center' },
 			valueFormatter: (param) => (param.value ? dayjs(param.value).format('YYYY-MM-DD') : '-'),
+		},
+		{
+			field: 'registerDate',
+			headerName: '휴가신청일',
+			cellStyle: { textAlign: 'center' },
+			valueFormatter: (param) => {
+				const registerDate = param.value ? dayjs(param.value).format('YYYY-MM-DD') : '-';
+				return param.data?.transactionType && param.data.transactionType === 'USE' ? registerDate : '-';
+			},
 		},
 		{
 			field: 'violationReason',

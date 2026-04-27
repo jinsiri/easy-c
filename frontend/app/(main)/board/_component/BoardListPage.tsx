@@ -22,7 +22,7 @@ const colDefs: ColDef<Record<string, any>>[] = [
 		headerName: 'No',
 		minWidth: 60,
 		maxWidth: 60,
-		cellStyle: { 'text-align': 'center' },
+		cellStyle: { textAlign: 'center' },
 		valueGetter: (params) => {
 			const pageSize = params.api.paginationGetPageSize();
 			const currentPage = params.api.paginationGetCurrentPage();

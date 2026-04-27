@@ -91,7 +91,9 @@ export default function DashboardPage() {
 
 		try {
 			const encodedMemberId = btoa(String(secureLocalStorage.getItem('memberId')));
-			vacationService.getVacationData(encodedMemberId).then((res: VacationResponseDto) => setVacationData(res.vacation));
+			vacationService.getVacationData(encodedMemberId).then((res: VacationResponseDto) => {
+				if (res) setVacationData(res.vacation);
+			});
 		} finally {
 			setLoader(false);
 		}

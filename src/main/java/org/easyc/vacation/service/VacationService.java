@@ -41,6 +41,8 @@ public class VacationService {
         VacationPolicy vacationPolicy = vacationPolicyMapRepository.findPolicyByMemberIdAndActivedTrue(memberId).orElse(null);
         MemberProfile memberProfile = memberProfileRepository.findById(memberId).orElse(null);
 
+        if(memberProfile == null) return null;
+
         //2. 정책 데이터 없는 경우 - 신규 데이터 로직 생성
         if(vacationPolicy == null){
             vacationPolicy = vacationPolicyRepository.findByVacationPolicyIdAndActiveTrue(Long.valueOf(1)).orElse(null);

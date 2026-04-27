@@ -60,19 +60,6 @@ SELECT setval(
     true
 );
 
---근태 맵핑 데이터 세팅
-INSERT INTO attendance_policy_map (mapping_id, attendance_policy_id, member_id, apply_start, apply_end, actived)
-SELECT 1, 1, 1, '1900-01-01', null, true
-WHERE NOT EXISTS (
-    SELECT 1 FROM attendance_policy_map
-);
-
--- 시퀀스 설정 수정
-SELECT setval(
-    'attendance_policy_map_seq',
-    COALESCE((SELECT MAX(mapping_id) FROM attendance_policy_map), 1),
-    true
-);
 
 --휴가 정책 초기
 INSERT INTO vacation_policy (
@@ -108,16 +95,3 @@ SELECT setval(
     true -- 차후 NEXTVAL 호출 시 MAX+1이 나오도록 설정
 );
 
---휴가정책 맵핑 데이터 세팅
-INSERT INTO vacation_policy_map (mapping_id, vacation_policy_id, member_id, apply_start, apply_end, actived)
-SELECT 1, 1, 1, '1900-01-01', null, true
-WHERE NOT EXISTS (
-    SELECT 1 FROM vacation_policy_map
-);
-
--- 시퀀스 설정 수정
-SELECT setval(
-    'vacation_policy_map_seq',
-    COALESCE((SELECT MAX(mapping_id) FROM vacation_policy_map), 1),
-    true
-);

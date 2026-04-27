@@ -2,6 +2,7 @@ package org.easyc.deptMemberMap.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -37,8 +38,9 @@ public class DeptMemberMap extends BaseEntity {
     private DeptRole deptRole;
 
     // 주요 부서 여부
+    @Builder.Default
     @Column(name="is_primary")
-    private boolean isPrimary = false;
+    private boolean isPrimary = true;
 
     // 읽기 전용 - 부서
     @ManyToOne(fetch = FetchType.LAZY)

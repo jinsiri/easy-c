@@ -2,6 +2,8 @@ package org.easyc.member.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.easyc.attendance.entity.AttendancePolicyMap;
+import org.easyc.attendance.repository.AttendancePolicyMapRepository;
 import org.easyc.common.exception.CustomException;
 import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.deptMemberMap.service.DeptMemberMapService;
@@ -14,6 +16,9 @@ import org.easyc.memberJobPositionMap.dto.MemberJobPositionMapResponseDto;
 import org.easyc.memberJobPositionMap.service.MemberJobPositionMapService;
 import org.easyc.memberJobRoleMap.dto.MemberJobRoleMapResponseDto;
 import org.easyc.memberJobRoleMap.service.MemberJobRoleMapService;
+import org.easyc.vacation.entity.VacationPolicy;
+import org.easyc.vacation.entity.VacationPolicyMap;
+import org.easyc.vacation.repository.VacationPolicyMapRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +45,9 @@ public class MemberService {
     private final MemberJobRoleMapService memberJobRoleMapService;
     private final MemberJobPositionMapService memberJobPositionMapService;
     private final DeptMemberMapService deptMemberMapService;
+
+    private final AttendancePolicyMapRepository attendancePolicyMapRepository;
+    private final VacationPolicyMapRepository vacationPolicyMapRepository;
 
     // 로그인 아이디 중복 체크
     public boolean isLoginIdDuplicate(String loginId) {
@@ -243,6 +251,15 @@ public class MemberService {
         languageDtos.forEach(dto ->
                 memberLanguageRepository.save(MemberLanguage.of(member, dto))
         );
+
+        //정책 등록
+        AttendancePolicyMap attendancePolicyMap = new AttendancePolicyMap();
+        attendancePolicyMap.create(member.getMemberId());
+        attendancePolicyMapRepository.save(attendancePolicyMap);
+
+        VacationPolicyMap vacationPolicyMap = new VacationPolicyMap();
+        vacationPolicyMap.create(member.getMemberId());
+        vacationPolicyMapRepository.save(vacationPolicyMap);
     }
 
     @Transactional

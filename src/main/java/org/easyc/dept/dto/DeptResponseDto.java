@@ -29,6 +29,7 @@ public class DeptResponseDto extends BaseTreeDto {
     private String deptCode;
     private String deptEmail;
 
+    @Builder.Default
     private List<DeptMemberMapResponseDto> deptMembers = new ArrayList<>();
 
     public static DeptResponseDto fromEntity(Dept dept) {

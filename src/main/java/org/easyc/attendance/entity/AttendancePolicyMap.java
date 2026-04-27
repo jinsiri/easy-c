@@ -46,6 +46,14 @@ public class AttendancePolicyMap {
     @JoinColumn(name = "attendance_policy_id", insertable = false, updatable = false)
     private AttendancePolicy attendancePolicy;
 
+    // 초기 정책 연결 메서드
+    public void create(Long memberId) {
+        this.attendancePolicyId = 1L;
+        this.memberId = memberId;
+        this.applyStart = LocalDate.now();
+        this.actived = true;
+    }
+
     // 정책 종료 메서드
     public void deactivate() {
         this.applyEnd = LocalDate.now();
