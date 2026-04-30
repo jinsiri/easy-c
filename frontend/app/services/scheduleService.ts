@@ -51,10 +51,22 @@ export interface ScheduleController {
 	endDate: dayjs.Dayjs | null;
 	startTime: dayjs.Dayjs | null;
 	endTime: dayjs.Dayjs | null;
+	published: string;
+}
+
+export interface ScheduleRequestDto {
+	memberId: number;
+	scheduleName: string;
+	scheduleDesc: string;
+	startDate: string | null;
+	endDate: string | null;
+	startTime: string | null;
+	endTime: string | null;
 	published: boolean;
 }
 
 // API 정의
 export const scheduleService = {
 	getUserMonthSchedules: (req: CalendarRequestDto) => axiosConfig.post<Record<dayName, CalendarDayDto>[]>('/api/schedule/user/month', req),
+	createUserSchedule: (req: ScheduleRequestDto) => axiosConfig.post<Record<dayName, CalendarDayDto>[]>('/api/schedule/user/create', req),
 };

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import secureLocalStorage from 'react-secure-storage';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -10,24 +11,9 @@ import useModalStore from '@/store/useModalStore';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
-import {
-	Accordion,
-	AccordionSummary,
-	AccordionDetails,
-	Box,
-	Button,
-	Typography,
-	Grid,
-	Select,
-	MenuItem,
-	ToggleButtonGroup,
-	ToggleButton,
-	FormControlLabel,
-	RadioGroup,
-	Radio,
-} from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, Box, Button, Typography, Grid, Tooltip, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 
-import { ExpandMoreRounded, ArrowBackRounded } from '@mui/icons-material';
+import { HelpRounded, ArrowBackRounded } from '@mui/icons-material';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 /** Custom */
@@ -37,7 +23,8 @@ import { FormWrapper, FormItem } from '@/app/_component/baseElement/FormComp';
 /** Type / Interface */
 import { ATTENDANCETYPE, SETTLEMENTPERIOD, WORKTIMERULE, WORKDAYOFWEEKNUMBER } from '@/constant/attendanceConst';
 import { AttendancePolicyRequestController, AttendancePolicyDto, attendancePolicyService } from '@/app/services/attendancePolicyService';
-import { ScheduleController } from '@/app/services/scheduleService';
+import { ScheduleController, ScheduleRequestDto, scheduleService } from '@/app/services/scheduleService';
+import { DatePicker } from '@mui/x-date-pickers';
 
 export default function ScheduleUserDataPage() {
 	const router = useRouter();
@@ -49,29 +36,39 @@ export default function ScheduleUserDataPage() {
 
 	const {
 		control,
-		watch,
-		reset,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<ScheduleController>({
 		defaultValues: {
 			scheduleName: '',
 			scheduleDesc: '',
-			published: false,
-			startDate: null,
+			published: 'public',
+			startDate: dayjs(),
 			endDate: null,
 			startTime: null,
 			endTime: null,
 		},
 	});
 
-	const handleSave = handleSubmit(async (data) => {
+	const handleSave = handleSubmit(async (data: ScheduleController) => {
 		setLoader(true);
 		try {
-			if (confirm('요청이 성공적으로 등록되었습니다.')) {
-				resetModalData();
-				router.back();
-			}
+			const _request: ScheduleRequestDto = {
+				...data,
+				memberId: secureLocalStorage.getItem('memberId') as number,
+				published: data.published === 'public',
+				startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
+				endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
+				startTime: data.startTime ? data.startTime.format('HH:mm') : null,
+				endTime: data.endTime ? data.endTime.format('HH:mm') : null,
+			};
+
+			scheduleService.createUserSchedule(_request).then(() => {
+				if (confirm('요청이 성공적으로 등록되었습니다.')) {
+					resetModalData();
+					router.back();
+				}
+			});
 		} finally {
 			setLoader(false);
 		}
@@ -113,78 +110,95 @@ export default function ScheduleUserDataPage() {
 							error={errors.scheduleName?.message}
 						/>
 						<FormWrapper label='일시' required>
-							<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
-								<Controller
-									name='startTime'
-									control={control}
-									rules={{
-										validate: (value) => {
-											if (!value) {
-												return '근무 시작 시간을 입력해주세요.';
-											}
-											return true;
-										},
-									}}
-									render={({ field }) => (
-										<TimePicker
-											{...field}
-											slotProps={{
-												textField: {
-													error: !!errors.startTime,
-													helperText: errors.startTime?.message,
-												},
-											}}
-										/>
-									)}
-								/>
+							<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 1 }}>
+								<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 1 }}>
+									<Controller
+										name='startDate'
+										control={control}
+										rules={{
+											validate: (value) => {
+												if (!value) {
+													return '일정 시작 일자을 입력해주세요.';
+												}
+												return true;
+											},
+										}}
+										render={({ field }) => (
+											<DatePicker
+												{...field}
+												slotProps={{
+													textField: {
+														error: !!errors.startTime,
+														helperText: errors.startTime?.message,
+													},
+												}}
+											/>
+										)}
+									/>
+									<Controller
+										name='startTime'
+										control={control}
+										render={({ field }) => (
+											<TimePicker
+												{...field}
+												slotProps={{
+													textField: {
+														error: !!errors.startTime,
+														helperText: errors.startTime?.message,
+													},
+												}}
+											/>
+										)}
+									/>
+								</Box>
 								~
-								<Controller
-									name='endTime'
-									control={control}
-									rules={{
-										validate: (value) => {
-											if (!value) {
-												return '근무 종료 시간을 입력해주세요.';
-											}
-											return true;
-										},
-									}}
-									render={({ field }) => (
-										<TimePicker
-											{...field}
-											slotProps={{
-												textField: {
-													error: !!errors.endTime,
-													helperText: errors.endTime?.message,
-												},
-											}}
-										/>
-									)}
-								/>
+								<Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 1 }}>
+									<Controller
+										name='endDate'
+										control={control}
+										render={({ field }) => (
+											<DatePicker
+												{...field}
+												slotProps={{
+													textField: {
+														error: !!errors.startTime,
+														helperText: errors.startTime?.message,
+													},
+												}}
+											/>
+										)}
+									/>
+									<Controller
+										name='endTime'
+										control={control}
+										render={({ field }) => (
+											<TimePicker
+												{...field}
+												slotProps={{
+													textField: {
+														error: !!errors.endTime,
+														helperText: errors.endTime?.message,
+													},
+												}}
+											/>
+										)}
+									/>
+								</Box>
 							</Box>
 						</FormWrapper>
 						<FormWrapper label='공개여부'>
 							<Controller
 								name='published'
 								control={control}
-								rules={{
-									validate: (value) => {
-										if (!value) {
-											return '근무 시작 시간을 입력해주세요.';
-										}
-										return true;
-									},
-								}}
 								render={({ field }) => (
-									<RadioGroup
-										row
-										aria-labelledby='demo-row-radio-buttons-group-label'
-										name='row-radio-buttons-group'
-										value={field.value ?? 'public'}
-										onChange={field.onChange}
-									>
+									<RadioGroup row name={field.name} value={field.value ?? 'private'} onChange={field.onChange}>
 										<FormControlLabel value='public' control={<Radio />} label='공개' />
-										<FormControlLabel value='private' control={<Radio />} label='비공개' />
+										<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+											<FormControlLabel value='private' control={<Radio />} label='비공개' />
+											<Tooltip title='‘비공개’를 선택하면 공유 캘린더의 다른 참석자들은 해당 일정을 볼 수 없습니다.' arrow>
+												<HelpRounded color='primary' sx={{ fontSize: '1rem', ml: '-12px' }} />
+											</Tooltip>
+										</Box>
 									</RadioGroup>
 								)}
 							/>

@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
-
     List<Schedule> findByMemberId(Long memberId);
+    List<Schedule> findByMemberIdAndScheduleStartDateBetweenAndDeletedFalse(Long memberId, LocalDate firstDay, LocalDate lastDay);
 }
