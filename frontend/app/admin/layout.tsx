@@ -30,7 +30,6 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
 			<Box
 				component={'main'}
 				sx={{
-					overflow: 'auto',
 					display: 'flex',
 					flexDirection: 'column',
 					position: 'relative',
@@ -39,7 +38,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
 				}}
 			>
 				<Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} headerHeight={headerHeight}></Header>
-				<Box sx={{ width: '100%', flexGrow: 1 /*height: `calc(100% - ${headerHeight} - 48px)`*/ }}>{children}</Box>
+				<Box sx={{ overflow: 'auto', width: '100%', flexGrow: 1 /*height: `calc(100% - ${headerHeight} - 48px)`*/ }}>{children}</Box>
 				<Footer />
 			</Box>
 		</Box>

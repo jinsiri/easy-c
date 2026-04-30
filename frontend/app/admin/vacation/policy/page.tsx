@@ -80,16 +80,6 @@ export default function VacationPolicyPage() {
 		}
 	};
 
-	const onClickUpdateButton = useCallback(
-		async (event: React.MouseEventHandler<HTMLButtonElement>, item: VacationPolicyDto) => {
-			if (item.vacationPolicyId) {
-				setModalData(item);
-				router.push(`/admin/vacation/policy/data?target=${btoa(item.vacationPolicyId.toString())}`);
-			}
-		},
-		[policyData],
-	);
-
 	const onClickDeleteButton = useCallback(
 		async (event: React.MouseEventHandler<HTMLButtonElement>, item: VacationPolicyDto) => {
 			try {

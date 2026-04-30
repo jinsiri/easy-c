@@ -16,6 +16,9 @@ import org.easyc.member.repository.MemberProfileRepository;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.memberJobGradeMap.entity.MemberJobGradeMap;
 import org.easyc.memberJobGradeMap.repository.MemberJobGradeMapRepository;
+import org.easyc.schedule.dto.CalendarDayDto;
+import org.easyc.schedule.dto.CalendarEventDto;
+import org.easyc.schedule.dto.CalendarRequestDto;
 import org.easyc.vacation.constant.VacationType;
 import org.easyc.vacation.entity.VacationApplication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -74,8 +77,34 @@ public class AttendanceService {
         return result;
     }
 
-    public List<Map<String, AttendanceCalendarResponseDto>> getAttendanceCalendarData(AttendanceRequestDto req) {
-        Long memberId = req.getMemberId();
+    public List<Map<String, CalendarDayDto>> getAttendanceCalendarData(CalendarRequestDto request) {
+        Long memberId = request.getMemberIds().get(0);
+
+        YearMonth yearMonth = YearMonth.of(request.getDate().getYear(), request.getDate().getMonthValue());
+        LocalDate firstDay = yearMonth.atDay(1);
+        LocalDate lastDay = yearMonth.atEndOfMonth();
+
+        List<Map<String, CalendarDayDto>> calendarFrame = createCalendarFrame(firstDay, lastDay, request.getScheduleType());
+
+        Map<LocalDate, List<CalendarEventDto>> attendanceMap = createAttendanceToCalendarMap(memberId, firstDay, lastDay, "PERSONAL");
+        Map<LocalDate, List<AttendanceApplication>> attendanceApplicationMap = createAttendanceAppMap(memberId, firstDay, lastDay);
+
+        List<Map<String, CalendarDayDto>> resultList =
+                calendarFrame.stream().map(dayMap -> {
+
+                    dayMap.forEach((key, dayDto) -> {
+                        LocalDate date = dayDto.getDate();
+
+                        dayDto.addEvents(attendanceMap.getOrDefault(date, List.of()));
+                        dayDto.addApplications(attendanceApplicationMap.getOrDefault(date, List.of()));
+                    });
+
+                    return dayMap;
+                }).toList();
+
+        return resultList;
+
+        /*Long memberId = req.getMemberId();
 
         Integer targetYear = req.getWorkDate().getYear();
         Integer targetMonth = req.getWorkDate().getMonthValue();
@@ -85,6 +114,8 @@ public class AttendanceService {
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
         List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateAsc(memberId, firstDay, lastDay);
+        Map<LocalDate,String> holidayMap = createHolidayMap(targetYear);
+
         Map<Integer, Attendance> attendanceMap =
                 targetMonthAttendanceList.stream()
                         .collect(Collectors.toMap(
@@ -93,13 +124,6 @@ public class AttendanceService {
                                 (existing, replacement) -> existing,
                                 LinkedHashMap::new
                         ));
-        List<HolidayCalendar> holidayCalendarList = holidayCalendarRepository.findByYearEquals(targetYear.toString());
-        Map<LocalDate,String> holidayMap = holidayCalendarList.stream()
-                .collect(Collectors.toMap(
-                        a -> a.getStartDate() ,
-                        a -> a.getSubject(),
-                        (existing, replacement) -> existing
-                ));
 
         List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDate(memberId, firstDay, lastDay);
         Map<Integer, List<AttendanceApplication>> changeRequestMap =
@@ -107,6 +131,8 @@ public class AttendanceService {
                         .collect(Collectors.groupingBy(
                                 a -> a.getWorkDate().getDayOfMonth()
                         ));
+
+
 
         String[] weekKeys = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
         List<Map<String, AttendanceCalendarResponseDto>> calendarList = new ArrayList<>();
@@ -160,7 +186,7 @@ public class AttendanceService {
             cursor = cursor.plusDays(1);
         }
 
-        return calendarList;
+        return calendarList;*/
     }
 
     public void startAttendanceData (AttendanceSaveRequestDto req) {
@@ -495,4 +521,101 @@ public class AttendanceService {
     }
 
 
+    //
+    public Map<LocalDate, List<CalendarEventDto>> createAttendanceToCalendarMap(Long memberId, LocalDate firstDay, LocalDate lastDay, String scheduleType){
+        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateAsc(memberId, firstDay, lastDay);
+
+        Map<LocalDate, List<CalendarEventDto>> calendarMap = new HashMap<>();
+        targetMonthAttendanceList.stream().forEach(attendance -> {
+            LocalDate date = attendance.getWorkDate();
+            List<CalendarEventDto> events = calendarMap.getOrDefault(date, new ArrayList<>());
+            CalendarEventDto dto = new CalendarEventDto(attendance);
+            events.add(dto);
+
+            calendarMap.put(date, events);
+        });
+
+        return calendarMap;
+    }
+
+    public Map<LocalDate, List<AttendanceApplication>> createAttendanceAppMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
+        List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDate(memberId, firstDay, lastDay);
+        Map<LocalDate, List<AttendanceApplication>> changeRequestMap =
+                targetAttendanceChangeRequestList.stream()
+                        .collect(Collectors.groupingBy(
+                                a -> a.getWorkDate()
+                        ));
+
+        return changeRequestMap;
+    }
+
+    private Map<LocalDate,String> createHolidayMap(Integer targetYear){
+        List<HolidayCalendar> holidayCalendarList = holidayCalendarRepository.findByYearEquals(targetYear.toString());
+        Map<LocalDate,String> holidayMap = holidayCalendarList.stream()
+                .collect(Collectors.toMap(
+                        a -> a.getStartDate() ,
+                        a -> a.getSubject(),
+                        (existing, replacement) -> existing
+                ));
+
+        return holidayMap;
+    }
+
+    private CalendarDayDto createCalendarItem(LocalDate date, boolean isCurrentMonth, String holidaySubject, String scheduleType){
+        CalendarDayDto calendarDayDto = CalendarDayDto.builder()
+                .date(date)
+                .scheduleType(scheduleType)
+                .isCurrentMonth(isCurrentMonth)
+                .isHoliday(holidaySubject != null)
+                .holidaySubject(holidaySubject)
+                .build();
+
+        return calendarDayDto;
+    }
+
+    public List<Map<String, CalendarDayDto>> createCalendarFrame(LocalDate firstDay, LocalDate lastDay, String scheduleType){
+        String[] weekKeys = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
+        List<Map<String, CalendarDayDto>> calendarList = new ArrayList<>();
+        Map<String, CalendarDayDto> currentWeek = new LinkedHashMap<>();
+
+        Map<LocalDate,String> holidayMap = createHolidayMap(firstDay.getYear());
+
+        // 1일 시작 전 이전 달 날짜 채우기 ---
+        int offset = firstDay.getDayOfWeek().getValue() - 1; // 월요일(1)이면 0, 수요일(3)이면 2
+        if (offset > 0) {
+            LocalDate prevMonthCursor = firstDay.minusDays(offset);
+            for (int i = 0; i < offset; i++) {
+                CalendarDayDto calendarDayDto = createCalendarItem(prevMonthCursor, false, holidayMap.get(prevMonthCursor), scheduleType);
+                currentWeek.put(weekKeys[i], calendarDayDto);
+                prevMonthCursor = prevMonthCursor.plusDays(1);
+            }
+        }
+
+        LocalDate cursor = firstDay;
+        while (!cursor.isAfter(lastDay) || currentWeek.size() != 0) {
+            DayOfWeek dayOfWeek = cursor.getDayOfWeek();
+            String key = weekKeys[dayOfWeek.getValue() - 1];
+
+            currentWeek.put(key, createCalendarItem(cursor, cursor.getMonth() == firstDay.getMonth(), holidayMap.get(cursor), scheduleType));
+
+            // 일요일이거나 월의 마지막 날이면 리스트에 추가
+            if (dayOfWeek == DayOfWeek.SUNDAY || cursor.equals(lastDay)) {
+
+                // 마지막 날이 일요일이 아니면 다음 달 날짜로 마저 채우기
+                if (cursor.equals(lastDay) && dayOfWeek != DayOfWeek.SUNDAY) {
+                    LocalDate nextMonthCursor = lastDay.plusDays(1);
+                    for (int i = dayOfWeek.getValue(); i < 7; i++) {
+                        currentWeek.put(weekKeys[i], createCalendarItem(nextMonthCursor, false, holidayMap.get(nextMonthCursor), scheduleType));
+                        nextMonthCursor = nextMonthCursor.plusDays(1);
+                    }
+                }
+
+                calendarList.add(currentWeek);
+                currentWeek = new LinkedHashMap<>();
+            }
+            cursor = cursor.plusDays(1);
+        }
+
+        return calendarList;
+    }
 }
