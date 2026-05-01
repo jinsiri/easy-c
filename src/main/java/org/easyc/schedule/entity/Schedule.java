@@ -25,17 +25,17 @@ public class Schedule extends BaseEntity {
     @Column(name = "schedule_name")
     private String scheduleName;
 
-    @Column(name = "schedule_start_date")
-    private LocalDate scheduleStartDate;
+    @Column(name = "start_date")
+    private LocalDate startDate;
 
-    @Column(name = "schedule_start_time")
-    private LocalTime scheduleStartTime;
+    @Column(name = "start_time")
+    private LocalTime startTime;
 
-    @Column(name = "schedule_end_date")
-    private LocalDate scheduleEndDate;
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
-    @Column(name = "schedule_end_time")
-    private LocalTime scheduleEndTime;
+    @Column(name = "end_time")
+    private LocalTime endTime;
 
     @Builder.Default
     @Column(name = "published")

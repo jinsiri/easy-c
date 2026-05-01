@@ -10,12 +10,15 @@ import org.easyc.schedule.entity.Schedule;
 import org.easyc.vacation.constant.VacationType;
 
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 @Getter
 @SuperBuilder
 @NoArgsConstructor
 public class CalendarEventDto {
+    private String groupId;
     private String eventType; // SCHEDULE / VACATION / OUTSIDE / ATTENDANCE
+    private Long duration;
 
     private Long memberId;
     private String memberNm;
@@ -43,7 +46,9 @@ public class CalendarEventDto {
 
 
     public CalendarEventDto(Attendance attendance) {
+        this.groupId = "";
         this.eventType = attendance.isVacationed() ? "VACATION" : attendance.isRemoted() ? "OUTSIDE" : "ATTENDANCE";
+        this.duration = 0L;
 
         this.memberId = attendance.getMemberId();
         this.memberNm = attendance.getMemberNm();
@@ -64,7 +69,9 @@ public class CalendarEventDto {
     }
 
     public CalendarEventDto(Schedule schedule, String memberNm, String deptNm, String jobGrade) {
+        this.groupId = "SCHEDULE_" + schedule.getSchedule_id();
         this.eventType = "SCHEDULE";
+        this.duration = schedule.getEndDate() != null ? ChronoUnit.DAYS.between(schedule.getStartDate(), schedule.getEndDate()): 0;
 
         this.memberId = schedule.getMemberId();
         this.memberNm = memberNm;
@@ -75,7 +82,7 @@ public class CalendarEventDto {
 
         this.scheduleName = schedule.getScheduleName();
         this.scheduleDesc = schedule.getScheduleDesc();
-        this.startTime = schedule.getScheduleStartTime();
-        this.endTime = schedule.getScheduleEndTime();
+        this.startTime = schedule.getStartTime();
+        this.endTime = schedule.getEndTime();
     }
 }

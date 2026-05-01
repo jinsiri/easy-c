@@ -47,7 +47,7 @@ export interface CalendarDayDto {
 export interface ScheduleController {
 	scheduleName: string;
 	scheduleDesc: string;
-	startDate: dayjs.Dayjs | null;
+	startDate: dayjs.Dayjs;
 	endDate: dayjs.Dayjs | null;
 	startTime: dayjs.Dayjs | null;
 	endTime: dayjs.Dayjs | null;
@@ -58,7 +58,7 @@ export interface ScheduleRequestDto {
 	memberId: number;
 	scheduleName: string;
 	scheduleDesc: string;
-	startDate: string | null;
+	startDate: string;
 	endDate: string | null;
 	startTime: string | null;
 	endTime: string | null;

@@ -9,8 +9,10 @@ import org.easyc.attendance.repository.AttendanceApplicationRepository;
 import org.easyc.attendance.repository.AttendanceRepository;
 import org.easyc.attendance.repository.HolidayCalendarRepository;
 import org.easyc.attendance.service.AttendanceService;
+import org.easyc.dept.entity.Dept;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
+import org.easyc.jobTitle.entity.JobTitle;
 import org.easyc.member.entity.Member;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.schedule.dto.CalendarDayDto;
@@ -19,9 +21,7 @@ import org.easyc.schedule.dto.CalendarRequestDto;
 import org.easyc.schedule.dto.ScheduleRequestDto;
 import org.easyc.schedule.entity.Schedule;
 import org.easyc.schedule.repository.ScheduleRepository;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -77,9 +77,19 @@ public class ScheduleService {
 
     public Map<LocalDate, List<CalendarEventDto>> createScheduleToCalendarMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
         DeptMemberMap deptMemberMaps = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(memberId);
-        String memberNm = Optional.ofNullable(deptMemberMaps.getMember().getMemberNm()).orElse(null);
-        String deptNm= Optional.ofNullable(deptMemberMaps.getDept().getDeptNm()).orElse(null);
-        String jobGrade= Optional.ofNullable(deptMemberMaps.getJobTitle().getJobTitleNm()).orElse(null);
+        String memberNm = Optional.ofNullable(deptMemberMaps)
+                .map(DeptMemberMap::getMember)
+                .map(Member::getMemberNm)
+                .orElse(null);
+        String deptNm = Optional.ofNullable(deptMemberMaps)
+                .map(DeptMemberMap::getDept)
+                .map(Dept::getDeptNm)
+                .orElse(null);
+
+        String jobGrade = Optional.ofNullable(deptMemberMaps)
+                .map(DeptMemberMap::getJobTitle)
+                .map(JobTitle::getJobTitleNm)
+                .orElse(null);
 
         if(deptMemberMaps == null){
             Member member = memberRepository.findByMemberId(memberId).orElseThrow();
@@ -88,19 +98,19 @@ public class ScheduleService {
 
         List<Schedule> scheduleList = scheduleRepository.findByMemberIdAndScheduleStartDateBetweenAndDeletedFalse(memberId, firstDay, lastDay);
 
-
         Map<LocalDate, List<CalendarEventDto>> calendarMap = new HashMap<>();
         for (Schedule schedule : scheduleList) {
-            LocalDate endDate = schedule.getScheduleEndDate();
-            LocalDate startDate = schedule.getScheduleStartDate();
-            long diff = ChronoUnit.DAYS.between(startDate, endDate);
+            LocalDate endDate = schedule.getEndDate();
+            LocalDate startDate = schedule.getStartDate();
+            long diff = endDate != null ? ChronoUnit.DAYS.between(startDate, endDate): 0;
 
             for(int i = 0; i < diff; i++) {
+                LocalDate targetDate = startDate.plusDays(i);
                 List<CalendarEventDto> list = calendarMap.getOrDefault(startDate, new ArrayList<>());
                 CalendarEventDto dto = new CalendarEventDto(schedule, memberNm, deptNm, jobGrade);
                 list.add(dto);
 
-                calendarMap.put(startDate, list);
+                calendarMap.put(targetDate, list);
             }
         }
 

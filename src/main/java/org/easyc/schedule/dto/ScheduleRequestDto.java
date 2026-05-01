@@ -26,16 +26,16 @@ public class ScheduleRequestDto {
     private String scheduleName;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate scheduleStartDate;
+    private LocalDate startDate;
 
     @JsonFormat(pattern = "HH:mm")
-    private LocalTime scheduleStartTime;
+    private LocalTime startTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate scheduleEndDate;
+    private LocalDate endDate;
 
     @JsonFormat(pattern = "HH:mm")
-    private LocalTime scheduleEndTime;
+    private LocalTime endTime;
 
     @JsonProperty("published")
     @Builder.Default
@@ -48,10 +48,10 @@ public class ScheduleRequestDto {
         return Schedule.builder()
                 .memberId(this.memberId)
                 .scheduleName(this.scheduleName)
-                .scheduleStartDate(this.scheduleStartDate)
-                .scheduleStartTime(this.scheduleStartTime)
-                .scheduleEndDate(this.scheduleEndDate)
-                .scheduleEndTime(this.scheduleEndTime)
+                .startDate(this.startDate)
+                .startTime(this.startTime)
+                .endDate(this.endDate)
+                .endTime(this.endTime)
                 .published(this.published)
                 .scheduleDesc(this.scheduleDesc)
                 .build();
