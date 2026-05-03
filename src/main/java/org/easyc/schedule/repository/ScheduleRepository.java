@@ -1,5 +1,6 @@
 package org.easyc.schedule.repository;
 
+import org.easyc.schedule.constant.ScheduleType;
 import org.easyc.schedule.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,4 +13,6 @@ import java.util.Optional;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findByMemberId(Long memberId);
     List<Schedule> findByMemberIdAndStartDateBetweenAndDeletedFalse(Long memberId, LocalDate firstDay, LocalDate lastDay);
+    List<Schedule> findByMemberIdAndStartDateBetweenAndScheduleTypeInAndDeletedFalse(Long memberId, LocalDate firstDay, LocalDate lastDay, List<ScheduleType> scheduleTypes);
+
 }

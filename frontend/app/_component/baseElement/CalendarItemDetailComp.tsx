@@ -19,7 +19,7 @@ import { formatMinutes, getTimelineInnerData } from '@/utils/commonFunc';
 import { AttendanceDayResDto } from '@/app/services/attendanceService';
 import { VACATIONTYPE, WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
 import { vacationType, workStatus, dayName, workType } from '@/type/types';
-import { CalendarDayDto } from '@/app/services/scheduleService';
+import { CalendarDayDto, CalendarEventDto } from '@/app/services/scheduleService';
 
 export interface CalendarColData {
 	key: dayName;
@@ -53,56 +53,10 @@ export default function CalendarItemDetailComp({ activeCell, idx, item }: { acti
 	const router = useRouter();
 	const { setModalData } = useModalStore();
 
-	const activeRowIdx = activeCell ? Number(activeCell.split('_')[0]) : null;
+	const activeSplit = activeCell ? activeCell.split('_') : null;
+	const activeRowIdx = activeSplit ? Number(activeSplit[0]) : null;
+	const activeColIdx = activeSplit ? Number(activeSplit[1]) : null;
 	const useComp = activeRowIdx === idx;
-
-	const makeTimelineData = useCallback(
-		(target: string): TimelineDataInterface => {
-			const [rowIdx, colIdx] = target.split('_').map(Number);
-			const rowData = item?.[calendarCol[colIdx].key];
-			const detail = item?.[calendarCol[colIdx].key]?.events[0].detailData;
-
-			const baseDate = dayjs(rowData.date, 'YYYY-MM-DD');
-
-			const visibleTimeStart = baseDate.startOf('day').valueOf();
-			const visibleTimeEnd = baseDate.endOf('day').valueOf();
-
-			if (!detail?.startTime || !detail?.endTime) {
-				return {
-					visibleTimeStart,
-					visibleTimeEnd,
-					data: [],
-				};
-			}
-
-			const start = dayjs(detail.startTime);
-			const end = dayjs(detail.endTime);
-
-			return {
-				// 해당 날짜의 00:00:00와 23:59:59
-				visibleTimeStart: visibleTimeStart,
-				visibleTimeEnd: visibleTimeEnd,
-				data: [
-					{
-						id: `item-${target}`, // ID 중복 방지를 위해 target 활용 권장
-						group: 'group1',
-						start_time: start.toDate(),
-						end_time: end.toDate(),
-						canMove: false,
-						canResize: false,
-						canChangeGroup: false,
-						itemProps: {
-							style: {
-								background: theme.palette.primary[500],
-								borderWidth: 0,
-							},
-						},
-					},
-				],
-			};
-		},
-		[item],
-	);
 
 	//memo
 	const detailCol = useMemo((): ColData[] => {
@@ -179,67 +133,114 @@ export default function CalendarItemDetailComp({ activeCell, idx, item }: { acti
 		];
 	}, []);
 
+	const detailData: AttendanceDayResDto | null = useMemo(() => {
+		if (activeColIdx) {
+			const targetDay: dayName = calendarCol[activeColIdx].key;
+			const targetEvents: CalendarEventDto[] = item[targetDay].events ?? [];
+			const attendance: CalendarEventDto[] = targetEvents.filter((item: CalendarEventDto) => item.eventType === 'ATTENDANCE');
+
+			if (attendance.length > 0) {
+				return attendance[0].detailData;
+			}
+		}
+
+		return null;
+	}, [activeColIdx, item]);
+
 	const activeTimelineData = useMemo((): TimelineDataInterface => {
-		if (activeCell) {
-			return makeTimelineData(activeCell);
+		if (detailData != null) {
+			const baseDate = dayjs(detailData.workDate, 'YYYY-MM-DD');
+			const visibleTimeStart = baseDate.startOf('day').valueOf();
+			const visibleTimeEnd = baseDate.endOf('day').valueOf();
+
+			if (!detailData?.startTime || !detailData?.endTime) {
+				return {
+					visibleTimeStart,
+					visibleTimeEnd,
+					data: [],
+				};
+			}
+
+			const start = dayjs(detailData.startTime);
+			const end = dayjs(detailData.endTime);
+
+			return {
+				// 해당 날짜의 00:00:00와 23:59:59
+				visibleTimeStart: visibleTimeStart,
+				visibleTimeEnd: visibleTimeEnd,
+				data: [
+					{
+						id: `item-${activeRowIdx}_${activeRowIdx}`, // ID 중복 방지를 위해 target 활용 권장
+						group: 'group1',
+						start_time: start.toDate(),
+						end_time: end.toDate(),
+						canMove: false,
+						canResize: false,
+						canChangeGroup: false,
+						itemProps: {
+							style: {
+								background: theme.palette.primary[500],
+								borderWidth: 0,
+							},
+						},
+					},
+				],
+			};
 		} else {
 			return { visibleTimeStart: undefined, visibleTimeEnd: undefined, data: [] };
 		}
-	}, [activeCell, makeTimelineData]);
+	}, [detailData]);
 
 	return (
-		activeCell &&
+		detailData &&
 		useComp && (
-			<Box sx={{ padding: '0.5rem', borderTop: `1px solid`, borderColor: 'grey.300' }}>
-				<Box sx={{ minHeight: '12rem' }}>
-					<Box sx={{ display: 'flex', width: '100%', height: '5rem' }}>
-						{detailCol.map((detailItem, detailIdx) => {
-							return (
-								<Box key={`${activeCell}_${detailIdx}`} sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-									<Box
-										className={'text-ellipsis'}
-										sx={{
-											width: '100%',
-											height: '2.5rem',
-											padding: '0.5rem',
-											textAlign: 'center',
-											borderBottom: `1px solid`,
-											borderColor: 'grey.300',
-										}}
-									>
-										{detailItem.header}
-									</Box>
-									<Box
-										className={'text-ellipsis'}
-										sx={{
-											width: '100%',
-											height: '2.5rem',
-											padding: '0.5rem',
-											textAlign: 'center',
-										}}
-									>
-										{detailItem.formatter
-											? detailItem.formatter(
-													item[calendarCol[Number(activeCell.split('_')[1])].key].detailData[detailItem.key],
-													item[calendarCol[Number(activeCell.split('_')[1])].key].detailData,
-												)
-											: getTimelineInnerData(item[calendarCol[Number(activeCell.split('_')[1])].key].detailData[detailItem.key])}
-									</Box>
+			<Box sx={{ width: '100%', minHeight: '12rem', padding: '0.5rem', borderTop: `1px solid`, borderColor: 'grey.300' }}>
+				<Box sx={{ display: 'flex', width: '100%', height: '5rem' }}>
+					{detailCol.map((detailItem, detailIdx) => {
+						return (
+							<Box key={`${activeCell}_${detailIdx}`} sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+								<Box
+									className={'text-ellipsis'}
+									sx={{
+										width: '100%',
+										height: '2.5rem',
+										padding: '0.5rem',
+										textAlign: 'center',
+										borderBottom: `1px solid`,
+										borderColor: 'grey.300',
+									}}
+								>
+									{detailItem.header}
 								</Box>
-							);
-						})}
-					</Box>
-					<Box
-						sx={{
-							overflow: 'hidden',
-							width: '100%',
-							minHeight: '6rem',
-							mt: '0.5rem',
-							padding: '1rem',
-							backgroundColor: 'grey.50',
-							borderRadius: '1rem',
-						}}
-					>
+								<Box
+									className={'text-ellipsis'}
+									sx={{
+										width: '100%',
+										height: '2.5rem',
+										padding: '0.5rem',
+										textAlign: 'center',
+									}}
+								>
+									{detailItem.formatter
+										? detailItem.formatter(detailData[detailItem.key], detailData)
+										: getTimelineInnerData(detailData[detailItem.key])}
+								</Box>
+							</Box>
+						);
+					})}
+				</Box>
+				<Box
+					sx={{
+						overflow: 'hidden',
+						width: '100%',
+						minHeight: '6rem',
+						mt: '0.5rem',
+						padding: '1rem',
+						backgroundColor: 'grey.50',
+						borderRadius: '1rem',
+					}}
+				>
+					<Box sx={{ width: '100%' }}>
 						<CustomReactCalendarTimeline
 							itemList={activeTimelineData.data}
 							visibleTimeStart={activeTimelineData.visibleTimeStart}

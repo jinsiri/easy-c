@@ -9,6 +9,7 @@ import org.easyc.common.entity.BaseEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Builder
@@ -80,23 +81,9 @@ public class Attendance extends BaseEntity {
     @Column(name = "detail")
     private String detail;
 
-
-    /** 외근 / 휴가 관련 */
+    /** 휴가 관련 */
     @Column(name = "vacation_app_id")
     private Long vacationAppId;
 
-    @Column(name = "remote_schedule_id")
-    private Long remoteScheduleId;
 
-    /*@Column(name = "remoted", columnDefinition = "boolean default false")
-    @Builder.Default
-    private boolean remoted = false;
-
-    @Column(name = "vacationed", columnDefinition = "boolean default false")
-    @Builder.Default
-    private boolean vacationed = false;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "vacation_type")
-    private VacationType vacationType;*/
 }

@@ -19,6 +19,7 @@ import { VACATIONTYPE } from '@/constant/attendanceConst';
 import { AttendanceDayResDto } from '@/app/services/attendanceService';
 import { dayName, vacationType } from '@/type/types';
 import { CalendarDayDto, CalendarEventDto } from '@/app/services/scheduleService';
+import CalendarItemDetailComp from './CalendarItemDetailComp';
 
 export interface CalendarColData {
 	key: dayName;
@@ -132,24 +133,22 @@ export default function CalendarItemComp({
 	calendarCol,
 	rowItem,
 	rowIdx,
+	activeCell,
+	cellClickEvent,
 }: {
 	calendarType: 'attendance' | 'schedule';
 	calendarCol: CalendarColData[];
 	rowItem: Record<dayName, CalendarDayDto>;
 	rowIdx: number;
+	activeCell: string | null;
+	cellClickEvent: (data: string) => void;
 }) {
 	const dayTitleHeight = '2rem';
 	const maxLine = calendarType === 'attendance' ? 2 : 3;
-	const [activeCell, setActiveCell] = useState<string | null>(null);
 
 	const onClickCell = (event: React.MouseEvent<HTMLElement>, target: string) => {
 		event.preventDefault();
-
-		if (target === activeCell) {
-			setActiveCell(null);
-		} else {
-			setActiveCell(target);
-		}
+		if (cellClickEvent) cellClickEvent(target);
 	};
 
 	const getDayColor = (currentMonth: boolean, holiday: boolean, dayKey: dayName) => {
@@ -264,106 +263,109 @@ export default function CalendarItemComp({
 	}, [rowItem, calendarType]);
 
 	return (
-		<Box sx={{ position: 'relative', width: '100%' }}>
-			<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-				{calendarCol.map((colItem: CalendarColData, colIdx: number) => {
-					const dateKey = dayjs(rowItem[colItem.key].date).format('YYYY-MM-DD');
+		<>
+			<Box sx={{ position: 'relative', width: '100%' }}>
+				<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+					{calendarCol.map((colItem: CalendarColData, colIdx: number) => {
+						const dateKey = dayjs(rowItem[colItem.key].date).format('YYYY-MM-DD');
 
-					return (
-						<Box
-							key={`${rowIdx}_${colIdx}`}
-							sx={{
-								overflow: 'hidden',
-								display: 'flex',
-								flexDirection: 'column',
-								width: `calc(100% /${calendarCol.length - 1})`,
-								minWidth: '8rem',
-								minHeight: '10rem',
-								...(colIdx !== 0 && {
-									marginLeft: '-1px',
-									borderLeft: `1px solid`,
-									borderColor: 'grey.300',
-								}),
-								...(activeCell === rowIdx + '_' + colIdx && {
-									outline: `2px solid`,
-									outlineColor: 'primary.main',
-									zIndex: 10,
-								}),
-								cursor: 'pointer',
-							}}
-							onClick={(e) => onClickCell(e, `${rowIdx}_${colIdx}`)}
-						>
+						return (
 							<Box
+								key={`${rowIdx}_${colIdx}`}
 								sx={{
-									display: 'flex',
-									justifyContent: 'space-between',
-									width: '100%',
-									height: dayTitleHeight,
-									padding: '0.375rem 0.625rem',
-									borderBottom: `1px solid`,
-									borderColor: 'grey.300',
-									gap: 2,
-								}}
-							>
-								<Typography
-									sx={{
-										fontWeight: 'bold',
-										color: getDayColor(rowItem[colItem.key].isCurrentMonth, rowItem[colItem.key].isHoliday, colItem.key),
-									}}
-								>
-									{dayjs(rowItem[colItem.key].date).format('DD')}
-								</Typography>
-								{rowItem[colItem.key].isHoliday && (
-									<Typography
-										variant='body2'
-										sx={{
-											overflow: 'hidden',
-											textWrap: 'nowrap',
-											textOverflow: 'ellipsis',
-											whiteSpace: 'nowrap',
-											color: 'error.500',
-										}}
-									>
-										{rowItem[colItem.key]?.holidaySubject ?? ''}
-									</Typography>
-								)}
-							</Box>
-							<Box
-								sx={{
-									position: 'relative',
+									overflow: 'hidden',
 									display: 'flex',
 									flexDirection: 'column',
-									flexGrow: 1,
-									width: '100%',
+									width: `calc(100% /${calendarCol.length - 1})`,
+									minWidth: '8rem',
+									minHeight: '10rem',
+									...(colIdx !== 0 && {
+										marginLeft: '-1px',
+										borderLeft: `1px solid`,
+										borderColor: 'grey.300',
+									}),
+									...(activeCell === rowIdx + '_' + colIdx && {
+										outline: `2px solid`,
+										outlineColor: 'primary.main',
+										zIndex: 10,
+									}),
+									cursor: calendarType === 'attendance' ? 'pointer' : 'default',
 								}}
+								onClick={(e) => calendarType === 'attendance' && onClickCell(e, `${rowIdx}_${colIdx}`)}
 							>
-								{dayOverflowMap[dateKey] && (
-									<Box
+								<Box
+									sx={{
+										display: 'flex',
+										justifyContent: 'space-between',
+										width: '100%',
+										height: dayTitleHeight,
+										padding: '0.375rem 0.625rem',
+										borderBottom: `1px solid`,
+										borderColor: 'grey.300',
+										gap: 2,
+									}}
+								>
+									<Typography
 										sx={{
-											position: 'absolute',
-											bottom: 0,
-											display: 'flex',
-											flexDirection: 'row',
-											justifyContent: 'end',
-											alignItems: 'center',
-											width: '100%',
+											fontWeight: 'bold',
+											color: getDayColor(rowItem[colItem.key].isCurrentMonth, rowItem[colItem.key].isHoliday, colItem.key),
 										}}
 									>
-										<Button>+{dayOverflowMap[dateKey]}</Button>
-									</Box>
-								)}
+										{dayjs(rowItem[colItem.key].date).format('DD')}
+									</Typography>
+									{rowItem[colItem.key].isHoliday && (
+										<Typography
+											variant='body2'
+											sx={{
+												overflow: 'hidden',
+												textWrap: 'nowrap',
+												textOverflow: 'ellipsis',
+												whiteSpace: 'nowrap',
+												color: 'error.500',
+											}}
+										>
+											{rowItem[colItem.key]?.holidaySubject ?? ''}
+										</Typography>
+									)}
+								</Box>
+								<Box
+									sx={{
+										position: 'relative',
+										display: 'flex',
+										flexDirection: 'column',
+										flexGrow: 1,
+										width: '100%',
+									}}
+								>
+									{dayOverflowMap[dateKey] && (
+										<Box
+											sx={{
+												position: 'absolute',
+												bottom: 0,
+												display: 'flex',
+												flexDirection: 'row',
+												justifyContent: 'end',
+												alignItems: 'center',
+												width: '100%',
+											}}
+										>
+											<Button>+{dayOverflowMap[dateKey]}</Button>
+										</Box>
+									)}
+								</Box>
 							</Box>
-						</Box>
-					);
-				})}
-			</Box>
+						);
+					})}
+				</Box>
 
-			{barEvents &&
-				barEvents
-					.filter((event) => event.line < maxLine)
-					.map((barEventItem: CalendarEventExtendDto, barEventIdx: number) => (
-						<EventBar key={`event_${rowIdx}_${barEventIdx}`} event={barEventItem} dayTitleHeight={dayTitleHeight} />
-					))}
-		</Box>
+				{barEvents &&
+					barEvents
+						.filter((event) => event.line < maxLine)
+						.map((barEventItem: CalendarEventExtendDto, barEventIdx: number) => (
+							<EventBar key={`event_${rowIdx}_${barEventIdx}`} event={barEventItem} dayTitleHeight={dayTitleHeight} />
+						))}
+				<CalendarItemDetailComp activeCell={activeCell} idx={rowIdx} item={rowItem} />
+			</Box>
+		</>
 	);
 }

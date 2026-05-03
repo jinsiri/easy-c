@@ -60,7 +60,7 @@ export default function CalendarComp({
 	}, [calendarDate]);
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: 'max-content', minWidth: '100%' }}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
 			<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem' }}>
 				<IconButton
 					sx={{
@@ -100,7 +100,7 @@ export default function CalendarComp({
 					<ArrowRightRounded sx={{ fontSize: '1.5rem' }} />
 				</IconButton>
 			</Box>
-			<Box sx={{ width: 'max-content', minWidth: '100%' }}>
+			<Box sx={{ width: '100%' }}>
 				<CalendarContentComp calendarRow={calendarRow} calendarType={calendarType} />
 			</Box>
 		</Box>

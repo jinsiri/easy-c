@@ -51,9 +51,7 @@ export default function CalendarContentComp({
 }) {
 	const [activeCell, setActiveCell] = useState<string | null>(null);
 
-	const onClickCell = (event: React.MouseEvent<HTMLElement>, target: string) => {
-		event.preventDefault();
-
+	const onClickCell = (target: string) => {
 		if (target === activeCell) {
 			setActiveCell(null);
 		} else {
@@ -128,7 +126,14 @@ export default function CalendarContentComp({
 									}),
 								}}
 							>
-								<CalendarItemComp calendarType={calendarType} calendarCol={calendarCol} rowItem={item} rowIdx={idx} />
+								<CalendarItemComp
+									calendarType={calendarType}
+									calendarCol={calendarCol}
+									rowItem={item}
+									rowIdx={idx}
+									activeCell={activeCell}
+									cellClickEvent={onClickCell}
+								/>
 							</Box>
 						);
 					})}

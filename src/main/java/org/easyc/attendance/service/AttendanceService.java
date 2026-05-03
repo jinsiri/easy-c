@@ -16,6 +16,7 @@ import org.easyc.member.repository.MemberProfileRepository;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.memberJobGradeMap.entity.MemberJobGradeMap;
 import org.easyc.memberJobGradeMap.repository.MemberJobGradeMapRepository;
+import org.easyc.schedule.constant.ScheduleType;
 import org.easyc.schedule.dto.CalendarDayDto;
 import org.easyc.schedule.dto.CalendarEventDto;
 import org.easyc.schedule.dto.CalendarRequestDto;
@@ -95,7 +96,7 @@ public class AttendanceService {
         List<Map<String, CalendarDayDto>> calendarFrame = createCalendarFrame(firstDay, lastDay, request.getScheduleType());
 
         Map<LocalDate, List<CalendarEventDto>> vacationMap = vacationService.createVacationAppToCalendarMap(memberId, firstDay, lastDay);
-        Map<LocalDate, List<CalendarEventDto>> scheduleMap = createScheduleToCalendarMap(memberId, firstDay, lastDay);
+        Map<LocalDate, List<CalendarEventDto>> scheduleMap = createRemoteToCalendarMap(memberId, firstDay, lastDay);
         Map<LocalDate, List<CalendarEventDto>> attendanceMap = createAttendanceToCalendarMap(memberId, firstDay, lastDay, "PERSONAL");
         Map<LocalDate, List<AttendanceApplication>> attendanceApplicationMap = createAttendanceAppMap(memberId, firstDay, lastDay);
 
@@ -216,24 +217,6 @@ public class AttendanceService {
         }
 
         return result;
-    }
-
-    private AttendanceCalendarResponseDto createResDto(LocalDate date, Attendance attendance, boolean isCurrentMonth) {
-        AttendanceCalendarResponseDto dto = new AttendanceCalendarResponseDto();
-
-        if (attendance != null) {
-            dto = new AttendanceCalendarResponseDto(attendance);
-
-            AttendancePolicy targetPolicy = findAttendancePolicy(attendance.getMemberId());
-            dto.setDefaultStartTime(targetPolicy.getStartTime());
-            dto.setDefaultEndTime(targetPolicy.getEndTime());
-        }
-
-        dto.setYear(date.getYear());
-        dto.setMonth(date.getMonthValue());
-        dto.setDay(date.getDayOfMonth());
-        dto.setIsCurrentMonth(isCurrentMonth);
-        return dto;
     }
 
     public Attendance updateAttendanceByStartTime(Attendance targetAttendance, AttendancePolicy targetPolicy, LocalDateTime startTime) {
@@ -400,23 +383,22 @@ public class AttendanceService {
             }
         }
 
-        AttendanceResponseDto resDto = new AttendanceResponseDto();
-        resDto.setAttendanceType(targetPolicy.getAttendanceType());
-        resDto.setSettlementPeriod(targetPolicy.getSettlementPeriod());
-        resDto.setWorktimeRule(targetPolicy.getWorktimeRule());
-        resDto.setStartTime(targetPolicy.getStartTime());
-        resDto.setEndTime(targetPolicy.getEndTime());
+        return AttendanceResponseDto.builder()
+                .attendanceType(targetPolicy.getAttendanceType())
+                .settlementPeriod(targetPolicy.getSettlementPeriod())
+                .worktimeRule(targetPolicy.getWorktimeRule())
+                .startTime(targetPolicy.getStartTime())
+                .endTime(targetPolicy.getEndTime())
+                .maxPolicyWorkTime(settlementPeriod.getMaxMinute())
+                .policyWorkDay(defaultTotalWorkDay)
+                .policyWorkTime(Long.valueOf(defaultTotalWorkTime))
+                .effectiveWorkDay(effectiveWorkDay)
+                .effectiveWorkTime(Long.valueOf(effectiveWorkTime))
+                .workDay(weekAttendanceData.size())
+                .workTime(workTime)
+                .vacationTime(vacationTime)
+                .build();
 
-        resDto.setMaxPolicyWorkTime(settlementPeriod.getMaxMinute());
-        resDto.setPolicyWorkDay(defaultTotalWorkDay);
-        resDto.setPolicyWorkTime(Long.valueOf(defaultTotalWorkTime));
-        resDto.setEffectiveWorkDay(effectiveWorkDay);
-        resDto.setEffectiveWorkTime(Long.valueOf(effectiveWorkTime));
-        resDto.setWorkDay(weekAttendanceData.size());
-        resDto.setWorkTime(workTime);
-        resDto.setVacationTime(vacationTime);
-
-        return resDto;
     }
 
     public Map<String, LocalDate> resolveDateRange(SettlementPeriod period, LocalDate today) {
@@ -492,6 +474,27 @@ public class AttendanceService {
 
     public Map<LocalDate, List<CalendarEventDto>> createScheduleToCalendarMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
         List<Schedule> scheduleList = scheduleRepository.findByMemberIdAndStartDateBetweenAndDeletedFalse(memberId, firstDay, lastDay);
+
+        Map<LocalDate, List<CalendarEventDto>> calendarMap = new HashMap<>();
+        for (Schedule schedule : scheduleList) {
+            LocalDate endDate = schedule.getEndDate();
+            LocalDate startDate = schedule.getStartDate();
+            long diff = endDate != null ? ChronoUnit.DAYS.between(startDate, endDate): 0;
+
+            for(int i = 0; i <= diff; i++) {
+                LocalDate targetDate = startDate.plusDays(i);
+                List<CalendarEventDto> list = calendarMap.getOrDefault(targetDate, new ArrayList<>());
+                CalendarEventDto dto = CalendarEventDto.fromSchedule(schedule);
+                list.add(dto);
+
+                calendarMap.put(targetDate, list);
+            }
+        }
+        return calendarMap;
+    }
+
+    public Map<LocalDate, List<CalendarEventDto>> createRemoteToCalendarMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
+        List<Schedule> scheduleList = scheduleRepository.findByMemberIdAndStartDateBetweenAndScheduleTypeInAndDeletedFalse(memberId, firstDay, lastDay, List.of(ScheduleType.OUTSIDE, ScheduleType.BUSINESS_TRIP));
 
         Map<LocalDate, List<CalendarEventDto>> calendarMap = new HashMap<>();
         for (Schedule schedule : scheduleList) {
