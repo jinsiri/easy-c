@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import secureLocalStorage from 'react-secure-storage';
 
 /** MUI */
-import { Alert, Box, Checkbox, FormControlLabel, Select, MenuItem } from '@mui/material';
+import { Alert, Box, Checkbox, FormControlLabel } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
@@ -19,7 +19,6 @@ import useLoaderStore from '@/store/useLoaderStore';
 import { attendanceService, AttendanceDayResDto } from '@/app/services/attendanceService';
 import { AttendanceApplicationController, AttendanceApplicationResponseDto, attendanceApplicationService } from '@/app/services/attendanceApplicationService';
 import { FormWrapper, FormItem } from '@/app/_component/baseElement/FormComp';
-import { WORKSTATUS } from '@/constant/attendanceConst';
 
 export default function AttendanceUserDetailModal({
 	modalData,
@@ -41,7 +40,7 @@ export default function AttendanceUserDetailModal({
 		formState: { errors },
 	} = useForm<AttendanceApplicationController>({
 		defaultValues: {
-			workDate: null,
+			workDate: dayjs(),
 			isStartTime: false,
 			isEndTime: false,
 			startTime: null,
@@ -91,6 +90,11 @@ export default function AttendanceUserDetailModal({
 	const handleSave = handleSubmit(async (data) => {
 		setLoader(true);
 		try {
+			if (!data.isStartTime && !data.isEndTime) {
+				alert('변경 시간을 입력해주세요.');
+				return;
+			}
+
 			await attendanceApplicationService.submitAttendanceApplication({
 				...data,
 				memberId: secureLocalStorage.getItem('memberId') as number,
@@ -151,7 +155,7 @@ export default function AttendanceUserDetailModal({
 				readOnly={modalData != null}
 			/>
 
-			<FormWrapper label='수정 근무상태' required>
+			{/*<FormWrapper label='수정 근무상태' required>
 				<Controller
 					name='workStatus'
 					control={control}
@@ -159,8 +163,6 @@ export default function AttendanceUserDetailModal({
 						<Select value={value} onChange={onChange} size='small' fullWidth inputProps={{ readOnly: modalData != null }}>
 							<MenuItem value='PRESENT'>정상 출근</MenuItem>
 							<MenuItem value='ABSENT'>결근</MenuItem>
-							<MenuItem value='OUTSIDE'>외근</MenuItem>
-							<MenuItem value='BUSINESS_TRIP'>출장</MenuItem>
 						</Select>
 					)}
 				/>
@@ -169,7 +171,7 @@ export default function AttendanceUserDetailModal({
 						기존 근무상태: {attendanceData.workStatus ? WORKSTATUS[attendanceData.workStatus] : '-'}
 					</Alert>
 				)}
-			</FormWrapper>
+			</FormWrapper>*/}
 
 			<FormWrapper label='수정 근무시간'>
 				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: '0.5rem' }}>

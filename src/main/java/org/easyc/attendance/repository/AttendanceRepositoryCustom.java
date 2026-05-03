@@ -76,7 +76,7 @@ public class AttendanceRepositoryCustom {
                 .where(whereClause)
                 .fetchOne();
 
-        List<AttendanceDayResponseDto> dtoList = content.stream().map(a ->new AttendanceDayResponseDto(a)).toList();
+        List<AttendanceDayResponseDto> dtoList = content.stream().map(a -> AttendanceDayResponseDto.fromEntity(a)).toList();
         return new PageImpl<>(dtoList, pageable, total != null ? total : 0L);
     }
 
@@ -133,7 +133,7 @@ public class AttendanceRepositoryCustom {
         response.setAbsentCount(stats.getAbsentCount().intValue());
         response.setChangeRequestCount(changeRequestApp != null ? changeRequestApp : 0L);
 
-        List<AttendanceDayResponseDto> dtoList = content.stream().map(a ->new AttendanceDayResponseDto(a)).toList();
+        List<AttendanceDayResponseDto> dtoList = content.stream().map(a -> AttendanceDayResponseDto.fromEntity(a)).toList();
         Long total = stats.getAllCount() != null ? stats.getAllCount().longValue() : 0L;
         Page<AttendanceDayResponseDto> dayData = new PageImpl<>(dtoList, pageable, total);
         response.setDayData(new PageResponseDto<>(dayData));

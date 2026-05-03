@@ -39,7 +39,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
 			>
 				<Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} headerHeight={headerHeight}></Header>
 				<Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-					<Box sx={{ width: '100%', paddingBottom: '2rem', flexGrow: 1 /*height: `calc(100% - ${headerHeight} - 48px)`*/ }}>{children}</Box>
+					<Box sx={{ width: '100%', flexGrow: 1 /*height: `calc(100% - ${headerHeight} - 48px)`*/ }}>{children}</Box>
 					<Footer />
 				</Box>
 			</Box>

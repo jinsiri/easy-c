@@ -13,7 +13,7 @@ export interface vacationApplicationController {
 	violationReason?: string;
 }
 
-export interface vacationApplicationDto extends BaseDto {
+export interface vacationApplication extends BaseDto {
 	vacationApplicationId?: number;
 	memberId?: number;
 	memberNm?: string;
@@ -25,6 +25,16 @@ export interface vacationApplicationDto extends BaseDto {
 	endDate?: string | null;
 	violationReason?: string;
 	status?: string;
+}
+
+export interface vacationApplicationDto {
+	vacationApplicationId?: number;
+	memberId?: number;
+	vacationType?: vacationType;
+	vacationDuration?: number;
+	startDate?: string;
+	endDate?: string | null;
+	violationReason?: string;
 }
 
 export interface vacationApplicationDataDto {
@@ -54,11 +64,11 @@ export interface VacationAppSearchRequestDto {
 // API 정의
 export const vacationApplicationService = {
 	getUserVacationApplicationData: (encodedMemberId: string) =>
-		axiosConfig.get<vacationApplicationDto[]>(`/api/vacation/application/user?target=${encodedMemberId}`),
+		axiosConfig.get<vacationApplication[]>(`/api/vacation/application/user?target=${encodedMemberId}`),
 
 	saveVacationApplicationData: (req: vacationApplicationDataDto) => axiosConfig.post<void>('/api/vacation/application/save', req),
-	approveAttendanceApplication: (req: vacationApplicationDto[]) => axiosConfig.post<void>('/api/vacation/application/approve', req),
-	rejectAttendanceApplication: (req: vacationApplicationDto[]) => axiosConfig.post<void>('/api/vacation/application/reject', req),
+	approveAttendanceApplication: (req: vacationApplication[]) => axiosConfig.post<void>('/api/vacation/application/approve', req),
+	rejectAttendanceApplication: (req: vacationApplication[]) => axiosConfig.post<void>('/api/vacation/application/reject', req),
 
 	searchVacationApplication: (request: PageRequest<VacationAppSearchRequestDto>) =>
 		axiosConfig.post<PageResponse<vacationApplicationDataDto>>('/api/vacation/application/search', request),

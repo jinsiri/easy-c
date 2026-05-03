@@ -57,7 +57,7 @@ public class VacationPolicyService {
     }
 
     public void savePolicyData(VacationPolicyDto request){
-       VacationPolicy policy = request.makeEntity();
+       VacationPolicy policy = request.toEntity();
         vacationPolicyRepository.save(policy);
     }
 

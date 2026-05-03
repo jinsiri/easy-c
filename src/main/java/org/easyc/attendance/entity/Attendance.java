@@ -82,7 +82,13 @@ public class Attendance extends BaseEntity {
 
 
     /** 외근 / 휴가 관련 */
-    @Column(name = "remoted", columnDefinition = "boolean default false")
+    @Column(name = "vacation_app_id")
+    private Long vacationAppId;
+
+    @Column(name = "remote_schedule_id")
+    private Long remoteScheduleId;
+
+    /*@Column(name = "remoted", columnDefinition = "boolean default false")
     @Builder.Default
     private boolean remoted = false;
 
@@ -92,5 +98,5 @@ public class Attendance extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "vacation_type")
-    private VacationType vacationType;
+    private VacationType vacationType;*/
 }

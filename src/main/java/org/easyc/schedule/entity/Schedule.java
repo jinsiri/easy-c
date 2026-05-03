@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.entity.BaseEntity;
+import org.easyc.schedule.constant.ScheduleType;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,8 +20,20 @@ public class Schedule extends BaseEntity {
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="schedule_seq")
     private Long schedule_id;
 
-    @Column(name = "member_id", nullable = false)
+
+    /** 근로자 정보 추가 */
+    @Column(name="member_id")
     private Long memberId;
+
+    @Column(name="member_nm")
+    private String memberNm;
+
+    @Column(name ="dept_nm")
+    private String deptNm;
+
+    @Column(name = "job_grade")
+    private String jobGrade;
+
 
     @Column(name = "schedule_name")
     private String scheduleName;
@@ -36,6 +49,10 @@ public class Schedule extends BaseEntity {
 
     @Column(name = "end_time")
     private LocalTime endTime;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="schedule_type")
+    private ScheduleType scheduleType;
 
     @Builder.Default
     @Column(name = "published")

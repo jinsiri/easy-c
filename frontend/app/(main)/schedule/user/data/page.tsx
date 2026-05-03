@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import secureLocalStorage from 'react-secure-storage';
 
@@ -11,20 +10,18 @@ import useModalStore from '@/store/useModalStore';
 import useLoaderStore from '@/store/useLoaderStore';
 
 /** MUI */
-import { Accordion, AccordionSummary, AccordionDetails, Box, Button, Typography, Grid, Tooltip, FormControlLabel, RadioGroup, Radio } from '@mui/material';
-
+import { Select, MenuItem, Box, Button, Typography, Grid, Tooltip, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import { HelpRounded, ArrowBackRounded } from '@mui/icons-material';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { DatePicker } from '@mui/x-date-pickers';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import { FormWrapper, FormItem } from '@/app/_component/baseElement/FormComp';
 
 /** Type / Interface */
-import { ATTENDANCETYPE, SETTLEMENTPERIOD, WORKTIMERULE, WORKDAYOFWEEKNUMBER } from '@/constant/attendanceConst';
-import { AttendancePolicyRequestController, AttendancePolicyDto, attendancePolicyService } from '@/app/services/attendancePolicyService';
 import { ScheduleController, ScheduleRequestDto, scheduleService } from '@/app/services/scheduleService';
-import { DatePicker } from '@mui/x-date-pickers';
+import { SCHEDULETYPE } from '@/constant/scheduleConst';
 
 export default function ScheduleUserDataPage() {
 	const router = useRouter();
@@ -32,10 +29,11 @@ export default function ScheduleUserDataPage() {
 	const target = searchParams.get('target');
 
 	const { setLoader } = useLoaderStore();
-	const { modalData, resetModalData } = useModalStore();
+	const { resetModalData } = useModalStore();
 
 	const {
 		control,
+		watch,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<ScheduleController>({
@@ -43,12 +41,18 @@ export default function ScheduleUserDataPage() {
 			scheduleName: '',
 			scheduleDesc: '',
 			published: 'public',
+			scheduleType: 'NORMAL',
 			startDate: dayjs(),
-			endDate: null,
+			endDate: dayjs(),
 			startTime: null,
 			endTime: null,
 		},
 	});
+
+	const watchStartDate = watch('startDate');
+	const watchEndDate = watch('endDate');
+	const watchStartTime = watch('startTime');
+	const watchEndTime = watch('endTime');
 
 	const handleSave = handleSubmit(async (data: ScheduleController) => {
 		setLoader(true);
@@ -57,7 +61,7 @@ export default function ScheduleUserDataPage() {
 				...data,
 				memberId: secureLocalStorage.getItem('memberId') as number,
 				published: data.published === 'public',
-				startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
+				startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : '',
 				endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
 				startTime: data.startTime ? data.startTime.format('HH:mm') : null,
 				endTime: data.endTime ? data.endTime.format('HH:mm') : null,
@@ -138,6 +142,20 @@ export default function ScheduleUserDataPage() {
 									<Controller
 										name='startTime'
 										control={control}
+										rules={{
+											validate: (value) => {
+												if (watchEndTime && !value) {
+													return '일정 시작시간을 입력해주세요.';
+												}
+
+												if (watchEndTime && value && watchStartDate.isSame(watchEndDate)) {
+													if (value.isAfter(watchEndTime)) {
+														return '종료시간은 시작 시간보다 이후 시간이어야 합니다.';
+													}
+												}
+												return true;
+											},
+										}}
 										render={({ field }) => (
 											<TimePicker
 												{...field}
@@ -156,6 +174,14 @@ export default function ScheduleUserDataPage() {
 									<Controller
 										name='endDate'
 										control={control}
+										rules={{
+											validate: (value) => {
+												if (!value) {
+													return '일정 종료일을 입력해주세요.';
+												}
+												return true;
+											},
+										}}
 										render={({ field }) => (
 											<DatePicker
 												{...field}
@@ -171,6 +197,21 @@ export default function ScheduleUserDataPage() {
 									<Controller
 										name='endTime'
 										control={control}
+										rules={{
+											validate: (value) => {
+												if (watchStartTime && !value) {
+													return '일정 종료시간을 입력해주세요.';
+												}
+
+												if (watchStartTime && value && watchStartDate.isSame(watchEndDate)) {
+													if (value.isBefore(watchStartTime)) {
+														return '시작시간은 시작 시간보다 이전 시간이어야 합니다.';
+													}
+												}
+
+												return true;
+											},
+										}}
 										render={({ field }) => (
 											<TimePicker
 												{...field}
@@ -200,6 +241,21 @@ export default function ScheduleUserDataPage() {
 											</Tooltip>
 										</Box>
 									</RadioGroup>
+								)}
+							/>
+						</FormWrapper>
+						<FormWrapper label='일정 종류' required>
+							<Controller
+								name='scheduleType'
+								control={control}
+								render={({ field: { onChange, value } }) => (
+									<Select value={value} onChange={onChange} size='small' fullWidth>
+										{Object.entries(SCHEDULETYPE).map(([key, value]) => (
+											<MenuItem key={key} value={key}>
+												{value}
+											</MenuItem>
+										))}
+									</Select>
 								)}
 							/>
 						</FormWrapper>

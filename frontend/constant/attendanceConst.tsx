@@ -22,8 +22,7 @@ export const WORKSTATUS: Record<workStatus, string> = {
 	EARLY_LEAVE: '조퇴',
 	ABSENT: '결근',
 	VACATION: '휴가',
-	OUTSIDE: '외근',
-	BUSINESS_TRIP: '출장',
+	REMOTE: '외근',
 	UNNORMAL_START: '비정상 출근',
 	UNNORMAL_END: '비정상 퇴근',
 };

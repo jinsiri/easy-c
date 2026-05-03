@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.easyc.board.dto.BoardCommentResponseDto;
 import org.easyc.board.entity.BoardComment;
+import org.easyc.schedule.constant.ScheduleType;
 import org.easyc.schedule.entity.Schedule;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ public class ScheduleRequestDto {
     private Long memberId;
 
     @JsonProperty("scheduleName")
+    @Enumerated(EnumType.STRING)
     private String scheduleName;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -41,6 +43,9 @@ public class ScheduleRequestDto {
     @Builder.Default
     private boolean published = false;
 
+    @JsonProperty("scheduleType")
+    private ScheduleType scheduleType;
+
     @JsonProperty("scheduleDesc")
     private String scheduleDesc;
 
@@ -53,6 +58,24 @@ public class ScheduleRequestDto {
                 .endDate(this.endDate)
                 .endTime(this.endTime)
                 .published(this.published)
+                .scheduleType(this.scheduleType)
+                .scheduleDesc(this.scheduleDesc)
+                .build();
+    }
+
+    public Schedule toEntity(String memberNm, String deptNm, String jobGrade) {
+        return Schedule.builder()
+                .memberId(this.memberId)
+                .memberNm(memberNm)
+                .deptNm(deptNm)
+                .jobGrade(jobGrade)
+                .scheduleName(this.scheduleName)
+                .startDate(this.startDate)
+                .startTime(this.startTime)
+                .endDate(this.endDate)
+                .endTime(this.endTime)
+                .published(this.published)
+                .scheduleType(this.scheduleType)
                 .scheduleDesc(this.scheduleDesc)
                 .build();
     }

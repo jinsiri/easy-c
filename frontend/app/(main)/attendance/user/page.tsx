@@ -227,11 +227,8 @@ export default function AttendanceUserPage() {
 
 	return (
 		<Box
+			className='main-wrap-overflow'
 			sx={{
-				display: 'flex',
-				flexDirection: 'column',
-				minWidth: '100%',
-				width: 'fit-content',
 				padding: '0 1.5rem',
 			}}
 		>

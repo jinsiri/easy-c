@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import secureLocalStorage from 'react-secure-storage';
 
@@ -18,66 +18,47 @@ import BaseDialog from '@/app/_component/baseElement/BaseDialog';
 
 /** Type / Interface */
 import { VACATIONTYPE } from '@/constant/attendanceConst';
-import { vacationApplicationController, vacationApplicationService, vacationApplicationDto } from '@/app/services/vacationApplicationService';
+import { vacationApplicationController, vacationApplicationService, vacationApplication } from '@/app/services/vacationApplicationService';
 import { FormItem, FormWrapper } from '@/app/_component/baseElement/FormComp';
 
 export default function VacationUserModal() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const type = searchParams.get('type');
-
 	const { modalData, resetModalData } = useModalStore();
 
+	const remainDay = modalData.remainDay ?? 30;
 	const [isSaving, setIsSaving] = useState(false);
-	const [remainDay, setRemainDay] = useState(1);
 
 	const {
 		control,
-		reset,
 		watch,
+		reset,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<vacationApplicationController>({
 		defaultValues: {
-			vacationType: 'FULL',
-			vacationDuration: '1',
-			startDate: null,
-			endDate: null,
-			violationReason: '',
+			vacationType: type === 'read' && modalData ? modalData.vacationType : modalData.remainDay === 0.5 ? 'HALF_AM' : 'FULL',
+			vacationDuration: type === 'read' && modalData ? String(modalData.vacationDuration) : '1',
+			startDate: modalData?.startDate ? dayjs(modalData.startDate) : null,
+			endDate: modalData?.endDate ? dayjs(modalData.endDate) : null,
+			violationReason: modalData?.violationReason,
 		},
 	});
 
 	const watchVacationType = watch('vacationType');
 	const watchVacationDuration = watch('vacationDuration');
 
-	useEffect(() => {
-		if (modalData) {
-			if (type && type === 'read') {
-				reset({
-					vacationType: modalData.vacationType,
-					vacationDuration: String(modalData.vacationDuration),
-					startDate: modalData.startDate ? dayjs(modalData.startDate) : null,
-					endDate: modalData.endDate ? dayjs(modalData.endDate) : null,
-					violationReason: modalData.violationReason,
-				});
-			} else {
-				reset({
-					vacationType: modalData.remainDay === 0.5 ? 'HALF_AM' : 'FULL',
-				});
-				setRemainDay(modalData.remainDay);
-			}
-		}
-	}, [type, modalData]);
-
 	const handleSave = handleSubmit(async (data) => {
 		setIsSaving(true);
 
 		try {
-			const request: vacationApplicationDto = {
+			const request: vacationApplication = {
 				...data,
 				memberId: Number(secureLocalStorage.getItem('memberId')),
 				startDate: dayjs(data.startDate).format('YYYY-MM-DD'),
 				endDate: data.endDate ? dayjs(data.endDate).format('YYYY-MM-DD') : null,
+				vacationDuration: Number(data.vacationDuration),
 			};
 
 			await vacationApplicationService.saveVacationApplicationData(request);
@@ -89,6 +70,18 @@ export default function VacationUserModal() {
 			setIsSaving(false);
 		}
 	});
+
+	useEffect(() => {
+		if (!modalData) return;
+
+		reset({
+			vacationType: type === 'read' ? modalData.vacationType : modalData.remainDay === 0.5 ? 'HALF_AM' : 'FULL',
+			vacationDuration: type === 'read' ? String(modalData.vacationDuration) : '1',
+			startDate: modalData.startDate ? dayjs(modalData.startDate) : null,
+			endDate: modalData.endDate ? dayjs(modalData.endDate) : null,
+			violationReason: modalData.violationReason,
+		});
+	}, [modalData, type]);
 
 	return (
 		<BaseDialog title={'휴가 신청'} loading={isSaving} onConfirm={type === 'read' ? undefined : handleSave}>
@@ -134,6 +127,7 @@ export default function VacationUserModal() {
 						/>
 					</FormWrapper>
 				)}
+
 				<FormWrapper label='휴가 일자' required>
 					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}>
 						<Controller

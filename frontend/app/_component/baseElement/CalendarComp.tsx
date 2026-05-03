@@ -11,7 +11,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { TimelineItemBase } from 'react-calendar-timeline';
 
 /** Custom */
-import CalendarItemComp from './CalendarItemComp';
+import CalendarContentComp from './CalendarContentComp';
 import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
 
 /** type / interface */
@@ -101,7 +101,7 @@ export default function CalendarComp({
 				</IconButton>
 			</Box>
 			<Box sx={{ width: 'max-content', minWidth: '100%' }}>
-				<CalendarItemComp calendarRow={calendarRow} calendarType={calendarType} />
+				<CalendarContentComp calendarRow={calendarRow} calendarType={calendarType} />
 			</Box>
 		</Box>
 	);

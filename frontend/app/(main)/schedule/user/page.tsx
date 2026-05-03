@@ -41,11 +41,8 @@ export default function ScheduleUserPage() {
 
 	return (
 		<Box
+			className='main-wrap-overflow'
 			sx={{
-				display: 'flex',
-				flexDirection: 'column',
-				minWidth: '100%',
-				width: 'fit-content',
 				padding: '0 1.5rem',
 			}}
 		>
@@ -56,7 +53,7 @@ export default function ScheduleUserPage() {
 			</PathBreadcrumbs>
 			<Box sx={{ flexDirection: 'column', flexGrow: 1, minWidth: '100%', gap: 2 }}>
 				<Box sx={{ flexGrow: 1 }}>
-					<CalendarComp calendarRow={calendarData} onChangeDate={onChangeDateFunc} />
+					<CalendarComp calendarType='schedule' calendarRow={calendarData} onChangeDate={onChangeDateFunc} />
 				</Box>
 			</Box>
 		</Box>

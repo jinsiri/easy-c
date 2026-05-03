@@ -34,7 +34,7 @@ public class AttendanceResponseDto {
     private Long vacationTime;          //현재까지 휴가시간
 
     public AttendanceResponseDto(Attendance entity) {
-        this.dayData = new AttendanceDayResponseDto(entity);
+        this.dayData = AttendanceDayResponseDto.fromEntity(entity);
     }
 
     public void applyWeekData(AttendanceResponseDto weekData) {

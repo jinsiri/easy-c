@@ -3,18 +3,21 @@
 import React, { useMemo, useState } from 'react';
 
 /** MUI */
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 
 /** lib */
 import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { TimelineItemBase } from 'react-calendar-timeline';
 
+dayjs.extend(isSameOrBefore);
+
 /** Custom */
-import CalendarItemDetailComp from './CalendarItemDetailComp';
+import { VACATIONTYPE } from '@/constant/attendanceConst';
 
 /** type / interface */
 import { AttendanceDayResDto } from '@/app/services/attendanceService';
-import { dayName } from '@/type/types';
+import { dayName, vacationType } from '@/type/types';
 import { CalendarDayDto, CalendarEventDto } from '@/app/services/scheduleService';
 
 export interface CalendarColData {
@@ -34,17 +37,35 @@ export interface TimelineDataInterface {
 	data: TimelineItemBase<Date>[];
 }
 
-const calendarCol: CalendarColData[] = [
-	{ key: 'mon', header: '월요일' },
-	{ key: 'tue', header: '화요일' },
-	{ key: 'wed', header: '수요일' },
-	{ key: 'thu', header: '목요일' },
-	{ key: 'fri', header: '금요일' },
-	{ key: 'sat', header: '토요일' },
-	{ key: 'sun', header: '일요일' },
-];
+export interface CalendarEventExtendDto extends CalendarEventDto {
+	line: number;
+}
 
-const DayEventList = ({ eventData, calendarType }: { eventData: CalendarEventDto; calendarType: 'attendance' | 'schedule' }) => {
+const EventBar = ({ event, dayTitleHeight }: { event: CalendarEventExtendDto; dayTitleHeight: string }) => {
+	const barHeight: number = 1.5; //rem기준
+	const start = dayjs(event.startDate, 'YYYY-MM-DD');
+	const end = event.endDate ? dayjs(event.endDate, 'YYYY-MM-DD') : dayjs(event.startDate, 'YYYY-MM-DD');
+
+	const getIdx = (d: dayjs.Dayjs) => {
+		const day = d.day();
+		return day === 0 ? 6 : day - 1; // 월요일 시작 기준
+	};
+
+	const startIdx = getIdx(start);
+	const endIdx = getIdx(end);
+
+	const dayBarStyle = {
+		position: 'absolute',
+		top: `calc(${dayTitleHeight} + ${(barHeight + 0.1) * event.line}rem)`,
+		left: `calc(${startIdx} * (100% / 7))`,
+		display: 'flex',
+		alignItems: 'center',
+		width: `calc(${endIdx - startIdx + 1} * (100% / 7))`,
+		minWidth: `calc(${endIdx - startIdx + 1} * 8rem)`,
+		height: `${barHeight}rem`,
+		px: 0.5,
+		borderRadius: '4px',
+	};
 	const attendanceTimeStyle = {
 		display: 'flex',
 		justifyContent: 'center',
@@ -54,104 +75,73 @@ const DayEventList = ({ eventData, calendarType }: { eventData: CalendarEventDto
 		marginRight: '0.25rem',
 		borderRadius: '100%',
 		fontSize: '0.625rem',
-		backgroundColor: 'primary.100',
-		color: 'primary.600',
+		backgroundColor: 'primary.500',
+		color: 'background.default',
 	};
 
-	const vacationEvent = useMemo(() => {
+	const AllDayBar = useMemo(() => {
 		return (
-			eventData.detailData.workStatus === 'VACATION' && (
-				<Box
-					sx={{
-						padding: '0.125rem 0.5rem',
-						bgcolor: 'primary.50',
-						color: 'primary.500',
-					}}
-				>
-					{eventData.detailData.vacationType === 'HALF_AM' ? '오전 반차' : eventData.detailData.vacationType === 'HALF_PM' ? '오후 반차' : '휴가'}
-				</Box>
-			)
+			<Box
+				sx={{
+					...dayBarStyle,
+					backgroundColor: 'primary.100',
+					color: 'primary.500',
+				}}
+			>
+				{event.eventType === 'VACATION' ? VACATIONTYPE[event.vacationData.vacationType as vacationType] : event.scheduleName}
+			</Box>
 		);
-	}, [eventData]);
+	}, [event]);
 
-	const outsideEvent = useMemo(() => {
+	const AttendanceBar = useMemo(() => {
 		return (
-			eventData.detailData.workStatus === 'OUTSIDE' && (
-				<Box
-					sx={{
-						padding: '0.125rem 0.5rem',
-						bgcolor: 'secondary.50',
-						color: 'secondary.500',
-					}}
-				>
-					외근
-				</Box>
-			)
+			<Box
+				sx={{
+					...dayBarStyle,
+					flexDirection: 'column',
+					justifyContent: 'start',
+					alignItems: 'start',
+					padding: '0.5rem',
+				}}
+			>
+				{event.detailData.startTime && (
+					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+						<Typography variant={'caption'} sx={attendanceTimeStyle}>
+							출
+						</Typography>
+						<Typography>{dayjs(event.detailData.startTime).format('HH:mm')}</Typography>
+					</Box>
+				)}
+				{event.detailData.endTime && (
+					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+						<Typography variant={'caption'} sx={attendanceTimeStyle}>
+							퇴
+						</Typography>
+						<Typography>{dayjs(event.detailData.endTime).format('HH:mm')}</Typography>
+					</Box>
+				)}
+			</Box>
 		);
-	}, [eventData]);
+	}, [event]);
 
-	const businesstripEvent = useMemo(() => {
-		return (
-			eventData.detailData.workStatus === 'BUSINESS_TRIP' && (
-				<Box
-					sx={{
-						padding: '0.125rem 0.5rem',
-						bgcolor: 'info.50',
-						color: 'info.500',
-					}}
-				>
-					출장
-				</Box>
-			)
-		);
-	}, [eventData]);
-
-	const attendanceEvent = useMemo(() => {
-		return (
-			calendarType === 'attendance' && (
-				<Box sx={{ padding: '0.5rem' }}>
-					{eventData.detailData.startTime && (
-						<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-							<Typography variant={'caption'} sx={attendanceTimeStyle}>
-								출
-							</Typography>
-							<Typography>{dayjs(eventData.detailData.startTime).format('HH:mm')}</Typography>
-						</Box>
-					)}
-
-					{eventData.detailData.endTime && (
-						<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-							<Typography variant={'caption'} sx={attendanceTimeStyle}>
-								퇴
-							</Typography>
-							<Typography>{dayjs(eventData.detailData.endTime).format('HH:mm')}</Typography>
-						</Box>
-					)}
-				</Box>
-			)
-		);
-	}, [calendarType]);
-
-	return (
-		<Box>
-			{vacationEvent}
-			{outsideEvent}
-			{businesstripEvent}
-			{attendanceEvent}
-		</Box>
-	);
+	return <>{event.eventType === 'ATTENDANCE' ? AttendanceBar : AllDayBar}</>;
 };
 
 export default function CalendarItemComp({
-	calendarRow,
 	calendarType,
+	calendarCol,
+	rowItem,
+	rowIdx,
 }: {
-	calendarRow: Record<dayName, CalendarDayDto>[];
 	calendarType: 'attendance' | 'schedule';
+	calendarCol: CalendarColData[];
+	rowItem: Record<dayName, CalendarDayDto>;
+	rowIdx: number;
 }) {
+	const dayTitleHeight = '2rem';
+	const maxLine = calendarType === 'attendance' ? 2 : 3;
 	const [activeCell, setActiveCell] = useState<string | null>(null);
 
-	//function
 	const onClickCell = (event: React.MouseEvent<HTMLElement>, target: string) => {
 		event.preventDefault();
 
@@ -176,163 +166,204 @@ export default function CalendarItemComp({
 		}
 	};
 
+	const { barEvents, dayOverflowMap } = useMemo<{
+		barEvents: CalendarEventExtendDto[];
+		dayOverflowMap: Record<string, number>;
+	}>(() => {
+		const groupEventMap = new Map<string, CalendarEventExtendDto>();
+		const noneGroupEvents: CalendarEventExtendDto[] = [];
+
+		// 1.그룹이 있는지 아닌지 구분 후 그룹 중복 제거
+		Object.values(rowItem).forEach((day) => {
+			(day.events ?? []).forEach((eventItem) => {
+				if (eventItem.groupId) {
+					if (!groupEventMap.has(eventItem.groupId)) {
+						groupEventMap.set(eventItem.groupId, { ...eventItem, line: 0 });
+					}
+				} else {
+					noneGroupEvents.push({ ...eventItem, line: 0 });
+				}
+			});
+		});
+
+		const allEvent = [...groupEventMap.values(), ...noneGroupEvents];
+
+		// 2. 시작일 기준 정렬
+		allEvent.sort((a, b) => dayjs(a.startDate).diff(dayjs(b.startDate)));
+
+		// 3. 라인 배치 (겹칠 때만 내려감)
+		const lines: CalendarEventExtendDto[][] = [];
+
+		allEvent.forEach((event) => {
+			let placed = false;
+
+			// 전체 라인을 돌면서 겹치는 것이 있는지 여부 판별
+			const eventStart = dayjs(event.startDate);
+			const eventEnd = event.endDate ? dayjs(event.endDate) : eventStart;
+
+			for (let i = 0; i < lines.length; i++) {
+				const isOverlap = lines[i].some((existing) => {
+					const existingStart = dayjs(existing.startDate);
+					const existingEnd = existing.endDate ? dayjs(existing.endDate) : existingStart;
+
+					// 1.현재 이벤트 끝 점이 기존 이벤트(어떤 곳이든)보다 이전
+					// 2. 현재 이벤트 시작점이 기존 이벤트(어떤 곳이든)보다 이후
+					// 두 조건이 아닌경우
+					return !(eventEnd.isBefore(existingStart) || eventStart.isAfter(existingEnd));
+				});
+
+				if (!isOverlap) {
+					event.line = i;
+					lines[i].push(event);
+					placed = true;
+					break;
+				}
+			}
+
+			if (!placed) {
+				event.line = lines.length;
+				lines.push([event]);
+			}
+		});
+
+		// 4. 날짜별 라인 개수 계산 (= +N용)
+		const dayLineCountMap: Record<string, Set<number>> = {};
+
+		allEvent.forEach((event) => {
+			const start = dayjs(event.startDate);
+			const end = event.endDate ? dayjs(event.endDate) : start;
+
+			for (let d = start; d.isSameOrBefore(end); d = d.add(1, 'day')) {
+				const key = d.format('YYYY-MM-DD');
+
+				if (!dayLineCountMap[key]) {
+					dayLineCountMap[key] = new Set();
+				}
+
+				dayLineCountMap[key].add(event.line);
+			}
+		});
+
+		// 5. +N 계산
+		const dayOverflowMap: Record<string, number> = {};
+
+		//attendance의 경우 스케줄은 2개까지 + 근태
+		//schedule의 경우 최대 스케줄 3개까지
+		Object.entries(dayLineCountMap).forEach(([dateKey, lineSet]) => {
+			const count = lineSet.size;
+
+			if (count > maxLine) {
+				dayOverflowMap[dateKey] = count - maxLine;
+			}
+		});
+
+		return {
+			barEvents: allEvent,
+			dayOverflowMap,
+		};
+	}, [rowItem, calendarType]);
+
 	return (
-		<Box>
-			<Box
-				sx={{
-					display: 'flex',
-					flexDirection: 'row',
-					height: '2.5rem',
-				}}
-			>
-				{calendarCol.map((subItem: CalendarColData, subIdx: number) => {
+		<Box sx={{ position: 'relative', width: '100%' }}>
+			<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+				{calendarCol.map((colItem: CalendarColData, colIdx: number) => {
+					const dateKey = dayjs(rowItem[colItem.key].date).format('YYYY-MM-DD');
+
 					return (
 						<Box
-							key={`${subIdx}`}
+							key={`${rowIdx}_${colIdx}`}
 							sx={{
 								overflow: 'hidden',
 								display: 'flex',
-								flexDirection: 'row',
-								justifyContent: 'center',
-								alignItems: 'center',
+								flexDirection: 'column',
 								width: `calc(100% /${calendarCol.length - 1})`,
 								minWidth: '8rem',
-								padding: '0.375rem 0.625rem',
+								minHeight: '10rem',
+								...(colIdx !== 0 && {
+									marginLeft: '-1px',
+									borderLeft: `1px solid`,
+									borderColor: 'grey.300',
+								}),
+								...(activeCell === rowIdx + '_' + colIdx && {
+									outline: `2px solid`,
+									outlineColor: 'primary.main',
+									zIndex: 10,
+								}),
+								cursor: 'pointer',
 							}}
+							onClick={(e) => onClickCell(e, `${rowIdx}_${colIdx}`)}
 						>
-							<Typography
+							<Box
 								sx={{
-									textWrap: 'nowrap',
-									textOverflow: 'ellipsis',
-									whiteSpace: 'nowrap',
-									color: getDayColor(true, false, subItem.key),
-									fontWeight: 'bold',
+									display: 'flex',
+									justifyContent: 'space-between',
+									width: '100%',
+									height: dayTitleHeight,
+									padding: '0.375rem 0.625rem',
+									borderBottom: `1px solid`,
+									borderColor: 'grey.300',
+									gap: 2,
 								}}
 							>
-								{subItem.header}
-							</Typography>
+								<Typography
+									sx={{
+										fontWeight: 'bold',
+										color: getDayColor(rowItem[colItem.key].isCurrentMonth, rowItem[colItem.key].isHoliday, colItem.key),
+									}}
+								>
+									{dayjs(rowItem[colItem.key].date).format('DD')}
+								</Typography>
+								{rowItem[colItem.key].isHoliday && (
+									<Typography
+										variant='body2'
+										sx={{
+											overflow: 'hidden',
+											textWrap: 'nowrap',
+											textOverflow: 'ellipsis',
+											whiteSpace: 'nowrap',
+											color: 'error.500',
+										}}
+									>
+										{rowItem[colItem.key]?.holidaySubject ?? ''}
+									</Typography>
+								)}
+							</Box>
+							<Box
+								sx={{
+									position: 'relative',
+									display: 'flex',
+									flexDirection: 'column',
+									flexGrow: 1,
+									width: '100%',
+								}}
+							>
+								{dayOverflowMap[dateKey] && (
+									<Box
+										sx={{
+											position: 'absolute',
+											bottom: 0,
+											display: 'flex',
+											flexDirection: 'row',
+											justifyContent: 'end',
+											alignItems: 'center',
+											width: '100%',
+										}}
+									>
+										<Button>+{dayOverflowMap[dateKey]}</Button>
+									</Box>
+								)}
+							</Box>
 						</Box>
 					);
 				})}
 			</Box>
-			<Box sx={{ flexDirection: 'column', border: `1px solid`, borderColor: 'grey.300', borderRadius: '1rem' }}>
-				{calendarRow &&
-					calendarRow.map((item: Record<dayName, CalendarDayDto>, idx: number) => {
-						return (
-							<Box
-								key={idx}
-								sx={{
-									...(idx !== 0 && {
-										marginTop: '-1px',
-										borderTop: `1px solid`,
-										borderColor: 'grey.300',
-									}),
-								}}
-							>
-								<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-									{calendarCol.map((subItem: CalendarColData, subIdx: number) => {
-										return (
-											<Box
-												key={`${idx}_${subIdx}`}
-												sx={{
-													overflow: 'hidden',
-													display: 'flex',
-													flexDirection: 'column',
-													width: `calc(100% /${calendarCol.length - 1})`,
-													minWidth: '8rem',
-													minHeight: '10rem',
-													...(subIdx !== 0 && {
-														marginLeft: '-1px',
-														borderLeft: `1px solid`,
-														borderColor: 'grey.300',
-													}),
-													...(activeCell === idx + '_' + subIdx && {
-														outline: `2px solid`,
-														outlineColor: 'primary.main',
-														zIndex: 10,
-													}),
-													cursor: 'pointer',
-												}}
-												onClick={(e) => onClickCell(e, `${idx}_${subIdx}`)}
-											>
-												<Box
-													sx={{
-														display: 'flex',
-														justifyContent: 'space-between',
-														width: '100%',
-														height: '2rem',
-														padding: '0.375rem 0.625rem',
-														borderBottom: `1px solid`,
-														borderColor: 'grey.300',
-														gap: 2,
-													}}
-												>
-													<Typography
-														sx={{
-															fontWeight: 'bold',
-															color: getDayColor(item[subItem.key].isCurrentMonth, item[subItem.key].isHoliday, subItem.key),
-														}}
-													>
-														{dayjs(item[subItem.key].date).format('DD')}
-													</Typography>
-													{item[subItem.key].isHoliday && (
-														<Typography
-															variant='body2'
-															sx={{
-																overflow: 'hidden',
-																textWrap: 'nowrap',
-																textOverflow: 'ellipsis',
-																whiteSpace: 'nowrap',
-																color: 'error.500',
-															}}
-														>
-															{item[subItem.key]?.holidaySubject ?? ''}
-														</Typography>
-													)}
-												</Box>
-												<Box
-													sx={{
-														display: 'flex',
-														flexDirection: 'column',
-														flexGrow: 1,
-														width: '100%',
-													}}
-												>
-													<Box
-														sx={{
-															display: 'flex',
-															flexDirection: 'column',
-															flexGrow: 1,
-														}}
-													>
-														{calendarType === 'attendance' &&
-															item[subItem.key].events.slice(0, 3).map((eventItem: CalendarEventDto, eventIdx: number) => {
-																return <DayEventList key={eventIdx} eventData={eventItem} calendarType={calendarType} />;
-															})}
-													</Box>
-													{item[subItem.key].events.length > 3 && (
-														<Box
-															sx={{
-																display: 'flex',
-																flexDirection: 'row',
-																justifyContent: 'end',
-																alignItems: 'start',
-																width: '100%',
-																padding: '0.25rem 0.5rem',
-															}}
-														>
-															<Button className='text-only'> + {item[subItem.key].events.length - 3}</Button>
-														</Box>
-													)}
-												</Box>
-											</Box>
-										);
-									})}
-								</Box>
-							</Box>
-						);
-					})}
-			</Box>
+
+			{barEvents &&
+				barEvents
+					.filter((event) => event.line < maxLine)
+					.map((barEventItem: CalendarEventExtendDto, barEventIdx: number) => (
+						<EventBar key={`event_${rowIdx}_${barEventIdx}`} event={barEventItem} dayTitleHeight={dayTitleHeight} />
+					))}
 		</Box>
 	);
 }

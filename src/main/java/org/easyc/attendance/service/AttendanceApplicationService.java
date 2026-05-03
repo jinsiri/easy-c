@@ -169,11 +169,7 @@ public class AttendanceApplicationService {
                 convertAttendance.setNormalized(false);
                 convertAttendance.setWorkStatus(request.getWorkStatus());
                 break;
-            case OUTSIDE:
-            case BUSINESS_TRIP:
-                convertAttendance.setWorkStatus(request.getWorkStatus());
-                convertAttendance.setRemoted(true);
-                break;
+
         }
 
         return convertAttendance;

@@ -47,7 +47,7 @@ export default function AttendanceUserModal() {
 			onConfirm={modalData ? undefined : handleSave}
 			onClose={onClose}
 		>
-			<Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '30rem', height: '20rem' }}>
+			<Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '30rem', height: '14rem' }}>
 				{modalMode === 'detail' ? (
 					<AttendanceUserDetailModal modalData={sendModalData} setSaveFunc={setSaveFunc} />
 				) : (

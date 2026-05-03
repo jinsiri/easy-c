@@ -1,9 +1,10 @@
 import axiosConfig from '../_lib/axiosConfig';
 import dayjs from 'dayjs';
 
-import { workStatus, vacationType, dayName } from '@/type/types';
+import { dayName, scheduleType } from '@/type/types';
 import { AttendanceApplicationResponseDto } from '@/app/services/attendanceApplicationService';
-import { AttendanceDayResDto, AttendanceReqDto } from './attendanceService';
+import { AttendanceDayResDto } from './attendanceService';
+import { vacationApplicationDto } from './vacationApplicationService';
 
 export interface CalendarRequestDto {
 	memberIds: number[];
@@ -12,26 +13,25 @@ export interface CalendarRequestDto {
 }
 
 export interface CalendarEventDto {
-	eventType: string; // SCHEDULE / VACATION / OUTSIDE / ATTENDANCE
+	eventType: string; // SCHEDULE / VACATION / ATTENDANCE
 	memberId: number;
 	memberNm: string;
 	deptNm: string;
 	jobGrade: string;
 
+	groupId: string;
+	startDate: string;
+	endDate: string;
 	published: boolean;
 
 	scheduleName: string;
 	scheduleDesc: string;
 	startTime: string;
 	endTime: string;
-
-	vacationed: boolean;
-	vacationType: vacationType;
-
-	remoted: boolean;
-	workStatus: workStatus;
+	scheduleType: scheduleType;
 
 	detailData: AttendanceDayResDto;
+	vacationData: vacationApplicationDto;
 }
 
 export interface CalendarDayDto {
@@ -51,6 +51,7 @@ export interface ScheduleController {
 	endDate: dayjs.Dayjs | null;
 	startTime: dayjs.Dayjs | null;
 	endTime: dayjs.Dayjs | null;
+	scheduleType: scheduleType;
 	published: string;
 }
 
@@ -62,6 +63,7 @@ export interface ScheduleRequestDto {
 	endDate: string | null;
 	startTime: string | null;
 	endTime: string | null;
+	scheduleType: scheduleType;
 	published: boolean;
 }
 

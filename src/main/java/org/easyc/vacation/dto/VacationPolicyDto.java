@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.easyc.attendance.entity.AttendancePolicy;
 import org.easyc.vacation.constant.VacationPolicyType;
 import org.easyc.vacation.entity.VacationPolicy;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 public class VacationPolicyDto {
     private Long vacationPolicyId;
@@ -25,8 +27,11 @@ public class VacationPolicyDto {
 
     private String vacationPolicyUnit;
 
+    @Builder.Default
     private boolean annualLeaveExpired = true;
+    @Builder.Default
     private boolean monthLeaveExpired = true;
+    @Builder.Default
     private boolean nextYearLeaveUsed = true;
 
     private Long mappingUserCount;
@@ -42,18 +47,16 @@ public class VacationPolicyDto {
         this.nextYearLeaveUsed = entity.isNextYearLeaveUsed();
     }
 
-    public VacationPolicy makeEntity(){
-        VacationPolicy vacationPolicy = new VacationPolicy();
-
-        vacationPolicy.setVacationPolicyId(this.vacationPolicyId);
-        vacationPolicy.setVacationPolicyName(this.vacationPolicyName);
-        vacationPolicy.setVacationPolicyDesc(this.vacationPolicyDesc);
-        vacationPolicy.setVacationPolicyType(this.vacationPolicyType);
-        vacationPolicy.setVacationPolicyUnit(this.vacationPolicyUnit);
-        vacationPolicy.setAnnualLeaveExpiredremoted(this.annualLeaveExpired);
-        vacationPolicy.setMonthLeaveExpired(this.monthLeaveExpired);
-        vacationPolicy.setNextYearLeaveUsed(this.nextYearLeaveUsed);
-
-        return vacationPolicy;
+    public VacationPolicy toEntity(){
+        return VacationPolicy.builder()
+                .vacationPolicyId(this.vacationPolicyId)
+                .vacationPolicyName(this.vacationPolicyName)
+                .vacationPolicyDesc(this.vacationPolicyDesc)
+                .vacationPolicyType(this.vacationPolicyType)
+                .vacationPolicyUnit(this.vacationPolicyUnit)
+                .annualLeaveExpiredremoted(this.annualLeaveExpired)
+                .monthLeaveExpired(this.monthLeaveExpired)
+                .nextYearLeaveUsed(this.nextYearLeaveUsed)
+                .build();
     }
 }
