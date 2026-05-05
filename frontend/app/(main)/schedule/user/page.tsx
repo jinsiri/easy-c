@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 /** Lib */
 import dayjs from 'dayjs';
 
 /** MUI */
-import { Box, Grid, Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
@@ -20,23 +21,25 @@ import secureLocalStorage from 'react-secure-storage';
 
 export default function ScheduleUserPage() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const [calendarData, setCalendarData] = useState<Record<dayName, CalendarDayDto>[]>([]);
 
-	const onChangeDateFunc = (calendarDate: dayjs.Dayjs) => {
+	const onChangeDateFunc = async (calendarDate: dayjs.Dayjs) => {
 		const request: CalendarRequestDto = {
 			memberIds: [secureLocalStorage.getItem('memberId') as number],
 			scheduleType: 'PERSONAL',
 			date: calendarDate ? calendarDate.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
 		};
 
-		scheduleService.getUserMonthSchedules(request).then((res) => {
-			console.log(res);
+		await scheduleService.getUserMonthSchedules(request).then((res) => {
 			setCalendarData(res);
+			router.replace(`?date=${calendarDate.format('YYYY-MM')}`);
 		});
 	};
 
 	useEffect(() => {
-		onChangeDateFunc(dayjs());
+		const initialDate = searchParams.get('date') ? dayjs(searchParams.get('date')) : dayjs();
+		onChangeDateFunc(initialDate);
 	}, []);
 
 	return (

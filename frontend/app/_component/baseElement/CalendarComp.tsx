@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 /** MUI */
 import { Box, IconButton, Typography } from '@mui/material';
@@ -45,7 +46,9 @@ export default function CalendarComp({
 	calendarRow: Record<dayName, CalendarDayDto>[];
 	onChangeDate: (calendarDate: Dayjs) => void;
 }) {
-	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
+	const searchParams = useSearchParams();
+	const initialDate = searchParams.get('date') ? dayjs(searchParams.get('date')) : dayjs();
+	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(initialDate);
 
 	const onChangeDatePicker = (value) => {
 		if (value != null) {
