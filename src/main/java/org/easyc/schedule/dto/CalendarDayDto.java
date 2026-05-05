@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.easyc.attendance.dto.AttendanceDayResponseDto;
+import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.entity.AttendanceApplication;
 
 import java.time.LocalDate;
@@ -31,6 +33,10 @@ public class CalendarDayDto {
     private String holidaySubject;
 
     @Builder.Default
+    @JsonProperty("attendances")
+    List<AttendanceDayResponseDto> attendances = new ArrayList<>();
+
+    @Builder.Default
     @JsonProperty("events")
     private List<CalendarEventDto> events = new ArrayList<>();
 
@@ -38,17 +44,13 @@ public class CalendarDayDto {
     @JsonProperty("applications")
     private List<AttendanceApplication> applications = new ArrayList<>();
 
-    
-    public void addEvent(CalendarEventDto event) {
-        if(event != null) this.events.add(event);
+
+    public void addAttendanceEvents(List<AttendanceDayResponseDto> attendance) {
+        this.attendances.addAll(attendance);
     }
 
     public void addEvents(List<CalendarEventDto> events) {
         this.events.addAll(events);
-    }
-
-    public void addApplication(AttendanceApplication app) {
-        if(app != null) this.applications.add(app);
     }
 
     public void addApplications(List<AttendanceApplication> apps) {

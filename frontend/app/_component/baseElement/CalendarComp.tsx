@@ -15,7 +15,7 @@ import CalendarContentComp from './CalendarContentComp';
 import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
 
 /** type / interface */
-import { AttendanceDayResDto, CalendarData } from '@/app/services/attendanceService';
+import { AttendanceDayResDto } from '@/app/services/attendanceService';
 import { CalendarDayDto } from '@/app/services/scheduleService';
 import { dayName } from '@/type/types';
 

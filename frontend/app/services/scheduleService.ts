@@ -29,8 +29,7 @@ export interface CalendarEventDto {
 	startTime: string;
 	endTime: string;
 	scheduleType: scheduleType;
-
-	detailData: AttendanceDayResDto;
+	//detailData: AttendanceDayResDto;
 	vacationData: vacationApplicationDto;
 }
 
@@ -40,6 +39,7 @@ export interface CalendarDayDto {
 	isCurrentMonth: boolean;
 	isHoliday: boolean;
 	holidaySubject: string;
+	attendances: AttendanceDayResDto[];
 	events: CalendarEventDto[];
 	applications: AttendanceApplicationResponseDto[];
 }

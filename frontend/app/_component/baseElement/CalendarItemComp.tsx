@@ -67,6 +67,53 @@ const EventBar = ({ event, dayTitleHeight }: { event: CalendarEventExtendDto; da
 		px: 0.5,
 		borderRadius: '4px',
 	};
+
+	return (
+		<Box
+			sx={{
+				...dayBarStyle,
+				backgroundColor: 'primary.100',
+				color: 'primary.500',
+			}}
+		>
+			{event.eventType === 'VACATION' ? VACATIONTYPE[event.vacationData.vacationType as vacationType] : event.scheduleName}
+		</Box>
+	);
+};
+
+const AttendanceBar = ({
+	attendance,
+	dayTitleHeight,
+	dayLineCountMap,
+}: {
+	attendance: AttendanceDayResDto;
+	dayTitleHeight: string;
+	dayLineCountMap: Record<string, Set<number>>;
+}) => {
+	const barHeight: number = 1.5; //rem기준
+	const start = dayjs(attendance.workDate, 'YYYY-MM-DD');
+
+	const getIdx = (d: dayjs.Dayjs) => {
+		const day = d.day();
+		return day === 0 ? 6 : day - 1; // 월요일 시작 기준
+	};
+
+	const lineMap = dayLineCountMap[attendance.workDate as string];
+	const line = lineMap ? (lineMap.size > 2 ? 2 : lineMap.size) : 0;
+
+	const dayBarStyle = {
+		position: 'absolute',
+		top: `calc(${dayTitleHeight} + ${(barHeight + 0.1) * line}rem)`,
+		left: `calc(${getIdx(start)} * (100% / 7))`,
+
+		display: 'flex',
+		alignItems: 'center',
+		width: `calc( 100% / 7)`,
+		minWidth: ` 8rem`,
+		height: `${barHeight}rem`,
+		px: 0.5,
+		borderRadius: '4px',
+	};
 	const attendanceTimeStyle = {
 		display: 'flex',
 		justifyContent: 'center',
@@ -80,52 +127,34 @@ const EventBar = ({ event, dayTitleHeight }: { event: CalendarEventExtendDto; da
 		color: 'background.default',
 	};
 
-	const AllDayBar = useMemo(() => {
-		return (
-			<Box
-				sx={{
-					...dayBarStyle,
-					backgroundColor: 'primary.100',
-					color: 'primary.500',
-				}}
-			>
-				{event.eventType === 'VACATION' ? VACATIONTYPE[event.vacationData.vacationType as vacationType] : event.scheduleName}
-			</Box>
-		);
-	}, [event]);
-
-	const AttendanceBar = useMemo(() => {
-		return (
-			<Box
-				sx={{
-					...dayBarStyle,
-					flexDirection: 'column',
-					justifyContent: 'start',
-					alignItems: 'start',
-					padding: '0.5rem',
-				}}
-			>
-				{event.detailData.startTime && (
-					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-						<Typography variant={'caption'} sx={attendanceTimeStyle}>
-							출
-						</Typography>
-						<Typography>{dayjs(event.detailData.startTime).format('HH:mm')}</Typography>
-					</Box>
-				)}
-				{event.detailData.endTime && (
-					<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-						<Typography variant={'caption'} sx={attendanceTimeStyle}>
-							퇴
-						</Typography>
-						<Typography>{dayjs(event.detailData.endTime).format('HH:mm')}</Typography>
-					</Box>
-				)}
-			</Box>
-		);
-	}, [event]);
-
-	return <>{event.eventType === 'ATTENDANCE' ? AttendanceBar : AllDayBar}</>;
+	return (
+		<Box
+			sx={{
+				...dayBarStyle,
+				flexDirection: 'column',
+				justifyContent: 'start',
+				alignItems: 'start',
+				padding: '0.5rem',
+			}}
+		>
+			{attendance.startTime && (
+				<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+					<Typography variant={'caption'} sx={attendanceTimeStyle}>
+						출
+					</Typography>
+					<Typography>{dayjs(attendance.startTime).format('HH:mm')}</Typography>
+				</Box>
+			)}
+			{attendance.endTime && (
+				<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+					<Typography variant={'caption'} sx={attendanceTimeStyle}>
+						퇴
+					</Typography>
+					<Typography>{dayjs(attendance.endTime).format('HH:mm')}</Typography>
+				</Box>
+			)}
+		</Box>
+	);
 };
 
 export default function CalendarItemComp({
@@ -165,8 +194,9 @@ export default function CalendarItemComp({
 		}
 	};
 
-	const { barEvents, dayOverflowMap } = useMemo<{
+	const { barEvents, dayLineCountMap, dayOverflowMap } = useMemo<{
 		barEvents: CalendarEventExtendDto[];
+		dayLineCountMap: Record<string, Set<number>>;
 		dayOverflowMap: Record<string, number>;
 	}>(() => {
 		const groupEventMap = new Map<string, CalendarEventExtendDto>();
@@ -186,6 +216,7 @@ export default function CalendarItemComp({
 		});
 
 		const allEvent = [...groupEventMap.values(), ...noneGroupEvents];
+		let attendanceEvent;
 
 		// 2. 시작일 기준 정렬
 		allEvent.sort((a, b) => dayjs(a.startDate).diff(dayjs(b.startDate)));
@@ -258,6 +289,8 @@ export default function CalendarItemComp({
 
 		return {
 			barEvents: allEvent,
+			attendanceEvent,
+			dayLineCountMap,
 			dayOverflowMap,
 		};
 	}, [rowItem, calendarType]);
@@ -357,13 +390,27 @@ export default function CalendarItemComp({
 						);
 					})}
 				</Box>
-
 				{barEvents &&
 					barEvents
-						.filter((event) => event.line < maxLine)
+						.slice(0, maxLine)
 						.map((barEventItem: CalendarEventExtendDto, barEventIdx: number) => (
 							<EventBar key={`event_${rowIdx}_${barEventIdx}`} event={barEventItem} dayTitleHeight={dayTitleHeight} />
 						))}
+
+				{calendarCol.map((colItem: CalendarColData, colIdx: number) => {
+					const targets: AttendanceDayResDto[] = rowItem[colItem.key].attendances;
+					return (
+						targets.length > 0 && (
+							<AttendanceBar
+								key={`attendance_${rowIdx}_${colIdx}`}
+								attendance={targets[0]}
+								dayTitleHeight={dayTitleHeight}
+								dayLineCountMap={dayLineCountMap}
+							/>
+						)
+					);
+				})}
+
 				<CalendarItemDetailComp activeCell={activeCell} idx={rowIdx} item={rowItem} />
 			</Box>
 		</>

@@ -1,18 +1,17 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 /** MUI */
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 /** lib */
-import dayjs from 'dayjs';
 import { TimelineItemBase } from 'react-calendar-timeline';
 
 /** type / interface */
 import { AttendanceDayResDto } from '@/app/services/attendanceService';
 import { dayName } from '@/type/types';
-import { CalendarDayDto, CalendarEventDto } from '@/app/services/scheduleService';
+import { CalendarDayDto } from '@/app/services/scheduleService';
 import CalendarItemComp from './CalendarItemComp';
 
 export interface CalendarColData {

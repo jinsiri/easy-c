@@ -76,7 +76,6 @@ export default function AttendanceUserPage() {
 			scheduleType: 'PERSONAL',
 			date: calendarDate.format('YYYY-MM-DD'),
 		});
-
 		setCalendarData(res);
 	};
 

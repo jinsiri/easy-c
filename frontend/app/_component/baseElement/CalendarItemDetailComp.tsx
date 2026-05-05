@@ -136,12 +136,9 @@ export default function CalendarItemDetailComp({ activeCell, idx, item }: { acti
 	const detailData: AttendanceDayResDto | null = useMemo(() => {
 		if (activeColIdx) {
 			const targetDay: dayName = calendarCol[activeColIdx].key;
-			const targetEvents: CalendarEventDto[] = item[targetDay].events ?? [];
-			const attendance: CalendarEventDto[] = targetEvents.filter((item: CalendarEventDto) => item.eventType === 'ATTENDANCE');
+			const attendaces = item[targetDay].attendances;
 
-			if (attendance.length > 0) {
-				return attendance[0].detailData;
-			}
+			if (attendaces.length > 0) return attendaces[0];
 		}
 
 		return null;
