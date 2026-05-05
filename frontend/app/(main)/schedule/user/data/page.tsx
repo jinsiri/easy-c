@@ -22,17 +22,20 @@ import { FormWrapper, FormItem } from '@/app/_component/baseElement/FormComp';
 /** Type / Interface */
 import { ScheduleController, ScheduleRequestDto, scheduleService } from '@/app/services/scheduleService';
 import { SCHEDULETYPE } from '@/constant/scheduleConst';
+import { useEditor } from '@tiptap/react';
+import { useEffect } from 'react';
 
 export default function ScheduleUserDataPage() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const target = searchParams.get('target');
+	const id = searchParams.get('id');
 
 	const { setLoader } = useLoaderStore();
 	const { resetModalData } = useModalStore();
 
 	const {
 		control,
+		reset,
 		watch,
 		handleSubmit,
 		formState: { errors },
@@ -78,9 +81,43 @@ export default function ScheduleUserDataPage() {
 		}
 	});
 
+	const handleDelete = () => {
+		if (confirm('정말 해당 일정을 삭제하시겠습니까?')) {
+			scheduleService.deleteUserSchedule(Number(id)).then(() => {
+				if (confirm('요청이 성공적으로 등록되었습니다.')) {
+					resetModalData();
+					router.back();
+				}
+			});
+		}
+	};
+
 	const handleClose = () => {
 		router.back();
 	};
+
+	const resetFormData = () => {
+		if (id != null) {
+			scheduleService.getUserSchedule(Number(id)).then((res) => {
+				if (res) {
+					reset({
+						scheduleName: res.scheduleName,
+						scheduleDesc: res.scheduleDesc,
+						published: res.published ? 'public' : 'private',
+						scheduleType: res.scheduleType,
+						startDate: dayjs(res.startDate, 'YYYY-MM-DD'),
+						endDate: res.endDate ? dayjs(res.endDate, 'YYYY-MM-DD') : null,
+						startTime: res.startTime ? dayjs(res.startTime, 'HH:mm') : null,
+						endTime: res.endTime ? dayjs(res.endTime, 'HH:mm') : null,
+					});
+				}
+			});
+		}
+	};
+
+	useEffect(() => {
+		resetFormData();
+	}, [id]);
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'grey.50' }}>
@@ -102,7 +139,7 @@ export default function ScheduleUserDataPage() {
 					}}
 				>
 					<Grid size={12} sx={{ display: 'flex', justifyContent: 'row', alignItems: 'center', gap: 1 }}>
-						<Typography variant='h5'>{target == null ? '일정 생성' : '일정 수정'} </Typography>
+						<Typography variant='h5'>{id == null ? '일정 생성' : '일정 수정'} </Typography>
 					</Grid>
 					<Grid size={12}>
 						<FormItem
@@ -268,11 +305,16 @@ export default function ScheduleUserDataPage() {
 						/>
 					</Grid>
 					<Grid size={12} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 3 }}>
+						<Button variant='contained' size='large' onClick={handleSave}>
+							{id == null ? '저장' : '수정'}
+						</Button>
+						{id != null && (
+							<Button variant='contained' color={'error'} size='large' onClick={handleDelete}>
+								삭제
+							</Button>
+						)}
 						<Button variant='text' onClick={handleClose} size='large'>
 							닫기
-						</Button>
-						<Button variant='contained' size='large' onClick={handleSave}>
-							저장
 						</Button>
 					</Grid>
 				</Grid>

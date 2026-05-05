@@ -15,4 +15,5 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findByMemberIdAndStartDateBetweenAndDeletedFalse(Long memberId, LocalDate firstDay, LocalDate lastDay);
     List<Schedule> findByMemberIdAndStartDateBetweenAndScheduleTypeInAndDeletedFalse(Long memberId, LocalDate firstDay, LocalDate lastDay, List<ScheduleType> scheduleTypes);
 
+    Optional<Schedule> findByScheduleIdAndDeletedFalse(Long id);
 }

@@ -6,44 +6,6 @@ import { AttendanceApplicationResponseDto } from '@/app/services/attendanceAppli
 import { AttendanceDayResDto } from './attendanceService';
 import { vacationApplicationDto } from './vacationApplicationService';
 
-export interface CalendarRequestDto {
-	memberIds: number[];
-	scheduleType: string; // PERSONAL / DEPT
-	date: string;
-}
-
-export interface CalendarEventDto {
-	eventType: string; // SCHEDULE / VACATION / ATTENDANCE
-	memberId: number;
-	memberNm: string;
-	deptNm: string;
-	jobGrade: string;
-
-	groupId: string;
-	startDate: string;
-	endDate: string;
-	published: boolean;
-
-	scheduleName: string;
-	scheduleDesc: string;
-	startTime: string;
-	endTime: string;
-	scheduleType: scheduleType;
-	//detailData: AttendanceDayResDto;
-	vacationData: vacationApplicationDto;
-}
-
-export interface CalendarDayDto {
-	scheduleType: string; // PERSONAL / DEPT
-	date: string;
-	isCurrentMonth: boolean;
-	isHoliday: boolean;
-	holidaySubject: string;
-	attendances: AttendanceDayResDto[];
-	events: CalendarEventDto[];
-	applications: AttendanceApplicationResponseDto[];
-}
-
 export interface ScheduleController {
 	scheduleName: string;
 	scheduleDesc: string;
@@ -67,8 +29,62 @@ export interface ScheduleRequestDto {
 	published: boolean;
 }
 
+export interface ScheduleDto {
+	scheduleId: number | null;
+	memberId: number;
+	memberNm: string;
+	deptNm: string;
+	jobGrade: string;
+
+	scheduleName: string;
+	startDate: string;
+	startTime: string | null;
+	endDate: string | null;
+	endTime: string | null;
+
+	scheduleType: scheduleType;
+	published: boolean;
+	scheduleDesc: string;
+}
+
+export interface CalendarRequestDto {
+	memberIds: number[];
+	scheduleType: string; // PERSONAL / DEPT
+	date: string;
+}
+
+export interface CalendarEventDto {
+	eventType: string; // SCHEDULE / VACATION
+	memberId: number;
+	memberNm: string;
+	deptNm: string;
+	jobGrade: string;
+
+	groupId: string;
+	startDate: string;
+	endDate: string;
+
+	vacationData: vacationApplicationDto;
+	scheduleData: ScheduleDto;
+
+	line: number; // 프론트에서만 사용
+}
+
+export interface CalendarDayDto {
+	scheduleType: string; // PERSONAL / DEPT
+	date: string;
+	isCurrentMonth: boolean;
+	isHoliday: boolean;
+	holidaySubject: string;
+	attendances: AttendanceDayResDto[];
+	events: CalendarEventDto[];
+	applications: AttendanceApplicationResponseDto[];
+}
+
 // API 정의
 export const scheduleService = {
+	getUserSchedule: (id: number) => axiosConfig.get<ScheduleDto>(`/api/schedule/user?id=${id}`),
 	getUserMonthSchedules: (req: CalendarRequestDto) => axiosConfig.post<Record<dayName, CalendarDayDto>[]>('/api/schedule/user/month', req),
 	createUserSchedule: (req: ScheduleRequestDto) => axiosConfig.post<Record<dayName, CalendarDayDto>[]>('/api/schedule/user/create', req),
+	deleteUserSchedule: (id: number) => axiosConfig.delete<void>(`/api/schedule/user/delete?id=${id}`),
 };

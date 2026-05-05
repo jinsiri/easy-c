@@ -12,6 +12,10 @@ const Button = (theme: Theme): Components => ({
 					margin: 0,
 					minWidth: 0,
 					minHeight: 0,
+
+					'& hover': {
+						textDecorationLine: 'underline',
+					},
 				},
 			},
 

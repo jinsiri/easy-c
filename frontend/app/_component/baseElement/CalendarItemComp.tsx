@@ -1,25 +1,29 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 /** MUI */
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, Popover, IconButton } from '@mui/material';
+import { DeleteRounded } from '@mui/icons-material';
 
 /** lib */
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { TimelineItemBase } from 'react-calendar-timeline';
+import useModalStore from '@/store/useModalStore';
 
 dayjs.extend(isSameOrBefore);
 
 /** Custom */
 import { VACATIONTYPE } from '@/constant/attendanceConst';
+import CalendarItemDetailComp from './CalendarItemDetailComp';
 
 /** type / interface */
 import { AttendanceDayResDto } from '@/app/services/attendanceService';
 import { dayName, vacationType } from '@/type/types';
 import { CalendarDayDto, CalendarEventDto } from '@/app/services/scheduleService';
-import CalendarItemDetailComp from './CalendarItemDetailComp';
+import { CalendarEventBarComp } from './CalendarEventBarComp';
 
 export interface CalendarColData {
 	key: dayName;
@@ -38,11 +42,7 @@ export interface TimelineDataInterface {
 	data: TimelineItemBase<Date>[];
 }
 
-export interface CalendarEventExtendDto extends CalendarEventDto {
-	line: number;
-}
-
-const EventBar = ({ event, dayTitleHeight }: { event: CalendarEventExtendDto; dayTitleHeight: string }) => {
+/*const EventBar = ({ event, dayTitleHeight }: { event: CalendarEventExtendDto; dayTitleHeight: string }) => {
 	const barHeight: number = 1.5; //rem기준
 	const start = dayjs(event.startDate, 'YYYY-MM-DD');
 	const end = event.endDate ? dayjs(event.endDate, 'YYYY-MM-DD') : dayjs(event.startDate, 'YYYY-MM-DD');
@@ -79,7 +79,7 @@ const EventBar = ({ event, dayTitleHeight }: { event: CalendarEventExtendDto; da
 			{event.eventType === 'VACATION' ? VACATIONTYPE[event.vacationData.vacationType as vacationType] : event.scheduleName}
 		</Box>
 	);
-};
+};*/
 
 const AttendanceBar = ({
 	attendance,
@@ -174,10 +174,30 @@ export default function CalendarItemComp({
 }) {
 	const dayTitleHeight = '2rem';
 	const maxLine = calendarType === 'attendance' ? 2 : 3;
+	const router = useRouter();
+	const setModalData = useModalStore((state) => state.setModalData);
+
+	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+	const [anchorTarget, setAnchorTarget] = useState<CalendarDayDto | null>();
 
 	const onClickCell = (event: React.MouseEvent<HTMLElement>, target: string) => {
 		event.preventDefault();
 		if (cellClickEvent) cellClickEvent(target);
+	};
+
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		if (event.currentTarget) {
+			const splitId: string[] = event.currentTarget.id.split('_');
+			const colIdx: number = Number(splitId[1]);
+
+			setAnchorEl(event.currentTarget);
+			setAnchorTarget(rowItem[calendarCol[colIdx].key]);
+		}
+	};
+
+	const handleClose = () => {
+		setAnchorEl(null);
+		setAnchorTarget(null);
 	};
 
 	const getDayColor = (currentMonth: boolean, holiday: boolean, dayKey: dayName) => {
@@ -195,12 +215,12 @@ export default function CalendarItemComp({
 	};
 
 	const { barEvents, dayLineCountMap, dayOverflowMap } = useMemo<{
-		barEvents: CalendarEventExtendDto[];
+		barEvents: CalendarEventDto[];
 		dayLineCountMap: Record<string, Set<number>>;
 		dayOverflowMap: Record<string, number>;
 	}>(() => {
-		const groupEventMap = new Map<string, CalendarEventExtendDto>();
-		const noneGroupEvents: CalendarEventExtendDto[] = [];
+		const groupEventMap = new Map<string, CalendarEventDto>();
+		const noneGroupEvents: CalendarEventDto[] = [];
 
 		// 1.그룹이 있는지 아닌지 구분 후 그룹 중복 제거
 		Object.values(rowItem).forEach((day) => {
@@ -216,13 +236,12 @@ export default function CalendarItemComp({
 		});
 
 		const allEvent = [...groupEventMap.values(), ...noneGroupEvents];
-		let attendanceEvent;
 
 		// 2. 시작일 기준 정렬
 		allEvent.sort((a, b) => dayjs(a.startDate).diff(dayjs(b.startDate)));
 
 		// 3. 라인 배치 (겹칠 때만 내려감)
-		const lines: CalendarEventExtendDto[][] = [];
+		const lines: CalendarEventDto[][] = [];
 
 		allEvent.forEach((event) => {
 			let placed = false;
@@ -289,7 +308,6 @@ export default function CalendarItemComp({
 
 		return {
 			barEvents: allEvent,
-			attendanceEvent,
 			dayLineCountMap,
 			dayOverflowMap,
 		};
@@ -311,7 +329,7 @@ export default function CalendarItemComp({
 									flexDirection: 'column',
 									width: `calc(100% /${calendarCol.length - 1})`,
 									minWidth: '8rem',
-									minHeight: '10rem',
+									minHeight: '11rem',
 									...(colIdx !== 0 && {
 										marginLeft: '-1px',
 										borderLeft: `1px solid`,
@@ -382,7 +400,13 @@ export default function CalendarItemComp({
 												width: '100%',
 											}}
 										>
-											<Button>+{dayOverflowMap[dateKey]}</Button>
+											<Button
+												id={`${rowIdx}_${colIdx}`}
+												aria-describedby={Boolean(anchorEl) ? 'simple-popover' : undefined}
+												onClick={handleClick /*(e) => onClickButton(e, rowItem[colItem.key].events)*/}
+											>
+												+{dayOverflowMap[dateKey]}
+											</Button>
 										</Box>
 									)}
 								</Box>
@@ -393,8 +417,13 @@ export default function CalendarItemComp({
 				{barEvents &&
 					barEvents
 						.slice(0, maxLine)
-						.map((barEventItem: CalendarEventExtendDto, barEventIdx: number) => (
-							<EventBar key={`event_${rowIdx}_${barEventIdx}`} event={barEventItem} dayTitleHeight={dayTitleHeight} />
+						.map((barEventItem: CalendarEventDto, barEventIdx: number) => (
+							<CalendarEventBarComp
+								key={`event_${rowIdx}_${barEventIdx}`}
+								barType='calendar'
+								event={barEventItem}
+								dayTitleHeight={dayTitleHeight}
+							/>
 						))}
 
 				{calendarCol.map((colItem: CalendarColData, colIdx: number) => {
@@ -412,6 +441,42 @@ export default function CalendarItemComp({
 				})}
 
 				<CalendarItemDetailComp activeCell={activeCell} idx={rowIdx} item={rowItem} />
+
+				{
+					<Popover
+						id={Boolean(anchorEl) ? 'simple-popover' : undefined}
+						open={Boolean(anchorEl)}
+						anchorEl={anchorEl}
+						onClose={handleClose}
+						anchorOrigin={{
+							vertical: 'top',
+							horizontal: 'left',
+						}}
+						transformOrigin={{
+							vertical: 'bottom',
+							horizontal: 'left',
+						}}
+					>
+						<Box sx={{ maxWidth: '40rem', padding: '1rem 0.5rem' }}>
+							<Box sx={{ mb: '0.5rem' }}>
+								<Typography sx={{ fontWeight: 'bold' }}>{anchorTarget && dayjs(anchorTarget.date).format('YYYY-MM-DD')}</Typography>
+							</Box>
+							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+								{anchorTarget &&
+									anchorTarget.events.map((item: CalendarEventDto, idx: number) => {
+										return (
+											<Box
+												key={idx}
+												sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}
+											>
+												<CalendarEventBarComp barType='list' event={item} />
+											</Box>
+										);
+									})}
+							</Box>
+						</Box>
+					</Popover>
+				}
 			</Box>
 		</>
 	);

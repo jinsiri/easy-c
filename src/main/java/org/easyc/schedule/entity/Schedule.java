@@ -18,8 +18,7 @@ public class Schedule extends BaseEntity {
     @Id
     @SequenceGenerator(name="schedule_seq", sequenceName="schedule_seq", allocationSize=1)
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="schedule_seq")
-    private Long schedule_id;
-
+    private Long scheduleId;
 
     /** 근로자 정보 추가 */
     @Column(name="member_id")

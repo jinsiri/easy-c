@@ -41,6 +41,10 @@ public class ScheduleService {
     private final DeptMemberMapRepository deptMemberMapRepository;
     private final VacationService vacationService;
 
+    public Schedule getUserSchedule(Long id){
+        return scheduleRepository.findByScheduleIdAndDeletedFalse(id).orElseThrow(() -> new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND));
+    }
+
     public List<Map<String, CalendarDayDto>> getUserMonthSchedules(CalendarRequestDto request) {
         Long memberId = Optional.ofNullable(request.getMemberIds())
                 .filter(list -> !list.isEmpty())
@@ -94,5 +98,12 @@ public class ScheduleService {
         }
 
         scheduleRepository.save(request.toEntity(memberNm, deptNm, jobGrade));
+    }
+
+    public void deleteUserSchedule( Long id) {
+        Schedule schedule = scheduleRepository.findByScheduleIdAndDeletedFalse(id).orElseThrow(() -> new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND));
+        schedule.delete();
+
+        scheduleRepository.save(schedule);
     }
 }

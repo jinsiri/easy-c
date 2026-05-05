@@ -23,7 +23,7 @@ import java.time.temporal.ChronoUnit;
 @SuperBuilder
 @NoArgsConstructor
 public class CalendarEventDto {
-    private String eventType; // SCHEDULE / VACATION / OUTSIDE / ATTENDANCE
+    private String eventType; // SCHEDULE / VACATION
     private Long memberId;
     private String memberNm;
     private String deptNm;
@@ -32,45 +32,27 @@ public class CalendarEventDto {
     private String groupId;
     private LocalDate startDate;
     private LocalDate endDate;
-    @Builder.Default
-    private boolean published = false;
-
-    //SCHEDULE
-    private String scheduleName;
-    private String scheduleDesc;
-    private LocalTime startTime;
-    private LocalTime endTime;
-
-    @Enumerated(EnumType.STRING)
-    private ScheduleType scheduleType;
-
-    //ATTENDANCE
-    @Builder.Default
-    private AttendanceDayResponseDto detailData = new AttendanceDayResponseDto();
 
     //VACATION
     @Builder.Default
     private VacationApplicationDto vacationData = new VacationApplicationDto();
 
+    //SCHEDULE
+    @Builder.Default
+    private Schedule scheduleData = new Schedule();
 
-    public static CalendarEventDto fromAttendance (Attendance attendance) {
-        return CalendarEventDto.builder()
-                .eventType("ATTENDANCE")
-                .memberId(attendance.getMemberId())
-                .memberNm(attendance.getMemberNm())
-                .deptNm(attendance.getDeptNm())
-                .jobGrade(attendance.getJobGrade())
-                .startDate(attendance.getWorkDate())
-                .endDate(attendance.getWorkDate())
-                .published(true)
-                .detailData(AttendanceDayResponseDto.fromEntity(attendance))
-                .build();
-    }
 
     public static CalendarEventDto fromSchedule(Schedule schedule) {
         String groupId = null;
-        if(schedule.getEndDate() != null || (schedule.getStartTime() == null && schedule.getEndTime() == null)) {
-            groupId = "SCHEDULE_" + schedule.getSchedule_id();
+
+        if( schedule.getStartDate() != null &&
+                schedule.getEndDate() != null &&
+                (
+                        !schedule.getStartDate().isEqual(schedule.getEndDate()) ||
+                                schedule.getStartTime() == null && schedule.getEndTime() == null
+                )
+        ){
+            groupId = "SCHEDULE_" + schedule.getScheduleId();
         }
 
         return CalendarEventDto.builder()
@@ -82,12 +64,7 @@ public class CalendarEventDto {
                 .jobGrade(schedule.getJobGrade())
                 .startDate(schedule.getStartDate())
                 .endDate(schedule.getEndDate())
-                .published(schedule.isPublished())
-                .scheduleName(schedule.getScheduleName())
-                .scheduleDesc(schedule.getScheduleDesc())
-                .startTime(schedule.getStartTime())
-                .endTime(schedule.getEndTime())
-                .scheduleType(schedule.getScheduleType())
+                .scheduleData(schedule)
                 .build();
     }
 
@@ -101,7 +78,6 @@ public class CalendarEventDto {
                 .jobGrade(vacationApp.getJobGrade())
                 .startDate(vacationApp.getStartDate())
                 .endDate(vacationApp.getEndDate())
-                .published(true)
                 .vacationData(VacationApplicationDto.fromEntity(vacationApp))
                 .build();
     }
