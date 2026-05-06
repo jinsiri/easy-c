@@ -27,7 +27,7 @@ export default function ScheduleUserPage() {
 	const onChangeDateFunc = async (calendarDate: dayjs.Dayjs) => {
 		const request: CalendarRequestDto = {
 			memberIds: [secureLocalStorage.getItem('memberId') as number],
-			scheduleType: 'PERSONAL',
+			calendarType: 'PERSONAL',
 			date: calendarDate ? calendarDate.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
 		};
 

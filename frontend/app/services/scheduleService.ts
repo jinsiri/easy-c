@@ -50,7 +50,7 @@ export interface ScheduleDto {
 
 export interface CalendarRequestDto {
 	memberIds: number[];
-	scheduleType: string; // PERSONAL / DEPT
+	calendarType?: string; // PERSONAL / DEPT
 	date: string;
 }
 
@@ -85,6 +85,7 @@ export interface CalendarDayDto {
 // API 정의
 export const scheduleService = {
 	getUserSchedule: (id: number) => axiosConfig.get<ScheduleDto>(`/api/schedule/user?id=${id}`),
+	getUserTodaySchedule: (req: CalendarRequestDto) => axiosConfig.post<ScheduleDto[]>(`/api/schedule/user/today`, req),
 	getUserMonthSchedules: (req: CalendarRequestDto) => axiosConfig.post<Record<dayName, CalendarDayDto>[]>('/api/schedule/user/month', req),
 	createUserSchedule: (req: ScheduleRequestDto) => axiosConfig.post<Record<dayName, CalendarDayDto>[]>('/api/schedule/user/create', req),
 	deleteUserSchedule: (id: number) => axiosConfig.delete<void>(`/api/schedule/user/delete?id=${id}`),

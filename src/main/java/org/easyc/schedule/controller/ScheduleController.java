@@ -26,6 +26,11 @@ public class ScheduleController {
         return scheduleService.getUserSchedule(id);
     }
 
+    @PostMapping("/user/today")
+    public List<Schedule> getUserTodaySchedules(@RequestBody CalendarRequestDto request) {
+        return scheduleService.getUserTodaySchedules(request);
+    }
+
     @PostMapping("/user/month")
     public List<Map<String, CalendarDayDto>> getUserMonthSchedules(@RequestBody CalendarRequestDto request) {
         return scheduleService.getUserMonthSchedules(request);

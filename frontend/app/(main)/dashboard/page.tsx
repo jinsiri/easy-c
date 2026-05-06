@@ -1,20 +1,26 @@
 'use client';
 
-import { Box, Divider, Grid, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import secureLocalStorage from 'react-secure-storage';
+
+/** Lib */
+import dayjs from 'dayjs';
+import { Box, Divider, Grid, Typography } from '@mui/material';
+
+import useLoaderStore from '@/store/useLoaderStore';
+
+/** Custom */
+import UserResorceComp from '@/app/_component/layoutElement/UserResourceComp';
+import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
+import VacationComp from '@/app/_component/layoutElement/VacationComp';
+import UserLoginLogComp from '@/app/_component/layoutElement/UserLoginLogComp';
+
 import { SecurityLogResponseDto, securityLogService } from '@/app/services/securityLogService';
 import { BoardPostResponseDto, boardPostService } from '@/app/services/boardPostService';
 import { DeptMemberMapResponseDto, MemberResponseDto, memberService } from '@/app/services/memberService';
 import { AttendanceResDto, attendanceService } from '@/app/services/attendanceService';
 import { VacationDataDto, VacationResponseDto, vacationService } from '@/app/services/vacationService';
-import secureLocalStorage from 'react-secure-storage';
-import dayjs from 'dayjs';
-import UserResorceComp from '@/app/_component/layoutElement/UserResourceComp';
-import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
-import VacationComp from '@/app/_component/layoutElement/VacationComp';
-import UserLoginLogComp from '@/app/_component/layoutElement/UserLoginLogComp';
-import useLoaderStore from '@/store/useLoaderStore';
 
 export default function DashboardPage() {
 	const router = useRouter();
@@ -105,19 +111,19 @@ export default function DashboardPage() {
 			spacing={2}
 			sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignContent: 'flex-start', padding: '1rem 1.5rem', width: '100%', height: '100%' }}
 		>
-			<Grid size={3}>
+			<Grid size={{ xs: 12, md: 6, lg: 3 }}>
 				<UserResorceComp userData={memberInfo} deptData={deptMemberMapInfo} />
 			</Grid>
-			<Grid size={4} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
+			<Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
 				<AttendanceComp type={'home'} attendanceData={attendanceData} onSuccess={getAttendanceTodayData} />
 			</Grid>
-			<Grid size={5} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
+			<Grid size={{ xs: 12, md: 6, lg: 5 }} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
 				<VacationComp type={'home'} vacationData={vacationData} onSuccess={getVacationData} />
 			</Grid>
-			<Grid size={4}>
+			<Grid size={{ xs: 12, md: 6, lg: 4 }}>
 				<UserLoginLogComp myLogins={myLogins} />
 			</Grid>
-			<Grid size={4}>
+			<Grid size={{ xs: 12, md: 6, lg: 4 }}>
 				{/* 공지사항 위젯 */}
 				<Box
 					sx={{
@@ -163,7 +169,7 @@ export default function DashboardPage() {
 					)}
 				</Box>
 			</Grid>
-			<Grid size={4}>
+			<Grid size={{ xs: 12, md: 6, lg: 4 }}>
 				{/* 자유게시판 위젯 */}
 				<Box
 					sx={{

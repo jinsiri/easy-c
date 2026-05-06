@@ -93,7 +93,7 @@ public class AttendanceService {
         LocalDate firstDay = yearMonth.atDay(1);
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
-        List<Map<String, CalendarDayDto>> calendarFrame = createCalendarFrame(firstDay, lastDay, request.getScheduleType());
+        List<Map<String, CalendarDayDto>> calendarFrame = createCalendarFrame(firstDay, lastDay);
 
         Map<LocalDate, List<CalendarEventDto>> vacationMap = vacationService.createVacationAppToCalendarMap(memberId, firstDay, lastDay);
         Map<LocalDate, List<CalendarEventDto>> scheduleMap = createRemoteToCalendarMap(memberId, firstDay, lastDay);
@@ -533,10 +533,9 @@ public class AttendanceService {
         return holidayMap;
     }
 
-    private CalendarDayDto createCalendarItem(LocalDate date, boolean isCurrentMonth, String holidaySubject, String scheduleType){
+    private CalendarDayDto createCalendarItem(LocalDate date, boolean isCurrentMonth, String holidaySubject){
         CalendarDayDto calendarDayDto = CalendarDayDto.builder()
                 .date(date)
-                .scheduleType(scheduleType)
                 .isCurrentMonth(isCurrentMonth)
                 .isHoliday(holidaySubject != null)
                 .holidaySubject(holidaySubject)
@@ -545,7 +544,7 @@ public class AttendanceService {
         return calendarDayDto;
     }
 
-    public List<Map<String, CalendarDayDto>> createCalendarFrame(LocalDate firstDay, LocalDate lastDay, String scheduleType){
+    public List<Map<String, CalendarDayDto>> createCalendarFrame(LocalDate firstDay, LocalDate lastDay){
         String[] weekKeys = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
         List<Map<String, CalendarDayDto>> calendarList = new ArrayList<>();
         Map<String, CalendarDayDto> currentWeek = new LinkedHashMap<>();
@@ -557,7 +556,7 @@ public class AttendanceService {
         if (offset > 0) {
             LocalDate prevMonthCursor = firstDay.minusDays(offset);
             for (int i = 0; i < offset; i++) {
-                CalendarDayDto calendarDayDto = createCalendarItem(prevMonthCursor, false, holidayMap.get(prevMonthCursor), scheduleType);
+                CalendarDayDto calendarDayDto = createCalendarItem(prevMonthCursor, false, holidayMap.get(prevMonthCursor));
                 currentWeek.put(weekKeys[i], calendarDayDto);
                 prevMonthCursor = prevMonthCursor.plusDays(1);
             }
@@ -568,7 +567,7 @@ public class AttendanceService {
             DayOfWeek dayOfWeek = cursor.getDayOfWeek();
             String key = weekKeys[dayOfWeek.getValue() - 1];
 
-            currentWeek.put(key, createCalendarItem(cursor, cursor.getMonth() == firstDay.getMonth(), holidayMap.get(cursor), scheduleType));
+            currentWeek.put(key, createCalendarItem(cursor, cursor.getMonth() == firstDay.getMonth(), holidayMap.get(cursor)));
 
             // 일요일이거나 월의 마지막 날이면 리스트에 추가
             if (dayOfWeek == DayOfWeek.SUNDAY || cursor.equals(lastDay)) {
@@ -577,7 +576,7 @@ public class AttendanceService {
                 if (cursor.equals(lastDay) && dayOfWeek != DayOfWeek.SUNDAY) {
                     LocalDate nextMonthCursor = lastDay.plusDays(1);
                     for (int i = dayOfWeek.getValue(); i < 7; i++) {
-                        currentWeek.put(weekKeys[i], createCalendarItem(nextMonthCursor, false, holidayMap.get(nextMonthCursor), scheduleType));
+                        currentWeek.put(weekKeys[i], createCalendarItem(nextMonthCursor, false, holidayMap.get(nextMonthCursor)));
                         nextMonthCursor = nextMonthCursor.plusDays(1);
                     }
                 }

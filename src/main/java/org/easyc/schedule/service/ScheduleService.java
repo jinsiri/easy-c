@@ -17,6 +17,7 @@ import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
 import org.easyc.jobTitle.entity.JobTitle;
 import org.easyc.member.entity.Member;
 import org.easyc.member.repository.MemberRepository;
+import org.easyc.schedule.constant.ScheduleType;
 import org.easyc.schedule.dto.CalendarDayDto;
 import org.easyc.schedule.dto.CalendarEventDto;
 import org.easyc.schedule.dto.CalendarRequestDto;
@@ -45,6 +46,15 @@ public class ScheduleService {
         return scheduleRepository.findByScheduleIdAndDeletedFalse(id).orElseThrow(() -> new CustomException(CustomExceptionCode.SYSTEM_DATA_NOT_FOUND));
     }
 
+    public List<Schedule> getUserTodaySchedules(CalendarRequestDto request) {
+        Long memberId = Optional.ofNullable(request.getMemberIds())
+                .filter(list -> !list.isEmpty())
+                .map(list -> list.get(0))
+                .orElseThrow(() -> new IllegalArgumentException("memberIds is required"));
+
+        return scheduleRepository.findByMemberIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedFalse(memberId, request.getDate(), request.getDate());
+    }
+
     public List<Map<String, CalendarDayDto>> getUserMonthSchedules(CalendarRequestDto request) {
         Long memberId = Optional.ofNullable(request.getMemberIds())
                 .filter(list -> !list.isEmpty())
@@ -55,7 +65,7 @@ public class ScheduleService {
         LocalDate firstDay = yearMonth.atDay(1);
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
-        List<Map<String, CalendarDayDto>> calendarFrame =  attendanceService.createCalendarFrame(firstDay, lastDay, request.getScheduleType());
+        List<Map<String, CalendarDayDto>> calendarFrame =  attendanceService.createCalendarFrame(firstDay, lastDay);
         Map<LocalDate, List<CalendarEventDto>> scheduleMap = attendanceService.createScheduleToCalendarMap(memberId, firstDay, lastDay);
         Map<LocalDate, List<CalendarEventDto>> vacationMap = vacationService.createVacationAppToCalendarMap(memberId, firstDay, lastDay);
         Map<LocalDate, List<AttendanceApplication>> attendanceApplicationMap = attendanceService.createAttendanceAppMap(memberId, firstDay, lastDay);

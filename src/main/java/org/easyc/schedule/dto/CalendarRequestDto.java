@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CalendarRequestDto {
     private List<Long> memberIds;
-    private String scheduleType; // PERSONAL / DEPT
+    private String calendarType; // PERSONAL / DEPT
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
