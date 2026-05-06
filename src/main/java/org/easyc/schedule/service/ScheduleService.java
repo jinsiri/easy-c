@@ -47,28 +47,33 @@ public class ScheduleService {
     }
 
     public List<Schedule> getUserTodaySchedules(CalendarRequestDto request) {
-        Long memberId = Optional.ofNullable(request.getMemberIds())
-                .filter(list -> !list.isEmpty())
-                .map(list -> list.get(0))
-                .orElseThrow(() -> new IllegalArgumentException("memberIds is required"));
-
+        Long memberId = request.getMemberId();
         return scheduleRepository.findByMemberIdAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndDeletedFalse(memberId, request.getDate(), request.getDate());
     }
 
     public List<Map<String, CalendarDayDto>> getUserMonthSchedules(CalendarRequestDto request) {
-        Long memberId = Optional.ofNullable(request.getMemberIds())
-                .filter(list -> !list.isEmpty())
-                .map(list -> list.get(0))
-                .orElseThrow(() -> new IllegalArgumentException("memberIds is required"));
+        Long memberId = request.getMemberId();
+        String calendarType = request.getCalendarType();
+
+        List<Long> memberList = new ArrayList<>();
+        if(calendarType.equals("DEPT")){
+            DeptMemberMap deptMemberMaps = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(memberId);
+
+            if(deptMemberMaps != null){
+                Long deptId = deptMemberMaps.getDept().getDeptId();
+                memberList = deptMemberMapRepository.findMemberIdByDeptIdAndDeletedFalse(deptId);
+            }
+        }
+
+        if(memberList.isEmpty()){ memberList.add(memberId); }
 
         YearMonth yearMonth = YearMonth.of(request.getDate().getYear(), request.getDate().getMonthValue());
         LocalDate firstDay = yearMonth.atDay(1);
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
         List<Map<String, CalendarDayDto>> calendarFrame =  attendanceService.createCalendarFrame(firstDay, lastDay);
-        Map<LocalDate, List<CalendarEventDto>> scheduleMap = attendanceService.createScheduleToCalendarMap(memberId, firstDay, lastDay);
-        Map<LocalDate, List<CalendarEventDto>> vacationMap = vacationService.createVacationAppToCalendarMap(memberId, firstDay, lastDay);
-        Map<LocalDate, List<AttendanceApplication>> attendanceApplicationMap = attendanceService.createAttendanceAppMap(memberId, firstDay, lastDay);
+        Map<LocalDate, List<CalendarEventDto>> scheduleMap = attendanceService.createScheduleToCalendarMap(memberList, firstDay, lastDay, calendarType);
+        Map<LocalDate, List<CalendarEventDto>> vacationMap = vacationService.createVacationAppToCalendarMap(memberList, firstDay, lastDay);
 
         List<Map<String, CalendarDayDto>> resultList =
             calendarFrame.stream().map(dayMap -> {
@@ -77,7 +82,6 @@ public class ScheduleService {
 
                     dayDto.addEvents(vacationMap.getOrDefault(date, List.of()));
                     dayDto.addEvents(scheduleMap.getOrDefault(date, List.of()));
-                    dayDto.addApplications(attendanceApplicationMap.getOrDefault(date, List.of()));
                 });
 
                 return dayMap;

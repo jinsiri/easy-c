@@ -103,12 +103,12 @@ const MainMenuItem: menuType[] = [
 						type: '2depth',
 						url: '/user',
 					},
-					/*{
+					{
 						id: 'main-schedule-dept',
 						title: '부서 일정관리',
 						type: '2depth',
 						url: '/dept',
-					},*/
+					},
 				],
 			},
 

@@ -14,7 +14,7 @@ import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
 import { MemberResponseDto, DeptMemberMapResponseDto } from '@/app/services/memberService';
 import { ScheduleDto, scheduleService } from '@/app/services/scheduleService';
 
-export default function UserResorceComp({ userData, deptData }: { userData?: MemberResponseDto; deptData?: DeptMemberMapResponseDto }) {
+export default function UserResorceComp({ userData, deptData }: { userData?: MemberResponseDto; deptData?: DeptMemberMapResponseDto[] }) {
 	const theme = useTheme();
 	const [scheduleList, setScheduleList] = useState<ScheduleDto[]>([]);
 
@@ -22,7 +22,7 @@ export default function UserResorceComp({ userData, deptData }: { userData?: Mem
 		const memberId = Number(secureLocalStorage.getItem('memberId'));
 
 		const request = {
-			memberIds: [memberId],
+			memberId: memberId,
 			date: dayjs().format('YYYY-MM-DD'),
 		};
 
@@ -34,6 +34,8 @@ export default function UserResorceComp({ userData, deptData }: { userData?: Mem
 	useEffect(() => {
 		getScheduleData();
 	}, []);
+
+	console.log(userData, deptData);
 
 	return (
 		<Box
@@ -50,6 +52,7 @@ export default function UserResorceComp({ userData, deptData }: { userData?: Mem
 			<Box sx={{ position: 'relative', display: 'flex', flexDirection: 'row', width: '100%', height: '6rem', gap: 3 }}>
 				<Box
 					sx={{
+						flex: '0 0 auto',
 						position: 'relative',
 						width: '6rem',
 						height: '6rem',
@@ -87,15 +90,21 @@ export default function UserResorceComp({ userData, deptData }: { userData?: Mem
 						></Box>
 					</Box>
 				</Box>
-				<Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', height: '100%' }}>
-					<Box sx={{ display: 'flex', alignItems: 'baseline' }}>
+				<Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'start', height: '100%' }}>
+					<Box sx={{ display: 'flex', alignItems: 'baseline', mb: 0.5 }}>
 						<Typography variant='subtitle1' sx={{ fontWeight: '700' }}>
 							{userData ? userData.memberNm : '-'}
 						</Typography>
 						<Typography sx={{ marginLeft: '0.25rem', fontWeight: '600' }}>{userData ? userData.jobPosition?.jobPositionNm : '-'}</Typography>
 					</Box>
-					<Box>
-						<Typography variant='body2'>{deptData?.deptNm}</Typography>
+					<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center', gap: 0.5 }}>
+						{deptData?.map((deptItem, deptIdx: number) => {
+							return (
+								<Typography key={deptIdx} variant='body2'>
+									{deptItem.deptNm}
+								</Typography>
+							);
+						})}
 					</Box>
 				</Box>
 			</Box>

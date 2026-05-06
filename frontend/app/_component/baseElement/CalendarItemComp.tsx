@@ -115,6 +115,7 @@ const AttendanceBar = ({
 };
 
 export default function CalendarItemComp({
+	calendarCategory,
 	calendarType,
 	calendarCol,
 	rowItem,
@@ -122,7 +123,8 @@ export default function CalendarItemComp({
 	activeCell,
 	cellClickEvent,
 }: {
-	calendarType: 'attendance' | 'schedule';
+	calendarCategory: 'attendance' | 'schedule';
+	calendarType: 'PERSONAL' | 'DEPT';
 	calendarCol: CalendarColData[];
 	rowItem: Record<dayName, CalendarDayDto>;
 	rowIdx: number;
@@ -130,7 +132,7 @@ export default function CalendarItemComp({
 	cellClickEvent: (data: string) => void;
 }) {
 	const dayTitleHeight = '2rem';
-	const maxLine = calendarType === 'attendance' ? 2 : 3;
+	const maxLine = calendarCategory === 'attendance' ? 2 : 3;
 
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [anchorTarget, setAnchorTarget] = useState<CalendarDayDto | null>();
@@ -271,8 +273,6 @@ export default function CalendarItemComp({
 		};
 	}, [rowItem, calendarType]);
 
-	console.log(barEvents);
-
 	return (
 		<>
 			<Box sx={{ position: 'relative', width: '100%' }}>
@@ -300,9 +300,9 @@ export default function CalendarItemComp({
 										outlineColor: 'primary.main',
 										zIndex: 10,
 									}),
-									cursor: calendarType === 'attendance' ? 'pointer' : 'default',
+									cursor: calendarCategory === 'attendance' ? 'pointer' : 'default',
 								}}
-								onClick={(e) => calendarType === 'attendance' && onClickCell(e, `${rowIdx}_${colIdx}`)}
+								onClick={(e) => calendarCategory === 'attendance' && onClickCell(e, `${rowIdx}_${colIdx}`)}
 							>
 								<Box
 									sx={{
@@ -381,6 +381,7 @@ export default function CalendarItemComp({
 							<CalendarEventBarComp
 								key={`event_${rowIdx}_${barEventIdx}`}
 								barType='calendar'
+								calendarType={calendarType}
 								event={barEventItem}
 								dayTitleHeight={dayTitleHeight}
 							/>
@@ -429,7 +430,7 @@ export default function CalendarItemComp({
 												key={idx}
 												sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}
 											>
-												<CalendarEventBarComp barType='list' event={item} />
+												<CalendarEventBarComp barType='list' event={item} calendarType={calendarType} />
 											</Box>
 										);
 									})}

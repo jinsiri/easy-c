@@ -263,8 +263,8 @@ public class VacationService {
         return saveVacationList;
     }
 
-    public Map<LocalDate, List<CalendarEventDto>> createVacationAppToCalendarMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
-        List<VacationApplication> vacationApplicationList = vacationApplicationRepository.findAllByMemberIdAndStartDateBetweenAndStatusAndDeletedFalse(memberId, firstDay, lastDay, BasicStatus.APPROVED);
+    public Map<LocalDate, List<CalendarEventDto>> createVacationAppToCalendarMap(List<Long> memberIds, LocalDate firstDay, LocalDate lastDay){
+        List<VacationApplication> vacationApplicationList = vacationApplicationRepository.findAllByMemberIdInAndStartDateBetweenAndStatusAndDeletedFalse(memberIds, firstDay, lastDay, BasicStatus.APPROVED);
 
         Map<LocalDate, List<CalendarEventDto>> vacationMap = new HashMap<>();
         for (VacationApplication vacationApp : vacationApplicationList) {

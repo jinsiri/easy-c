@@ -38,11 +38,13 @@ export interface TimelineDataInterface {
 }
 
 export default function CalendarComp({
+	calendarCategory,
 	calendarType,
 	calendarRow,
 	onChangeDate,
 }: {
-	calendarType: 'attendance' | 'schedule';
+	calendarCategory: 'attendance' | 'schedule';
+	calendarType: 'PERSONAL' | 'DEPT';
 	calendarRow: Record<dayName, CalendarDayDto>[];
 	onChangeDate: (calendarDate: Dayjs) => void;
 }) {
@@ -104,7 +106,7 @@ export default function CalendarComp({
 				</IconButton>
 			</Box>
 			<Box sx={{ width: '100%' }}>
-				<CalendarContentComp calendarRow={calendarRow} calendarType={calendarType} />
+				<CalendarContentComp calendarRow={calendarRow} calendarCategory={calendarCategory} calendarType={calendarType} />
 			</Box>
 		</Box>
 	);

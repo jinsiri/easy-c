@@ -17,7 +17,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 public class CalendarRequestDto {
-    private List<Long> memberIds;
+    private Long memberId;
     private String calendarType; // PERSONAL / DEPT
 
     @JsonFormat(pattern = "yyyy-MM-dd")

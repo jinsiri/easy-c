@@ -87,7 +87,7 @@ public class AttendanceService {
     }
 
     public List<Map<String, CalendarDayDto>> getAttendanceCalendarData(CalendarRequestDto request) {
-        Long memberId = request.getMemberIds().get(0);
+        Long memberId = request.getMemberId();
 
         YearMonth yearMonth = YearMonth.of(request.getDate().getYear(), request.getDate().getMonthValue());
         LocalDate firstDay = yearMonth.atDay(1);
@@ -95,10 +95,11 @@ public class AttendanceService {
 
         List<Map<String, CalendarDayDto>> calendarFrame = createCalendarFrame(firstDay, lastDay);
 
-        Map<LocalDate, List<CalendarEventDto>> vacationMap = vacationService.createVacationAppToCalendarMap(memberId, firstDay, lastDay);
-        Map<LocalDate, List<CalendarEventDto>> scheduleMap = createRemoteToCalendarMap(memberId, firstDay, lastDay);
-        Map<LocalDate, AttendanceDayResponseDto> attendanceMap = createAttendanceMap(memberId, firstDay, lastDay, "PERSONAL");
-        Map<LocalDate, List<AttendanceApplication>> attendanceApplicationMap = createAttendanceAppMap(memberId, firstDay, lastDay);
+        List<Long> memberIds = List.of(memberId);
+        Map<LocalDate, List<CalendarEventDto>> vacationMap = vacationService.createVacationAppToCalendarMap(memberIds, firstDay, lastDay);
+        Map<LocalDate, List<CalendarEventDto>> scheduleMap = createRemoteToCalendarMap(memberIds, firstDay, lastDay);
+        Map<LocalDate, AttendanceDayResponseDto> attendanceMap = createAttendanceMap(memberId, firstDay, lastDay);
+        Map<LocalDate, List<AttendanceApplication>> attendanceApplicationMap = createAttendanceAppMap(memberIds, firstDay, lastDay);
 
         List<Map<String, CalendarDayDto>> resultList =
                 calendarFrame.stream().map(dayMap -> {
@@ -456,7 +457,7 @@ public class AttendanceService {
 
 
     //
-    public Map<LocalDate, AttendanceDayResponseDto> createAttendanceMap(Long memberId, LocalDate firstDay, LocalDate lastDay, String scheduleType){
+    public Map<LocalDate, AttendanceDayResponseDto> createAttendanceMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
         List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateAsc(memberId, firstDay, lastDay);
 
         Map<LocalDate, AttendanceDayResponseDto> calendarMap = new HashMap<>();
@@ -468,8 +469,13 @@ public class AttendanceService {
         return calendarMap;
     }
 
-    public Map<LocalDate, List<CalendarEventDto>> createScheduleToCalendarMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
-        List<Schedule> scheduleList = scheduleRepository.findByMemberIdAndStartDateBetweenAndDeletedFalse(memberId, firstDay, lastDay);
+    public Map<LocalDate, List<CalendarEventDto>> createScheduleToCalendarMap(List<Long> memberIds, LocalDate firstDay, LocalDate lastDay, String calendarType){
+        List<Schedule> scheduleList;
+        if(calendarType.equals("DEPT")){
+            scheduleList = scheduleRepository.findByMemberIdInAndStartDateBetweenAndPublishedTrueAndDeletedFalse(memberIds, firstDay, lastDay);
+        }else{
+            scheduleList = scheduleRepository.findByMemberIdInAndStartDateBetweenAndDeletedFalse(memberIds, firstDay, lastDay);
+        }
 
         Map<LocalDate, List<CalendarEventDto>> calendarMap = new HashMap<>();
         for (Schedule schedule : scheduleList) {
@@ -489,8 +495,8 @@ public class AttendanceService {
         return calendarMap;
     }
 
-    public Map<LocalDate, List<CalendarEventDto>> createRemoteToCalendarMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
-        List<Schedule> scheduleList = scheduleRepository.findByMemberIdAndStartDateBetweenAndScheduleTypeInAndDeletedFalse(memberId, firstDay, lastDay, List.of(ScheduleType.OUTSIDE, ScheduleType.BUSINESS_TRIP));
+    public Map<LocalDate, List<CalendarEventDto>> createRemoteToCalendarMap(List<Long> memberIds, LocalDate firstDay, LocalDate lastDay){
+        List<Schedule> scheduleList = scheduleRepository.findByMemberIdInAndStartDateBetweenAndScheduleTypeInAndDeletedFalse(memberIds, firstDay, lastDay, List.of(ScheduleType.OUTSIDE, ScheduleType.BUSINESS_TRIP));
 
         Map<LocalDate, List<CalendarEventDto>> calendarMap = new HashMap<>();
         for (Schedule schedule : scheduleList) {
@@ -510,8 +516,8 @@ public class AttendanceService {
         return calendarMap;
     }
 
-    public Map<LocalDate, List<AttendanceApplication>> createAttendanceAppMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
-        List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDate(memberId, firstDay, lastDay);
+    public Map<LocalDate, List<AttendanceApplication>> createAttendanceAppMap(List<Long> memberIds, LocalDate firstDay, LocalDate lastDay){
+        List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdInAndWorkDateBetweenAndDeletedFalseOrderByWorkDate(memberIds, firstDay, lastDay);
         Map<LocalDate, List<AttendanceApplication>> changeRequestMap =
                 targetAttendanceChangeRequestList.stream()
                         .collect(Collectors.groupingBy(

@@ -2,9 +2,10 @@
 
 import React, { ReactNode, useMemo, MouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import secureLocalStorage from 'react-secure-storage';
 
 /** MUI */
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 /** lib */
 import dayjs from 'dayjs';
@@ -16,12 +17,11 @@ dayjs.extend(isSameOrBefore);
 
 /** Custom */
 import { VACATIONTYPE } from '@/constant/attendanceConst';
-import CalendarItemDetailComp from './CalendarItemDetailComp';
 
 /** type / interface */
 import { AttendanceDayResDto } from '@/app/services/attendanceService';
 import { dayName, vacationType } from '@/type/types';
-import { CalendarDayDto, CalendarEventDto } from '@/app/services/scheduleService';
+import { CalendarEventDto } from '@/app/services/scheduleService';
 
 export interface CalendarColData {
 	key: dayName;
@@ -42,14 +42,17 @@ export interface TimelineDataInterface {
 
 export const CalendarEventBarComp = ({
 	barType,
+	calendarType,
 	event,
 	dayTitleHeight,
 }: {
 	barType: 'calendar' | 'list';
+	calendarType: 'PERSONAL' | 'DEPT';
 	event: CalendarEventDto;
 	dayTitleHeight?: string;
 }) => {
 	const router = useRouter();
+	const targetMemberId = secureLocalStorage.getItem('memberId') as number;
 	const setModalData = useModalStore((state) => state.setModalData);
 
 	const barHeight: number = 1.5; //rem기준
@@ -81,17 +84,24 @@ export const CalendarEventBarComp = ({
 	const onClickBar = (e: MouseEvent<HTMLAnchorElement>) => {
 		e.preventDefault();
 
-		if (event.eventType === 'VACATION') {
-			setModalData(event.vacationData);
-			router.push('/vacation/user/modal?type=read');
-		} else {
-			setModalData(event.scheduleData);
-			router.push(`/schedule/user/modal`);
+		if (calendarType !== 'DEPT') {
+			if (event.eventType === 'VACATION') {
+				setModalData(event.vacationData);
+				router.push('/vacation/user/modal?type=read');
+			} else {
+				setModalData(event.scheduleData);
+				router.push(`/schedule/user/modal`);
+			}
 		}
 	};
 
 	const barTitle: ReactNode = useMemo(() => {
-		if (event.eventType === 'VACATION') return <Typography>{VACATIONTYPE[event.vacationData.vacationType as vacationType]}</Typography>;
+		if (event.eventType === 'VACATION')
+			return (
+				<Typography>
+					{targetMemberId !== event.memberId && `[${event.memberNm}]  `} {VACATIONTYPE[event.vacationData.vacationType as vacationType]}
+				</Typography>
+			);
 
 		const _startDate = event.scheduleData.startDate;
 		const _endDate = event.scheduleData.endDate ?? _startDate;
@@ -107,7 +117,10 @@ export const CalendarEventBarComp = ({
 						&nbsp;&nbsp;&nbsp;&nbsp;
 					</Typography>
 				)}
-				<Typography className='text-ellipsis'>{event.scheduleData.scheduleName}</Typography>
+
+				<Typography className='text-ellipsis'>
+					{targetMemberId !== event.memberId && `[${event.memberNm}]  `} {event.scheduleData.scheduleName}
+				</Typography>
 			</Box>
 		);
 	}, [event]);
@@ -123,10 +136,10 @@ export const CalendarEventBarComp = ({
 				color: 'primary.500',
 				px: 0.5,
 				borderRadius: '4px',
-				cursor: 'pointer',
+				cursor: calendarType === 'DEPT' ? 'default' : 'pointer',
 
 				'&:hover': {
-					textDecoration: 'underline',
+					textDecoration: calendarType === 'DEPT' ? 'none' : 'underline',
 				},
 			}}
 			onClick={onClickBar}

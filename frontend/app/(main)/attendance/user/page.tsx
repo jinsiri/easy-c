@@ -72,8 +72,8 @@ export default function AttendanceUserPage() {
 
 	const getAttendanceCalendarData = async (calendarDate: Dayjs) => {
 		const res = await attendanceService.getAttendanceCalendarData({
-			memberIds: [secureLocalStorage.getItem('memberId') as number],
-			scheduleType: 'PERSONAL',
+			memberId: secureLocalStorage.getItem('memberId') as number,
+			calendarType: 'PERSONAL',
 			date: calendarDate.format('YYYY-MM-DD'),
 		});
 		setCalendarData(res);
@@ -323,7 +323,7 @@ export default function AttendanceUserPage() {
 					</Box>
 				</Box>
 				<Box sx={{ flexGrow: 1 }}>
-					<CalendarComp calendarRow={calendarData} calendarType='attendance' onChangeDate={onChangeDateFunc} />
+					<CalendarComp calendarRow={calendarData} calendarCategory='attendance' calendarType='PERSONAL' onChangeDate={onChangeDateFunc} />
 				</Box>
 				<Box sx={{ display: 'flex', flexDirection: { lg: 'row', md: 'column', sm: 'column', xs: 'column' }, minHeight: '15rem', gap: '1rem' }}>
 					<Box

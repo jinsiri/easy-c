@@ -26,7 +26,7 @@ export default function ScheduleUserPage() {
 
 	const onChangeDateFunc = async (calendarDate: dayjs.Dayjs) => {
 		const request: CalendarRequestDto = {
-			memberIds: [secureLocalStorage.getItem('memberId') as number],
+			memberId: secureLocalStorage.getItem('memberId') as number,
 			calendarType: 'PERSONAL',
 			date: calendarDate ? calendarDate.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
 		};
@@ -56,7 +56,7 @@ export default function ScheduleUserPage() {
 			</PathBreadcrumbs>
 			<Box sx={{ flexDirection: 'column', flexGrow: 1, minWidth: '100%', gap: 2 }}>
 				<Box sx={{ flexGrow: 1 }}>
-					<CalendarComp calendarType='schedule' calendarRow={calendarData} onChangeDate={onChangeDateFunc} />
+					<CalendarComp calendarCategory='schedule' calendarType='PERSONAL' calendarRow={calendarData} onChangeDate={onChangeDateFunc} />
 				</Box>
 			</Box>
 		</Box>

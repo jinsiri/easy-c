@@ -43,10 +43,12 @@ const calendarCol: CalendarColData[] = [
 
 export default function CalendarContentComp({
 	calendarRow,
+	calendarCategory,
 	calendarType,
 }: {
 	calendarRow: Record<dayName, CalendarDayDto>[];
-	calendarType: 'attendance' | 'schedule';
+	calendarCategory: 'attendance' | 'schedule';
+	calendarType: 'PERSONAL' | 'DEPT';
 }) {
 	const [activeCell, setActiveCell] = useState<string | null>(null);
 
@@ -126,6 +128,7 @@ export default function CalendarContentComp({
 								}}
 							>
 								<CalendarItemComp
+									calendarCategory={calendarCategory}
 									calendarType={calendarType}
 									calendarCol={calendarCol}
 									rowItem={item}

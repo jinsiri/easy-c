@@ -49,7 +49,7 @@ export interface ScheduleDto {
 }
 
 export interface CalendarRequestDto {
-	memberIds: number[];
+	memberId: number;
 	calendarType?: string; // PERSONAL / DEPT
 	date: string;
 }
