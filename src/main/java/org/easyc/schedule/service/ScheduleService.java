@@ -77,27 +77,37 @@ public class ScheduleService {
     }
 
     public void createUserSchedule( ScheduleRequestDto request) {
-        DeptMemberMap deptMemberMaps = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(request.getMemberId());
-        String memberNm = Optional.ofNullable(deptMemberMaps)
-                .map(DeptMemberMap::getMember)
-                .map(Member::getMemberNm)
-                .orElse(null);
-        String deptNm = Optional.ofNullable(deptMemberMaps)
-                .map(DeptMemberMap::getDept)
-                .map(Dept::getDeptNm)
-                .orElse(null);
+        Schedule schedule = new Schedule();
 
-        String jobGrade = Optional.ofNullable(deptMemberMaps)
-                .map(DeptMemberMap::getJobTitle)
-                .map(JobTitle::getJobTitleNm)
-                .orElse(null);
+        if(request.getScheduleId() != null) {
+            schedule = scheduleRepository.findByScheduleIdAndDeletedFalse(request.getScheduleId()).orElse(new Schedule());
+            schedule.updateEntityFromDto(request, null, null, null);
 
-        if(deptMemberMaps == null){
-            Member member = memberRepository.findByMemberId(request.getMemberId()).orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
-            memberNm = member.getMemberNm();
+        }else{
+            DeptMemberMap deptMemberMaps = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(request.getMemberId());
+            String memberNm = Optional.ofNullable(deptMemberMaps)
+                    .map(DeptMemberMap::getMember)
+                    .map(Member::getMemberNm)
+                    .orElse(null);
+            String deptNm = Optional.ofNullable(deptMemberMaps)
+                    .map(DeptMemberMap::getDept)
+                    .map(Dept::getDeptNm)
+                    .orElse(null);
+
+            String jobGrade = Optional.ofNullable(deptMemberMaps)
+                    .map(DeptMemberMap::getJobTitle)
+                    .map(JobTitle::getJobTitleNm)
+                    .orElse(null);
+
+            if(deptMemberMaps == null){
+                Member member = memberRepository.findByMemberId(request.getMemberId()).orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
+                memberNm = member.getMemberNm();
+            }
+
+            schedule.updateEntityFromDto(request, memberNm, deptNm, jobGrade);
         }
 
-        scheduleRepository.save(request.toEntity(memberNm, deptNm, jobGrade));
+        scheduleRepository.save(schedule);
     }
 
     public void deleteUserSchedule( Long id) {

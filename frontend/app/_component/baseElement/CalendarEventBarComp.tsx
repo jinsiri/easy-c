@@ -50,6 +50,8 @@ export const CalendarEventBarComp = ({
 	dayTitleHeight?: string;
 }) => {
 	const router = useRouter();
+	const setModalData = useModalStore((state) => state.setModalData);
+
 	const barHeight: number = 1.5; //rem기준
 	const start = dayjs(event.startDate, 'YYYY-MM-DD');
 	const end = event.endDate ? dayjs(event.endDate, 'YYYY-MM-DD') : dayjs(event.startDate, 'YYYY-MM-DD');
@@ -65,8 +67,8 @@ export const CalendarEventBarComp = ({
 	const dayBarStyle = {
 		position: 'absolute',
 		top: `calc(${dayTitleHeight ?? 0} + ${(barHeight + 0.1) * event.line}rem)`,
-		left: `calc(${startIdx} * (100% / 7))`,
-		width: `calc(${endIdx - startIdx + 1} * (100% / 7))`,
+		left: `calc(${startIdx} * (100% / 7) + 1px)`,
+		width: `calc(${endIdx - startIdx + 1} * (100% / 7) - 2px)`,
 		minWidth: `calc(${endIdx - startIdx + 1} * 8rem)`,
 		height: `${barHeight}rem`,
 	};
@@ -78,18 +80,27 @@ export const CalendarEventBarComp = ({
 
 	const onClickBar = (e: MouseEvent<HTMLAnchorElement>) => {
 		e.preventDefault();
-		router.push(`/schedule/user/data?id=${event.scheduleData.scheduleId}`);
+
+		if (event.eventType === 'VACATION') {
+			setModalData(event.vacationData);
+			router.push('/vacation/user/modal?type=read');
+		} else {
+			setModalData(event.scheduleData);
+			router.push(`/schedule/user/modal`);
+		}
 	};
 
 	const barTitle: ReactNode = useMemo(() => {
 		if (event.eventType === 'VACATION') return <Typography>{VACATIONTYPE[event.vacationData.vacationType as vacationType]}</Typography>;
 
+		const _startDate = event.scheduleData.startDate;
+		const _endDate = event.scheduleData.endDate ?? _startDate;
 		const _startTime = event.scheduleData.startTime;
 		const _endTime = event.scheduleData.endTime;
 
 		return (
 			<Box sx={{ overflow: 'hidden', display: 'flex', flexDirection: 'row' }}>
-				{_startTime && (
+				{_startDate === _endDate && _startTime && (
 					<Typography>
 						{dayjs(_startTime, 'HH:mm:ss').format('HH:mm')}
 						{_endTime && ' ~ ' + dayjs(_endTime, 'HH:mm:ss').format('HH:mm')}

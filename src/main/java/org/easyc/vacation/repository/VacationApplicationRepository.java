@@ -16,6 +16,4 @@ public interface VacationApplicationRepository extends JpaRepository<VacationApp
 
     List<VacationApplication> findAllByVacationApplicationIdInAndDeletedFalse(List<Long> vacationAppIdList);
     List<VacationApplication> findAllByMemberIdAndStartDateBetweenAndStatusAndDeletedFalse(Long memberId, LocalDate firstDay, LocalDate lastDay, BasicStatus status);
-
-    List<VacationApplication> findAllByMemberIdAndStartDateBetweenAndDeletedFalse(Long memberId, LocalDate firstDay, LocalDate lastDay);
 }

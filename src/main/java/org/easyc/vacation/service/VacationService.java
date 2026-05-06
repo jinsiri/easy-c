@@ -264,7 +264,7 @@ public class VacationService {
     }
 
     public Map<LocalDate, List<CalendarEventDto>> createVacationAppToCalendarMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
-        List<VacationApplication> vacationApplicationList = vacationApplicationRepository.findAllByMemberIdAndStartDateBetweenAndDeletedFalse(memberId, firstDay, lastDay);
+        List<VacationApplication> vacationApplicationList = vacationApplicationRepository.findAllByMemberIdAndStartDateBetweenAndStatusAndDeletedFalse(memberId, firstDay, lastDay, BasicStatus.APPROVED);
 
         Map<LocalDate, List<CalendarEventDto>> vacationMap = new HashMap<>();
         for (VacationApplication vacationApp : vacationApplicationList) {

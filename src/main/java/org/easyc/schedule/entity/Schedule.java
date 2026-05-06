@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.easyc.common.entity.BaseEntity;
 import org.easyc.schedule.constant.ScheduleType;
+import org.easyc.schedule.dto.ScheduleRequestDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -59,5 +60,22 @@ public class Schedule extends BaseEntity {
 
     @Column(name = "schedule_desc")
     private String scheduleDesc;
+
+
+    public void updateEntityFromDto(ScheduleRequestDto dto, String memberNm, String deptNm, String jobGrade) {
+        this.memberId = dto.getMemberId();
+        this.scheduleName = dto.getScheduleName();
+        this.startDate = dto.getStartDate();
+        this.startTime = dto.getStartTime();
+        this.endDate = dto.getEndDate();
+        this.endTime = dto.getEndTime();
+        this.scheduleType = dto.getScheduleType();
+        this.published = dto.isPublished();
+        this.scheduleDesc = dto.getScheduleDesc();
+
+        if(memberNm != null) { this.memberNm = memberNm; }
+        if(deptNm != null) { this.deptNm = deptNm; }
+        if(jobGrade != null) { this.jobGrade = jobGrade; }
+    }
 
 }

@@ -97,7 +97,7 @@ public class AttendanceService {
 
         Map<LocalDate, List<CalendarEventDto>> vacationMap = vacationService.createVacationAppToCalendarMap(memberId, firstDay, lastDay);
         Map<LocalDate, List<CalendarEventDto>> scheduleMap = createRemoteToCalendarMap(memberId, firstDay, lastDay);
-        Map<LocalDate, List<AttendanceDayResponseDto>> attendanceMap = createAttendanceMap(memberId, firstDay, lastDay, "PERSONAL");
+        Map<LocalDate, AttendanceDayResponseDto> attendanceMap = createAttendanceMap(memberId, firstDay, lastDay, "PERSONAL");
         Map<LocalDate, List<AttendanceApplication>> attendanceApplicationMap = createAttendanceAppMap(memberId, firstDay, lastDay);
 
         List<Map<String, CalendarDayDto>> resultList =
@@ -107,7 +107,7 @@ public class AttendanceService {
 
                         dayDto.addEvents(vacationMap.getOrDefault(date, List.of()));
                         dayDto.addEvents(scheduleMap.getOrDefault(date, List.of()));
-                        dayDto.addAttendanceEvents(attendanceMap.getOrDefault(date, List.of()));
+                        dayDto.addAttendance(attendanceMap.getOrDefault(date, new AttendanceDayResponseDto()));
                         dayDto.addApplications(attendanceApplicationMap.getOrDefault(date, List.of()));
                     });
 
@@ -456,16 +456,13 @@ public class AttendanceService {
 
 
     //
-    public Map<LocalDate, List<AttendanceDayResponseDto>> createAttendanceMap(Long memberId, LocalDate firstDay, LocalDate lastDay, String scheduleType){
+    public Map<LocalDate, AttendanceDayResponseDto> createAttendanceMap(Long memberId, LocalDate firstDay, LocalDate lastDay, String scheduleType){
         List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateAsc(memberId, firstDay, lastDay);
 
-        Map<LocalDate, List<AttendanceDayResponseDto>> calendarMap = new HashMap<>();
+        Map<LocalDate, AttendanceDayResponseDto> calendarMap = new HashMap<>();
         targetMonthAttendanceList.stream().forEach(attendance -> {
             LocalDate date = attendance.getWorkDate();
-            List<AttendanceDayResponseDto> events = calendarMap.getOrDefault(date, new ArrayList<>());
-            events.add(AttendanceDayResponseDto.fromEntity(attendance));
-
-            calendarMap.put(date, events);
+            calendarMap.put(date, AttendanceDayResponseDto.fromEntity(attendance));
         });
 
         return calendarMap;

@@ -20,6 +20,9 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 public class ScheduleRequestDto {
+    @JsonProperty("scheduleId")
+    private Long scheduleId;
+
     @JsonProperty("memberId")
     private Long memberId;
 
@@ -51,6 +54,7 @@ public class ScheduleRequestDto {
 
     public Schedule toEntity() {
         return Schedule.builder()
+                .scheduleId(this.scheduleId)
                 .memberId(this.memberId)
                 .scheduleName(this.scheduleName)
                 .startDate(this.startDate)
@@ -65,6 +69,7 @@ public class ScheduleRequestDto {
 
     public Schedule toEntity(String memberNm, String deptNm, String jobGrade) {
         return Schedule.builder()
+                .scheduleId(this.scheduleId)
                 .memberId(this.memberId)
                 .memberNm(memberNm)
                 .deptNm(deptNm)

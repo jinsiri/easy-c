@@ -18,6 +18,7 @@ export interface ScheduleController {
 }
 
 export interface ScheduleRequestDto {
+	scheduleId: number | null;
 	memberId: number;
 	scheduleName: string;
 	scheduleDesc: string;
@@ -76,7 +77,7 @@ export interface CalendarDayDto {
 	isCurrentMonth: boolean;
 	isHoliday: boolean;
 	holidaySubject: string;
-	attendances: AttendanceDayResDto[];
+	attendance: AttendanceDayResDto;
 	events: CalendarEventDto[];
 	applications: AttendanceApplicationResponseDto[];
 }

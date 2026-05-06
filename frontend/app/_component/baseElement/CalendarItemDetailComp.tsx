@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
 /** MUI */
@@ -19,7 +19,7 @@ import { formatMinutes, getTimelineInnerData } from '@/utils/commonFunc';
 import { AttendanceDayResDto } from '@/app/services/attendanceService';
 import { VACATIONTYPE, WORKSTATUS, WORKTYPE } from '@/constant/attendanceConst';
 import { vacationType, workStatus, dayName, workType } from '@/type/types';
-import { CalendarDayDto, CalendarEventDto } from '@/app/services/scheduleService';
+import { CalendarDayDto } from '@/app/services/scheduleService';
 
 export interface CalendarColData {
 	key: dayName;
@@ -136,9 +136,9 @@ export default function CalendarItemDetailComp({ activeCell, idx, item }: { acti
 	const detailData: AttendanceDayResDto | null = useMemo(() => {
 		if (activeColIdx) {
 			const targetDay: dayName = calendarCol[activeColIdx].key;
-			const attendaces = item[targetDay].attendances;
+			const attendace = item[targetDay].attendance;
 
-			if (attendaces.length > 0) return attendaces[0];
+			if (attendace) return attendace;
 		}
 
 		return null;
