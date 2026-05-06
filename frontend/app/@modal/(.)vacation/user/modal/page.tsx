@@ -27,27 +27,30 @@ export default function VacationUserModal() {
 	const type = searchParams.get('type');
 	const { modalData, resetModalData } = useModalStore();
 
-	const remainDay = modalData.remainDay ?? 30;
+	const remainDay = modalData?.remainDay ?? 30;
 	const [isSaving, setIsSaving] = useState(false);
 
 	const {
 		control,
 		watch,
 		reset,
+		setValue,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<vacationApplicationController>({
 		defaultValues: {
-			vacationType: type === 'read' && modalData ? modalData.vacationType : modalData.remainDay === 0.5 ? 'HALF_AM' : 'FULL',
-			vacationDuration: type === 'read' && modalData ? String(modalData.vacationDuration) : '1',
-			startDate: modalData?.startDate ? dayjs(modalData.startDate) : null,
-			endDate: modalData?.endDate ? dayjs(modalData.endDate) : null,
-			violationReason: modalData?.violationReason,
+			vacationType: 'FULL',
+			vacationDuration: '1',
+			startDate: dayjs(),
+			endDate: dayjs(),
+			violationReason: '',
 		},
 	});
 
 	const watchVacationType = watch('vacationType');
 	const watchVacationDuration = watch('vacationDuration');
+	const watchStartDate = watch('startDate');
+	const watchEndDate = watch('endDate');
 
 	const handleSave = handleSubmit(async (data) => {
 		setIsSaving(true);
@@ -77,11 +80,22 @@ export default function VacationUserModal() {
 		reset({
 			vacationType: type === 'read' ? modalData.vacationType : modalData.remainDay === 0.5 ? 'HALF_AM' : 'FULL',
 			vacationDuration: type === 'read' ? String(modalData.vacationDuration) : '1',
-			startDate: modalData.startDate ? dayjs(modalData.startDate) : null,
-			endDate: modalData.endDate ? dayjs(modalData.endDate) : null,
+			startDate: modalData.startDate ? dayjs(modalData.startDate) : dayjs(),
+			endDate: modalData.endDate ? dayjs(modalData.endDate) : dayjs(),
 			violationReason: modalData.violationReason,
 		});
 	}, [modalData, type]);
+
+	useEffect(() => {
+		if (!watchStartDate || !watchVacationDuration) return;
+
+		const duration = Number(watchVacationDuration);
+
+		if (isNaN(duration)) return;
+
+		const calculatedEndDate = duration === 1 ? watchStartDate : watchStartDate.add(duration - 1, 'day');
+		setValue('endDate', calculatedEndDate);
+	}, [watchStartDate, watchVacationDuration, setValue]);
 
 	return (
 		<BaseDialog title={'휴가 신청'} loading={isSaving} onConfirm={type === 'read' ? undefined : handleSave}>
@@ -138,6 +152,12 @@ export default function VacationUserModal() {
 									if (!value) {
 										return '휴가 일자는 필수 입력사항입니다.';
 									}
+
+									const duration = Number(watchVacationDuration);
+									const calculatedStartDate = duration === 1 ? watchEndDate : dayjs(watchEndDate).subtract(duration - 1, 'day');
+									if (!value.isSame(calculatedStartDate)) {
+										return '휴가 시작, 종료일과 휴가기간이 맞지 않습니다.';
+									}
 									return true;
 								},
 							}}
@@ -164,9 +184,16 @@ export default function VacationUserModal() {
 									control={control}
 									rules={{
 										validate: (value) => {
-											if (Number(watchVacationDuration) > 1 && !value) {
+											if (!value) {
 												return '휴가 일자는 필수 입력사항입니다.';
 											}
+
+											const duration = Number(watchVacationDuration);
+											const calculatedEndDate = duration === 1 ? watchStartDate : dayjs(watchStartDate).add(duration - 1, 'day');
+											if (!value.isSame(calculatedEndDate)) {
+												return '휴가 시작, 종료일과 휴가기간이 맞지 않습니다.';
+											}
+
 											return true;
 										},
 									}}
@@ -175,6 +202,8 @@ export default function VacationUserModal() {
 											{...field}
 											value={field.value ?? null}
 											readOnly={type === 'read'}
+											minDate={watchStartDate ? dayjs(watchStartDate).add(Number(watchVacationDuration) - 1, 'day') : undefined}
+											maxDate={watchStartDate ? dayjs(watchStartDate).add(Number(watchVacationDuration) - 1, 'day') : undefined}
 											slotProps={{
 												textField: {
 													error: !!errors.endDate,

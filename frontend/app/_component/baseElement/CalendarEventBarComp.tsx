@@ -78,9 +78,7 @@ export const CalendarEventBarComp = ({
 
 	const onClickBar = (e: MouseEvent<HTMLAnchorElement>) => {
 		e.preventDefault();
-
-		router.replace(`/schedule/user/data?id=${event.scheduleData.scheduleId}`);
-		router.refresh();
+		router.push(`/schedule/user/data?id=${event.scheduleData.scheduleId}`);
 	};
 
 	const barTitle: ReactNode = useMemo(() => {
