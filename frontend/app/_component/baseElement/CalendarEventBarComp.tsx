@@ -8,12 +8,14 @@ import secureLocalStorage from 'react-secure-storage';
 import { Box, Typography } from '@mui/material';
 
 /** lib */
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { TimelineItemBase } from 'react-calendar-timeline';
 import useModalStore from '@/store/useModalStore';
 
 dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
 
 /** Custom */
 import { VACATIONTYPE } from '@/constant/attendanceConst';
@@ -45,11 +47,15 @@ export const CalendarEventBarComp = ({
 	calendarType,
 	event,
 	dayTitleHeight,
+	rowStart,
+	rowEnd,
 }: {
 	barType: 'calendar' | 'list';
 	calendarType: 'PERSONAL' | 'DEPT';
 	event: CalendarEventDto;
 	dayTitleHeight?: string;
+	rowStart: Dayjs;
+	rowEnd: Dayjs;
 }) => {
 	const router = useRouter();
 	const targetMemberId = secureLocalStorage.getItem('memberId') as number;
@@ -59,13 +65,17 @@ export const CalendarEventBarComp = ({
 	const start = dayjs(event.startDate, 'YYYY-MM-DD');
 	const end = event.endDate ? dayjs(event.endDate, 'YYYY-MM-DD') : dayjs(event.startDate, 'YYYY-MM-DD');
 
+	//같은 주 데이터 인지 확인
+	const targetStart = start.isSameOrAfter(rowStart) ? start : rowStart;
+	const targetEnd = end.isSameOrBefore(rowEnd) ? end : rowEnd;
+
 	const getIdx = (d: dayjs.Dayjs) => {
 		const day = d.day();
 		return day === 0 ? 6 : day - 1; // 월요일 시작 기준
 	};
 
-	const startIdx = getIdx(start);
-	const endIdx = getIdx(end);
+	const startIdx = getIdx(targetStart);
+	const endIdx = getIdx(targetEnd);
 
 	const dayBarStyle = {
 		position: 'absolute',
@@ -132,8 +142,8 @@ export const CalendarEventBarComp = ({
 				...(barType === 'calendar' ? dayBarStyle : listBarStyle),
 				display: 'flex',
 				alignItems: 'center',
-				backgroundColor: event.groupId != null ? 'primary.100' : 'transparent',
-				color: 'primary.500',
+				backgroundColor: event.groupId != null ? (targetMemberId === event.memberId ? 'primary.100' : 'secondary.100') : 'transparent',
+				color: targetMemberId === event.memberId ? 'primary.500' : 'secondary.600',
 				px: 0.5,
 				borderRadius: '4px',
 				cursor: calendarType === 'DEPT' ? 'default' : 'pointer',

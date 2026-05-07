@@ -133,6 +133,8 @@ export default function CalendarItemComp({
 }) {
 	const dayTitleHeight = '2rem';
 	const maxLine = calendarCategory === 'attendance' ? 2 : 3;
+	const rowStart = dayjs(rowItem.mon.date);
+	const rowEnd = dayjs(rowItem.sun.date);
 
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [anchorTarget, setAnchorTarget] = useState<CalendarDayDto | null>();
@@ -384,6 +386,8 @@ export default function CalendarItemComp({
 								calendarType={calendarType}
 								event={barEventItem}
 								dayTitleHeight={dayTitleHeight}
+								rowStart={rowStart}
+								rowEnd={rowEnd}
 							/>
 						))}
 
@@ -430,7 +434,13 @@ export default function CalendarItemComp({
 												key={idx}
 												sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}
 											>
-												<CalendarEventBarComp barType='list' event={item} calendarType={calendarType} />
+												<CalendarEventBarComp
+													barType='list'
+													event={item}
+													calendarType={calendarType}
+													rowStart={rowStart}
+													rowEnd={rowEnd}
+												/>
 											</Box>
 										);
 									})}
