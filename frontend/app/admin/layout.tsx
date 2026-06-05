@@ -37,7 +37,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
 					transition: 'all ease 0.3s',
 				}}
 			>
-				<Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} headerHeight={headerHeight}></Header>
+				<Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} headerHeight={headerHeight} mode={'admin'}></Header>
 				<Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
 					<Box sx={{ width: '100%', flexGrow: 1 /*height: `calc(100% - ${headerHeight} - 48px)`*/ }}>{children}</Box>
 					<Footer />
