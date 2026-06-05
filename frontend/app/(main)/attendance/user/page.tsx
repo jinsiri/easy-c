@@ -5,15 +5,15 @@ import secureLocalStorage from 'react-secure-storage';
 import { useRouter, usePathname } from 'next/navigation';
 
 /** Lib */
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
 import useLoaderStore from '@/store/useLoaderStore';
 import useModalStore from '@/store/useModalStore';
+import { useDialogStore } from '@/store/useDialogStore';
 
 /** MUI */
-import { Box, Button, Grid, IconButton, Typography, useTheme } from '@mui/material';
-import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
+import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
 
 /** Ag Grid */
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
@@ -21,18 +21,18 @@ import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 /** Custom */
 import PathBreadcrumbs from '@/app/_component/PathBreadcrumbs';
 import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
-import Calendar from '@/app/(main)/attendance/Calendar';
+import CalendarComp from '@/app/_component/baseElement/CalendarComp';
+
 import AttendanceComp from '@/app/_component/layoutElement/AttendanceComp';
-import ButtonFieldDatePicker from '@/app/_component/ButtonFieldDatePicker';
 import CustomEchartComp from '@/app/_lib/CustomEchartComp';
 import { colDefs } from '@/constant/attendanceColDef';
 import { formatMinutes } from '@/utils/commonFunc';
 
 /** Type / Interface */
 import { dayName } from '@/type/types';
-import { attendanceService, AttendanceResDto, CalendarData } from '@/app/services/attendanceService';
+import { attendanceService, AttendanceResDto } from '@/app/services/attendanceService';
 import { attendanceApplicationService, AttendanceApplicationResponseDto } from '@/app/services/attendanceApplicationService';
-import { useDialogStore } from '@/store/useDialogStore';
+import { CalendarDayDto } from '@/app/services/scheduleService';
 
 dayjs.extend(duration);
 
@@ -47,29 +47,9 @@ export default function AttendanceUserPage() {
 	const gridRef = useRef();
 
 	const [attendanceData, setAttenceData] = useState<AttendanceResDto>({});
-	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(dayjs());
-	const [calendarData, setCalendarData] = useState<Record<dayName, CalendarData>[]>([]);
+	const [calendarData, setCalendarData] = useState<Record<dayName, CalendarDayDto>[]>([]);
 	const [attendanceAppData, setAttendanceData] = useState<AttendanceApplicationResponseDto[]>([]);
 	const [chartOption, setChartOption] = useState<Record<string, any>>({});
-
-	useEffect(() => {
-		//금일 및 금주 데이터
-		getAttendanceTodayData();
-	}, []);
-
-	useEffect(() => {
-		//해당하는 달의 날짜 정보 및 달력에 표시할 데이터 불러오기
-		getAttendanceCalendarData();
-		getAttendancAppData();
-	}, [calendarDate]);
-
-	useEffect(() => {
-		if (pathName === '/attendance/user' && isRefresh) {
-			//근태수정요청 데이터
-			getAttendancAppData();
-			setIsRefresh(false);
-		}
-	}, [pathName]);
 
 	const getAttendanceTodayData = async () => {
 		if (!loader) setLoader(true);
@@ -90,34 +70,22 @@ export default function AttendanceUserPage() {
 		}
 	};
 
-	const getAttendanceCalendarData = async () => {
-		if (!loader) setLoader(true);
-
-		try {
-			const res = await attendanceService.getAttendanceCalendarData({
-				memberId: secureLocalStorage.getItem('memberId') as number,
-				workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
-			});
-
-			setCalendarData(res);
-		} finally {
-			setLoader(false);
-		}
+	const getAttendanceCalendarData = async (calendarDate: Dayjs) => {
+		const res = await attendanceService.getAttendanceCalendarData({
+			memberId: secureLocalStorage.getItem('memberId') as number,
+			calendarType: 'PERSONAL',
+			date: calendarDate.format('YYYY-MM-DD'),
+		});
+		setCalendarData(res);
 	};
 
-	const getAttendancAppData = async () => {
-		if (!loader) setLoader(true);
+	const getAttendancAppData = async (calendarDate: Dayjs) => {
+		const res = await attendanceApplicationService.getUserMonthAttendanceApplication({
+			memberId: secureLocalStorage.getItem('memberId') as number,
+			workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
+		});
 
-		try {
-			const res = await attendanceApplicationService.getUserMonthAttendanceApplication({
-				memberId: secureLocalStorage.getItem('memberId') as number,
-				workDate: calendarDate.format('YYYY-MM-DD HH:mm'),
-			});
-
-			setAttendanceData(res);
-		} finally {
-			setLoader(false);
-		}
+		setAttendanceData(res);
 	};
 
 	const makeChartOption = (data: AttendanceResDto) => {
@@ -207,17 +175,10 @@ export default function AttendanceUserPage() {
 
 	const onSuccessEvent = async () => {
 		setLoader(true);
-
 		try {
-			await Promise.all([getAttendanceTodayData(), getAttendanceCalendarData(), getAttendancAppData()]);
+			await Promise.all([getAttendanceTodayData(), getAttendanceCalendarData(dayjs()), getAttendancAppData(dayjs())]);
 		} finally {
 			setLoader(false);
-		}
-	};
-
-	const onChangeDatePicker = (value) => {
-		if (value != null) {
-			setCalendarDate(value);
 		}
 	};
 
@@ -243,11 +204,36 @@ export default function AttendanceUserPage() {
 		}
 	};
 
+	const onChangeDateFunc = (calendarDate: Dayjs) => {
+		//해당하는 달의 날짜 정보 및 달력에 표시할 데이터 불러오기
+		getAttendanceCalendarData(calendarDate);
+		getAttendancAppData(calendarDate);
+	};
+
+	useEffect(() => {
+		//금일 및 금주 데이터
+		getAttendanceTodayData();
+		onChangeDateFunc(dayjs());
+	}, []);
+
+	useEffect(() => {
+		if (pathName === '/attendance/user' && isRefresh) {
+			//근태수정요청 데이터
+			getAttendancAppData(dayjs());
+			setIsRefresh(false);
+		}
+	}, [pathName]);
+
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '0 1.5rem' }}>
+		<Box
+			className='main-wrap-overflow'
+			sx={{
+				padding: '0 1.5rem',
+			}}
+		>
 			<PathBreadcrumbs />
-			<Grid container spacing={2} sx={{ flexDirection: 'column', flexGrow: 1 }}>
-				<Grid
+			<Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: '100%', gap: '1rem' }}>
+				<Box
 					sx={{
 						display: 'flex',
 						flexDirection: { xs: 'column', sm: 'column', md: 'row' },
@@ -335,50 +321,11 @@ export default function AttendanceUserPage() {
 							</ColTitleAndText>
 						</Box>
 					</Box>
-				</Grid>
-				<Grid size={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem' }}>
-					<IconButton
-						sx={{
-							display: 'flex',
-							justifyContent: 'center',
-							alignItems: 'center',
-							width: '1.25rem',
-							height: '1.25rem',
-							borderRadius: '100%',
-							border: '2px solid',
-							borderColor: 'grey.900',
-						}}
-						onClick={(e) => setCalendarDate((prev) => prev.subtract(1, 'month'))}
-					>
-						<ArrowLeftRounded sx={{ fontSize: '1.5rem', strokeWidth: 5 }} />
-					</IconButton>
-
-					<Box sx={{ display: 'flex', alignItems: 'center', margin: '0 2rem' }}>
-						<Typography variant='h5' sx={{ marginRight: 0.5 }}>
-							{calendarDate.format('YYYY-MM')}
-						</Typography>
-						<ButtonFieldDatePicker value={calendarDate} views={['month', 'year']} onChange={onChangeDatePicker} />
-					</Box>
-					<IconButton
-						sx={{
-							display: 'flex',
-							justifyContent: 'center',
-							alignItems: 'center',
-							width: '1.25rem',
-							height: '1.25rem',
-							borderRadius: '100%',
-							border: '2px solid',
-							borderColor: 'grey.900',
-						}}
-						onClick={(e) => setCalendarDate((prev) => prev.add(1, 'month'))}
-					>
-						<ArrowRightRounded sx={{ fontSize: '1.5rem' }} />
-					</IconButton>
-				</Grid>
-				<Grid size={12} sx={{ flexGrow: 1 }}>
-					<Calendar calendarRow={calendarData} />
-				</Grid>
-				<Grid sx={{ display: 'flex', flexDirection: { lg: 'row', md: 'column', sm: 'column', xs: 'column' }, minHeight: '15rem', gap: '1rem' }}>
+				</Box>
+				<Box sx={{ flexGrow: 1 }}>
+					<CalendarComp calendarRow={calendarData} calendarCategory='attendance' calendarType='PERSONAL' onChangeDate={onChangeDateFunc} />
+				</Box>
+				<Box sx={{ display: 'flex', flexDirection: { lg: 'row', md: 'column', sm: 'column', xs: 'column' }, minHeight: '15rem', gap: '1rem' }}>
 					<Box
 						sx={{
 							display: 'flex',
@@ -394,7 +341,7 @@ export default function AttendanceUserPage() {
 							<Typography variant='subtitle1'>근태 수정 요청 내역</Typography>
 							<Button onClick={(e) => router.push(`/attendance/user/list`)}>더보기</Button>
 						</Box>
-						<Box sx={{ flexGrow: 1, minHeight: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
+						<Box sx={{ flexGrow: 1, height: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
 							<CustomAgGridComp
 								ref={gridRef}
 								rowData={attendanceAppData}
@@ -405,8 +352,8 @@ export default function AttendanceUserPage() {
 							/>
 						</Box>
 					</Box>
-				</Grid>
-			</Grid>
+				</Box>
+			</Box>
 		</Box>
 	);
 }

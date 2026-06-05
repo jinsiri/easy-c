@@ -21,21 +21,28 @@ export const colDefs = (onClickDetail: (data: any) => void, onClickRemove: (data
 		{
 			field: 'registerDate',
 			headerName: '휴가신청일',
+			flex: 1,
+			cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
 			valueFormatter: (param) => (param.value ? dayjs(param.value).format('YYYY-MM-DD') : '-'),
 		},
 		{
 			field: 'vacationType',
 			headerName: '휴가 종류',
+			flex: 1,
+			cellStyle: { display: 'flex', justifyContent: 'start', alignItems: 'center' },
 			valueFormatter: (data) => (data.value ? VACATIONTYPE[data.value as vacationType] : '-'),
 		},
 		{
 			field: 'vacationDuration',
 			headerName: '휴가일',
+			flex: 1,
+			cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
 		},
 		{
 			field: 'time',
 			headerName: '휴가기간',
-			flex: 3,
+			cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
+			flex: 2,
 			valueFormatter: (param) => {
 				const start = param.data?.startDate ? dayjs(param.data.startDate).format('YYYY-MM-DD') : '-';
 				const end = param.data?.endDate ? ` ~ ${dayjs(param.data.endDate).format('YYYY-MM-DD')}` : '';
@@ -46,6 +53,8 @@ export const colDefs = (onClickDetail: (data: any) => void, onClickRemove: (data
 		{
 			field: 'remove',
 			headerName: '신청취소',
+			minWidth: 100,
+			flex: 1,
 			cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
 			cellRenderer: (params: any) => {
 				return (

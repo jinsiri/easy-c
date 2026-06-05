@@ -5,6 +5,18 @@ const Button = (theme: Theme): Components => ({
 		styleOverrides: {
 			root: {
 				textWrap: 'nowrap',
+
+				'&.text-only': {
+					display: 'inline-block',
+					padding: 0,
+					margin: 0,
+					minWidth: 0,
+					minHeight: 0,
+
+					'& hover': {
+						textDecorationLine: 'underline',
+					},
+				},
 			},
 
 			contained: ({ ownerState }) => {

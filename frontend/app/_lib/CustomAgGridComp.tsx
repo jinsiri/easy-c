@@ -51,6 +51,7 @@ interface propsType extends AgGridReactProps {
 	isRowSelectable?: IsRowSelectableType;
 	animateRows?: boolean;
 	isReorderMode?: boolean;
+	isColumnFit?: boolean;
 	onGridReady?: (params: GridReadyEvent) => void;
 	onRowDragEnd?: (params: RowDragEndEvent) => void;
 	onCellClicked?: (params: CellClickedEvent) => void;
@@ -69,6 +70,7 @@ const CustomAgGridComp = forwardRef(
 			isRowSelectable,
 			animateRows,
 			isReorderMode = false,
+			isColumnFit = true,
 			onGridReady,
 			onRowDragEnd,
 			onCellClicked,
@@ -130,19 +132,27 @@ const CustomAgGridComp = forwardRef(
 		}, [rowSelectionMode, isReorderMode, enableClickSelection, isRowSelectable]);
 
 		const onGridReadyEvent = (params: GridReadyEvent) => {
-			params.api.sizeColumnsToFit();
+			if (isColumnFit) {
+				params.api.sizeColumnsToFit();
+			}
+
 			if (onGridReady) {
 				onGridReady(params);
 			}
 		};
 
-		const onGridSizeChanged = useCallback((params: { api: { sizeColumnsToFit: () => void } }) => {
-			params.api.sizeColumnsToFit();
-		}, []);
+		const onGridSizeChanged = useCallback(
+			(params: { api: { sizeColumnsToFit: () => void } }) => {
+				if (isColumnFit) {
+					params.api.sizeColumnsToFit();
+				}
+			},
+			[isColumnFit],
+		);
 
 		return (
-			<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-				<Box sx={{ flex: 1, minHeight: 0 }}>
+			<Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', width: '100%', height: '100%' }}>
+				<Box className='ag-grid-wrap' sx={{ flex: 1, minHeight: '8rem' }}>
 					<AgGridReact
 						{...props}
 						ref={gridRef}

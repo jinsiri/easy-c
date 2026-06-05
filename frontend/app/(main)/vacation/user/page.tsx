@@ -125,7 +125,6 @@ export default function VacationUserPage() {
 				setVacationHistory(res.history);
 				makeChartOption(res.vacation);
 			}
-		} catch (error: any) {
 		} finally {
 			setLoader(false);
 		}
@@ -151,9 +150,11 @@ export default function VacationUserPage() {
 
 	const onClickRemove = (data: any) => {
 		if (data.vacationApplicationId) {
-			if (confirm('휴가신청을 취소하시겠습니까>')) {
+			if (confirm('휴가신청을 취소하시겠습니까?')) {
 				vacationApplicationService.deleteVacationApplication(data.vacationApplicationId);
 				alert('휴가신청이 성공적으로 취소되었습니다.');
+
+				getvacationApplicationList();
 			}
 		}
 	};
@@ -218,7 +219,13 @@ export default function VacationUserPage() {
 							<Button onClick={(e) => router.push(`/vacation/user/list?type=vacationHistory`)}>더보기</Button>
 						</Box>
 						<Box sx={{ flexGrow: 1, minHeight: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
-							<CustomAgGridComp rowData={vacationHistory} colDefs={[...historyColDefs()]} rowSelectionMode='none' pagination={false} />
+							<CustomAgGridComp
+								rowData={vacationHistory}
+								colDefs={[...historyColDefs()]}
+								rowSelectionMode='none'
+								pagination={false}
+								isColumnFit={false}
+							/>
 						</Box>
 					</Box>
 				</Grid>
@@ -245,6 +252,7 @@ export default function VacationUserPage() {
 								rowSelectionMode='none'
 								pagination={false}
 								rowHeight={56}
+								isColumnFit={false}
 							/>
 						</Box>
 					</Box>

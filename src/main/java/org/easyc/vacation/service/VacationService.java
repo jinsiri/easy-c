@@ -1,9 +1,14 @@
 package org.easyc.vacation.service;
 
 import lombok.RequiredArgsConstructor;
+import org.easyc.common.constant.BasicStatus;
 import org.easyc.common.dto.PageResponseDto;
+import org.easyc.common.exception.CustomException;
+import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.member.entity.MemberProfile;
 import org.easyc.member.repository.MemberProfileRepository;
+import org.easyc.schedule.dto.CalendarEventDto;
+import org.easyc.schedule.entity.Schedule;
 import org.easyc.vacation.constant.TransactionType;
 import org.easyc.vacation.constant.VacationCategory;
 import org.easyc.vacation.constant.VacationPolicyType;
@@ -12,6 +17,7 @@ import org.easyc.vacation.dto.VacationHistorySearchRequestDto;
 import org.easyc.vacation.dto.VacationResponseDto;
 import org.easyc.vacation.entity.*;
 import org.easyc.vacation.repository.*;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +38,7 @@ public class VacationService {
     private final VacationHistoryRepository vacationHistoryRepository;
     private final VacationRepositoryCustom vacationRepositoryCustom;
     private final VacationHistoryRepositoryCustom vacationHistoryRepositoryCustom;
+    private final VacationApplicationRepository vacationApplicationRepository;
 
     public VacationResponseDto getVacation(Long memberId){
         LocalDate today = LocalDate.now();
@@ -39,9 +46,7 @@ public class VacationService {
         //1. 통계 테이블에서 올해 해당 데이터 있는 지 조회
         Vacation vacation = vacationRepository.findAllByYearAndMemberId(today.getYear(), memberId).orElse(null);
         VacationPolicy vacationPolicy = vacationPolicyMapRepository.findPolicyByMemberIdAndActivedTrue(memberId).orElse(null);
-        MemberProfile memberProfile = memberProfileRepository.findById(memberId).orElse(null);
-
-        if(memberProfile == null) return null;
+        MemberProfile memberProfile = memberProfileRepository.findById(memberId).orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         //2. 정책 데이터 없는 경우 - 신규 데이터 로직 생성
         if(vacationPolicy == null){
@@ -69,25 +74,25 @@ public class VacationService {
         else{
             vacationHistoryList = vacationHistoryRepository.findTop10ByMemberIdAndAccrualDateBetweenAndActiveTrueOrderByRegisterDateDesc(memberId, LocalDate.of(today.getYear(), 1, 1), LocalDate.of(today.getYear(), 12, 31));
 
-            LocalDate resignationDate = memberProfile.getResignationDate();
-            long workingYears = ChronoUnit.YEARS.between(resignationDate, today);
+            LocalDate hireDate = memberProfile.getHireDate();
+            long workingYears = ChronoUnit.YEARS.between(hireDate, today);
 
             if(workingYears == 0){
-                if (!(vacationPolicy.equals(VacationPolicyType.FINANCIAL_DAY) && today.getYear() != resignationDate.getYear())){
-                    Long durationMonth = ChronoUnit.MONTHS.between(resignationDate, today);
-                    LocalDate expectedAccrualDate = resignationDate.plusMonths(durationMonth);
+                if (!(vacationPolicy.equals(VacationPolicyType.FINANCIAL_DAY) && today.getYear() != hireDate.getYear())){
+                    Long durationMonth = ChronoUnit.MONTHS.between(hireDate, today);
+                    LocalDate expectedAccrualDate = hireDate.plusMonths(durationMonth);
 
                     boolean exists = vacationHistoryList.stream()
                             .anyMatch(history ->
-                                    history.getAccrualDate().equals(resignationDate.plusMonths(durationMonth))
+                                    history.getAccrualDate().equals(hireDate.plusMonths(durationMonth))
                             );
 
                     if(today.isAfter(expectedAccrualDate) && !exists){
                         VacationHistory newHistory = createHistory(
                                 memberProfile,
                                 1.0,
-                                resignationDate.plusMonths(durationMonth),
-                                resignationDate.plusYears(1).minusDays(1),
+                                hireDate.plusMonths(durationMonth),
+                                hireDate.plusYears(1).minusDays(1),
                                 "1년 미만 월차"
                         );
                         VacationHistory saved = vacationHistoryRepository.save(newHistory);
@@ -126,12 +131,11 @@ public class VacationService {
     }
 
 
-
     public Vacation makeVacation (MemberProfile targetMemberProfile, VacationPolicy targetVacationPolicy, List<VacationHistory> vh, Vacation targetVacation ){
-        LocalDate resignationDate = targetMemberProfile.getResignationDate();
+        LocalDate hireDate = targetMemberProfile.getHireDate();
         LocalDate today = LocalDate.now();
-        Long minusYear = ChronoUnit.YEARS.between(resignationDate, today);
-        Map<String, LocalDate> calculateDate = calculateDate(resignationDate, targetVacationPolicy);
+        Long minusYear = ChronoUnit.YEARS.between(hireDate, today);
+        Map<String, LocalDate> calculateDate = calculateDate(hireDate, targetVacationPolicy);
 
         Double annualVacation = 0.0;
         Double sickVacation = 0.0;
@@ -170,45 +174,46 @@ public class VacationService {
 
         }
 
-        Vacation newVacation = targetVacation != null ? targetVacation : new Vacation();
-        newVacation.setMemberId(targetMemberProfile.getMemberId());
-        newVacation.setMemberNm(targetMemberProfile.getMember().getMemberNm());
-
-        newVacation.setVacationPolicyName(targetVacationPolicy.getVacationPolicyName());
-        newVacation.setVacationPolicyType(targetVacationPolicy.getVacationPolicyType());
-
-        newVacation.setYear(today.getYear());
-        newVacation.setYearsOfService(minusYear);
-        newVacation.setAccrualDate(calculateDate.get("accrualDate"));
-        newVacation.setExpireDate(calculateDate.get("expireDate"));
-        newVacation.setGrantedDay(grantedDay);
-        newVacation.setUsedDay(usedDay);
-        newVacation.setRemainDay(grantedDay - usedDay);
-        newVacation.setAnnualVacation(annualVacation);
-        newVacation.setSickVacation(sickVacation);
-        newVacation.setHolidayVacation(holidayVacation);
-        newVacation.setSpecialVacation(specialVacation);
-        newVacation.setCarryOverVacation(carryOverVacation);
+        Vacation newVacation = targetVacation != null
+                ? targetVacation
+                : Vacation.builder()
+                        .memberId(targetMemberProfile.getMemberId())
+                        .memberNm(targetMemberProfile.getMember().getMemberNm())
+                        .vacationPolicyName(targetVacationPolicy.getVacationPolicyName())
+                        .vacationPolicyType(targetVacationPolicy.getVacationPolicyType())
+                        .year(today.getYear())
+                        .yearsOfService(minusYear)
+                        .accrualDate(calculateDate.get("accrualDate"))
+                        .expireDate(calculateDate.get("expireDate"))
+                        .grantedDay(grantedDay)
+                        .usedDay(usedDay)
+                        .remainDay(grantedDay - usedDay)
+                        .annualVacation(annualVacation)
+                        .sickVacation(sickVacation)
+                        .holidayVacation(holidayVacation)
+                        .specialVacation(specialVacation)
+                        .carryOverVacation(carryOverVacation)
+                        .build();
 
         return newVacation;
     }
 
     public List<VacationHistory> makeVacationHistory (MemberProfile targetMemberProfile, VacationPolicyType vacationPolicyType){
-        LocalDate resignationDate = targetMemberProfile.getResignationDate();
+        LocalDate hireDate = targetMemberProfile.getHireDate();
         LocalDate today = LocalDate.now();
         LocalDate firstYear = LocalDate.of(today.getYear(), 1, 1);
         LocalDate lastYear = LocalDate.of(today.getYear(), 12, 31);
         VacationPolicyType policyType = vacationPolicyType != null ? vacationPolicyType : VacationPolicyType.FINANCIAL_DAY;
 
         // 재직 연수 계산 (0이면 1년 미만 신입)
-        long workingYears = ChronoUnit.YEARS.between(resignationDate, today);
+        long workingYears = ChronoUnit.YEARS.between(hireDate, today);
         List<VacationHistory> saveVacationList = new ArrayList<>();
 
         //1. 1년 미만인 경우
         if (workingYears == 0) {
             //회계일기준인데 해가 다른 경우 비율 계산
-            if (policyType.equals(VacationPolicyType.FINANCIAL_DAY) && today.getYear() != resignationDate.getYear()){
-                LocalDate anniversaryDate = resignationDate.plusYears(1);
+            if (policyType.equals(VacationPolicyType.FINANCIAL_DAY) && today.getYear() != hireDate.getYear()){
+                LocalDate anniversaryDate = hireDate.plusYears(1);
 
                 //1월부터 입사일까지의 월차
                 long monthlyCount = ChronoUnit.MONTHS.between(firstYear, anniversaryDate);
@@ -240,16 +245,16 @@ public class VacationService {
             }
             //해가 바뀌지 않았거나 입사일 기준인 경우
             else{
-                long monthsPassed = ChronoUnit.MONTHS.between(resignationDate, today);
+                long monthsPassed = ChronoUnit.MONTHS.between(hireDate, today);
                 for (int i = 1; i <= monthsPassed; i++) {
-                    saveVacationList.add(createHistory(targetMemberProfile, 1.0, resignationDate.plusMonths(i), resignationDate.plusYears(1), "1년 미만 월차"));
+                    saveVacationList.add(createHistory(targetMemberProfile, 1.0, hireDate.plusMonths(i), hireDate.plusYears(1), "1년 미만 월차"));
                 }
             }
         }
         //2. 1년 이상인 경우
         else{
             double vacationDay = vacationDay(workingYears);
-            LocalDate accrualDate = policyType.equals(VacationPolicyType.FINANCIAL_DAY) ? firstYear : LocalDate.of(today.getYear(), resignationDate.getMonthValue(), resignationDate.getDayOfMonth());
+            LocalDate accrualDate = policyType.equals(VacationPolicyType.FINANCIAL_DAY) ? firstYear : LocalDate.of(today.getYear(), hireDate.getMonthValue(), hireDate.getDayOfMonth());
             LocalDate expireDate = accrualDate.plusYears(1).minusDays(1);
 
             saveVacationList.add(createHistory(targetMemberProfile, vacationDay, accrualDate, expireDate, "정기 연차"));
@@ -258,17 +263,39 @@ public class VacationService {
         return saveVacationList;
     }
 
-    private VacationHistory createHistory(MemberProfile profile, Double days, LocalDate accrualDate, LocalDate expireDate, String desc) {
-        VacationHistory newHistory = new VacationHistory();
-        newHistory.setMemberId(profile.getMemberId());
-        newHistory.setVacationCategory(VacationCategory.ANNUAL);
-        newHistory.setTransactionType(TransactionType.GRANT);
-        newHistory.setDay(days);
-        newHistory.setAccrualDate(accrualDate);
-        newHistory.setExpireDate(expireDate);
-        newHistory.setViolationReason(desc);
+    public Map<LocalDate, List<CalendarEventDto>> createVacationAppToCalendarMap(List<Long> memberIds, LocalDate firstDay, LocalDate lastDay){
+        List<VacationApplication> vacationApplicationList = vacationApplicationRepository.findAllByMemberIdInAndStartDateBetweenAndStatusAndDeletedFalse(memberIds, firstDay, lastDay, BasicStatus.APPROVED);
 
-        return newHistory;
+        Map<LocalDate, List<CalendarEventDto>> vacationMap = new HashMap<>();
+        for (VacationApplication vacationApp : vacationApplicationList) {
+            LocalDate endDate = vacationApp.getEndDate();
+            LocalDate startDate = vacationApp.getStartDate();
+            long diff = endDate != null ? ChronoUnit.DAYS.between(startDate, endDate): 0;
+
+            for(int i = 0; i <= diff; i++) {
+                LocalDate targetDate = startDate.plusDays(i);
+                List<CalendarEventDto> list = vacationMap.getOrDefault(targetDate, new ArrayList<>());
+                CalendarEventDto dto = CalendarEventDto.fromVacation(vacationApp);
+                list.add(dto);
+
+                vacationMap.put(targetDate, list);
+            }
+        }
+
+        return vacationMap;
+
+    }
+
+    private VacationHistory createHistory(MemberProfile profile, Double days, LocalDate accrualDate, LocalDate expireDate, String desc) {
+        return VacationHistory.builder()
+                .memberId(profile.getMemberId())
+                .vacationCategory(VacationCategory.ANNUAL)
+                .transactionType(TransactionType.GRANT)
+                .day(days)
+                .accrualDate(accrualDate)
+                .expireDate(expireDate)
+                .violationReason(desc)
+                .build();
     }
 
     private Double vacationDay (Long minusYear) {
@@ -298,21 +325,21 @@ public class VacationService {
 
     }
 
-    private Map<String, LocalDate> calculateDate ( LocalDate resignationDate, VacationPolicy targetVacationPolicy){
+    private Map<String, LocalDate> calculateDate ( LocalDate hireDate, VacationPolicy targetVacationPolicy){
         Map<String, LocalDate> resultMap = new HashMap<String, LocalDate>();
         LocalDate today = LocalDate.now();
-        Long minusYear = ChronoUnit.YEARS.between(resignationDate, today);
+        Long minusYear = ChronoUnit.YEARS.between(hireDate, today);
 
         LocalDate accrualDate = null;
         LocalDate expireDate = null;
 
         if(targetVacationPolicy.getVacationPolicyType().equals(VacationPolicyType.valueOf("WORKING_DAY"))){
-            accrualDate = LocalDate.of(LocalDate.now().getYear(), resignationDate.getMonthValue(), resignationDate.getDayOfMonth());
+            accrualDate = LocalDate.of(LocalDate.now().getYear(), hireDate.getMonthValue(), hireDate.getDayOfMonth());
             expireDate = accrualDate.plusYears(1).minusDays(1);
         }else{
 
-            if(minusYear == 0 && today.getYear() == resignationDate.getYear()){
-                accrualDate = resignationDate;
+            if(minusYear == 0 && today.getYear() == hireDate.getYear()){
+                accrualDate = hireDate;
                 expireDate = accrualDate.plusYears(1).minusDays(1);
             }else{
                 accrualDate = LocalDate.of(LocalDate.now().getYear(), 1, 1);

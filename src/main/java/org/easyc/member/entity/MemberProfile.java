@@ -57,9 +57,10 @@ public class MemberProfile extends BaseEntity { //회원정보_회사 관련
     // 추천자
     private String referredBy;
     // 입사일
-    private LocalDate resignationDate;
-    // 퇴사일
     private LocalDate hireDate;
+
+    // 퇴사일
+    private LocalDate resignationDate;
 
     //직군
     //직종

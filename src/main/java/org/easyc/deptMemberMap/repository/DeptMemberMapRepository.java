@@ -51,4 +51,7 @@ public interface DeptMemberMapRepository extends JpaRepository<DeptMemberMap, Lo
     @Query("UPDATE DeptMemberMap d SET d.deleted = true " +
             "WHERE d.deptId = :prevDeptId AND d.memberId IN :memberIds AND d.deleted = false")
     void deleteSpecificMapping(Long prevDeptId, Set<Long> memberIds);
+
+    @Query("SELECT dmm.memberId FROM DeptMemberMap dmm WHERE dmm.deptId = :deptId AND dmm.deleted = false")
+    List<Long> findMemberIdByDeptIdAndDeletedFalse(Long deptId);
 }

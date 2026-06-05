@@ -142,7 +142,7 @@ const colorScheme = {
 			},
 
 			background: {
-				default: '#Fefefe',
+				default: '#fefefe',
 				paper: '#fff',
 			},
 		},

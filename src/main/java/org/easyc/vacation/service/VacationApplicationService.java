@@ -9,6 +9,7 @@ import org.easyc.common.exception.CustomExceptionCode;
 import org.easyc.deptMemberMap.entity.DeptMemberMap;
 import org.easyc.deptMemberMap.repository.DeptMemberMapRepository;
 import org.easyc.member.entity.Member;
+import org.easyc.member.entity.MemberProfile;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.vacation.constant.VacationCategory;
 import org.easyc.vacation.constant.VacationType;
@@ -43,9 +44,10 @@ public class VacationApplicationService {
     private final DeptMemberMapRepository deptMemberMapRepository;
     private final VacationApplicationRepositoryCustom vacationApplicationRepositoryCustom;
     private final MemberRepository memberRepository;
+    private final VacationService vacationService;
 
     public void saveVacationApplication(VacationApplicationDto request) {
-        VacationApplication application = request.returnEntity();
+        VacationApplication application = request.toEntity();
 
         DeptMemberMap deptMemberMap = deptMemberMapRepository.findOneByMemberIdWithFetchJoinPrimaryTrue(request.getMemberId());
         if(deptMemberMap == null){
@@ -80,14 +82,16 @@ public class VacationApplicationService {
 
         for(VacationApplication vacationApplication : request){
             if(vacationApplication.getStatus().equals(BasicStatus.PENDING)){
-                Vacation targetVacation = prevVacationMap.get(vacationApplication.getMemberId()) ;
-                Map<String, Object> vacationData = approveVacationData(vacationApplication, targetVacation);
+                Vacation targetVacation = prevVacationMap.getOrDefault(vacationApplication.getMemberId(), null);
+                if(targetVacation != null){
+                    Map<String, Object> vacationData = approveVacationData(vacationApplication, targetVacation);
 
-                vacationApplication.setStatus(BasicStatus.APPROVED);
-                vacationApplicationList.add(vacationApplication);
+                    vacationApplication.setStatus(BasicStatus.APPROVED);
+                    vacationApplicationList.add(vacationApplication);
 
-                if(vacationData.get("vacation") != null) vacationList.add((Vacation) vacationData.get("vacation"));
-                if(vacationData.get("history") != null)  vacationHistoryList.add((VacationHistory) vacationData.get("history"));
+                    if(vacationData.get("vacation") != null) vacationList.add((Vacation) vacationData.get("vacation"));
+                    if(vacationData.get("history") != null)  vacationHistoryList.add((VacationHistory) vacationData.get("history"));
+                }
             }
         }
 

@@ -11,6 +11,7 @@ export interface BaseDialogProps {
 	className?: string;
 	loading?: boolean;
 	onConfirm?: () => void;
+	onDelete?: () => void;
 	onClose?: () => void;
 	confirmLabel?: string;
 	maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
@@ -19,7 +20,19 @@ export interface BaseDialogProps {
 }
 
 export default function BaseDialog(props: BaseDialogProps) {
-	const { title, children, loading, onConfirm, onClose, confirmLabel = '저장', maxWidth = 'sm', fullWidth = false, className = '', paperSx } = props;
+	const {
+		title,
+		children,
+		loading,
+		onConfirm,
+		onDelete,
+		onClose,
+		confirmLabel = '저장',
+		maxWidth = 'sm',
+		fullWidth = false,
+		className = '',
+		paperSx,
+	} = props;
 	const router = useRouter();
 
 	const handleClose = () => {
@@ -52,6 +65,11 @@ export default function BaseDialog(props: BaseDialogProps) {
 				{onConfirm && (
 					<Button variant='contained' onClick={() => onConfirm?.()} disabled={loading}>
 						{loading ? <CircularProgress size={24} /> : confirmLabel}
+					</Button>
+				)}
+				{onDelete && (
+					<Button variant='contained' color='error' onClick={() => onDelete?.()} disabled={loading}>
+						{loading ? <CircularProgress size={24} /> : '삭제'}
 					</Button>
 				)}
 			</DialogActions>

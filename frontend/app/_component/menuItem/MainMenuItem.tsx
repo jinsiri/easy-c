@@ -1,5 +1,5 @@
 /** MUI */
-import { DashboardRounded, AssignmentIndRounded, WorkHistoryRounded, BeachAccessRounded, AssignmentRounded } from '@mui/icons-material';
+import { DashboardRounded, AssignmentIndRounded, WorkHistoryRounded, BeachAccessRounded, AssignmentRounded, CalendarMonthRounded } from '@mui/icons-material';
 
 /** Custom */
 import { menuType } from '@/type/types';
@@ -90,6 +90,27 @@ const MainMenuItem: menuType[] = [
 					},
 				],
 			},
+			{
+				id: 'main-schedule',
+				title: '일정관리',
+				type: '1depth',
+				url: '/schedule',
+				icon: CalendarMonthRounded,
+				children: [
+					{
+						id: 'main-schedule-user',
+						title: '개인 일정관리',
+						type: '2depth',
+						url: '/user',
+					},
+					{
+						id: 'main-schedule-dept',
+						title: '부서 일정관리',
+						type: '2depth',
+						url: '/dept',
+					},
+				],
+			},
 
 			/*{
 				id: 'main-mail',
@@ -97,13 +118,6 @@ const MainMenuItem: menuType[] = [
 				type: '1depth',
 				url: '/mail',
 				icon: EmailRounded,
-			},
-			{
-				id: 'main-board',
-				title: '게시판',
-				type: '1depth',
-				url: '/board',
-				icon: AssignmentRounded,
 			},
 			{
 				id: 'main-work',

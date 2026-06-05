@@ -21,7 +21,7 @@ public class AttendanceCalendarResponseDto {
     private AttendanceDayResponseDto detailData = new AttendanceDayResponseDto();
 
     public AttendanceCalendarResponseDto(Attendance entity) {
-        this.detailData = new AttendanceDayResponseDto(entity);
+        this.detailData =AttendanceDayResponseDto.fromEntity(entity);
     }
 
 }

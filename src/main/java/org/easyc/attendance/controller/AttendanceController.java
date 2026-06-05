@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.easyc.attendance.dto.*;
 import org.easyc.audit.activity.annotation.AuditAction;
 import org.easyc.attendance.service.AttendanceService;
+import org.easyc.schedule.dto.CalendarDayDto;
+import org.easyc.schedule.dto.CalendarRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +33,8 @@ public class AttendanceController {
     }
 
    @PostMapping("/calendar")
-    public List<Map<String, AttendanceCalendarResponseDto>>getAttendanceCalendarData(@RequestBody AttendanceRequestDto request) {
-       List<Map<String, AttendanceCalendarResponseDto>> result = attendanceService.getAttendanceCalendarData(request);
+    public List<Map<String, CalendarDayDto>>getAttendanceCalendarData(@RequestBody CalendarRequestDto request) {
+       List<Map<String, CalendarDayDto>> result = attendanceService.getAttendanceCalendarData(request);
         return result;
     }
 

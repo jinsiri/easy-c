@@ -25,12 +25,11 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
 	}, [isDownLg]);
 
 	return (
-		<Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100vw', height: '100vh' }}>
+		<Box sx={{ overflow: 'hidden', display: 'flex', justifyContent: 'space-between', width: '100vw', height: '100vh' }}>
 			<AdminSidebar drawerOpen={drawerOpen} headerHeight={headerHeight}></AdminSidebar>
 			<Box
 				component={'main'}
 				sx={{
-					overflow: 'auto',
 					display: 'flex',
 					flexDirection: 'column',
 					position: 'relative',
@@ -39,8 +38,10 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
 				}}
 			>
 				<Header drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} headerHeight={headerHeight}></Header>
-				<Box sx={{ width: '100%', flexGrow: 1 /*height: `calc(100% - ${headerHeight} - 48px)`*/ }}>{children}</Box>
-				<Footer />
+				<Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+					<Box sx={{ width: '100%', flexGrow: 1 /*height: `calc(100% - ${headerHeight} - 48px)`*/ }}>{children}</Box>
+					<Footer />
+				</Box>
 			</Box>
 		</Box>
 	);

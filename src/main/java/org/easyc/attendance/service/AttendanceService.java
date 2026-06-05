@@ -16,8 +16,17 @@ import org.easyc.member.repository.MemberProfileRepository;
 import org.easyc.member.repository.MemberRepository;
 import org.easyc.memberJobGradeMap.entity.MemberJobGradeMap;
 import org.easyc.memberJobGradeMap.repository.MemberJobGradeMapRepository;
+import org.easyc.schedule.constant.ScheduleType;
+import org.easyc.schedule.dto.CalendarDayDto;
+import org.easyc.schedule.dto.CalendarEventDto;
+import org.easyc.schedule.dto.CalendarRequestDto;
+import org.easyc.schedule.entity.Schedule;
+import org.easyc.schedule.repository.ScheduleRepository;
+import org.easyc.schedule.service.ScheduleService;
 import org.easyc.vacation.constant.VacationType;
 import org.easyc.vacation.entity.VacationApplication;
+import org.easyc.vacation.repository.VacationApplicationRepository;
+import org.easyc.vacation.service.VacationService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -36,12 +45,15 @@ public class AttendanceService {
     private final AttendanceApplicationRepository attendanceApplicationRepository;
     private final MemberRepository memberRepository;
     private final DeptMemberMapRepository deptMemberMapRepository;
-    private final MemberJobGradeMapRepository memberJobGradeMapRepository;
+    private final VacationApplicationRepository vacationApplicationRepository;
+    private final ScheduleRepository scheduleRepository;
+
+    private final VacationService vacationService;
 
     public AttendanceDayResponseDto getAttendanceUserData(AttendanceRequestDto req) {
         LocalDate workDate =  req.getWorkDate().toLocalDate();
         Attendance attendance = attendanceRepository.findByMemberIdAndWorkDateAndDeletedFalse(req.getMemberId(),workDate).orElse(new Attendance());
-        return new AttendanceDayResponseDto(attendance);
+        return AttendanceDayResponseDto.fromEntity(attendance);
     }
 
     public AttendanceResponseDto getAttendanceTodayData (AttendanceRequestDto req){
@@ -74,93 +86,36 @@ public class AttendanceService {
         return result;
     }
 
-    public List<Map<String, AttendanceCalendarResponseDto>> getAttendanceCalendarData(AttendanceRequestDto req) {
-        Long memberId = req.getMemberId();
+    public List<Map<String, CalendarDayDto>> getAttendanceCalendarData(CalendarRequestDto request) {
+        Long memberId = request.getMemberId();
 
-        Integer targetYear = req.getWorkDate().getYear();
-        Integer targetMonth = req.getWorkDate().getMonthValue();
-
-        YearMonth yearMonth = YearMonth.of(targetYear, targetMonth);
+        YearMonth yearMonth = YearMonth.of(request.getDate().getYear(), request.getDate().getMonthValue());
         LocalDate firstDay = yearMonth.atDay(1);
         LocalDate lastDay = yearMonth.atEndOfMonth();
 
-        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateAsc(memberId, firstDay, lastDay);
-        Map<Integer, Attendance> attendanceMap =
-                targetMonthAttendanceList.stream()
-                        .collect(Collectors.toMap(
-                                a -> a.getWorkDate().getDayOfMonth(),
-                                a -> a,
-                                (existing, replacement) -> existing,
-                                LinkedHashMap::new
-                        ));
-        List<HolidayCalendar> holidayCalendarList = holidayCalendarRepository.findByYearEquals(targetYear.toString());
-        Map<LocalDate,String> holidayMap = holidayCalendarList.stream()
-                .collect(Collectors.toMap(
-                        a -> a.getStartDate() ,
-                        a -> a.getSubject(),
-                        (existing, replacement) -> existing
-                ));
+        List<Map<String, CalendarDayDto>> calendarFrame = createCalendarFrame(firstDay, lastDay);
 
-        List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDate(memberId, firstDay, lastDay);
-        Map<Integer, List<AttendanceApplication>> changeRequestMap =
-                targetAttendanceChangeRequestList.stream()
-                        .collect(Collectors.groupingBy(
-                                a -> a.getWorkDate().getDayOfMonth()
-                        ));
+        List<Long> memberIds = List.of(memberId);
+        Map<LocalDate, List<CalendarEventDto>> vacationMap = vacationService.createVacationAppToCalendarMap(memberIds, firstDay, lastDay);
+        Map<LocalDate, List<CalendarEventDto>> scheduleMap = createRemoteToCalendarMap(memberIds, firstDay, lastDay);
+        Map<LocalDate, AttendanceDayResponseDto> attendanceMap = createAttendanceMap(memberId, firstDay, lastDay);
+        Map<LocalDate, List<AttendanceApplication>> attendanceApplicationMap = createAttendanceAppMap(memberIds, firstDay, lastDay);
 
-        String[] weekKeys = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
-        List<Map<String, AttendanceCalendarResponseDto>> calendarList = new ArrayList<>();
-        Map<String, AttendanceCalendarResponseDto> currentWeek = new LinkedHashMap<>();
+        List<Map<String, CalendarDayDto>> resultList =
+                calendarFrame.stream().map(dayMap -> {
+                    dayMap.forEach((key, dayDto) -> {
+                        LocalDate date = dayDto.getDate();
 
-        // 1일 시작 전 이전 달 날짜 채우기 ---
-        int firsrDayOfWeek = firstDay.getDayOfWeek().getValue();
-        int offset = firsrDayOfWeek - 1; // 월요일(1)이면 0, 수요일(3)이면 2
+                        dayDto.addEvents(vacationMap.getOrDefault(date, List.of()));
+                        dayDto.addEvents(scheduleMap.getOrDefault(date, List.of()));
+                        dayDto.addAttendance(attendanceMap.getOrDefault(date, new AttendanceDayResponseDto()));
+                        dayDto.addApplications(attendanceApplicationMap.getOrDefault(date, List.of()));
+                    });
 
-        if (offset > 0) {
-            LocalDate prevMonthCursor = firstDay.minusDays(offset);
-            for (int i = 0; i < offset; i++) {
-                currentWeek.put(weekKeys[i], createResDto(prevMonthCursor, null, false));
-                prevMonthCursor = prevMonthCursor.plusDays(1);
-            }
-        }
+                    return dayMap;
+                }).toList();
 
-        LocalDate cursor = firstDay;
-        while (!cursor.isAfter(lastDay)) {
-            DayOfWeek dayOfWeek = cursor.getDayOfWeek();
-            String key = weekKeys[dayOfWeek.getValue() - 1];
-
-            Attendance targetAttendance = attendanceMap.get(cursor.getDayOfMonth());
-            List<AttendanceApplication> targetAttendanceApplication = changeRequestMap.getOrDefault(cursor.getDayOfMonth(), new ArrayList<>());
-            AttendanceCalendarResponseDto dto = createResDto(cursor, targetAttendance, true );
-            AttendanceDayResponseDto dtoDetailData = dto.getDetailData();
-            dtoDetailData.setApplicationList(targetAttendanceApplication);
-
-            if(holidayMap.containsKey(cursor)){
-                dto.setIsHoliday(true);
-                dto.setHolidaySubject(holidayMap.get(cursor));
-            }
-
-            currentWeek.put(key, dto);
-
-            // 일요일이거나 월의 마지막 날이면 리스트에 추가
-            if (dayOfWeek == DayOfWeek.SUNDAY || cursor.equals(lastDay)) {
-
-                // 마지막 날이 일요일이 아니면 다음 달 날짜로 마저 채우기
-                if (cursor.equals(lastDay) && dayOfWeek != DayOfWeek.SUNDAY) {
-                    LocalDate nextMonthCursor = lastDay.plusDays(1);
-                    for (int i = dayOfWeek.getValue(); i < 7; i++) {
-                        currentWeek.put(weekKeys[i], createResDto(nextMonthCursor, null, false));
-                        nextMonthCursor = nextMonthCursor.plusDays(1);
-                    }
-                }
-
-                calendarList.add(currentWeek);
-                currentWeek = new LinkedHashMap<>();
-            }
-            cursor = cursor.plusDays(1);
-        }
-
-        return calendarList;
+        return resultList;
     }
 
     public void startAttendanceData (AttendanceSaveRequestDto req) {
@@ -207,22 +162,23 @@ public class AttendanceService {
             LocalDate currentDate = startDate.plusDays(i);
 
             Attendance prevAttendance = prevAttendanceMap.get(currentDate);
+            //해당 날짜에 데이터 있으면 지우고 새 근태 생성
             if(prevAttendance != null){
                 prevAttendance.delete();
                 attendanceList.add(prevAttendance);
             }
 
-            Attendance result = new Attendance();
-            result.setMemberId(application.getMemberId());
-            result.setMemberNm(application.getMemberNm());
-            result.setDeptNm(application.getDeptNm());
-            result.setJobGrade(application.getJobGrade());
-            result.setWorkDate(currentDate);
-            result.setWorkType(WorkType.NORMAL);
-            result.setWorkStatus(WorkStatus.VACATION);
-            result.setViolationReason(application.getViolationReason());
-            result.setVacationed(true);
-            result.setVacationType(application.getVacationType());
+            Attendance result = Attendance.builder()
+                    .memberId(application.getMemberId())
+                    .memberNm(application.getMemberNm())
+                    .deptNm(application.getDeptNm())
+                    .jobGrade(application.getJobGrade())
+                    .workDate(currentDate)
+                    .workType(WorkType.NORMAL)
+                    .workStatus(WorkStatus.VACATION)
+                    .violationReason(application.getViolationReason())
+                    .vacationAppId(application.getVacationApplicationId())
+                    .build();
 
             attendanceList.add(result);
         }
@@ -264,24 +220,6 @@ public class AttendanceService {
         return result;
     }
 
-    private AttendanceCalendarResponseDto createResDto(LocalDate date, Attendance attendance, boolean isCurrentMonth) {
-        AttendanceCalendarResponseDto dto = new AttendanceCalendarResponseDto();
-
-        if (attendance != null) {
-            dto = new AttendanceCalendarResponseDto(attendance);
-
-            AttendancePolicy targetPolicy = findAttendancePolicy(attendance.getMemberId());
-            dto.setDefaultStartTime(targetPolicy.getStartTime());
-            dto.setDefaultEndTime(targetPolicy.getEndTime());
-        }
-
-        dto.setYear(date.getYear());
-        dto.setMonth(date.getMonthValue());
-        dto.setDay(date.getDayOfMonth());
-        dto.setIsCurrentMonth(isCurrentMonth);
-        return dto;
-    }
-
     public Attendance updateAttendanceByStartTime(Attendance targetAttendance, AttendancePolicy targetPolicy, LocalDateTime startTime) {
         if(targetAttendance != null && targetPolicy != null) {
             int dayOfWeek = startTime.getDayOfWeek().getValue();
@@ -300,9 +238,15 @@ public class AttendanceService {
             }
 
             //근무 상태 판별 - 비정상출근(근로시간 외 출근) / 지각
+            VacationType vacationType = null;
+            if(targetAttendance.getVacationAppId() != null){
+                VacationApplication vacationApp = vacationApplicationRepository.findByVacationApplicationIdAndDeletedFalse(targetAttendance.getVacationAppId()).orElse(null);
+                if(vacationApp != null){ vacationType = vacationApp.getVacationType(); }
+            }
+
             LocalTime policyEndTime = targetPolicy.getEndTime();
             LocalTime policyCoreEndTime = targetPolicy.getCoreEndTime();
-            LocalTime limitTime = (targetAttendance.isVacationed() && VacationType.HALF_AM.equals(targetAttendance.getVacationType()))
+            LocalTime limitTime = (targetAttendance.getVacationAppId() != null && VacationType.HALF_AM.equals(vacationType))
                     ? targetPolicy.getHalfLeaveStartTime().plus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES)
                     : targetPolicy.getStartTime().plus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES);
 
@@ -330,7 +274,13 @@ public class AttendanceService {
             LocalTime currentEndTime = endTime.toLocalTime();
 
             //근무 상태 판별 - 비정상퇴근(7시까지 미퇴근) / 조퇴
-            LocalTime limitTime = (targetAttendance.isVacationed() && VacationType.HALF_PM.equals(targetAttendance.getVacationType()))
+            VacationType vacationType = null;
+            if(targetAttendance.getVacationAppId() != null){
+                VacationApplication vacationApp = vacationApplicationRepository.findByVacationApplicationIdAndDeletedFalse(targetAttendance.getVacationAppId()).orElse(null);
+                if(vacationApp != null){ vacationType = vacationApp.getVacationType(); }
+            }
+
+            LocalTime limitTime = (targetAttendance.getVacationAppId() != null && VacationType.HALF_PM.equals(vacationType))
                     ? targetPolicy.getHalfLeaveEndTime().minus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES)
                     : targetPolicy.getEndTime().minus(targetPolicy.getAllowMarginMinute(), ChronoUnit.MINUTES);
 
@@ -399,10 +349,22 @@ public class AttendanceService {
         Long workTime = Long.valueOf(0); //분 단위
         Long vacationTime = Long.valueOf(0); //분 단위
 
+        List<Long> vacationAppIdList = weekAttendanceData.stream()
+                .map(Attendance::getVacationAppId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        List<VacationApplication> vacationApplicationList = vacationApplicationRepository.findAllByVacationApplicationIdInAndDeletedFalse(vacationAppIdList);
+        Map<Long, VacationApplication> vacationApplicationMap = vacationApplicationList.stream().collect(Collectors.toMap(
+                a -> a.getVacationApplicationId() , a -> a));
+
         if(weekAttendanceData != null && weekAttendanceData.size() > 0) {
             for (Attendance attendance : weekAttendanceData) {
-                if(attendance.isVacationed()) {
-                    if(attendance.getVacationType().equals(VacationType.FULL) ){
+                if(attendance.getVacationAppId() != null) {
+                    VacationApplication targetVacationApp = vacationApplicationMap.get(attendance.getVacationAppId());
+
+                    if(targetVacationApp.getVacationType().equals(VacationType.FULL) ){
                         effectiveWorkDay -= 1;
                         effectiveWorkTime -= defaultDayWorkTime;
                         vacationTime +=  defaultDayWorkTime ;
@@ -422,23 +384,22 @@ public class AttendanceService {
             }
         }
 
-        AttendanceResponseDto resDto = new AttendanceResponseDto();
-        resDto.setAttendanceType(targetPolicy.getAttendanceType());
-        resDto.setSettlementPeriod(targetPolicy.getSettlementPeriod());
-        resDto.setWorktimeRule(targetPolicy.getWorktimeRule());
-        resDto.setStartTime(targetPolicy.getStartTime());
-        resDto.setEndTime(targetPolicy.getEndTime());
+        return AttendanceResponseDto.builder()
+                .attendanceType(targetPolicy.getAttendanceType())
+                .settlementPeriod(targetPolicy.getSettlementPeriod())
+                .worktimeRule(targetPolicy.getWorktimeRule())
+                .startTime(targetPolicy.getStartTime())
+                .endTime(targetPolicy.getEndTime())
+                .maxPolicyWorkTime(settlementPeriod.getMaxMinute())
+                .policyWorkDay(defaultTotalWorkDay)
+                .policyWorkTime(Long.valueOf(defaultTotalWorkTime))
+                .effectiveWorkDay(effectiveWorkDay)
+                .effectiveWorkTime(Long.valueOf(effectiveWorkTime))
+                .workDay(weekAttendanceData.size())
+                .workTime(workTime)
+                .vacationTime(vacationTime)
+                .build();
 
-        resDto.setMaxPolicyWorkTime(settlementPeriod.getMaxMinute());
-        resDto.setPolicyWorkDay(defaultTotalWorkDay);
-        resDto.setPolicyWorkTime(Long.valueOf(defaultTotalWorkTime));
-        resDto.setEffectiveWorkDay(effectiveWorkDay);
-        resDto.setEffectiveWorkTime(Long.valueOf(effectiveWorkTime));
-        resDto.setWorkDay(weekAttendanceData.size());
-        resDto.setWorkTime(workTime);
-        resDto.setVacationTime(vacationTime);
-
-        return resDto;
     }
 
     public Map<String, LocalDate> resolveDateRange(SettlementPeriod period, LocalDate today) {
@@ -495,4 +456,143 @@ public class AttendanceService {
     }
 
 
+    //
+    public Map<LocalDate, AttendanceDayResponseDto> createAttendanceMap(Long memberId, LocalDate firstDay, LocalDate lastDay){
+        List<Attendance> targetMonthAttendanceList = attendanceRepository.findAllByMemberIdAndWorkDateBetweenAndDeletedFalseOrderByWorkDateAsc(memberId, firstDay, lastDay);
+
+        Map<LocalDate, AttendanceDayResponseDto> calendarMap = new HashMap<>();
+        targetMonthAttendanceList.stream().forEach(attendance -> {
+            LocalDate date = attendance.getWorkDate();
+            calendarMap.put(date, AttendanceDayResponseDto.fromEntity(attendance));
+        });
+
+        return calendarMap;
+    }
+
+    public Map<LocalDate, List<CalendarEventDto>> createScheduleToCalendarMap(List<Long> memberIds, LocalDate firstDay, LocalDate lastDay, String calendarType){
+        List<Schedule> scheduleList;
+        if(calendarType.equals("DEPT")){
+            scheduleList = scheduleRepository.findByMemberIdInAndStartDateBetweenAndPublishedTrueAndDeletedFalse(memberIds, firstDay, lastDay);
+        }else{
+            scheduleList = scheduleRepository.findByMemberIdInAndStartDateBetweenAndDeletedFalse(memberIds, firstDay, lastDay);
+        }
+
+        Map<LocalDate, List<CalendarEventDto>> calendarMap = new HashMap<>();
+        for (Schedule schedule : scheduleList) {
+            LocalDate endDate = schedule.getEndDate();
+            LocalDate startDate = schedule.getStartDate();
+            long diff = endDate != null ? ChronoUnit.DAYS.between(startDate, endDate): 0;
+
+            for(int i = 0; i <= diff; i++) {
+                LocalDate targetDate = startDate.plusDays(i);
+                List<CalendarEventDto> list = calendarMap.getOrDefault(targetDate, new ArrayList<>());
+                CalendarEventDto dto = CalendarEventDto.fromSchedule(schedule);
+                list.add(dto);
+
+                calendarMap.put(targetDate, list);
+            }
+        }
+        return calendarMap;
+    }
+
+    public Map<LocalDate, List<CalendarEventDto>> createRemoteToCalendarMap(List<Long> memberIds, LocalDate firstDay, LocalDate lastDay){
+        List<Schedule> scheduleList = scheduleRepository.findByMemberIdInAndStartDateBetweenAndScheduleTypeInAndDeletedFalse(memberIds, firstDay, lastDay, List.of(ScheduleType.OUTSIDE, ScheduleType.BUSINESS_TRIP));
+
+        Map<LocalDate, List<CalendarEventDto>> calendarMap = new HashMap<>();
+        for (Schedule schedule : scheduleList) {
+            LocalDate endDate = schedule.getEndDate();
+            LocalDate startDate = schedule.getStartDate();
+            long diff = endDate != null ? ChronoUnit.DAYS.between(startDate, endDate): 0;
+
+            for(int i = 0; i <= diff; i++) {
+                LocalDate targetDate = startDate.plusDays(i);
+                List<CalendarEventDto> list = calendarMap.getOrDefault(targetDate, new ArrayList<>());
+                CalendarEventDto dto = CalendarEventDto.fromSchedule(schedule);
+                list.add(dto);
+
+                calendarMap.put(targetDate, list);
+            }
+        }
+        return calendarMap;
+    }
+
+    public Map<LocalDate, List<AttendanceApplication>> createAttendanceAppMap(List<Long> memberIds, LocalDate firstDay, LocalDate lastDay){
+        List<AttendanceApplication> targetAttendanceChangeRequestList = attendanceApplicationRepository.findAllByMemberIdInAndWorkDateBetweenAndDeletedFalseOrderByWorkDate(memberIds, firstDay, lastDay);
+        Map<LocalDate, List<AttendanceApplication>> changeRequestMap =
+                targetAttendanceChangeRequestList.stream()
+                        .collect(Collectors.groupingBy(
+                                a -> a.getWorkDate()
+                        ));
+
+        return changeRequestMap;
+    }
+
+    private Map<LocalDate,String> createHolidayMap(Integer targetYear){
+        List<HolidayCalendar> holidayCalendarList = holidayCalendarRepository.findByYearEquals(targetYear.toString());
+        Map<LocalDate,String> holidayMap = holidayCalendarList.stream()
+                .collect(Collectors.toMap(
+                        a -> a.getStartDate() ,
+                        a -> a.getSubject(),
+                        (existing, replacement) -> existing
+                ));
+
+        return holidayMap;
+    }
+
+    private CalendarDayDto createCalendarItem(LocalDate date, boolean isCurrentMonth, String holidaySubject){
+        CalendarDayDto calendarDayDto = CalendarDayDto.builder()
+                .date(date)
+                .isCurrentMonth(isCurrentMonth)
+                .isHoliday(holidaySubject != null)
+                .holidaySubject(holidaySubject)
+                .build();
+
+        return calendarDayDto;
+    }
+
+    public List<Map<String, CalendarDayDto>> createCalendarFrame(LocalDate firstDay, LocalDate lastDay){
+        String[] weekKeys = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
+        List<Map<String, CalendarDayDto>> calendarList = new ArrayList<>();
+        Map<String, CalendarDayDto> currentWeek = new LinkedHashMap<>();
+
+        Map<LocalDate,String> holidayMap = createHolidayMap(firstDay.getYear());
+
+        // 1일 시작 전 이전 달 날짜 채우기 ---
+        int offset = firstDay.getDayOfWeek().getValue() - 1; // 월요일(1)이면 0, 수요일(3)이면 2
+        if (offset > 0) {
+            LocalDate prevMonthCursor = firstDay.minusDays(offset);
+            for (int i = 0; i < offset; i++) {
+                CalendarDayDto calendarDayDto = createCalendarItem(prevMonthCursor, false, holidayMap.get(prevMonthCursor));
+                currentWeek.put(weekKeys[i], calendarDayDto);
+                prevMonthCursor = prevMonthCursor.plusDays(1);
+            }
+        }
+
+        LocalDate cursor = firstDay;
+        while (!cursor.isAfter(lastDay) || currentWeek.size() != 0) {
+            DayOfWeek dayOfWeek = cursor.getDayOfWeek();
+            String key = weekKeys[dayOfWeek.getValue() - 1];
+
+            currentWeek.put(key, createCalendarItem(cursor, cursor.getMonth() == firstDay.getMonth(), holidayMap.get(cursor)));
+
+            // 일요일이거나 월의 마지막 날이면 리스트에 추가
+            if (dayOfWeek == DayOfWeek.SUNDAY || cursor.equals(lastDay)) {
+
+                // 마지막 날이 일요일이 아니면 다음 달 날짜로 마저 채우기
+                if (cursor.equals(lastDay) && dayOfWeek != DayOfWeek.SUNDAY) {
+                    LocalDate nextMonthCursor = lastDay.plusDays(1);
+                    for (int i = dayOfWeek.getValue(); i < 7; i++) {
+                        currentWeek.put(weekKeys[i], createCalendarItem(nextMonthCursor, false, holidayMap.get(nextMonthCursor)));
+                        nextMonthCursor = nextMonthCursor.plusDays(1);
+                    }
+                }
+
+                calendarList.add(currentWeek);
+                currentWeek = new LinkedHashMap<>();
+            }
+            cursor = cursor.plusDays(1);
+        }
+
+        return calendarList;
+    }
 }

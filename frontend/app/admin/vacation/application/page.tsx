@@ -28,7 +28,7 @@ import { BASICSTATUS, PAGE_SIZE_OPTIONS } from '@/constant/commonConst';
 import { VACATIONTYPE } from '@/constant/attendanceConst';
 import { adminBasicColDef, getAdminBasicDetailColumn, getAdminBasicActionColumn } from '@/constant/commonColDef';
 import {
-	vacationApplicationDto,
+	vacationApplication,
 	vacationApplicationService,
 	VacationAppSearchRequestDto,
 	vacationApplicationDataDto,
@@ -210,7 +210,7 @@ export default function VacationApplicationPage() {
 	}, []);
 
 	const approveRejectData = useCallback(
-		async (type: 'reject' | 'approve', data: vacationApplicationDto[]) => {
+		async (type: 'reject' | 'approve', data: vacationApplication[]) => {
 			try {
 				if (type === 'reject') {
 					await vacationApplicationService.rejectAttendanceApplication(data);
@@ -248,7 +248,7 @@ export default function VacationApplicationPage() {
 			router.push('/vacation/user/modal?type=read');
 		};
 
-		const onClickEvent = async (type: 'reject' | 'approve', data: vacationApplicationDto) => {
+		const onClickEvent = async (type: 'reject' | 'approve', data: vacationApplication) => {
 			if (data !== null) {
 				approveRejectData(type, [data]);
 			}
@@ -258,16 +258,18 @@ export default function VacationApplicationPage() {
 			{
 				field: 'vacationType',
 				headerName: '휴가종류',
+				flex: 1,
 				valueFormatter: (param) => (param.value ? VACATIONTYPE[param.value] : '-'),
 			},
 			{
 				field: 'vacationDuration',
 				headerName: '휴가일수',
+				flex: 1,
 			},
 			{
 				field: 'time',
 				headerName: '휴가기간',
-				flex: 3,
+				flex: 2,
 				valueFormatter: (param) => {
 					const start = param.data?.startDate ? dayjs(param.data.startDate).format('YYYY-MM-DD') : '-';
 					const end = param.data?.endDate ? ` ~ ${dayjs(param.data.endDate).format('YYYY-MM-DD')}` : '';
@@ -280,7 +282,7 @@ export default function VacationApplicationPage() {
 	}, [router, setModalData, approveRejectData]);
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: 'grey.50' }}>
+		<Box className='main-wrap-fit' sx={{ backgroundColor: 'grey.50' }}>
 			<Box sx={{ padding: '0 1.5rem' }}>
 				<PathBreadcrumbs sx={{ mb: 0 }} />
 			</Box>
@@ -322,29 +324,32 @@ export default function VacationApplicationPage() {
 						</Button>
 					</Box>
 				</Grid>
-				<Grid sx={{ flexDirection: 'column', flexGrow: 1 }}>
-					<CustomAgGridComp
-						ref={gridRef}
-						rowData={gridData}
-						colDefs={colDefs}
-						rowSelectionMode='single'
-						enableClickSelection={false}
-						rowHeight={56}
-						isRowSelectable={(rowNode) => {
-							return rowNode.data.status ? rowNode.data.status === 'PENDING' : false;
-						}}
-						serverPagination={{
-							page,
-							pageSize,
-							totalElements,
-							pageSizeOptions: PAGE_SIZE_OPTIONS,
-							onPageChange: setPage,
-							onPageSizeChange: (s) => {
-								setPageSize(s);
-								setPage(0);
-							},
-						}}
-					/>
+				<Grid sx={{ flexDirection: 'column', flexGrow: 1, backgroundColor: 'background.default' }}>
+					{
+						<CustomAgGridComp
+							ref={gridRef}
+							rowData={gridData}
+							colDefs={colDefs}
+							rowSelectionMode='single'
+							enableClickSelection={false}
+							rowHeight={56}
+							isRowSelectable={(rowNode) => {
+								return rowNode.data.status ? rowNode.data.status === 'PENDING' : false;
+							}}
+							isColumnFit={false}
+							serverPagination={{
+								page,
+								pageSize,
+								totalElements,
+								pageSizeOptions: PAGE_SIZE_OPTIONS,
+								onPageChange: setPage,
+								onPageSizeChange: (s) => {
+									setPageSize(s);
+									setPage(0);
+								},
+							}}
+						/>
+					}
 				</Grid>
 			</Grid>
 		</Box>

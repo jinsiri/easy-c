@@ -3,6 +3,7 @@ package org.easyc.attendance.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.easyc.attendance.entity.Attendance;
 import org.easyc.attendance.constant.AttendanceType;
 import org.easyc.attendance.constant.SettlementPeriod;
@@ -13,6 +14,7 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@SuperBuilder
 public class AttendanceResponseDto {
     // 금일 데이터
     private AttendanceDayResponseDto dayData = new AttendanceDayResponseDto();
@@ -34,7 +36,7 @@ public class AttendanceResponseDto {
     private Long vacationTime;          //현재까지 휴가시간
 
     public AttendanceResponseDto(Attendance entity) {
-        this.dayData = new AttendanceDayResponseDto(entity);
+        this.dayData = AttendanceDayResponseDto.fromEntity(entity);
     }
 
     public void applyWeekData(AttendanceResponseDto weekData) {

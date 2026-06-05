@@ -60,10 +60,6 @@ public class ExcelAttendanceDto {
     @ExcelEnumDropdown(WorkStatus.class)
     private WorkStatus workStatus;
 
-    @ExcelProperty(value = "휴가 타입", index = 11, converter = EnumConverter.class)
-    @ExcelEnumDropdown(VacationType.class)
-    private VacationType vacationType;
-
     @ExcelProperty(value = "상세", index = 12)
     private String detail;
 
@@ -79,7 +75,6 @@ public class ExcelAttendanceDto {
         this.overTime = entity.getOverTime();
         this.workType = entity.getWorkType();
         this.workStatus = entity.getWorkStatus();
-        this.vacationType = entity.getVacationType();
         this.detail = entity.getDetail();
     }
 
