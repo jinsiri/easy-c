@@ -121,14 +121,14 @@ export const CalendarEventBarComp = ({
 		return (
 			<Box sx={{ overflow: 'hidden', display: 'flex', flexDirection: 'row' }}>
 				{_startDate === _endDate && _startTime && (
-					<Typography>
+					<Typography className='w-1/2 text-ellipsis'>
 						{dayjs(_startTime, 'HH:mm:ss').format('HH:mm')}
 						{_endTime && ' ~ ' + dayjs(_endTime, 'HH:mm:ss').format('HH:mm')}
 						&nbsp;&nbsp;&nbsp;&nbsp;
 					</Typography>
 				)}
 
-				<Typography className='text-ellipsis'>
+				<Typography className='w-1/2 text-ellipsis'>
 					{targetMemberId !== event.memberId && `[${event.memberNm}]  `} {event.scheduleData.scheduleName}
 				</Typography>
 			</Box>

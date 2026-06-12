@@ -356,7 +356,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 					display: 'flex',
 					flexDirection: 'column',
 					marginTop: '-1px',
-					//height: '40vh',
+					height: '30vh',
 					overflowY: 'auto',
 				}}
 			/>

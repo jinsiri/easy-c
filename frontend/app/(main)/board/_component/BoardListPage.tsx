@@ -73,7 +73,7 @@ export default function BoardListPage({ category, rowData, serverPagination, fil
 			<Box sx={{ padding: '0 1.5rem' }}>
 				<PathBreadcrumbs>
 					{canWrite && (
-						<Button variant='contained' size='small' onClick={() => router.push(`/board/write?category=${category}`)}>
+						<Button variant='contained' onClick={() => router.push(`/board/write?category=${category}`)}>
 							등록
 						</Button>
 					)}
