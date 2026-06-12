@@ -6,7 +6,15 @@ import secureLocalStorage from 'react-secure-storage';
 
 /** MUI */
 import { Box, Button, IconButton, Paper, Stack, Popper, Fade, List, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
-import { FormatIndentIncrease, PersonOutlineRounded, LoginRounded, LogoutRounded, ManageAccountsRounded, ContactsRounded } from '@mui/icons-material';
+import {
+	FormatIndentIncrease,
+	PersonOutlineRounded,
+	LoginRounded,
+	LogoutRounded,
+	ManageAccountsRounded,
+	ContactsRounded,
+	ExitToApp,
+} from '@mui/icons-material';
 import PopupState, { bindToggle, bindPopper } from 'material-ui-popup-state';
 import { authService } from '@/app/services/authService';
 import { useRouter } from 'next/navigation';
@@ -15,12 +23,13 @@ interface propsType {
 	drawerOpen: boolean;
 	setDrawerOpen: Dispatch<SetStateAction<boolean>>;
 	headerHeight: string;
+	mode?: string;
 }
 
 export default function Header(props: propsType) {
 	const router = useRouter();
 
-	const { drawerOpen, setDrawerOpen, headerHeight } = props;
+	const { drawerOpen, setDrawerOpen, headerHeight, mode } = props;
 	const [loginId, setLoginId] = useState<string | null>(null);
 	const [memberRole, setMemberRole] = useState<string | null>(null);
 
@@ -77,10 +86,17 @@ export default function Header(props: propsType) {
 			</Box>
 			<Box>
 				<Stack direction={'row'} spacing={'0.75rem'} sx={{ height: '100%', alignItems: 'center' }}>
-					{memberRole && memberRole === 'ROLE_ADMIN' && (
-						<Button component={Link} href='/admin/dept/list' target={'_blank'} variant='outlined' startIcon={<ManageAccountsRounded />}>
-							관리자 모드
+					{mode === 'admin' ? (
+						<Button component={Link} href='/' variant='outlined' startIcon={<ExitToApp />}>
+							관리자 모드 종료
 						</Button>
+					) : (
+						memberRole &&
+						memberRole === 'ROLE_ADMIN' && (
+							<Button component={Link} href='/admin/dept/list' variant='outlined' startIcon={<ManageAccountsRounded />}>
+								관리자 모드
+							</Button>
+						)
 					)}
 
 					<PopupState variant='popper' popupId='demo-popup-popper'>

@@ -39,7 +39,7 @@ export default function DeptJobTitleChangeDialog({ onClose, deptList, jobTitleLi
 
 	const handleSave = async () => {
 		if (selection.deptId || editingId !== null) {
-			await alert('현재 편집 중인 항목이 있습니다. 화살표 버튼을 눌러 적용을 완료해주세요.');
+			await alert('현재 편집 중인 항목이 있습니다. 편집 완료 후 확인을 눌러주세요!');
 			return;
 		}
 
