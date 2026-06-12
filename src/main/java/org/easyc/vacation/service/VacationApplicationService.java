@@ -59,7 +59,7 @@ public class VacationApplicationService {
         }else{
             application.setMemberNm(deptMemberMap.getMember().getMemberNm());
             application.setDeptNm(deptMemberMap.getDept().getDeptNm());
-            application.setJobGrade(deptMemberMap.getJobTitle().getJobTitleNm());
+            if(deptMemberMap.getJobTitle() != null) application.setJobGrade(deptMemberMap.getJobTitle().getJobTitleNm());
         }
         vacationApplicationRepository.save(application);
     }
