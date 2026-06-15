@@ -1,8 +1,10 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
-import { Box, Checkbox, Chip, Grid, IconButton, List, ListItem, OutlinedInput, Typography, useTheme } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+
+import { Box, Checkbox, Chip, Grid, IconButton, List, ListItem, OutlinedInput, Typography, useTheme } from '@mui/material';
 import { memberService } from '@/app/services/memberService';
 import { useContainerSize } from '@/app/_hooks/useContainerSize';
 import { CAREER_COL_DEFS, CERTIFICATION_COL_DEFS, LANGUAGE_COL_DEFS, REWARD_COL_DEFS } from '@/app/admin/member/_constant/formConst';
@@ -10,6 +12,9 @@ import CommonTabs from '@/app/_component/CommonTabs';
 import { getDisplayValue, transformGridData } from '@/app/admin/member/_utils/formUtil';
 import { CheckCircle, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import useRefreshStore from '@/store/useRefreshStore';
+
+/** Type & Interface */
+import { MemberResponseDto } from '@/app/services/memberService';
 
 // ========== 필드 매핑 정의 ==========
 // 상단 기본 인사정보 (카드 영역)
@@ -88,7 +93,7 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 	const theme = useTheme();
 	const { targetRef, width } = useContainerSize();
 
-	const [memberInfo, setMemberInfo] = useState<any>({});
+	const [memberInfo, setMemberInfo] = useState<MemberResponseDto>({});
 	const [deptMemberMapInfo, setDeptMemberMapInfo] = useState<any[]>([]);
 	const [basicInfo, setBasicInfo] = useState<any>({});
 	const [personalInfo, setPersonalInfo] = useState<any>({});
@@ -274,16 +279,23 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 					<Box
 						sx={{
 							display: 'flex',
+							flexDirection: 'row',
 							justifyContent: 'center',
 							alignItems: 'center',
-							width: '15%',
-							minWidth: '9rem',
+							width: '9rem',
+							height: '9rem',
 							overflow: 'hidden',
 						}}
 					>
-						<img src={'/images/blank_profile.png'} alt={'프로필'} style={{ maxWidth: '70%', borderRadius: '50%', objectFit: 'cover' }} />
+						<Image
+							src={memberInfo?.profileImagePath ?? '/images/blank_profile.png'}
+							alt={'프로필'}
+							style={{ width: '95%', borderRadius: '50%', objectFit: 'cover' }}
+							width={140}
+							height={140}
+						/>
 					</Box>
-					<Box sx={{ width: 'calc(80% - 1rem)', marginLeft: '1rem' }}>
+					<Box sx={{ flex: 1, width: 'calc(80% - 1rem)', marginLeft: '1rem' }}>
 						<List sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', width: '100%' }}>
 							{memberInfoFields.map(({ key, label }) => {
 								const combinedData = { ...memberInfo };
@@ -294,6 +306,9 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 									<ListItem
 										key={key}
 										sx={{
+											display: 'flex',
+											flexDirection: 'row',
+											alignItems: 'flex-start',
 											flexBasis: '33.33%',
 											minWidth: '14rem',
 											whiteSpace: 'nowrap',
@@ -301,39 +316,46 @@ export default function MemberDetail({ selectedId }: MemberDetailProps) {
 										}}
 									>
 										<Box sx={{ width: '6rem', textWrap: 'nowrap', fontSize: '0.875rem', color: theme.palette.grey[700] }}>{label}</Box>
-										<Box sx={{ width: 'calc(100% - 6rem)', textWrap: 'nowrap' }}>
+										<Box sx={{ display: 'flex', flexDirection: 'column', width: 'calc(100% - 6rem)', textWrap: 'nowrap', gap: 0.5 }}>
 											{key === 'deptMemberMapList' ? (
 												<>
 													{deptMemberMapInfo.length > 0 ? (
 														<>
-															{(isExpanded ? deptMemberMapInfo : [deptMemberMapInfo[0]]).map((m) => (
-																<Box key={m.deptMemberMapId} sx={{ display: 'flex' }}>
+															{(isExpanded ? deptMemberMapInfo : [deptMemberMapInfo[0]]).map((m, idx) => (
+																<Box
+																	key={m.deptMemberMapId}
+																	sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+																>
 																	<Chip
 																		label={`${m.deptNm}${m.jobTitleNm ? ` - ${m.jobTitleNm}` : ''}`}
 																		variant='outlined'
 																		color='primary'
 																		size='small'
 																	/>
-																	{m.isPrimary && <CheckCircle color='primary' sx={{ ml: '2px' }} />}
-																</Box>
-															))}
-
-															{deptMemberMapInfo.length > 1 && (
-																<Box component='span' onClick={toggleExpand}>
-																	{!isExpanded && (
-																		<Box component='span' sx={{ fontSize: '0.8rem', color: 'text.secondary', ml: 0.5 }}>
-																			외 {deptMemberMapInfo.length - 1}건
+																	{m.isPrimary && (
+																		<CheckCircle color='primary' sx={{ ml: '2px', width: '1rem', height: '1rem' }} />
+																	)}
+																	{idx === 0 && deptMemberMapInfo.length > 1 && (
+																		<Box component='span' onClick={toggleExpand}>
+																			{!isExpanded && (
+																				<Box
+																					component='span'
+																					sx={{ fontSize: '0.8rem', color: 'text.secondary', ml: 0.5 }}
+																				>
+																					외 {deptMemberMapInfo.length - 1}건
+																				</Box>
+																			)}
+																			<IconButton size='small' sx={{ p: 0, ml: 0.2 }}>
+																				{isExpanded ? (
+																					<KeyboardArrowUp fontSize='small' />
+																				) : (
+																					<KeyboardArrowDown fontSize='small' />
+																				)}
+																			</IconButton>
 																		</Box>
 																	)}
-																	<IconButton size='small' sx={{ p: 0, ml: 0.2 }}>
-																		{isExpanded ? (
-																			<KeyboardArrowUp fontSize='small' />
-																		) : (
-																			<KeyboardArrowDown fontSize='small' />
-																		)}
-																	</IconButton>
 																</Box>
-															)}
+															))}
 														</>
 													) : (
 														'소속 부서 미지정'

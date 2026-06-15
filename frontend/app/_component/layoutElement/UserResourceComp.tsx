@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import secureLocalStorage from 'react-secure-storage';
+import Image from 'next/image';
 
 /** Lib */
 import dayjs from 'dayjs';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Chip, Typography, useTheme } from '@mui/material';
 
 /** Custom */
 import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
@@ -31,11 +32,29 @@ export default function UserResorceComp({ userData, deptData }: { userData?: Mem
 		});
 	};
 
+	const primaryDept = useMemo(() => {
+		const filter = deptData?.filter((item) => item.isPrimary) ?? [];
+
+		return (
+			<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center' }}>
+				{filter.map((deptItem, deptIdx: number) => {
+					return (
+						<Chip
+							key={deptIdx}
+							label={`${deptItem.deptNm}${deptItem.jobTitleNm ? ` - ${deptItem.jobTitleNm}` : ''}`}
+							variant='outlined'
+							color='primary'
+							size='small'
+						/>
+					);
+				})}
+			</Box>
+		);
+	}, [deptData]);
+
 	useEffect(() => {
 		getScheduleData();
 	}, []);
-
-	console.log(userData, deptData);
 
 	return (
 		<Box
@@ -49,7 +68,7 @@ export default function UserResorceComp({ userData, deptData }: { userData?: Mem
 				gap: 2,
 			}}
 		>
-			<Box sx={{ position: 'relative', display: 'flex', flexDirection: 'row', width: '100%', height: '6rem', gap: 3 }}>
+			<Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
 				<Box
 					sx={{
 						flex: '0 0 auto',
@@ -58,6 +77,7 @@ export default function UserResorceComp({ userData, deptData }: { userData?: Mem
 						height: '6rem',
 						background: `linear-gradient(to bottom, ${theme.palette.primary.main}, ${theme.palette.point.main})`,
 						borderRadius: '50%',
+						mb: 1,
 					}}
 				>
 					<Box
@@ -76,45 +96,42 @@ export default function UserResorceComp({ userData, deptData }: { userData?: Mem
 							borderRadius: '50%',
 						}}
 					>
-						<Box
-							sx={{
-								width: '5rem',
-								height: '5rem',
-								borderRadius: '50%',
-								backgroundImage: 'url(/images/blank_profile.png)',
-								backgroundOrigin: 'border-box',
-								backgroundRepeat: 'no-repeat',
-								backgroundPosition: 'center',
-								backgroundSize: 'contain',
-							}}
-						></Box>
+						<Image
+							src={userData?.profileImagePath ?? '/images/blank_profile.png'}
+							alt={'프로필'}
+							style={{ borderRadius: '50%', objectFit: 'cover' }}
+							width={80}
+							height={80}
+						/>
 					</Box>
 				</Box>
-				<Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'start', height: '100%' }}>
-					<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'baseline', gap: 0.5, mb: 0.5 }}>
-						<Typography variant='subtitle1' sx={{ textWrap: 'noWrap', fontWeight: '700' }}>
+				<Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 0.5 }}>
+					<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'baseline' }}>
+						<Typography variant='subtitle1' sx={{ textWrap: 'noWrap', fontWeight: '700', mr: 0.5 }}>
 							{userData ? userData.memberNm : '-'}
 						</Typography>
 						<Typography sx={{ textWrap: 'noWrap', fontWeight: '600' }}>{userData ? userData.jobPosition?.jobPositionNm : '-'}</Typography>
 					</Box>
-					<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center', gap: 0.5 }}>
-						{deptData?.map((deptItem, deptIdx: number) => {
-							return (
-								<Typography key={deptIdx} variant='body2'>
-									{deptItem.deptNm}
-								</Typography>
-							);
-						})}
-					</Box>
+					{primaryDept}
 				</Box>
 			</Box>
-			<Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', flexGrow: 1, gap: 1 }}>
-				<ColTitleAndText subtitle={'오늘의 일정'} sx={{ flex: '1', borderRadius: '1rem', padding: '1rem 0.25rem' }}>
+			<Box
+				sx={{
+					display: 'flex',
+					flexDirection: 'row',
+					justifyContent: 'center',
+					alignItems: 'center',
+					width: '100%',
+					flexGrow: 1,
+					gap: 2,
+				}}
+			>
+				<ColTitleAndText subtitle={'오늘의 일정'} sx={{ borderRadius: '1rem', padding: '0 1rem' }}>
 					<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 						<Typography variant='h6'>{scheduleList.length}</Typography>
 					</Box>
 				</ColTitleAndText>
-				<ColTitleAndText subtitle={'오늘의 할 일'} sx={{ flex: '1', borderRadius: '1rem', padding: '1rem 0.25rem' }}>
+				<ColTitleAndText subtitle={'오늘의 할 일'} sx={{ borderRadius: '1rem', padding: '0 1rem' }}>
 					<Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
 						<Typography variant='h6'>{'0'}</Typography>
 					</Box>

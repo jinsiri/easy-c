@@ -48,6 +48,7 @@ public class MemberService {
 
     private final AttendancePolicyMapRepository attendancePolicyMapRepository;
     private final VacationPolicyMapRepository vacationPolicyMapRepository;
+    private final MemberProfileImageRepository memberProfileImageRepository;
 
     // 로그인 아이디 중복 체크
     public boolean isLoginIdDuplicate(String loginId) {
@@ -109,6 +110,9 @@ public class MemberService {
                 .orElseThrow(() -> new CustomException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         MemberResponseDto memberDto = MemberResponseDto.fromEntity(member);
+
+        MemberProfileImage memberProfileImage = memberProfileImageRepository.findByMemberId(memberId).orElse(null);
+        if(memberProfileImage != null) memberDto.setProfileImagePath(memberProfileImage.getMemberProfileImagePath());
 
         MemberJobPositionMapResponseDto positionMap = memberJobPositionMapService.getJobPositionByMemberId(memberId);
         if(positionMap != null) {

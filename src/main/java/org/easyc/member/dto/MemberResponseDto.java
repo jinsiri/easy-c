@@ -24,6 +24,7 @@ public class MemberResponseDto extends BaseDto {
     private String memberNmEn; // 영문 이름
     private MemberRole memberRole;
     private AccountStatus accountStatus;
+    private String profileImagePath;
 
     private MemberJobPositionMapResponseDto jobPosition;
     private MemberJobGradeMapResponseDto jobGrade;

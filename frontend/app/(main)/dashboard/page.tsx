@@ -111,13 +111,13 @@ export default function DashboardPage() {
 			spacing={2}
 			sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignContent: 'flex-start', padding: '1rem 1.5rem', width: '100%', height: '100%' }}
 		>
-			<Grid size={{ xs: 12, md: 6, lg: 3 }}>
+			<Grid size={{ xs: 12, md: 6, lg: 4 }}>
 				<UserResorceComp userData={memberInfo} deptData={deptMemberMapInfo} />
 			</Grid>
 			<Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
 				<AttendanceComp type={'home'} attendanceData={attendanceData} onSuccess={getAttendanceTodayData} />
 			</Grid>
-			<Grid size={{ xs: 12, md: 6, lg: 5 }} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
+			<Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ border: '1px solid', borderColor: 'grey.200', borderRadius: '1rem' }}>
 				<VacationComp type={'home'} vacationData={vacationData} onSuccess={getVacationData} />
 			</Grid>
 			<Grid size={{ xs: 12, md: 6, lg: 4 }}>

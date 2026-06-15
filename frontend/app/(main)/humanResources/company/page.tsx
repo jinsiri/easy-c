@@ -39,8 +39,6 @@ const _rowData: Record<string, any>[] = [
 ];
 
 export default function HumanResourceCompanyPage() {
-	const theme = useTheme();
-
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
 			<Box sx={{ padding: '0 1.5rem' }}>
