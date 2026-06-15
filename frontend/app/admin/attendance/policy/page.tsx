@@ -155,7 +155,7 @@ export default function AttendancePolicyPage() {
 									justifyContent: idx === 0 ? 'space-between' : 'end',
 									alignItems: 'center',
 									height: '3rem',
-									padding: '0.5rem',
+									padding: '0.5rem ',
 									gap: 0.5,
 								}}
 							>

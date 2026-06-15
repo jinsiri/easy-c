@@ -88,7 +88,7 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 			onClickExcelDown?.(data);
 		});
 
-		const controllerContents = (fieldItem) => {
+		const controllerContents = (fieldItem: FilterField) => {
 			switch (fieldItem.type) {
 				case 'select':
 					return (
@@ -286,7 +286,9 @@ const DetailSearchFilterComp = forwardRef<FilterRef, Props>(
 							)}
 
 							{/* 동적 필드 */}
-							{fields?.map((fieldItem) => <Box key={fieldItem.key}> {controllerContents(fieldItem)} </Box>)}
+							{fields?.map((fieldItem) => (
+								<Box key={fieldItem.key}> {controllerContents(fieldItem)} </Box>
+							))}
 						</Box>
 						<Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'nowrap', flexGrow: 1, gap: 1, mt: '0.5rem' }}>
 							<Button variant='contained' type='submit' onClick={handleSave}>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import secureLocalStorage from 'react-secure-storage';
 
 /** Lib */
@@ -131,7 +131,7 @@ export default function AttendanceUserListPage() {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
 			<Box sx={{ p: '1rem 1.5rem' }}>
-				<Button startIcon={<ArrowBackRounded fontSize='small' />} onClick={(e) => router.back()}>
+				<Button startIcon={<ArrowBackRounded fontSize='small' />} onClick={() => router.back()}>
 					뒤로 가기
 				</Button>
 			</Box>

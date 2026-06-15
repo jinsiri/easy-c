@@ -91,11 +91,11 @@ export default function UserResorceComp({ userData, deptData }: { userData?: Mem
 					</Box>
 				</Box>
 				<Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'start', height: '100%' }}>
-					<Box sx={{ display: 'flex', alignItems: 'baseline', mb: 0.5 }}>
-						<Typography variant='subtitle1' sx={{ fontWeight: '700' }}>
+					<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'baseline', gap: 0.5, mb: 0.5 }}>
+						<Typography variant='subtitle1' sx={{ textWrap: 'noWrap', fontWeight: '700' }}>
 							{userData ? userData.memberNm : '-'}
 						</Typography>
-						<Typography sx={{ marginLeft: '0.25rem', fontWeight: '600' }}>{userData ? userData.jobPosition?.jobPositionNm : '-'}</Typography>
+						<Typography sx={{ textWrap: 'noWrap', fontWeight: '600' }}>{userData ? userData.jobPosition?.jobPositionNm : '-'}</Typography>
 					</Box>
 					<Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', alignItems: 'center', gap: 0.5 }}>
 						{deptData?.map((deptItem, deptIdx: number) => {

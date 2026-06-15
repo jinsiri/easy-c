@@ -26,7 +26,7 @@ export default function Menu1Depth({ item, drawerOpen, prevUrl }: propsType) {
 	const [collapseOpen, setCollapseOpen] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
 
-	const onClickListItemButton = (event: React.MouseEvent<HTMLElement>) => {
+	const onClickListItemButton = () => {
 		setCollapseOpen(!collapseOpen);
 	};
 

@@ -15,11 +15,11 @@ import ColTitleAndText from '@/app/_component/layoutElement/ColTitleAndText';
 import { VACATIONPOLICYTYPE } from '@/constant/vacationConst';
 import { VacationDataDto } from '@/app/services/vacationService';
 
-const vacationList: Record<string, any>[] = [
+const vacationList: { key: keyof VacationDataDto; label: string }[] = [
 	{ key: 'grantedDay', label: '총 연차' },
 	{ key: 'remainDay', label: '잔여 연차' },
 	{ key: 'usedDay', label: '사용 연차' },
-	{ key: 'yearsOfService', label: '근속 년수' },
+	//{ key: 'yearsOfService', label: '근속 년수' },
 ];
 
 export default function VacationComp({ type, vacationData }: { type?: string; vacationData?: VacationDataDto; onSuccess?: () => void }) {

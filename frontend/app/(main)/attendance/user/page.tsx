@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import secureLocalStorage from 'react-secure-storage';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -13,7 +13,7 @@ import useModalStore from '@/store/useModalStore';
 import { useDialogStore } from '@/store/useDialogStore';
 
 /** MUI */
-import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
+import { Box, Button, Typography, useTheme } from '@mui/material';
 
 /** Ag Grid */
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
@@ -51,7 +51,7 @@ export default function AttendanceUserPage() {
 	const [attendanceAppData, setAttendanceData] = useState<AttendanceApplicationResponseDto[]>([]);
 	const [chartOption, setChartOption] = useState<Record<string, any>>({});
 
-	const getAttendanceTodayData = async () => {
+	const getAttendanceTodayData = useCallback(async () => {
 		if (!loader) setLoader(true);
 
 		try {
@@ -68,7 +68,7 @@ export default function AttendanceUserPage() {
 		} finally {
 			setLoader(false);
 		}
-	};
+	}, []);
 
 	const getAttendanceCalendarData = async (calendarDate: Dayjs) => {
 		const res = await attendanceService.getAttendanceCalendarData({
@@ -204,17 +204,17 @@ export default function AttendanceUserPage() {
 		}
 	};
 
-	const onChangeDateFunc = (calendarDate: Dayjs) => {
+	const onChangeDateFunc = useCallback((calendarDate: Dayjs) => {
 		//해당하는 달의 날짜 정보 및 달력에 표시할 데이터 불러오기
 		getAttendanceCalendarData(calendarDate);
 		getAttendancAppData(calendarDate);
-	};
+	}, []);
 
 	useEffect(() => {
 		//금일 및 금주 데이터
 		getAttendanceTodayData();
 		onChangeDateFunc(dayjs());
-	}, []);
+	}, [getAttendanceTodayData, onChangeDateFunc]);
 
 	useEffect(() => {
 		if (pathName === '/attendance/user' && isRefresh) {
@@ -339,7 +339,7 @@ export default function AttendanceUserPage() {
 					>
 						<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0.5rem 0.5rem 1rem' }}>
 							<Typography variant='subtitle1'>근태 수정 요청 내역</Typography>
-							<Button onClick={(e) => router.push(`/attendance/user/list`)}>더보기</Button>
+							<Button onClick={() => router.push(`/attendance/user/list`)}>더보기</Button>
 						</Box>
 						<Box sx={{ flexGrow: 1, height: '10rem', pb: '1rem', borderRadius: '1rem', backgroundColor: '#fff' }}>
 							<CustomAgGridComp

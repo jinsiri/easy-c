@@ -35,13 +35,13 @@ public class EasycApplication {
 			if (memberRepo.findByLoginId("admin").isEmpty()) {
 				createMemberIfNotExist(memberService,
 						"admin", "관리자", "admin", MemberRole.ROLE_ADMIN,
-						"admin001");
+						"EMP001");
 			}
 
 			if (memberRepo.findByLoginId("user1").isEmpty()) {
 				createMemberIfNotExist(memberService,
 						"user1", "사용자1", "user1", MemberRole.ROLE_USER,
-						"user001");
+						"EMP002");
 			}
 
 		};

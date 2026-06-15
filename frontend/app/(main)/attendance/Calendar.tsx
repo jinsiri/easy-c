@@ -56,21 +56,21 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 		{
 			header: '출근 시간',
 			key: 'startTime',
-			formatter: (value, row) => {
+			formatter: (value) => {
 				return <Typography>{value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}</Typography>;
 			},
 		},
 		{
 			header: '퇴근 시간',
 			key: 'endTime',
-			formatter: (value, row) => {
+			formatter: (value) => {
 				return <Typography>{value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-'}</Typography>;
 			},
 		},
 		{
 			header: '근로 타입',
 			key: 'workType',
-			formatter: (value, row) => {
+			formatter: (value) => {
 				return <Typography>{WORKTYPE[value as workType]}</Typography>;
 			},
 		},
@@ -90,21 +90,21 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 		{
 			header: '총 근로시간',
 			key: 'fullTime',
-			formatter: (value, row) => {
+			formatter: (value) => {
 				return formatMinutes(value);
 			},
 		},
 		{
 			header: '초과 근로시간',
 			key: 'overTime',
-			formatter: (value, row) => {
+			formatter: (value) => {
 				return formatMinutes(value);
 			},
 		},
 		{
 			header: '수정 요청 상세',
 			key: 'applicationList',
-			formatter: (value, row) => {
+			formatter: (value) => {
 				console.log(value);
 				if (value)
 					return (
@@ -112,7 +112,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 						value.length > 0 && (
 							<Box
 								sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', py: '6px' }}
-								onClick={(e) => {
+								onClick={() => {
 									setModalData(value);
 									router.push('/attendance/user/modal?mode=list');
 								}}
