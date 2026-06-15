@@ -1,7 +1,8 @@
 # 🏢 EASY-C (Groupware System)
-
 **EASY-C**는 기업의 효율적인 자원 관리와 협업을 위해 설계된 차세대 그룹웨어 시스템입니다.  
 Spring Boot와 Next.js의 최신 기능을 활용하여 견고한 백엔드 아키텍처와 반응형 UI를 제공합니다.
+
+![메인이미지](./readme/main.png)
 
 ---
 
@@ -19,6 +20,10 @@ Spring Boot와 Next.js의 최신 기능을 활용하여 견고한 백엔드 아�
 ## 🛠 Tech Stack
 
 ### **Backend (Spring Boot)**
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=flat-square&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/springboot-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![Postgres](https://img.shields.io/badge/postgresql-%23316192.svg?style=flat-square&logo=postgresql&logoColor=white)
+
 * **Framework**: Spring Boot 3.5.6 (Java 17)
 * **Database**: PostgreSQL
 * **ORM/Query**: Spring Data JPA & Querydsl 5.0 (Jakarta)
@@ -27,6 +32,11 @@ Spring Boot와 Next.js의 최신 기능을 활용하여 견고한 백엔드 아�
 * **Utility**: Lombok, Spring-Dotenv (환경 변수 관리), Hibernate Validator
 
 ### **Frontend (Next.js)**
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=flat-square&logo=javascript&logoColor=%23F7DF1E)
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat-square&logo=react&logoColor=%2361DAFB)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=flat-square&logo=typescript&logoColor=white)
+![Next JS](https://img.shields.io/badge/Next-black.svg?style=flat-square&logo=next.js&logoColor=white)
+
 * **Framework**: Next.js 15.1 (App Router)
 * **State Management**: Zustand (경량화된 상태 관리)
 * **UI Library**: Material UI (MUI) v7 & Emotion
@@ -36,3 +46,27 @@ Spring Boot와 Next.js의 최신 기능을 활용하여 견고한 백엔드 아�
 * **Communication**: Axios (HTTP Client)
 
 ---
+
+## 📝 Position
+
+**진실** <br>
+* 그룹웨어 기능 명세서 초안 작성 및 요구사항 정의 
+* 관리자/사용자 화면의 기본 와이어프레임 설계 참여 
+* 조직 및 인사 체계(부서·직급)의 트리 구조 기반 백엔드 설계 
+* 조직도 및 부서 관리 기능 화면 구현 
+* 관리자 모드(Admin) 주요 기능 개발 담당
+
+**푸름** <br>
+* 프로젝트 UI/UX 스타일 가이드 작성 
+* 관리자/사용자 화면의 기본 와이어프레임 설계 참여 
+* 근태 및 휴가 관리 시스템의 DB 모델링 및 백엔드 구조 설계 
+* 근태 정책 기반 일정 관리 및 기간별 통계 차트 기능 구현
+* 휴가 신청 프로세스 및 관련 비즈니스 로직 개발
+* 개인 및 부서 단위 일정 캘린더 기능 구현
+
+**민선** <br>
+* 관리자 및 사용자 플로우 차트 설계
+* 프로젝트 전체 ERD 설계 및 데이터 모델링
+* Spring Security 기반 인증·인가 체계 구축, Refresh Token 관리
+* 인사 정보 관리 DB 설계 및 관리 화면 구현
+* 게시판 기능 설계 및 개발
