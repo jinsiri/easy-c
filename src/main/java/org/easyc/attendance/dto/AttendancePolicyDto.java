@@ -66,7 +66,7 @@ public class AttendancePolicyDto {
         this.attendancePolicyDesc = entity.getAttendancePolicyDesc();
 
         this.attendanceType = entity.getAttendanceType();
-        this.workDayOfWeek = Arrays.stream(entity.getWorkDayOfWeek().split(",")).toList();
+        this.workDayOfWeek = Arrays.stream(entity.getWorkingDayOfWeek().split(",")).toList();
         this.settlementPeriod = entity.getSettlementPeriod();
         this.worktimeRule = entity.getWorktimeRule();
 
@@ -92,7 +92,7 @@ public class AttendancePolicyDto {
         attendancePolicy.setSettlementPeriod(this.settlementPeriod);
         attendancePolicy.setWorktimeRule(this.worktimeRule);
         attendancePolicy.setWorkingTimeDay(Integer.parseInt(this.targetHour) * 60 + Integer.parseInt(this.targetMinute));
-        attendancePolicy.setWorkDayOfWeek(this.workDayOfWeek.stream().collect(Collectors.joining(",")));
+        attendancePolicy.setWorkingDayOfWeek(this.workDayOfWeek.stream().collect(Collectors.joining(",")));
         attendancePolicy.setStartTime(this.startTime);
         attendancePolicy.setEndTime(this.endTime);
         attendancePolicy.setCoreStartTime(this.coreStartTime);

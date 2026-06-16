@@ -47,7 +47,7 @@ public class AttendancePolicy extends BaseEntity {
     private Integer workingTimeDay;
 
     @Column(name = "working_day_of_week")
-    private String workDayOfWeek;
+    private String workingDayOfWeek;
 
     @Column(name = "start_time")
     private LocalTime startTime;

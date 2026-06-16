@@ -231,7 +231,7 @@ public class AttendanceService {
 
             if(holidayData.isPresent()){
                 workType = WorkType.HOLIDAY;
-            } else if(!targetPolicy.getWorkDayOfWeek().contains(String.valueOf(dayOfWeek))){
+            } else if(!targetPolicy.getWorkingDayOfWeek().contains(String.valueOf(dayOfWeek))){
                 workType = WorkType.HOLIDAY;
             } else if (dayOfWeek >= 6) {
                 workType = WorkType.WEEKEND;
@@ -318,7 +318,8 @@ public class AttendanceService {
 
     public AttendancePolicy findAttendancePolicy(Long memberId) {
         AttendancePolicyMap attendancePolicyMap = attendancePolicyMapRepository.findTopByMemberIdAndActivedTrueOrderByMappingIdDesc(memberId).orElse(null);
-        AttendancePolicy attendancePolicy = attendancePolicyRepository.findByAttendancePolicyIdAndActiveTrue(attendancePolicyMap != null ? attendancePolicyMap.getAttendancePolicyId() : 1).orElseThrow();
+        Long policyId = attendancePolicyMap != null ? attendancePolicyMap.getAttendancePolicyId() : 1;
+        AttendancePolicy attendancePolicy = attendancePolicyRepository.findByAttendancePolicyIdAndActiveTrue(policyId).orElseThrow();
         return attendancePolicy;
     }
 
@@ -327,8 +328,9 @@ public class AttendanceService {
         List<HolidayCalendar> holidayCalendarList = holidayCalendarRepository.findByYearEquals(String.valueOf(workDate.getYear()));
         Map<LocalDate,String> holidayMap = holidayCalendarList.stream().collect(Collectors.toMap(a -> a.getStartDate() , a -> a.getSubject()));
 
+        String workingDayOfWeek = targetPolicy.getWorkingDayOfWeek();
         //단위 기간으로 근태 데이터 조회
-        Set<Integer> dayOfWeekSet =  Arrays.stream(targetPolicy.getWorkDayOfWeek().trim().split(",")).map(Integer::valueOf).collect(Collectors.toSet()); // 근무요일
+        Set<Integer> dayOfWeekSet =  Arrays.stream(workingDayOfWeek.trim().split(",")).map(Integer::valueOf).collect(Collectors.toSet()); // 근무요일
         SettlementPeriod settlementPeriod = targetPolicy.getSettlementPeriod(); // 정산 기준 단위
         Map<String, LocalDate> resolveDateRange = resolveDateRange(settlementPeriod, workDate);
         LocalDate start = resolveDateRange.get("start");
