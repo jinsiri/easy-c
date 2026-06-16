@@ -60,7 +60,7 @@ public class ExcelAttendanceDto {
     @ExcelEnumDropdown(WorkStatus.class)
     private WorkStatus workStatus;
 
-    @ExcelProperty(value = "상세", index = 12)
+    @ExcelProperty(value = "상세", index = 11)
     private String detail;
 
     public ExcelAttendanceDto(AttendanceDayResponseDto entity) {
