@@ -22,7 +22,7 @@ export const PIE_OPTION = {
 				alignTo: 'none',
 				fontSize: 18,
 				fontWeight: 'bold',
-				formatter: (params) => {
+				formatter: (params: { value?: unknown; name: string }) => {
 					// value가 0이면 label 숨김
 					return params.value === 0 ? '' : `${params.name}`;
 				},

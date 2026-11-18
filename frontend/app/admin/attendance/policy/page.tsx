@@ -100,7 +100,7 @@ export default function AttendancePolicyPage() {
 	};
 
 	const onClickUpdateButton = useCallback(
-		async (event: React.MouseEventHandler<HTMLButtonElement>, item: AttendancePolicyDto) => {
+		async (event: React.MouseEvent<HTMLButtonElement>, item: AttendancePolicyDto) => {
 			if (item.attendancePolicyId) {
 				setModalData(item);
 				router.push(`/admin/attendance/policy/data?target=${btoa(item.attendancePolicyId.toString())}`);
@@ -110,7 +110,7 @@ export default function AttendancePolicyPage() {
 	);
 
 	const onClickDeleteButton = useCallback(
-		async (event: React.MouseEventHandler<HTMLButtonElement>, item: AttendancePolicyDto) => {
+		async (event: React.MouseEvent<HTMLButtonElement>, item: AttendancePolicyDto) => {
 			try {
 				if (item.attendancePolicyId && confirm('정말 해당 정책을 삭제하시겠습니까?')) {
 					setLoader(true);
@@ -179,7 +179,7 @@ export default function AttendancePolicyPage() {
 										return (
 											<Box key={listIdx} sx={{ display: 'flex', flexDirection: 'row', marginBottom: '0.25rem' }}>
 												<Typography sx={{ width: '8rem' }}>{listItem.name}</Typography>
-												{listItem.valueFormatter ? listItem.valueFormatter(item) : <Box>{item[listItem.key]}</Box>}
+												{listItem.valueFormatter ? listItem.valueFormatter(item) : <Box>{(item as Record<string, any>)[listItem.key]}</Box>}
 											</Box>
 										);
 									})}

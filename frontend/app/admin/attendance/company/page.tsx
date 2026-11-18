@@ -14,7 +14,7 @@ import { Box, Grid, IconButton, Typography } from '@mui/material';
 import { ArrowLeftRounded, ArrowRightRounded } from '@mui/icons-material';
 
 /** Ag Grid */
-import { ColDef } from 'ag-grid-community';
+import { ColDef, ICellRendererParams, ValueFormatterParams } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
@@ -169,7 +169,7 @@ export default function AttendanceCompanyPage() {
 	);
 
 	const onChangeDatePicker = useCallback(
-		(value) => {
+		(value: dayjs.Dayjs | null) => {
 			if (value != null) {
 				setCalendarDate(value);
 			}
@@ -187,8 +187,8 @@ export default function AttendanceCompanyPage() {
 		}
 	}, [calendarDate, rowData]);
 
-	const colDefs: ColDef<Record<string, any>>[] = useMemo(
-		() => [
+	const colDefs = useMemo(
+		(): ColDef<Record<string, any>>[] => [
 			{ field: 'workDate', headerName: '근무일', flex: 1 },
 			{
 				field: 'member',
@@ -203,20 +203,20 @@ export default function AttendanceCompanyPage() {
 				field: 'workType',
 				headerName: '근로타입',
 				flex: 1,
-				valueFormatter: (param) => (param.data ? WORKTYPE[param.data.workType as workType] : '-'),
+				valueFormatter: (param: ValueFormatterParams) => (param.data ? WORKTYPE[param.data.workType as workType] : '-'),
 			},
 			{
 				field: 'workStatus',
 				headerName: '근로상태',
 				flex: 1,
-				valueFormatter: (param) => (param.data ? WORKSTATUS[param.data.workStatus as workStatus] : '-'),
+				valueFormatter: (param: ValueFormatterParams) => (param.data ? WORKSTATUS[param.data.workStatus as workStatus] : '-'),
 			},
 			{
 				field: 'time',
 				headerName: '근로시간',
 				flex: 3,
 				cellStyle: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
-				cellRenderer: (param) => (
+				cellRenderer: (param: ICellRendererParams) => (
 					<Box>
 						<Typography>총 근로시간(분): {formatMinutes(param.data.fullTime)}</Typography>
 						<Typography>출근시간: {param.data.startTime ? dayjs(param.data.startTime).format('HH:mm') : '-'}</Typography>

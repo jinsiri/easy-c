@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ICellRendererParams } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 /** Lib */
@@ -93,7 +95,7 @@ export default function AttendanceApplicationPage() {
 	const { setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 
-	const gridRef = useRef();
+	const gridRef = useRef<AgGridReact>(null);
 	const detailSearchFilterRef = useRef<FilterRef>(null);
 
 	const [gridData, setGridData] = useState<Record<string, any>[]>([]);
@@ -144,6 +146,7 @@ export default function AttendanceApplicationPage() {
 					memberId: null,
 					startDate: data.startDate ? data.startDate.format('YYYY-MM-DD') : null,
 					endDate: data.endDate ? data.endDate.format('YYYY-MM-DD') : null,
+					workDate: data.workDate ? data.workDate.format('YYYY-MM-DD') : null,
 				},
 			};
 
@@ -209,7 +212,7 @@ export default function AttendanceApplicationPage() {
 			{
 				field: 'summary',
 				headerName: '수정 내용',
-				cellRenderer: (param) => {
+				cellRenderer: (param: ICellRendererParams) => {
 					const valueList: string[] = param?.value ? param.value.split(',') : [];
 					return (
 						<Box sx={{ py: '6px' }}>

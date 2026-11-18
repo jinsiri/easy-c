@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { AgGridReact } from 'ag-grid-react';
 import { useRouter } from 'next/navigation';
 import secureLocalStorage from 'react-secure-storage';
 
@@ -65,7 +66,7 @@ export default function AttendanceUserListPage() {
 	const { alert } = useDialogStore();
 	const { setModalData } = useModalStore();
 
-	const gridRef = useRef();
+	const gridRef = useRef<AgGridReact>(null);
 	const detailSearchFilterRef = useRef<FilterRef>(null);
 
 	const [gridData, setGridData] = useState<Record<string, any>[]>([]);

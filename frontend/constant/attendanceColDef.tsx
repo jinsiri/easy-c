@@ -2,7 +2,7 @@
 import { Box, Button, Typography } from '@mui/material';
 
 /** Ag Grid */
-import { ColDef } from 'ag-grid-community';
+import { ColDef, ICellRendererParams } from 'ag-grid-community';
 
 /** Custom */
 import { getAppStatusColumn, getAdminBasicDetailColumn } from '@/constant/commonColDef';
@@ -23,7 +23,7 @@ export const colDefs = (onClickDetail: (data: any) => void, onClickRemove: (data
 			field: 'member',
 			headerName: '수정 근무자',
 			flex: 2,
-			cellRenderer: (param) => {
+			cellRenderer: (param: ICellRendererParams) => {
 				const deptNm = param.data?.deptNm;
 				const jobGrade = param.data?.jobGrade;
 
@@ -38,7 +38,7 @@ export const colDefs = (onClickDetail: (data: any) => void, onClickRemove: (data
 			field: 'summary',
 			headerName: '수정 내용',
 			flex: 2,
-			cellRenderer: (param) => {
+			cellRenderer: (param: ICellRendererParams) => {
 				const valueList: string[] = param?.value ? param.value.split(',') : [];
 				return (
 					<Box sx={{ py: '6px' }}>

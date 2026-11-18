@@ -144,7 +144,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 
 		if (target === activeCell) {
 			setActiveCell(null);
-			setActiveTimelineData([]);
+			setActiveTimelineData({ visibleTimeStart: undefined, visibleTimeEnd: undefined, data: [] });
 		} else {
 			setActiveCell(target);
 			setActiveTimelineData(makeTimelineData(target));
@@ -303,7 +303,7 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 																휴가
 															</Box>
 														)}
-													{item[subItem.key].detailData.workStatus === 'OUTSIDE' && (
+													{item[subItem.key].detailData.workStatus === 'REMOTE' && (
 														<Box
 															sx={{
 																padding: '0.125rem 0.5rem',
@@ -312,17 +312,6 @@ export default function Calendar({ calendarRow }: { calendarRow: Record<dayName,
 															}}
 														>
 															외근
-														</Box>
-													)}
-													{item[subItem.key].detailData.workStatus === 'BUSINESS_TRIP' && (
-														<Box
-															sx={{
-																padding: '0.125rem 0.5rem',
-																bgcolor: 'info.50',
-																color: 'info.500',
-															}}
-														>
-															출장
 														</Box>
 													)}
 												</Box>

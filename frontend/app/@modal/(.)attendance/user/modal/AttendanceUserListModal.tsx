@@ -6,7 +6,7 @@ import { useState, Dispatch, SetStateAction } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 
 /** Ag Grid */
-import { ColDef } from 'ag-grid-community';
+import { ColDef, ICellRendererParams } from 'ag-grid-community';
 import CustomAgGridComp from '@/app/_lib/CustomAgGridComp';
 
 /** Custom */
@@ -30,7 +30,7 @@ export default function AttendanceUserListModal({
 			field: 'status',
 			headerName: '상태',
 			flex: 1,
-			cellRenderer: (data) => (
+			cellRenderer: (data: ICellRendererParams) => (
 				<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
 					{data.value ? <GridStatusComp status={data.value} /> : '-'}
 				</Box>
@@ -40,7 +40,7 @@ export default function AttendanceUserListModal({
 			field: 'member',
 			headerName: '수정 근무자',
 			flex: 1,
-			cellRenderer: (param) => {
+			cellRenderer: (param: ICellRendererParams) => {
 				const deptNm = param.data?.deptNm;
 				const jobGrade = param.data?.jobGrade;
 
@@ -55,7 +55,7 @@ export default function AttendanceUserListModal({
 			field: 'summary',
 			headerName: '수정 내용',
 			flex: 2,
-			cellRenderer: (param) => {
+			cellRenderer: (param: ICellRendererParams) => {
 				const valueList: string[] = param?.value ? param.value.split(',') : [];
 				return (
 					<Box sx={{ py: '6px' }}>
@@ -69,7 +69,7 @@ export default function AttendanceUserListModal({
 		{
 			field: 'detail',
 			headerName: '상세',
-			cellRenderer: (param) => (
+			cellRenderer: (param: ICellRendererParams) => (
 				<Box
 					sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', py: '6px' }}
 					onClick={(e) => {

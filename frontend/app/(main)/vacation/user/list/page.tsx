@@ -181,10 +181,19 @@ export default function VacationUserListPage() {
 			type === 'vacationHistory'
 				? [...historyColDefs()]
 				: [
-						...colDefs((data: any) => {
-							setModalData(data);
-							router.push('/vacation/user/modal?type=read');
-						}),
+						...colDefs(
+							(data: any) => {
+								setModalData(data);
+								router.push('/vacation/user/modal?type=read');
+							},
+							async (data: any) => {
+								if (data.vacationApplicationId && confirm('휴가신청을 취소하시겠습니까?')) {
+									await vacationApplicationService.deleteVacationApplication(data.vacationApplicationId);
+									setGridData((prev) => prev.filter((item) => item.vacationApplicationId !== data.vacationApplicationId));
+									alert('휴가신청이 성공적으로 취소되었습니다.');
+								}
+							},
+						),
 					],
 		);
 

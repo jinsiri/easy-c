@@ -52,7 +52,7 @@ export default function CalendarComp({
 	const initialDate = searchParams.get('date') ? dayjs(searchParams.get('date')) : dayjs();
 	const [calendarDate, setCalendarDate] = useState<dayjs.Dayjs>(initialDate);
 
-	const onChangeDatePicker = (value) => {
+	const onChangeDatePicker = (value: dayjs.Dayjs | null) => {
 		if (value != null) {
 			setCalendarDate(value);
 		}

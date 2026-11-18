@@ -35,7 +35,7 @@ export default function AttendanceComp({
 
 	const [workingStatus, setWorkingStatus] = useState('BEFORE_WORK');
 	const [activated, setActived] = useState<boolean>(false);
-	const [workData, setWorkData] = useState<AttendanceResDto>({});
+	const [workData, setWorkData] = useState<AttendanceResDto>({} as AttendanceResDto);
 
 	useEffect(() => {
 		if (attendanceData && attendanceData.dayData) {

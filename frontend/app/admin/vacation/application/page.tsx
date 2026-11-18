@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ValueFormatterParams } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
 import { useRouter } from 'next/navigation';
 
 /** Lib */
@@ -150,7 +152,7 @@ export default function VacationApplicationPage() {
 	const { setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 
-	const gridRef = useRef();
+	const gridRef = useRef<AgGridReact>(null);
 	const detailSearchFilterRef = useRef<FilterRef>(null);
 
 	const [gridData, setGridData] = useState<Record<string, any>[]>([]);
@@ -259,7 +261,7 @@ export default function VacationApplicationPage() {
 				field: 'vacationType',
 				headerName: '휴가종류',
 				flex: 1,
-				valueFormatter: (param) => (param.value ? VACATIONTYPE[param.value] : '-'),
+				valueFormatter: (param: ValueFormatterParams) => (param.value ? VACATIONTYPE[param.value as keyof typeof VACATIONTYPE] : '-'),
 			},
 			{
 				field: 'vacationDuration',
@@ -270,7 +272,7 @@ export default function VacationApplicationPage() {
 				field: 'time',
 				headerName: '휴가기간',
 				flex: 2,
-				valueFormatter: (param) => {
+				valueFormatter: (param: ValueFormatterParams) => {
 					const start = param.data?.startDate ? dayjs(param.data.startDate).format('YYYY-MM-DD') : '-';
 					const end = param.data?.endDate ? ` ~ ${dayjs(param.data.endDate).format('YYYY-MM-DD')}` : '';
 					return start + end;

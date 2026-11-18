@@ -102,7 +102,7 @@ export const SheduleInputFormComp = forwardRef<SheduleInputFormRef>(({}, ref) =>
 
 	const handleDelete = () => {
 		if (confirm('정말 해당 일정을 삭제하시겠습니까?')) {
-			scheduleService.deleteUserSchedule(Number(id)).then(() => {
+			scheduleService.deleteUserSchedule(Number(modalData?.scheduleId)).then(() => {
 				if (confirm('요청이 성공적으로 등록되었습니다.')) {
 					resetModalData();
 					router.back();

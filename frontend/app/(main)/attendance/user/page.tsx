@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { AgGridReact } from 'ag-grid-react';
 import secureLocalStorage from 'react-secure-storage';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -44,9 +45,9 @@ export default function AttendanceUserPage() {
 	const { loader, setLoader } = useLoaderStore();
 	const { isRefresh, setIsRefresh, setModalData } = useModalStore();
 
-	const gridRef = useRef();
+	const gridRef = useRef<AgGridReact>(null);
 
-	const [attendanceData, setAttenceData] = useState<AttendanceResDto>({});
+	const [attendanceData, setAttenceData] = useState<AttendanceResDto>({} as AttendanceResDto);
 	const [calendarData, setCalendarData] = useState<Record<dayName, CalendarDayDto>[]>([]);
 	const [attendanceAppData, setAttendanceData] = useState<AttendanceApplicationResponseDto[]>([]);
 	const [chartOption, setChartOption] = useState<Record<string, any>>({});
@@ -142,7 +143,7 @@ export default function AttendanceUserPage() {
 							position: 'start',
 							fontFamily: 'Pretendard Variable',
 							color: theme.palette.grey[700],
-							formatter: (item) => formatMinutes(item.value),
+							formatter: (item: { value?: unknown }) => formatMinutes(item.value as number),
 						},
 						lineStyle: {
 							type: 'dashed',

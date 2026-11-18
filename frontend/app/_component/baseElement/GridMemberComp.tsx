@@ -10,17 +10,17 @@ export default function GridMemberComp({ memberNm, deptNm, jobGrade, policyNm }:
 		{
 			icon: <AccountCircleRounded fontSize='small' sx={{ ...style }} />,
 			label: memberNm,
-			variant: 'body1',
+			variant: 'body1' as const,
 		},
 		{
 			icon: <WorkRounded fontSize='small' sx={{ ...style }} />,
 			label: deptNm && jobGrade ? deptNm + ' / ' + jobGrade : '-',
-			variant: 'body2',
+			variant: 'body2' as const,
 		},
 		{
 			icon: <FeedRounded fontSize='small' sx={{ ...style }} />,
 			label: policyNm,
-			variant: 'body1',
+			variant: 'body1' as const,
 		},
 	];
 

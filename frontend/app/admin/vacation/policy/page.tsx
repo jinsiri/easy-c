@@ -81,7 +81,7 @@ export default function VacationPolicyPage() {
 	};
 
 	const onClickDeleteButton = useCallback(
-		async (event: React.MouseEventHandler<HTMLButtonElement>, item: VacationPolicyDto) => {
+		async (event: React.MouseEvent<HTMLButtonElement>, item: VacationPolicyDto) => {
 			try {
 				if (item.vacationPolicyId && confirm('정말 해당 정책을 삭제하시겠습니까?')) {
 					setLoader(true);
@@ -146,7 +146,7 @@ export default function VacationPolicyPage() {
 										return (
 											<Box key={listIdx} sx={{ display: 'flex', flexDirection: 'row', marginBottom: '0.25rem' }}>
 												<Typography sx={{ width: '8rem' }}>{listItem.name}</Typography>
-												{listItem.valueFormatter ? listItem.valueFormatter(item) : <Box>{item[listItem.key]}</Box>}
+												{listItem.valueFormatter ? listItem.valueFormatter(item) : <Box>{(item as Record<string, any>)[listItem.key]}</Box>}
 											</Box>
 										);
 									})}

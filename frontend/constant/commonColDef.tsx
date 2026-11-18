@@ -1,5 +1,5 @@
 /** Ag Grid */
-import { ColDef } from 'ag-grid-community';
+import { ColDef, ICellRendererParams } from 'ag-grid-community';
 
 /** Lib */
 import dayjs from 'dayjs';
@@ -40,12 +40,12 @@ export const getAdminBasicDetailColumn = (onClickDetail: (data: any) => void): C
 	cellRendererParams: { onClickDetail },
 });
 
-export const getAdminBasicActionColumn = (onClickAction: (data: any) => void): ColDef => ({
+export const getAdminBasicActionColumn = (onClickAction: (type: 'approve' | 'reject', data: any) => void): ColDef => ({
 	field: 'action',
 	headerName: '처리',
 	minWidth: 200,
 	flex: 2,
-	cellRenderer: (params) => {
+	cellRenderer: (params: ICellRendererParams) => {
 		if (params.data.status !== 'PENDING') return null;
 		return <GridActionButtonComp {...params} />;
 	},

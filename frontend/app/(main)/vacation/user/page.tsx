@@ -33,7 +33,7 @@ export default function VacationUserPage() {
 	const { loader, setLoader } = useLoaderStore();
 	const { setModalData } = useModalStore();
 
-	const [vacationData, setVacationData] = useState<VacationDataDto>(null);
+	const [vacationData, setVacationData] = useState<VacationDataDto | null>(null);
 	const [vacationHistory, setVacationHistory] = useState<VacationHistoryDto[]>([]);
 	const [vacationList, setVacationList] = useState<vacationApplicationDataDto[]>([]);
 
@@ -174,7 +174,7 @@ export default function VacationUserPage() {
 					}}
 				>
 					<Box sx={{ width: { sm: '100%', md: '50%' }, borderRight: '1px solid', borderColor: 'grey.300' }}>
-						<VacationComp vacationData={vacationData} />
+						<VacationComp vacationData={vacationData ?? undefined} />
 					</Box>
 					<Box sx={{ width: { sm: '100%', md: '50%' } }}>
 						<Box

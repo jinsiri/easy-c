@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { AgGridReact } from 'ag-grid-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 /** MUI */
@@ -32,7 +33,7 @@ export default function AttendancePolicyModal() {
 	const router = useRouter();
 	const { modalData, resetModalData } = useModalStore();
 
-	const gridRef = useRef();
+	const gridRef = useRef<AgGridReact>(null);
 
 	const [members, setMembers] = useState<Record<string, any>[]>([]);
 

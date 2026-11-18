@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Paper, Typography, Button, Container } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import useJobRoleForm from '@/app/admin/dept/_hooks/useJobRoleForm';

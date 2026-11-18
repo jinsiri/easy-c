@@ -5,11 +5,12 @@ import { Add, Delete } from '@mui/icons-material';
 import { Control, Controller, useFieldArray } from 'react-hook-form';
 import { MemberColDef } from '@/app/admin/member/_constant/formConst';
 import { makeEmptyRow } from '@/app/admin/member/_utils/formUtil';
+import type { MemberFormValues } from '@/app/admin/member/_component/MemberFormContainer';
 
 interface Props {
 	title: string;
 	name: 'careerList' | 'rewardDisciplineList' | 'qualificationList' | 'languageList';
-	control: Control<any>;
+	control: Control<MemberFormValues>;
 	cols: MemberColDef[];
 }
 
