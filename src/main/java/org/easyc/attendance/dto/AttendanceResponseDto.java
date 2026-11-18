@@ -1,5 +1,6 @@
 package org.easyc.attendance.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +18,7 @@ import java.time.LocalTime;
 @SuperBuilder
 public class AttendanceResponseDto {
     // 금일 데이터
+    @Builder.Default
     private AttendanceDayResponseDto dayData = new AttendanceDayResponseDto();
 
     //일주일 데이터
